@@ -3,6 +3,7 @@ import { createError } from "../shared/errors";
 
 export type EventErrorCode =
   | "EVENT_ARCHIVED"
+  | "EVENT_ALREADY_ACTIVE"
   | "TAG_SLUG_NOT_UNIQUE"
   | "PLACE_NOT_UNIQUE"
   | "TAG_NOT_FOUND"

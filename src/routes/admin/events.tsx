@@ -2,11 +2,11 @@ import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { Result } from "@praha/byethrow";
 import { listEvents } from "@/application/query/event/list-events";
-import type { EventListItem } from "@/application/query/event/list-events";
-import { Badge, Button, Code, Table } from "@/components/ui";
+import { EventStatusBadge } from "@/features/event/components";
+import { Button, Code, IconButton, Table } from "@/components/ui";
 import { css } from "styled-system/css";
 import { Flex, Stack } from "styled-system/jsx";
-import { PlusIcon } from "lucide-react";
+import { PencilIcon, PlusIcon } from "lucide-react";
 
 /**
  * Server function to load all events
@@ -66,6 +66,7 @@ function EventListPage() {
                 <Table.Header>スラッグ</Table.Header>
                 <Table.Header>ステータス</Table.Header>
                 <Table.Header>作成日</Table.Header>
+                <Table.Header>アクション</Table.Header>
               </Table.Row>
             </Table.Head>
             <Table.Body>
@@ -79,6 +80,13 @@ function EventListPage() {
                     <EventStatusBadge status={event.status} />
                   </Table.Cell>
                   <Table.Cell>{new Date(event.createdAt).toLocaleDateString("ja-JP")}</Table.Cell>
+                  <Table.Cell>
+                    <IconButton size="sm" variant="plain" aria-label="編集" asChild>
+                      <Link to="/admin/events/$eventId" params={{ eventId: event.id }}>
+                        <PencilIcon />
+                      </Link>
+                    </IconButton>
+                  </Table.Cell>
                 </Table.Row>
               ))}
             </Table.Body>
@@ -88,15 +96,4 @@ function EventListPage() {
       <Outlet />
     </div>
   );
-}
-
-/**
- * Event status badge component
- */
-function EventStatusBadge({ status }: { status: EventListItem["status"] }) {
-  if (status === "active") {
-    return <Badge variant="solid">Active</Badge>;
-  }
-
-  return <Badge variant="subtle">Archived</Badge>;
 }

@@ -17,6 +17,7 @@ import { Route as AdminEventsRouteImport } from './routes/admin/events'
 import { Route as PublicLoginRouteImport } from './routes/_public/login'
 import { Route as AuthenticatedTestRouteImport } from './routes/_authenticated/test'
 import { Route as ApiAuthSplatRouteImport } from './routes/api.auth.$'
+import { Route as AdminEventsEventIdRouteImport } from './routes/admin/events_.$eventId'
 import { Route as AdminEventsNewRouteImport } from './routes/admin/events.new'
 
 const AdminRoute = AdminRouteImport.update({
@@ -57,6 +58,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminEventsEventIdRoute = AdminEventsEventIdRouteImport.update({
+  id: '/events_/$eventId',
+  path: '/events/$eventId',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminEventsNewRoute = AdminEventsNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -70,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof PublicLoginRoute
   '/admin/events': typeof AdminEventsRouteWithChildren
   '/admin/events/new': typeof AdminEventsNewRoute
+  '/admin/events/$eventId': typeof AdminEventsEventIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
@@ -79,6 +86,7 @@ export interface FileRoutesByTo {
   '/login': typeof PublicLoginRoute
   '/admin/events': typeof AdminEventsRouteWithChildren
   '/admin/events/new': typeof AdminEventsNewRoute
+  '/admin/events/$eventId': typeof AdminEventsEventIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
@@ -91,6 +99,7 @@ export interface FileRoutesById {
   '/_public/login': typeof PublicLoginRoute
   '/admin/events': typeof AdminEventsRouteWithChildren
   '/admin/events/new': typeof AdminEventsNewRoute
+  '/admin/events_/$eventId': typeof AdminEventsEventIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
@@ -102,6 +111,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/events'
     | '/admin/events/new'
+    | '/admin/events/$eventId'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -111,6 +121,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/events'
     | '/admin/events/new'
+    | '/admin/events/$eventId'
     | '/api/auth/$'
   id:
     | '__root__'
@@ -122,6 +133,7 @@ export interface FileRouteTypes {
     | '/_public/login'
     | '/admin/events'
     | '/admin/events/new'
+    | '/admin/events_/$eventId'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
@@ -191,6 +203,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/events_/$eventId': {
+      id: '/admin/events_/$eventId'
+      path: '/events/$eventId'
+      fullPath: '/admin/events/$eventId'
+      preLoaderRoute: typeof AdminEventsEventIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/events/new': {
       id: '/admin/events/new'
       path: '/new'
@@ -238,10 +257,12 @@ const AdminEventsRouteWithChildren = AdminEventsRoute._addFileChildren(
 
 interface AdminRouteChildren {
   AdminEventsRoute: typeof AdminEventsRouteWithChildren
+  AdminEventsEventIdRoute: typeof AdminEventsEventIdRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminEventsRoute: AdminEventsRouteWithChildren,
+  AdminEventsEventIdRoute: AdminEventsEventIdRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)

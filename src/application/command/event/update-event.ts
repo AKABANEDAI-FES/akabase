@@ -1,0 +1,85 @@
+import { Result } from "@praha/byethrow";
+import { gen, suspend } from "@/libs/result";
+import type { EventId, UserId } from "@/domain/shared/ids";
+import type { Event } from "@/domain/event/schema";
+import type { EventError } from "@/domain/event/errors";
+import { eventError } from "@/domain/event/errors";
+import { canModifyEvent } from "@/domain/event/logic";
+import type { RepositoryError } from "@/infrastructure/repositories/interfaces";
+import type { Dependencies } from "@/infrastructure/di";
+
+/**
+ * Input for updating an event
+ */
+export type UpdateEventInput = {
+  eventId: EventId;
+  name: string;
+  slug: string;
+  userId: UserId;
+};
+
+/**
+ * Output of event update
+ */
+export type UpdateEventOutput = {
+  eventId: EventId;
+};
+
+/**
+ * Errors that can occur during event update
+ */
+export type UpdateEventError = EventError | RepositoryError;
+
+/**
+ * Update an existing event
+ *
+ * Business rules:
+ * - Event must exist
+ * - Archived events cannot be modified
+ * - Slug must be unique (excluding the event itself)
+ * - updatedAt is automatically updated
+ *
+ * @param deps - Dependencies (repositories)
+ * @param input - Event update input
+ * @returns Result with event ID or error
+ */
+export async function updateEvent(
+  deps: Pick<Dependencies, "eventRepo">,
+  input: UpdateEventInput,
+): Result.ResultAsync<UpdateEventOutput, UpdateEventError> {
+  return suspend(() =>
+    gen(async function* ($) {
+      // Fetch the event
+      const event = yield* $(await deps.eventRepo.findById(input.eventId));
+
+      if (!event) {
+        return yield* $(Result.fail(eventError("EVENT_NOT_FOUND", "イベントが見つかりません")));
+      }
+
+      // Check if event can be modified (not archived)
+      yield* $(canModifyEvent(event));
+
+      // Check if slug is unique (exclude current event)
+      const existingEvent = yield* $(await deps.eventRepo.findBySlug(input.slug));
+
+      if (existingEvent && existingEvent.id !== input.eventId) {
+        return yield* $(
+          Result.fail(eventError("SLUG_NOT_UNIQUE", "このスラッグは既に使用されています")),
+        );
+      }
+
+      // Update event entity
+      const updatedEvent: Event = {
+        ...event,
+        name: input.name,
+        slug: input.slug,
+        updatedAt: new Date(),
+      };
+
+      // Save updated event to database
+      yield* $(await deps.eventRepo.updateEvent(updatedEvent));
+
+      return { eventId: input.eventId };
+    }),
+  );
+}
