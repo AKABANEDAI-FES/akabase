@@ -33,7 +33,7 @@ const mockDraft: DraftWithTags = {
 describe("submitProject", () => {
   it("should successfully submit project", async () => {
     // Arrange
-    const mockDeps: Dependencies = {
+    const mockDeps: Pick<Dependencies, "projectRepo"> = {
       projectRepo: {
         findById: vi.fn().mockResolvedValue(Result.succeed(mockProject)),
         findDraftWithTags: vi.fn().mockResolvedValue(Result.succeed(mockDraft)),
@@ -62,7 +62,7 @@ describe("submitProject", () => {
 
   it("should fail when project not found", async () => {
     // Arrange
-    const mockDeps: Dependencies = {
+    const mockDeps: Pick<Dependencies, "projectRepo"> = {
       projectRepo: {
         findById: vi.fn().mockResolvedValue(Result.succeed(null)),
         findDraftWithTags: vi.fn(),
@@ -86,7 +86,7 @@ describe("submitProject", () => {
 
   it("should fail when draft not found", async () => {
     // Arrange
-    const mockDeps: Dependencies = {
+    const mockDeps: Pick<Dependencies, "projectRepo"> = {
       projectRepo: {
         findById: vi.fn().mockResolvedValue(Result.succeed(mockProject)),
         findDraftWithTags: vi.fn().mockResolvedValue(Result.succeed(null)),
@@ -115,7 +115,7 @@ describe("submitProject", () => {
       activeSubmissionId: "existing_sub" as SubmissionId,
     };
 
-    const mockDeps: Dependencies = {
+    const mockDeps: Pick<Dependencies, "projectRepo"> = {
       projectRepo: {
         findById: vi.fn().mockResolvedValue(Result.succeed(projectWithActiveSubmission)),
         findDraftWithTags: vi.fn().mockResolvedValue(Result.succeed(mockDraft)),
@@ -143,7 +143,7 @@ describe("submitProject", () => {
 
   it("should fail when repository operation fails", async () => {
     // Arrange
-    const mockDeps: Dependencies = {
+    const mockDeps: Pick<Dependencies, "projectRepo"> = {
       projectRepo: {
         findById: vi.fn().mockResolvedValue(Result.succeed(mockProject)),
         findDraftWithTags: vi.fn().mockResolvedValue(Result.succeed(mockDraft)),
@@ -172,7 +172,7 @@ describe("submitProject", () => {
 
   it("should set activeSubmissionId on the project", async () => {
     // Arrange
-    const mockDeps: Dependencies = {
+    const mockDeps: Pick<Dependencies, "projectRepo"> = {
       projectRepo: {
         findById: vi.fn().mockResolvedValue(Result.succeed(mockProject)),
         findDraftWithTags: vi.fn().mockResolvedValue(Result.succeed(mockDraft)),

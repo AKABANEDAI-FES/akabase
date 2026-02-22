@@ -46,7 +46,7 @@ export type SubmitProjectError = ProjectError | RepositoryError;
  * - Clean separation: Domain logic is pure, side effects in repositories
  */
 export function submitProject(
-  deps: Dependencies,
+  deps: Pick<Dependencies, "projectRepo">,
   input: SubmitProjectInput,
 ): Result.ResultAsync<SubmitProjectOutput, SubmitProjectError> {
   return suspend(() =>
@@ -79,7 +79,7 @@ export function submitProject(
       yield* $(canSubmit(projectResult));
 
       // 4. Create submission snapshot from draft (domain logic - pure function)
-      const submissionId = generateId() as SubmissionId;
+      const submissionId = generateId<SubmissionId>();
       const submission = createSubmissionFromDraft(draftResult, input.userId, submissionId);
 
       // 5. Update project with active submission ID (domain logic - pure function)
