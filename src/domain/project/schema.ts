@@ -48,7 +48,7 @@ export const projectSubmissionSchema = z.object({
   id: z.custom<SubmissionId>(),
   projectId: z.custom<ProjectId>(),
   status: submissionStatusSchema,
-  pamphletText: z.string().nullable(),
+  pamphletText: z.string().max(120).nullable(),
   webContentJson: z.json().nullable(),
   submittedAt: z.date(),
   submittedBy: z.custom<UserId>(),
@@ -64,7 +64,7 @@ export type ProjectSubmission = z.infer<typeof projectSubmissionSchema>;
  */
 export const projectPublishedSchema = z.object({
   projectId: z.custom<ProjectId>(),
-  pamphletText: z.string().nullable(),
+  pamphletText: z.string().max(120).nullable(),
   webContentJson: z.json().nullable(),
   publishedAt: z.date(),
   publishedBy: z.custom<UserId>(),

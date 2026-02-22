@@ -240,7 +240,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
       await db.insert(projectDrafts).values({
         projectId: draft.projectId,
         pamphletText: draft.pamphletText,
-        webContentJson: draft.webContentJson as Record<string, unknown>,
+        webContentJson: draft.webContentJson,
         updatedAt: draft.updatedAt,
         updatedBy: draft.updatedBy,
       });
@@ -288,7 +288,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         .update(projectDrafts)
         .set({
           pamphletText: draft.pamphletText,
-          webContentJson: draft.webContentJson as Record<string, unknown>,
+          webContentJson: draft.webContentJson,
           updatedAt: draft.updatedAt,
           updatedBy: draft.updatedBy,
         })
@@ -323,7 +323,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         projectId: submission.projectId,
         status: submission.status,
         pamphletText: submission.pamphletText,
-        webContentJson: submission.webContentJson as Record<string, unknown>,
+        webContentJson: submission.webContentJson,
         submittedAt: submission.submittedAt,
         submittedBy: submission.submittedBy,
         decidedAt: submission.decidedAt,
@@ -374,7 +374,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         .values({
           projectId: published.projectId,
           pamphletText: published.pamphletText,
-          webContentJson: published.webContentJson as Record<string, unknown>,
+          webContentJson: published.webContentJson,
           publishedAt: published.publishedAt,
           publishedBy: published.publishedBy,
         })
@@ -382,7 +382,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
           target: projectPublished.projectId,
           set: {
             pamphletText: published.pamphletText,
-            webContentJson: published.webContentJson as Record<string, unknown>,
+            webContentJson: published.webContentJson,
             publishedAt: published.publishedAt,
             publishedBy: published.publishedBy,
           },

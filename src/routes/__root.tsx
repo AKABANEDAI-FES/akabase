@@ -9,6 +9,7 @@ import appCss from "../styles.css?url";
 import type { QueryClient } from "@tanstack/react-query";
 import { getSessionFn } from "@/libs/session-server";
 import type { SessionData } from "@/libs/session-server";
+import { Toaster } from "@/components/ui";
 
 interface MyRouterContext {
   queryClient: QueryClient;
@@ -54,6 +55,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
+        <Toaster />
         <TanStackDevtools
           config={{
             position: "bottom-right",

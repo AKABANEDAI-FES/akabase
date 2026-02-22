@@ -136,11 +136,11 @@ export const dialog = defineSlotRecipe({
       none: {},
     },
     size: {
-      xs: { content: { maxW: "xs" } },
-      sm: { content: { maxW: "sm" } },
-      md: { content: { maxW: "md" } },
-      lg: { content: { maxW: "lg" } },
-      xl: { content: { maxW: "xl" } },
+      xs: { content: { maxW: "min(95vw, token(sizes.xs))" } },
+      sm: { content: { maxW: "min(95vw, token(sizes.sm))" } },
+      md: { content: { maxW: "min(95vw, token(sizes.md))" } },
+      lg: { content: { maxW: "min(95vw, token(sizes.lg))" } },
+      xl: { content: { maxW: "min(95vw, token(sizes.xl))" } },
       cover: {
         positioner: { padding: "8" },
         content: {

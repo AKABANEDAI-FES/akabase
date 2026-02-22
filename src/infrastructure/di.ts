@@ -1,4 +1,5 @@
-import type { ProjectRepository } from "./repositories/interfaces";
+import type { EventRepository, ProjectRepository } from "./repositories/interfaces";
+import { EventRepositoryImpl } from "./repositories/event-repository";
 import { ProjectRepositoryImpl } from "./repositories/project-repository";
 
 /**
@@ -7,8 +8,8 @@ import { ProjectRepositoryImpl } from "./repositories/project-repository";
  */
 export type Dependencies = {
   projectRepo: ProjectRepository;
+  eventRepo: EventRepository;
   // organizationRepo: OrganizationRepository; // TODO: Implement
-  // eventRepo: EventRepository;               // TODO: Implement
   // userRepo: UserRepository;                 // TODO: Implement
 };
 
@@ -20,8 +21,8 @@ export type Dependencies = {
 export function createDependencies(): Dependencies {
   return {
     projectRepo: new ProjectRepositoryImpl(),
+    eventRepo: new EventRepositoryImpl(),
     // organizationRepo: new OrganizationRepositoryImpl(),
-    // eventRepo: new EventRepositoryImpl(),
     // userRepo: new UserRepositoryImpl(),
   };
 }

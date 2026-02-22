@@ -32,15 +32,18 @@ export type RepositoryErrorCode =
 export type RepositoryError = {
   code: RepositoryErrorCode;
   message: string;
-  originalError?: unknown;
 };
 
 export function repositoryError(
   code: RepositoryErrorCode,
   message: string,
-  originalError?: unknown,
+  error?: unknown,
 ): RepositoryError {
-  return { code, message, originalError };
+  // Log the underlying error for debugging purposes
+  if (error) {
+    console.error(`[RepositoryError] ${code}: ${message}`, error);
+  }
+  return { code, message };
 }
 
 /**

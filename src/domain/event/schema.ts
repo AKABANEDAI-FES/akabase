@@ -14,8 +14,14 @@ export type EventStatus = z.infer<typeof eventStatusSchema>;
  */
 export const eventSchema = z.object({
   id: z.custom<EventId>(),
-  name: z.string(),
-  slug: z.string(),
+  name: z
+    .string()
+    .min(1, "イベント名を入力してください")
+    .max(100, "イベント名は100文字以内で入力してください"),
+  slug: z
+    .string()
+    .min(1, "スラッグを入力してください")
+    .regex(/^[a-z0-9-]+$/, "スラッグは小文字英数字とハイフンのみ使用できます"),
   status: eventStatusSchema,
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -30,8 +36,11 @@ export type Event = z.infer<typeof eventSchema>;
 export const tagSchema = z.object({
   id: z.custom<TagId>(),
   eventId: z.custom<EventId>(),
-  name: z.string(),
-  slug: z.string(),
+  name: z.string().min(1).max(100),
+  slug: z
+    .string()
+    .min(1)
+    .regex(/^[a-z0-9-]+$/),
   createdAt: z.date(),
 });
 
@@ -44,8 +53,11 @@ export type Tag = z.infer<typeof tagSchema>;
 export const placeSchema = z.object({
   id: z.custom<PlaceId>(),
   eventId: z.custom<EventId>(),
-  name: z.string(),
-  slug: z.string(),
+  name: z.string().min(1).max(100),
+  slug: z
+    .string()
+    .min(1)
+    .regex(/^[a-z0-9-]+$/),
   createdAt: z.date(),
 });
 

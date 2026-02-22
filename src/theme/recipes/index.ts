@@ -1,3 +1,4 @@
+import { code } from "./code";
 import { icon } from "./icon";
 import { textarea } from "./textarea";
 import { pagination } from "./pagination";
@@ -45,5 +46,6 @@ export const recipes = {
   pagination,
   textarea,
   icon,
+  code,
 };
 export const slotRecipes = {};

@@ -37,3 +37,7 @@ export type FeedbackThreadId = z.infer<typeof feedbackThreadIdSchema>;
 
 export const feedbackMessageIdSchema = z.string().brand<"FeedbackMessageId">();
 export type FeedbackMessageId = z.infer<typeof feedbackMessageIdSchema>;
+
+export function cast<T extends string>(id: string): T {
+  return z.string().parse(id) as T;
+}

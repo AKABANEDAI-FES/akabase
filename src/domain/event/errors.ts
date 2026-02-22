@@ -9,7 +9,8 @@ export type EventErrorCode =
   | "PLACE_NOT_FOUND"
   | "DEADLINE_NOT_FOUND"
   | "FIELD_PAST_DEADLINE"
-  | "EVENT_NOT_FOUND";
+  | "EVENT_NOT_FOUND"
+  | "SLUG_NOT_UNIQUE";
 
 export type EventError = BaseError<EventErrorCode>;
 
