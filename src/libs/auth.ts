@@ -19,6 +19,12 @@ export const auth = betterAuth({
       hd: "toyo.jp",
     },
   },
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60, // Cache duration: 5 minutes
+    },
+  },
   databaseHooks: {
     user: {
       create: {
