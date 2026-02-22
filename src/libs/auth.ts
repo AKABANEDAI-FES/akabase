@@ -28,6 +28,15 @@ export const auth = betterAuth({
               message: "Email must be verified and belong to @toyo.jp domain.",
             });
           }
+          if (env.ADMIN_EMAILS.includes(user.email as (typeof env.ADMIN_EMAILS)[number])) {
+            return {
+              data: {
+                ...user,
+                role: "admin",
+              },
+            };
+          }
+          return { data: user };
         },
       },
     },
