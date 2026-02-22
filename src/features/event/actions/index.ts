@@ -1,2 +1,2 @@
-export * from "./event-mutations";
-export * from "./event-queries";
+export * from "./mutations";
+export * from "./queries";
