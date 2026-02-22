@@ -386,27 +386,18 @@ src/
 │   ├── _public.tsx
 │   └── ...
 │
-├── components/                   # React コンポーネント（既存）
-│   ├── features/                 # 機能別コンポーネント
-│   │   ├── project/
-│   │   │   ├── ProjectDraftEditor.tsx
-│   │   │   ├── SubmissionList.tsx
-│   │   │   └── PublishedPreview.tsx
-│   │   ├── organization/
-│   │   └── admin/
-│   ├── shared/                   # 共通UIコンポーネント
-│   │   ├── layout/
-│   │   │   ├── AppShell.tsx
-│   │   │   ├── Header.tsx
-│   │   │   └── Sidebar.tsx
-│   │   ├── forms/
-│   │   │   ├── Input.tsx
-│   │   │   ├── Textarea.tsx
-│   │   │   └── Select.tsx
-│   │   └── feedback/
-│   │       ├── Toast.tsx
-│   │       ├── Modal.tsx
-│   │       └── Alert.tsx
+├── features/                     # 機能別モジュール
+│   ├── project/
+│   │   └── components/
+│   │       ├── ProjectDraftEditor.tsx
+│   │       ├── SubmissionList.tsx
+│   │       └── PublishedPreview.tsx
+│   ├── organization/
+│   │   └── components/
+│   └── admin/
+│       └── components/
+│
+├── components/                   # 共通コンポーネント（既存）
 │   └── ui/                       # Park UI コンポーネント
 │
 ├── hooks/                        # カスタムフック
