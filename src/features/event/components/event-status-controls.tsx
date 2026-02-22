@@ -3,6 +3,7 @@ import { Result } from "@praha/byethrow";
 import { activateEventFn, archiveEventFn } from "@/features/event/actions";
 import { Button, Fieldset, toaster } from "@/components/ui";
 import { ArchiveIcon, ArchiveRestoreIcon } from "lucide-react";
+import { useRouter } from "@tanstack/react-router";
 
 interface EventStatusControlsProps {
   eventId: string;
@@ -16,6 +17,7 @@ interface EventStatusControlsProps {
  */
 export function EventStatusControls({ eventId, eventName, status }: EventStatusControlsProps) {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const isArchived = status === "archived";
 
@@ -41,6 +43,7 @@ export function EventStatusControls({ eventId, eventName, status }: EventStatusC
             ? `「${eventName}」が編集可能になりました`
             : `「${eventName}」は読み取り専用になりました`,
         });
+        router.invalidate();
       } catch (error) {
         toaster.create({
           type: "error",
