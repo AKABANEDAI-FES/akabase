@@ -1,0 +1,274 @@
+import { Result } from "@praha/byethrow";
+import { describe, expect, it } from "vitest";
+import type { OrgMember, Organization } from "./schema";
+import type { OrgId, UserId } from "../shared/ids";
+import {
+  addMember,
+  canAddMember,
+  canRemoveMember,
+  isManager,
+  removeMember,
+  updateMemberRole,
+  updateOrganizationDescription,
+  updateOrganizationLogoKey,
+  updateOrganizationName,
+} from "./logic";
+
+// Test fixtures
+const mockOrgId = "org_123" as OrgId;
+const mockEventId = "event_123" as any;
+const mockUserId1 = "user_1" as UserId;
+const mockUserId2 = "user_2" as UserId;
+
+const createMockOrganization = (overrides?: Partial<Organization>): Organization => ({
+  id: mockOrgId,
+  eventId: mockEventId,
+  name: "Test Organization",
+  description: null,
+  logoKey: null,
+  createdAt: new Date("2025-01-01"),
+  updatedAt: new Date("2025-01-01"),
+  ...overrides,
+});
+
+const createMockMember = (userId: UserId, role: "manager" | "editor" = "editor"): OrgMember => ({
+  id: `member_${userId}`,
+  orgId: mockOrgId,
+  userId,
+  role,
+  createdAt: new Date("2025-01-01"),
+});
+
+describe("Organization Domain Logic", () => {
+  describe("Invariant Checks", () => {
+    describe("canAddMember", () => {
+      it("succeeds when user is not a member", () => {
+        const members: OrgMember[] = [createMockMember(mockUserId1)];
+        const result = canAddMember(members, mockUserId2);
+
+        expect(Result.isSuccess(result)).toBe(true);
+      });
+
+      it("fails when user is already a member", () => {
+        const members: OrgMember[] = [createMockMember(mockUserId1)];
+        const result = canAddMember(members, mockUserId1);
+
+        expect(Result.isFailure(result)).toBe(true);
+        if (Result.isFailure(result)) {
+          expect(result.error.code).toBe("USER_ALREADY_MEMBER");
+        }
+      });
+    });
+
+    describe("canRemoveMember", () => {
+      it("succeeds when removing a non-last manager", () => {
+        const members: OrgMember[] = [
+          createMockMember(mockUserId1, "manager"),
+          createMockMember(mockUserId2, "manager"),
+        ];
+        const result = canRemoveMember(members, mockUserId1);
+
+        expect(Result.isSuccess(result)).toBe(true);
+      });
+
+      it("succeeds when removing an editor", () => {
+        const members: OrgMember[] = [
+          createMockMember(mockUserId1, "manager"),
+          createMockMember(mockUserId2, "editor"),
+        ];
+        const result = canRemoveMember(members, mockUserId2);
+
+        expect(Result.isSuccess(result)).toBe(true);
+      });
+
+      it("fails when removing the last manager", () => {
+        const members: OrgMember[] = [
+          createMockMember(mockUserId1, "manager"),
+          createMockMember(mockUserId2, "editor"),
+        ];
+        const result = canRemoveMember(members, mockUserId1);
+
+        expect(Result.isFailure(result)).toBe(true);
+        if (Result.isFailure(result)) {
+          expect(result.error.code).toBe("CANNOT_REMOVE_LAST_MANAGER");
+        }
+      });
+
+      it("fails when user is not a member", () => {
+        const members: OrgMember[] = [createMockMember(mockUserId1)];
+        const result = canRemoveMember(members, mockUserId2);
+
+        expect(Result.isFailure(result)).toBe(true);
+        if (Result.isFailure(result)) {
+          expect(result.error.code).toBe("USER_NOT_MEMBER");
+        }
+      });
+    });
+
+    describe("isManager", () => {
+      it("succeeds when user is a manager", () => {
+        const members: OrgMember[] = [createMockMember(mockUserId1, "manager")];
+        const result = isManager(members, mockUserId1);
+
+        expect(Result.isSuccess(result)).toBe(true);
+      });
+
+      it("fails when user is an editor", () => {
+        const members: OrgMember[] = [createMockMember(mockUserId1, "editor")];
+        const result = isManager(members, mockUserId1);
+
+        expect(Result.isFailure(result)).toBe(true);
+        if (Result.isFailure(result)) {
+          expect(result.error.code).toBe("NOT_MANAGER");
+        }
+      });
+
+      it("fails when user is not a member", () => {
+        const members: OrgMember[] = [createMockMember(mockUserId1)];
+        const result = isManager(members, mockUserId2);
+
+        expect(Result.isFailure(result)).toBe(true);
+        if (Result.isFailure(result)) {
+          expect(result.error.code).toBe("USER_NOT_MEMBER");
+        }
+      });
+    });
+  });
+
+  describe("Member Management Functions", () => {
+    describe("addMember", () => {
+      it("adds a new member to the list", () => {
+        const members: OrgMember[] = [createMockMember(mockUserId1)];
+        const newMember = createMockMember(mockUserId2, "editor");
+
+        const updatedMembers = addMember(members, newMember);
+
+        expect(updatedMembers).toHaveLength(2);
+        expect(updatedMembers).toContain(newMember);
+      });
+
+      it("does not mutate the original array", () => {
+        const members: OrgMember[] = [createMockMember(mockUserId1)];
+        const originalLength = members.length;
+        const newMember = createMockMember(mockUserId2);
+
+        addMember(members, newMember);
+
+        expect(members).toHaveLength(originalLength);
+      });
+    });
+
+    describe("removeMember", () => {
+      it("removes the member from the list", () => {
+        const members: OrgMember[] = [createMockMember(mockUserId1), createMockMember(mockUserId2)];
+
+        const updatedMembers = removeMember(members, mockUserId1);
+
+        expect(updatedMembers).toHaveLength(1);
+        expect(updatedMembers[0].userId).toBe(mockUserId2);
+      });
+
+      it("does not mutate the original array", () => {
+        const members: OrgMember[] = [createMockMember(mockUserId1)];
+        const originalLength = members.length;
+
+        removeMember(members, mockUserId1);
+
+        expect(members).toHaveLength(originalLength);
+      });
+    });
+
+    describe("updateMemberRole", () => {
+      it("updates the member role", () => {
+        const members: OrgMember[] = [createMockMember(mockUserId1, "editor")];
+
+        const updatedMembers = updateMemberRole(members, mockUserId1, "manager");
+
+        expect(updatedMembers[0].role).toBe("manager");
+      });
+
+      it("does not change other members", () => {
+        const members: OrgMember[] = [
+          createMockMember(mockUserId1, "editor"),
+          createMockMember(mockUserId2, "manager"),
+        ];
+
+        const updatedMembers = updateMemberRole(members, mockUserId1, "manager");
+
+        expect(updatedMembers[1].role).toBe("manager");
+        expect(updatedMembers[1].userId).toBe(mockUserId2);
+      });
+
+      it("does not mutate the original array", () => {
+        const members: OrgMember[] = [createMockMember(mockUserId1, "editor")];
+        const originalRole = members[0].role;
+
+        updateMemberRole(members, mockUserId1, "manager");
+
+        expect(members[0].role).toBe(originalRole);
+      });
+    });
+  });
+
+  describe("Organization Updates", () => {
+    describe("updateOrganizationName", () => {
+      it("updates organization name", () => {
+        const org = createMockOrganization({ name: "Old Name" });
+        const updated = updateOrganizationName(org, "New Name");
+
+        expect(updated.name).toBe("New Name");
+        expect(updated.updatedAt).not.toEqual(org.updatedAt);
+      });
+    });
+
+    describe("updateOrganizationDescription", () => {
+      it("updates organization description when within 100 characters", () => {
+        const org = createMockOrganization({ description: null });
+        const result = updateOrganizationDescription(org, "New description");
+
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.description).toBe("New description");
+        }
+      });
+
+      it("succeeds for null description", () => {
+        const org = createMockOrganization({ description: "Old" });
+        const result = updateOrganizationDescription(org, null);
+
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.description).toBeNull();
+        }
+      });
+
+      it("fails when description exceeds 100 characters", () => {
+        const org = createMockOrganization();
+        const longDescription = "a".repeat(101);
+        const result = updateOrganizationDescription(org, longDescription);
+
+        expect(Result.isFailure(result)).toBe(true);
+        if (Result.isFailure(result)) {
+          expect(result.error.code).toBe("INVALID_ROLE");
+        }
+      });
+
+      it("succeeds for exactly 100 characters", () => {
+        const org = createMockOrganization();
+        const description = "a".repeat(100);
+        const result = updateOrganizationDescription(org, description);
+
+        expect(Result.isSuccess(result)).toBe(true);
+      });
+    });
+
+    describe("updateOrganizationLogoKey", () => {
+      it("updates organization logo key", () => {
+        const org = createMockOrganization({ logoKey: null });
+        const updated = updateOrganizationLogoKey(org, "logos/test.png");
+
+        expect(updated.logoKey).toBe("logos/test.png");
+      });
+    });
+  });
+});
