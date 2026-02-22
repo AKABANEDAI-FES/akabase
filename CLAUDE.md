@@ -98,25 +98,100 @@ Draft → [Submit] → Submission (Submitted)
 - `project_published`: Current public version
 - Auth tables: `user`, `session`, `account`, `verification` (Better Auth schema)
 
+### CQRS Pattern (Command Query Responsibility Segregation)
+
+The application layer is split into **Command** (write) and **Query** (read) to optimize each separately:
+
+**Command** (`application/command/`):
+
+- Handles state changes (Create, Update, Delete)
+- Uses Repository pattern for persistence
+- Enforces domain invariants and business rules
+- Returns domain models
+- Used in route `action` functions
+
+**Query** (`application/query/`):
+
+- Handles data retrieval for display (Read)
+- Direct database access with Drizzle ORM
+- Can JOIN across aggregates for optimized reads
+- Returns DTOs (Data Transfer Objects) defined with zod schemas
+- DTOs are defined in the same file as query functions (no separate `types.ts`)
+- Used in route `loader` functions
+
+**Example**:
+
+```typescript
+// application/query/event/list-events.ts
+import { z } from "zod";
+
+// DTO schema (zod)
+export const eventListItemSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  projectCount: z.number(), // Joined from projects table
+});
+
+// Type derived from schema
+export type EventListItem = z.infer<typeof eventListItemSchema>;
+
+// Query function
+export async function listEvents(): Promise<Result<EventListItem[], QueryError>> {
+  // Direct DB access with JOIN
+  const rows = await db
+    .select({
+      /* ... */
+    })
+    .from(events)
+    .leftJoin(projects, eq(events.id, projects.eventId));
+
+  return Result.succeed(rows.map((row) => eventListItemSchema.parse(row)));
+}
+```
+
 ### Directory Structure
 
 ```
 src/
-├── routes/          # TanStack Router file-based routes
-│   ├── __root.tsx   # Layout wrapper with <Outlet />
-│   └── index.tsx    # Individual route files
+├── application/
+│   ├── command/         # Write operations (Use Cases)
+│   │   ├── project/
+│   │   │   ├── submit-project.ts
+│   │   │   └── approve-project.ts
+│   │   └── event/
+│   │       └── create-event.ts
+│   └── query/           # Read operations (DTOs + Query functions)
+│       ├── event/
+│       │   └── list-events.ts    # DTO schema + query function
+│       └── project/
+│           └── get-project-detail.ts
+├── domain/              # Domain models, logic, errors
+│   ├── project/
+│   │   ├── schema.ts    # Zod schemas + types
+│   │   ├── logic.ts     # Pure business logic
+│   │   └── errors.ts    # Error types
+│   └── event/
+│       └── schema.ts
+├── infrastructure/
+│   ├── repositories/    # Repository implementations
+│   │   ├── interfaces.ts
+│   │   └── project-repository.ts
+│   └── di.ts            # Dependency injection
+├── routes/              # TanStack Router file-based routes
+│   ├── __root.tsx       # Layout wrapper with <Outlet />
+│   └── index.tsx        # Individual route files
 ├── db/
-│   ├── schema.ts    # Drizzle schema (re-exports auth-schema)
-│   ├── auth-schema.ts # Better Auth database tables
-│   └── index.ts     # Database client initialization
+│   ├── schema.ts        # Drizzle schema (re-exports auth-schema)
+│   ├── auth-schema.ts   # Better Auth database tables
+│   └── index.ts         # Database client initialization
 ├── libs/
-│   ├── auth.ts      # Better Auth configuration
-│   └── result.ts    # Result type utilities (with tests)
+│   ├── auth.ts          # Better Auth configuration
+│   └── result.ts        # Result type utilities (with tests)
 ├── integrations/
 │   └── tanstack-query/
 │       ├── root-provider.tsx  # QueryClient setup
 │       └── devtools.tsx       # Query devtools
-└── router.tsx       # Router creation with SSR-Query integration
+└── router.tsx           # Router creation with SSR-Query integration
 ```
 
 ### Routing
@@ -180,12 +255,31 @@ const db = env.DB; // D1 database
 
 ## Development Guidelines
 
+### When to Use Command vs Query
+
+**Use Command** (`application/command/`):
+
+- Data mutations (Create, Update, Delete)
+- Business rule validation required
+- Domain invariants must be enforced
+- Transaction boundaries needed
+- Called from route `action` functions
+
+**Use Query** (`application/query/`):
+
+- Read-only data retrieval
+- Display/UI data needs
+- Statistics or aggregated data
+- Need to JOIN across multiple aggregates
+- Called from route `loader` functions
+
 ### When Adding Routes
 
 1. Create file in `src/routes/`
 2. TanStack Router will auto-generate route configuration
-3. Use `loader` for data fetching before render
-4. Use `createRoute()` or file-based conventions
+3. Use `loader` for data fetching (call Query functions)
+4. Use `action` for mutations (call Command use cases)
+5. Use `createRoute()` or file-based conventions
 
 ### When Modifying Database Schema
 
@@ -194,11 +288,68 @@ const db = env.DB; // D1 database
 3. Run `pnpm migrate` to apply to local D1 database
 4. For production, use `wrangler d1 migrations apply archive --remote`
 
+### When Writing Queries
+
+1. Create file in `application/query/<context>/` (e.g., `application/query/event/list-events.ts`)
+2. Define DTO schema with zod in the same file:
+   ```typescript
+   export const eventListItemSchema = z.object({
+     id: z.string(),
+     name: z.string(),
+     projectCount: z.number(),
+   });
+   export type EventListItem = z.infer<typeof eventListItemSchema>;
+   ```
+3. Implement query function with direct DB access:
+   ```typescript
+   export async function listEvents(): Promise<Result<EventListItem[], QueryError>> {
+     const rows = await db.select({ /* ... */ }).from(events).leftJoin(projects, ...);
+     return Result.succeed(rows.map(row => eventListItemSchema.parse(row)));
+   }
+   ```
+4. Use in route `loader`:
+   ```typescript
+   const loadEventsFn = createServerFn({ method: "GET" }).handler(async () => {
+     const result = await listEvents();
+     if (Result.isFailure(result)) throw new Error(result.error.message);
+     return result.value;
+   });
+   ```
+
+### When Writing Commands (Use Cases)
+
+1. Create file in `application/command/<context>/` (e.g., `application/command/project/submit-project.ts`)
+2. Define Input/Output types
+3. Accept dependencies via DI (first parameter)
+4. Use Repository pattern for persistence
+5. Delegate to domain logic for business rules:
+   ```typescript
+   export const submitProject = (deps: Dependencies, input: SubmitProjectInput) => {
+     return gen(async function* ($) {
+       const project = yield* $(await deps.projectRepo.findById(input.projectId));
+       yield* $(canSubmit(project)); // Domain logic
+       const submission = createSubmissionFromDraft(draft, userId, submissionId);
+       yield* $(await deps.projectRepo.saveSubmission(submission));
+       return { submissionId };
+     });
+   };
+   ```
+6. Use in route `action`:
+   ```typescript
+   const submitProjectFn = createServerFn({ method: "POST" }).handler(async ({ data }) => {
+     const result = await submitProject(dependencies, data);
+     if (Result.isFailure(result)) throw new Error(result.error.message);
+     return result.value;
+   });
+   ```
+
 ### When Writing Tests
 
 - Tests live alongside source files (e.g., `result.test.ts`)
 - Use Vitest with React Testing Library
 - JSDOM environment configured for React components
+- Mock dependencies for Command tests
+- Mock DB for Query tests
 
 ### Code Quality Tools
 

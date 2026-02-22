@@ -2,7 +2,7 @@
 
 **プロジェクト**: 大学祭企画情報管理システム
 **最終更新**: 2026-02-23
-**バージョン**: 1.0.0
+**バージョン**: 1.1.0
 
 ---
 
@@ -11,15 +11,16 @@
 1. [概要](#概要)
 2. [アーキテクチャ原則](#アーキテクチャ原則)
 3. [全体構成](#全体構成)
-4. [ディレクトリ構造](#ディレクトリ構造)
-5. [レイヤー設計](#レイヤー設計)
-6. [型システム設計](#型システム設計)
-7. [エラーハンドリング戦略](#エラーハンドリング戦略)
-8. [実装パターン](#実装パターン)
-9. [データフロー](#データフロー)
-10. [権限管理](#権限管理)
-11. [テスト戦略](#テスト戦略)
-12. [参考資料](#参考資料)
+4. [CQRS パターン](#cqrs-パターン)
+5. [ディレクトリ構造](#ディレクトリ構造)
+6. [レイヤー設計](#レイヤー設計)
+7. [型システム設計](#型システム設計)
+8. [エラーハンドリング戦略](#エラーハンドリング戦略)
+9. [実装パターン](#実装パターン)
+10. [データフロー](#データフロー)
+11. [権限管理](#権限管理)
+12. [テスト戦略](#テスト戦略)
+13. [参考資料](#参考資料)
 
 ---
 
@@ -41,6 +42,7 @@
 ### 設計方針
 
 - **Domain-Driven Design (DDD)**: ドメインロジックを中心に据えた設計
+- **CQRS (Command Query Responsibility Segregation)**: 読み取りと書き込みの責務分離
 - **Functional Programming**: 純粋関数とイミュータブルなデータ構造
 - **Type Safety**: Zod スキーマによるランタイムバリデーション + Brand型
 - **Result型**: 例外を使わない安全なエラーハンドリング
@@ -54,10 +56,12 @@
 各レイヤーは明確な責務を持ち、下位レイヤーへの依存のみ許可します。
 
 ```
-Presentation → Controller → Application → Domain
-                                ↓
-                        Infrastructure
+Presentation → Application (Command/Query) → Domain
+                     ↓
+               Infrastructure
 ```
+
+**CQRS パターン**: Application層をCommand（書き込み）とQuery（読み取り）に分離し、それぞれ異なる最適化を行います。
 
 ### 2. JSONシリアライズ可能性
 
@@ -146,59 +150,163 @@ export const canSubmit = (project: Project): void => {
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│         Presentation Layer (既存構造維持)            │
+│         Presentation Layer (React + TanStack)       │
 │  ┌──────────────┐  ┌──────────────┐                │
 │  │   routes/    │  │ components/  │                │
-│  │ (TanStack)   │  │  (React 19)  │                │
+│  │ - loader     │  │  (React 19)  │                │
+│  │ - action     │  │              │                │
 │  └──────────────┘  └──────────────┘                │
-└─────────────────────────────────────────────────────┘
-                        ▼
-┌─────────────────────────────────────────────────────┐
-│          Controller Layer (Server Functions)        │
-│  controllers/                                        │
-│    └─ project/                                       │
-│        ├─ submit-project.ts   (createServerFn)      │
-│        ├─ approve-project.ts                         │
-│        └─ edit-draft.ts                              │
 │                                                      │
-│  責務: 認証・認可・バリデーション・DI・エラー変換    │
+│  責務: UI表示・ユーザーインタラクション              │
 └─────────────────────────────────────────────────────┘
-                        ▼
-┌─────────────────────────────────────────────────────┐
-│         Application Layer (Use Cases)               │
-│  application/                                        │
-│    └─ project/                                       │
-│        ├─ submit-project.ts   (Pure Function)       │
-│        ├─ approve-project.ts                         │
-│        └─ edit-draft.ts                              │
-│                                                      │
-│  責務: ビジネスフローの調整・トランザクション管理    │
-└─────────────────────────────────────────────────────┘
-                        ▼
-┌─────────────────────────────────────────────────────┐
-│         Domain Layer (Pure Functions)               │
-│  domain/                                             │
-│    └─ project/                                       │
-│        ├─ schema.ts       (Zod + 型定義)            │
-│        ├─ logic.ts        (純粋関数)                │
-│        └─ errors.ts       (エラー型定義)            │
-│                                                      │
-│  責務: ビジネスルール・不変条件・ドメインロジック    │
-└─────────────────────────────────────────────────────┘
-                        ▼
-┌─────────────────────────────────────────────────────┐
-│         Infrastructure Layer (I/O)                  │
-│  infrastructure/                                     │
-│    ├─ repositories/                                  │
-│    │   ├─ interfaces.ts    (Repository定義)         │
-│    │   └─ project-repository.ts (Drizzle実装)      │
-│    ├─ storage/                                       │
-│    │   └─ r2-storage.ts    (R2クライアント)         │
-│    └─ di.ts               (DIコンテナ)              │
-│                                                      │
-│  責務: 永続化・外部システム連携                      │
-└─────────────────────────────────────────────────────┘
+         │                           │
+         │ loader                    │ action
+         │ (読み取り)                │ (書き込み)
+         ▼                           ▼
+┌──────────────────┐        ┌──────────────────┐
+│  Query Service   │        │  Command (UC)    │
+│  application/    │        │  application/    │
+│    query/        │        │    command/      │
+│                  │        │                  │
+│  - DTO定義       │        │  - Use Cases     │
+│  - JOIN可能      │        │  - DI受け取り    │
+│  - 表示最適化    │        │  - ビジネス      │
+│                  │        │    フロー調整    │
+└──────────────────┘        └──────────────────┘
+         │                           │
+         │ 直接DB                    │ Repository
+         │ (Drizzle)                 ▼
+         │                  ┌──────────────────┐
+         │                  │  Domain Layer    │
+         │                  │  domain/         │
+         │                  │  - schema.ts     │
+         │                  │  - logic.ts      │
+         │                  │  - errors.ts     │
+         │                  └──────────────────┘
+         │                           │
+         └───────────┬───────────────┘
+                     ▼
+         ┌─────────────────────────┐
+         │  Infrastructure Layer   │
+         │  infrastructure/        │
+         │  - repositories/        │
+         │  - di.ts                │
+         └─────────────────────────┘
+                     │
+                     ▼
+              ┌─────────────┐
+              │  Database   │
+              │  (D1/ORM)   │
+              └─────────────┘
 ```
+
+---
+
+## CQRS パターン
+
+### Command Query Responsibility Segregation
+
+読み取り（Query）と書き込み（Command）の責務を分離し、それぞれ異なる最適化を行います。
+
+### 設計原則
+
+| 側面             | Command (書き込み)             | Query (読み取り)           |
+| ---------------- | ------------------------------ | -------------------------- |
+| **目的**         | ビジネスロジック実行、状態変更 | データ表示                 |
+| **レイヤー**     | `application/command/`         | `application/query/`       |
+| **使用場所**     | ルーターの`action`             | ルーターの`loader`         |
+| **データソース** | Repository (集約単位)          | 直接DB (JOIN可能)          |
+| **戻り値**       | 集約モデル（Domain型）         | DTO（表示用型）            |
+| **制約**         | 集約の不変条件を守る           | 制約なし（読み取り専用）   |
+| **最適化**       | トランザクション、整合性       | パフォーマンス、キャッシュ |
+| **スキーマ**     | Domain schemaを使用            | zod schemaでDTO定義        |
+
+### Command（コマンド）
+
+**責務**: ビジネスルールを守りながら状態を変更する
+
+**特徴**:
+
+- 集約の不変条件をチェック
+- Repositoryを通じて永続化
+- トランザクション境界を持つ
+- ドメインロジックに委譲
+- Result型でエラーを返す
+
+**実装場所**: `application/command/`
+
+**例**: 企画提出、承認、差戻し
+
+### Query（クエリ）
+
+**責務**: 表示に最適化されたデータを返す
+
+**特徴**:
+
+- 読み取り専用、副作用なし
+- 集約の境界を超えてJOIN可能
+- DTO（Data Transfer Object）で柔軟な型を返す
+- パフォーマンス最適化可能（キャッシュ、インデックス）
+- zod schemaでDTOを定義し、型は`z.infer`で派生
+
+**実装場所**: `application/query/`
+
+**例**: イベント一覧、企画詳細、統計データ
+
+### DTO定義規則
+
+Queryでは、ドメインモデルとは別にDTO（Data Transfer Object）を定義します。
+
+**原則**:
+
+- DTOはクエリ関数と同じファイルに定義（`types.ts`は作らない）
+- zod schemaで定義し、型は`z.infer`で派生（ドメインモデルと同様）
+- 複数テーブルのJOIN結果を表現可能
+- 表示に必要なフィールドのみ含む
+- 計算済みフィールドを追加可能
+
+**例**:
+
+```typescript
+// application/query/event/list-events.ts
+import { z } from "zod";
+
+// DTO schema定義
+export const eventListItemSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  slug: z.string(),
+  status: z.enum(["active", "archived"]),
+  createdAt: z.date(),
+  // 集約を超えた集計データ
+  projectCount: z.number(),
+  organizationCount: z.number(),
+});
+
+// 型を派生
+export type EventListItem = z.infer<typeof eventListItemSchema>;
+
+// Query関数
+export async function listEvents(): Promise<Result<EventListItem[], QueryError>> {
+  // ...
+}
+```
+
+### 使い分け
+
+**Command を使う場合**:
+
+- データを変更する操作（Create, Update, Delete）
+- ビジネスルールの検証が必要
+- トランザクションが必要
+- 集約の不変条件を守る必要がある
+
+**Query を使う場合**:
+
+- データを表示する（Read）
+- 複数の集約をまたぐデータが必要
+- 統計・集計データが必要
+- パフォーマンスを最適化したい
 
 ---
 
@@ -206,38 +314,41 @@ export const canSubmit = (project: Project): void => {
 
 ```
 src/
-├── controllers/                  # Controller層（Server Functions）
-│   ├── project/
-│   │   ├── submit-project.ts     # 企画提出
-│   │   ├── approve-project.ts    # 企画承認
-│   │   ├── return-project.ts     # 企画差戻し
-│   │   ├── withdraw-project.ts   # 企画取り下げ
-│   │   └── edit-draft.ts         # Draft編集
-│   ├── organization/
-│   │   ├── create-org.ts
-│   │   ├── update-org.ts
-│   │   └── manage-members.ts
-│   ├── event/
-│   │   ├── create-event.ts
-│   │   ├── update-event.ts
-│   │   └── archive-event.ts
-│   └── admin/
-│       ├── assign-committee-role.ts
-│       └── manage-deadlines.ts
-│
-├── application/                  # Application層（Use Cases）
-│   ├── project/
-│   │   ├── submit-project.ts     # 提出ユースケース
-│   │   ├── approve-project.ts    # 承認ユースケース
-│   │   ├── return-project.ts     # 差戻しユースケース
-│   │   ├── withdraw-project.ts   # 取り下げユースケース
-│   │   └── edit-draft.ts         # Draft編集ユースケース
-│   ├── organization/
-│   │   ├── create-org.ts
-│   │   └── add-member.ts
-│   └── event/
-│       ├── create-event.ts
-│       └── archive-event.ts
+├── application/                  # Application層（CQRS）
+│   ├── command/                  # Command側（書き込み）
+│   │   ├── project/
+│   │   │   ├── submit-project.ts     # 企画提出UC
+│   │   │   ├── approve-project.ts    # 企画承認UC
+│   │   │   ├── return-project.ts     # 企画差戻しUC
+│   │   │   ├── withdraw-project.ts   # 企画取り下げUC
+│   │   │   └── edit-draft.ts         # Draft編集UC
+│   │   ├── organization/
+│   │   │   ├── create-org.ts
+│   │   │   ├── update-org.ts
+│   │   │   └── manage-members.ts
+│   │   ├── event/
+│   │   │   ├── create-event.ts
+│   │   │   ├── update-event.ts
+│   │   │   └── archive-event.ts
+│   │   └── admin/
+│   │       ├── assign-committee-role.ts
+│   │       └── manage-deadlines.ts
+│   │
+│   └── query/                    # Query側（読み取り）
+│       ├── event/
+│       │   ├── list-events.ts        # イベント一覧（DTO + Query関数）
+│       │   ├── get-event-detail.ts   # イベント詳細（DTO + Query関数）
+│       │   └── get-event-stats.ts    # 統計情報
+│       ├── project/
+│       │   ├── list-projects.ts      # 企画一覧
+│       │   ├── get-project-detail.ts # 企画詳細
+│       │   └── get-draft.ts          # Draft取得
+│       ├── organization/
+│       │   ├── list-organizations.ts
+│       │   └── get-org-members.ts
+│       └── admin/
+│           ├── get-submissions.ts
+│           └── get-committee-members.ts
 │
 ├── domain/                       # Domain層（純粋関数 + 型）
 │   ├── project/
@@ -367,43 +478,48 @@ src/
 
 ### Application層（アプリケーション層）
 
+Application層はCQRSパターンに従い、Command（書き込み）とQuery（読み取り）に分離します。
+
+#### Command（書き込み）
+
 **責務**: ビジネスフローの調整・トランザクション管理
 
 **原則**:
 
-- 依存をDIで受け取る（引数として渡す）
+- 依存（Repository）をDIで受け取る（引数として渡す）
 - Result型を返す
 - ドメインロジックに委譲
 - `gen` 関数でResultをハンドリング
+- 集約の不変条件を守る
 
 **ファイル構成**:
 
-- `submit-project.ts`: 提出ユースケース
-- `approve-project.ts`: 承認ユースケース
+- `application/command/project/submit-project.ts`: 提出ユースケース
+- `application/command/project/approve-project.ts`: 承認ユースケース
 - など
 
-**例**: [application/project/submit-project.ts](#applicationprojectsubmit-projectts)
+**例**: [application/command/project/submit-project.ts](#applicationcommandprojectsubmit-projectts)
 
----
+#### Query（読み取り）
 
-### Controller層（コントローラー層）
-
-**責務**: 認証・認可・バリデーション・依存注入・エラー変換
+**責務**: 表示に最適化されたデータ取得
 
 **原則**:
 
-- `createServerFn` を使用
-- 認証チェック → 認可チェック → DI → ユースケース実行
-- Result型 → HTTPレスポンス変換
-- Zodでバリデーション
+- 読み取り専用、副作用なし
+- 直接DBにアクセス（Drizzle ORM使用）
+- 集約を超えてJOIN可能
+- zod schemaでDTOを定義し、型は`z.infer`で派生
+- DTOはクエリ関数と同じファイルに定義
+- Result型を返す
 
 **ファイル構成**:
 
-- `submit-project.ts`: 企画提出コントローラー
-- `approve-project.ts`: 企画承認コントローラー
+- `application/query/event/list-events.ts`: イベント一覧（DTO定義 + Query関数）
+- `application/query/project/get-project-detail.ts`: 企画詳細（DTO定義 + Query関数）
 - など
 
-**例**: [controllers/project/submit-project.ts](#controllersprojectsubmit-projectts)
+**例**: [application/query/event/list-events.ts](#applicationqueryeventlist-eventsts)
 
 ---
 
@@ -763,6 +879,99 @@ export const projectAfterApprove = (project: Project): Project => {
 
 ---
 
+### application/query/event/list-events.ts
+
+```typescript
+import { z } from "zod";
+import { Result } from "@praha/byethrow";
+import { db } from "@/db";
+import { events, projects } from "@/db/schema";
+import { desc, eq, count } from "drizzle-orm";
+
+/**
+ * Event list item DTO schema
+ * イベント一覧表示用のDTOスキーマ
+ */
+export const eventListItemSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  slug: z.string(),
+  status: z.enum(["active", "archived"]),
+  createdAt: z.date(),
+  // 集約を超えた集計データ
+  projectCount: z.number(),
+  organizationCount: z.number(),
+});
+
+/**
+ * Event list item DTO type (derived from schema)
+ */
+export type EventListItem = z.infer<typeof eventListItemSchema>;
+
+/**
+ * Query error type
+ */
+export type QueryError = {
+  code: "DATABASE_ERROR" | "UNKNOWN_ERROR";
+  message: string;
+};
+
+/**
+ * List all events with aggregated data
+ * 集約を超えてJOINし、表示に最適化されたデータを返す
+ */
+export async function listEvents(): Promise<Result.Result<EventListItem[], QueryError>> {
+  try {
+    // 複数テーブルをJOINして表示用データを取得
+    const rows = await db
+      .select({
+        id: events.id,
+        name: events.name,
+        slug: events.slug,
+        status: events.status,
+        createdAt: events.createdAt,
+        // 集約: イベント内の企画数
+        projectCount: count(projects.id),
+      })
+      .from(events)
+      .leftJoin(projects, eq(events.id, projects.eventId))
+      .groupBy(events.id)
+      .orderBy(desc(events.createdAt));
+
+    // zodでバリデーション + 型変換
+    const eventList: EventListItem[] = rows.map((row) =>
+      eventListItemSchema.parse({
+        id: row.id,
+        name: row.name,
+        slug: row.slug,
+        status: row.status,
+        createdAt: new Date(row.createdAt),
+        projectCount: row.projectCount,
+        organizationCount: 0, // TODO: 実装
+      }),
+    );
+
+    return Result.succeed(eventList);
+  } catch (error) {
+    console.error("[Query Error] Failed to list events", error);
+    return Result.fail({
+      code: "DATABASE_ERROR",
+      message: "イベント一覧の取得に失敗しました。",
+    });
+  }
+}
+```
+
+**特徴**:
+
+- DTOスキーマ（`eventListItemSchema`）をzodで定義
+- 型（`EventListItem`）は`z.infer`で派生
+- 複数テーブル（`events`, `projects`）をJOINして集計
+- 表示に必要なデータのみ返す
+- zodで結果をバリデーション
+
+---
+
 ### infrastructure/repositories/interfaces.ts
 
 ```typescript
@@ -831,7 +1040,7 @@ export const getDependencies = (): Dependencies => {
 
 ---
 
-### application/project/submit-project.ts
+### application/command/project/submit-project.ts
 
 ```typescript
 import { Result } from "@praha/byethrow";
@@ -908,81 +1117,25 @@ export const submitProject = (
 
 ---
 
-### controllers/project/submit-project.ts
-
-```typescript
-import { createServerFn } from "@tanstack/start/server";
-import { Result } from "@praha/byethrow";
-import { getSession } from "@/libs/session-server";
-import { canSubmitProject } from "@/libs/permissions";
-import { getDependencies } from "@/infrastructure/di";
-import { submitProject as submitProjectUseCase } from "@/application/project/submit-project";
-import {
-  projectIdSchema,
-  userIdSchema,
-  type ProjectId,
-  type UserId,
-} from "@/domain/project/schema";
-
-/**
- * 企画提出コントローラー
- */
-export const submitProject = createServerFn({ method: "POST" })
-  .validator((data: { projectId: string }) => {
-    // Zodでバリデーション + Brand型変換
-    const projectId = projectIdSchema.parse(data.projectId);
-    return { projectId };
-  })
-  .handler(async ({ data }) => {
-    // 1. 認証チェック
-    const session = await getSession();
-    if (!session?.user) {
-      throw new Error("Unauthorized");
-    }
-
-    // 2. 認可チェック
-    const hasPermission = await canSubmitProject(session.user.id, data.projectId);
-    if (!hasPermission) {
-      throw new Error("Forbidden: You do not have permission to submit this project");
-    }
-
-    // 3. 依存注入
-    const deps = getDependencies();
-
-    // 4. ユースケース実行
-    const result = await submitProjectUseCase(deps, {
-      projectId: data.projectId,
-      userId: session.user.id as UserId,
-    });
-
-    // 5. Result → HTTPレスポンス変換
-    if (Result.isFailure(result)) {
-      const error = result.error;
-      throw new Error(`[${error.code}] ${error.message}`);
-    }
-
-    return result.value;
-  });
-```
-
----
-
 ## データフロー
 
-### Draft → Submission → Published のライフサイクル
+### Command（書き込み）フロー
+
+Draft → Submission → Published のライフサイクル
 
 ```
 ┌─────────────────────────────────────────────────────┐
 │  1. Draft編集 (Organization Member)                 │
-│     ↓ editDraft serverFn                            │
-│     └→ editDraftUseCase                             │
+│     ↓ routes/action                                 │
+│     └→ editDraftCommand (application/command/)      │
+│         ├─ Domain logic check                       │
 │         └→ ProjectRepository.saveDraft()            │
 └─────────────────────────────────────────────────────┘
                         ▼
 ┌─────────────────────────────────────────────────────┐
 │  2. 提出 (Organization Manager)                     │
-│     ↓ submitProject serverFn                        │
-│     └→ submitProjectUseCase                         │
+│     ↓ routes/action                                 │
+│     └→ submitProjectCommand (application/command/)  │
 │         ├─ canSubmit(project)  ← ドメイン不変条件   │
 │         ├─ createSubmissionFromDraft()              │
 │         ├─ projectAfterSubmit()                     │
@@ -991,21 +1144,94 @@ export const submitProject = createServerFn({ method: "POST" })
                         ▼
 ┌─────────────────────────────────────────────────────┐
 │  3. 承認 (Approver/Admin)                           │
-│     ↓ approveProject serverFn                       │
-│     └→ approveProjectUseCase                        │
+│     ↓ routes/action                                 │
+│     └→ approveProjectCommand (application/command/) │
 │         ├─ canApprove(submission)  ← ドメイン不変条件│
 │         ├─ approveSubmission()                      │
 │         ├─ createPublishedFromSubmission()          │
 │         ├─ projectAfterApprove()                    │
 │         └→ ProjectRepository.savePublished()        │
 └─────────────────────────────────────────────────────┘
-                        ▼
+```
+
+### Query（読み取り）フロー
+
+表示に最適化されたデータ取得
+
+```
 ┌─────────────────────────────────────────────────────┐
-│  4. 公開データ利用                                  │
-│     ├─ CSV/JSON出力 (Committee Member)             │
-│     ├─ 公開Webサイト連携                            │
-│     └─ 検索・フィルタ                               │
+│  イベント一覧表示                                   │
+│     ↓ routes/loader                                 │
+│     └→ listEventsQuery (application/query/)         │
+│         ├─ 直接DB（Drizzle ORM）                    │
+│         ├─ JOIN: events + projects (集計)           │
+│         ├─ DTO: EventListItem (zod schema)          │
+│         └→ 表示用データ返却                          │
 └─────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────┐
+│  企画詳細表示                                       │
+│     ↓ routes/loader                                 │
+│     └→ getProjectDetailQuery (application/query/)   │
+│         ├─ 直接DB（Drizzle ORM）                    │
+│         ├─ JOIN: project + draft + published        │
+│         │        + tags + organization               │
+│         ├─ DTO: ProjectDetailDTO (zod schema)       │
+│         └→ 表示用データ返却                          │
+└─────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────┐
+│  統計情報表示                                       │
+│     ↓ routes/loader                                 │
+│     └→ getEventStatsQuery (application/query/)      │
+│         ├─ 直接DB（Drizzle ORM）                    │
+│         ├─ 集計: COUNT, GROUP BY                    │
+│         ├─ DTO: EventStatsDTO (zod schema)          │
+│         └→ 統計データ返却                            │
+└─────────────────────────────────────────────────────┘
+```
+
+### CQRS データフロー全体像
+
+```
+┌─────────────────────────────────────────────────────┐
+│                    Presentation                     │
+│  ┌────────────────┐         ┌────────────────┐     │
+│  │  routes/loader │         │ routes/action  │     │
+│  │  (読み取り)    │         │  (書き込み)    │     │
+│  └────────────────┘         └────────────────┘     │
+└─────────────────────────────────────────────────────┘
+         │                              │
+         │ Query                        │ Command
+         ▼                              ▼
+┌──────────────────┐         ┌──────────────────┐
+│ application/     │         │ application/     │
+│   query/         │         │   command/       │
+│                  │         │                  │
+│ - DTO定義(zod)   │         │ - Use Cases      │
+│ - 直接DB         │         │ - Repository経由 │
+│ - JOIN可能       │         │ - Domain logic   │
+└──────────────────┘         └──────────────────┘
+         │                              │
+         │                              ▼
+         │                    ┌──────────────────┐
+         │                    │     Domain       │
+         │                    │   - logic.ts     │
+         │                    │   - schema.ts    │
+         │                    └──────────────────┘
+         │                              │
+         └──────────┬───────────────────┘
+                    ▼
+         ┌─────────────────────┐
+         │   Infrastructure    │
+         │  - repositories/    │
+         │  - DB (Drizzle)     │
+         └─────────────────────┘
+                    │
+                    ▼
+              ┌─────────┐
+              │    D1   │
+              └─────────┘
 ```
 
 ---
@@ -1076,12 +1302,12 @@ describe('canSubmit', () => {
 })
 ```
 
-### 2. ユースケースのテスト
+### 2. Command（Use Case）のテスト
 
 依存をモックして注入します。
 
 ```typescript
-// application/project/submit-project.test.ts
+// application/command/project/submit-project.test.ts
 import { describe, it, expect, vi } from 'vitest'
 import { submitProject } from './submit-project'
 import { Result } from '@praha/byethrow'
@@ -1121,25 +1347,44 @@ describe('submitProject', () => {
 })
 ```
 
-### 3. Controller のテスト
+### 3. Query のテスト
 
-認証・認可を含めた統合テスト。
+DBをモックしてテストします。
 
 ```typescript
-// controllers/project/submit-project.test.ts
+// application/query/event/list-events.test.ts
 import { describe, it, expect, vi } from "vitest";
-import { submitProject } from "./submit-project";
+import { listEvents } from "./list-events";
+import { Result } from "@praha/byethrow";
 
-describe("submitProject controller", () => {
-  it("未認証の場合、エラー", async () => {
-    // セッションをモック（未認証）
-    vi.mock("@/libs/session-server", () => ({
-      getSession: () => null,
-    }));
+// DBモックを作成
+vi.mock("@/db", () => ({
+  db: {
+    select: vi.fn().mockReturnThis(),
+    from: vi.fn().mockReturnThis(),
+    leftJoin: vi.fn().mockReturnThis(),
+    groupBy: vi.fn().mockReturnThis(),
+    orderBy: vi.fn().mockResolvedValue([
+      {
+        id: "evt_1",
+        name: "学園祭2025",
+        slug: "2025",
+        status: "active",
+        createdAt: "2025-01-01",
+        projectCount: 10,
+      },
+    ]),
+  },
+}));
 
-    await expect(() => submitProject({ data: { projectId: "proj_123" } })).rejects.toThrow(
-      "Unauthorized",
-    );
+describe("listEvents", () => {
+  it("正常系: イベント一覧取得成功", async () => {
+    const result = await listEvents();
+
+    expect(Result.isSuccess(result)).toBe(true);
+    expect(result.value).toHaveLength(1);
+    expect(result.value[0].name).toBe("学園祭2025");
+    expect(result.value[0].projectCount).toBe(10);
   });
 });
 ```
@@ -1177,6 +1422,7 @@ describe("submitProject controller", () => {
 
 ## 改訂履歴
 
-| バージョン | 日付       | 変更内容                       |
-| ---------- | ---------- | ------------------------------ |
-| 1.0.0      | 2026-02-23 | 初版作成（アーキテクチャ確定） |
+| バージョン | 日付       | 変更内容                              |
+| ---------- | ---------- | ------------------------------------- |
+| 1.1.0      | 2026-02-23 | CQRSパターン導入（Command/Query分離） |
+| 1.0.0      | 2026-02-23 | 初版作成（アーキテクチャ確定）        |
