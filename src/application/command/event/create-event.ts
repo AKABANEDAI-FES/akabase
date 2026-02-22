@@ -1,11 +1,15 @@
 import { Result } from "@praha/byethrow";
 import { gen, suspend } from "@/libs/result";
 import { generateId } from "@/libs/id";
-import type { EventId, UserId } from "@/domain/shared/ids";
+import { cast } from "@/domain/shared/ids";
+import type { EventId } from "@/domain/shared/ids";
 import type { Event } from "@/domain/event/schema";
 import type { EventError } from "@/domain/event/errors";
 import { eventError } from "@/domain/event/errors";
 import type { RepositoryError } from "@/infrastructure/repositories/interfaces";
+import type { AuthorizationError } from "@/domain/authorization/errors";
+import type { Actor } from "@/domain/authorization/actor";
+import { eventResource } from "@/domain/authorization/resource";
 import type { Dependencies } from "@/infrastructure/di";
 
 /**
@@ -14,7 +18,7 @@ import type { Dependencies } from "@/infrastructure/di";
 export type CreateEventInput = {
   name: string;
   slug: string;
-  userId: UserId;
+  actor: Actor;
 };
 
 /**
@@ -27,25 +31,35 @@ export type CreateEventOutput = {
 /**
  * Errors that can occur during event creation
  */
-export type CreateEventError = EventError | RepositoryError;
+export type CreateEventError = EventError | RepositoryError | AuthorizationError;
 
 /**
  * Create a new event
  *
  * Business rules:
+ * - Only global admins can create events
  * - Slug must be unique across all events
  * - Event is created with "active" status
  *
- * @param deps - Dependencies (repositories)
+ * @param deps - Dependencies (repositories, authService)
  * @param input - Event creation input
  * @returns Result with event ID or error
  */
 export async function createEvent(
-  deps: Pick<Dependencies, "eventRepo">,
+  deps: Pick<Dependencies, "eventRepo" | "authService">,
   input: CreateEventInput,
 ): Result.ResultAsync<CreateEventOutput, CreateEventError> {
   return suspend(() =>
     gen(async function* ($) {
+      // Authorization check: only global admins can create events
+      // Note: event:create permission check only validates global admin role,
+      // not the specific eventId, so we use an empty placeholder
+      const placeholderResource = eventResource(cast<EventId>(""));
+      yield* $(deps.authService.enforce(input.actor, placeholderResource, "event:create"));
+
+      // Generate new event ID after authorization passes
+      const eventId = generateId<EventId>();
+
       // Check if slug is already in use
       const existingEvent = yield* $(await deps.eventRepo.findBySlug(input.slug));
 
@@ -54,9 +68,6 @@ export async function createEvent(
           Result.fail(eventError("SLUG_NOT_UNIQUE", "このスラッグは既に使用されています")),
         );
       }
-
-      // Generate new event ID
-      const eventId = generateId<EventId>();
 
       // Create event entity
       const now = new Date();

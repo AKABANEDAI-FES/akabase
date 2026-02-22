@@ -1,10 +1,13 @@
 import { Result } from "@praha/byethrow";
 import { gen, suspend } from "@/libs/result";
-import type { EventId, UserId } from "@/domain/shared/ids";
+import type { EventId } from "@/domain/shared/ids";
 import type { EventError } from "@/domain/event/errors";
 import { eventError } from "@/domain/event/errors";
 import { activateEvent as activateEventLogic } from "@/domain/event/logic";
 import type { RepositoryError } from "@/infrastructure/repositories/interfaces";
+import type { AuthorizationError } from "@/domain/authorization/errors";
+import type { Actor } from "@/domain/authorization/actor";
+import { eventResource } from "@/domain/authorization/resource";
 import type { Dependencies } from "@/infrastructure/di";
 
 /**
@@ -12,7 +15,7 @@ import type { Dependencies } from "@/infrastructure/di";
  */
 export type ActivateEventInput = {
   eventId: EventId;
-  userId: UserId;
+  actor: Actor;
 };
 
 /**
@@ -25,23 +28,24 @@ export type ActivateEventOutput = {
 /**
  * Errors that can occur during event activation
  */
-export type ActivateEventError = EventError | RepositoryError;
+export type ActivateEventError = EventError | RepositoryError | AuthorizationError;
 
 /**
  * Activate an archived event
  *
  * Business rules:
+ * - Only global admins or event committee admins can activate events
  * - Event must exist
  * - Event must not be already active
  * - Status changes to "active"
  * - Activated events can be edited again
  *
- * @param deps - Dependencies (repositories)
+ * @param deps - Dependencies (repositories, authService)
  * @param input - Event activate input
  * @returns Result with event ID or error
  */
 export async function activateEvent(
-  deps: Pick<Dependencies, "eventRepo">,
+  deps: Pick<Dependencies, "eventRepo" | "authService">,
   input: ActivateEventInput,
 ): Result.ResultAsync<ActivateEventOutput, ActivateEventError> {
   return suspend(() =>
@@ -52,6 +56,10 @@ export async function activateEvent(
       if (!event) {
         return yield* $(Result.fail(eventError("EVENT_NOT_FOUND", "イベントが見つかりません")));
       }
+
+      // Authorization check: global admin or event committee admin
+      const resource = eventResource(input.eventId, event);
+      yield* $(deps.authService.enforce(input.actor, resource, "event:activate"));
 
       // Check if event is already active
       if (event.status === "active") {

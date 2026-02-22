@@ -1,13 +1,16 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { Result } from "@praha/byethrow";
 import { dependencies } from "@/infrastructure/di";
 import { createEvent } from "@/application/command/event/create-event";
 import { updateEvent } from "@/application/command/event/update-event";
 import { archiveEvent } from "@/application/command/event/archive-event";
 import { activateEvent } from "@/application/command/event/activate-event";
+import { resolveActor } from "@/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/session-server";
 import { cast, eventIdSchema } from "@/domain/shared/ids";
 import type { EventId, UserId } from "@/domain/shared/ids";
+import type { GlobalRole } from "@/domain/authorization/actor";
 import { eventSchema } from "@/domain/event/schema";
 
 /**
@@ -27,10 +30,20 @@ export const createEventFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .inputValidator(createEventInputSchema)
   .handler(async ({ data, context }) => {
+    // Resolve actor from session (no event context needed for creation)
+    const actorResult = await resolveActor({
+      userId: cast<UserId>(context.session.user.id),
+      globalRole: context.session.user.role as GlobalRole,
+    });
+
+    if (Result.isFailure(actorResult)) {
+      throw new Error(actorResult.error.message);
+    }
+
     const result = await createEvent(dependencies, {
       name: data.name,
       slug: data.slug,
-      userId: cast<UserId>(context.session.user.id),
+      actor: actorResult.value,
     });
 
     return result;
@@ -43,11 +56,22 @@ export const updateEventFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .inputValidator(updateEventInputSchema)
   .handler(async ({ data, context }) => {
+    // Resolve actor with event context
+    const actorResult = await resolveActor({
+      userId: cast<UserId>(context.session.user.id),
+      globalRole: context.session.user.role as GlobalRole,
+      eventIds: [cast<EventId>(data.id)],
+    });
+
+    if (Result.isFailure(actorResult)) {
+      throw new Error(actorResult.error.message);
+    }
+
     const result = await updateEvent(dependencies, {
       eventId: data.id,
       name: data.name,
       slug: data.slug,
-      userId: cast<UserId>(context.session.user.id),
+      actor: actorResult.value,
     });
 
     return result;
@@ -60,9 +84,20 @@ export const archiveEventFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
   .handler(async ({ data, context }) => {
-    const result = await archiveEvent(dependencies, {
-      eventId: data.eventId as EventId,
+    // Resolve actor with event context
+    const actorResult = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
+      globalRole: context.session.user.role as GlobalRole,
+      eventIds: [cast<EventId>(data.eventId)],
+    });
+
+    if (Result.isFailure(actorResult)) {
+      throw new Error(actorResult.error.message);
+    }
+
+    const result = await archiveEvent(dependencies, {
+      eventId: cast<EventId>(data.eventId),
+      actor: actorResult.value,
     });
 
     return result;
@@ -75,9 +110,20 @@ export const activateEventFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
   .handler(async ({ data, context }) => {
-    const result = await activateEvent(dependencies, {
-      eventId: data.eventId as EventId,
+    // Resolve actor with event context
+    const actorResult = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
+      globalRole: context.session.user.role as GlobalRole,
+      eventIds: [cast<EventId>(data.eventId)],
+    });
+
+    if (Result.isFailure(actorResult)) {
+      throw new Error(actorResult.error.message);
+    }
+
+    const result = await activateEvent(dependencies, {
+      eventId: cast<EventId>(data.eventId),
+      actor: actorResult.value,
     });
 
     return result;
