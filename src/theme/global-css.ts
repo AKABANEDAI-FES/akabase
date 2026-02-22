@@ -5,12 +5,13 @@ export const globalCss = {
       "--global-color-placeholder": "colors.fg.subtle",
       "--global-color-selection": "colors.colorPalette.subtle.bg",
       "--global-color-focus-ring": "colors.colorPalette.solid.bg",
+      "--global-font-body": "sans-serif",
     },
     html: {
-      colorPalette: "gray",
+      colorPalette: "iris",
     },
     body: {
-      background: "canvas",
+      background: "bg.canvas",
       color: "fg.default",
     },
   },
