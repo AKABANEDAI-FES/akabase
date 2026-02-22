@@ -1,0 +1,20 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "archive",
+  "compatibility_date": "2025-09-02",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "@tanstack/react-start/server-entry",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "archive",
+      "database_id": "00000000-0000-4000-0000-000000000000",
+      "preview_database_id": "DB",
+      "migrations_dir": "src/db/migrations",
+    },
+  ],
+  "vars": {
+    "BETTER_AUTH_URL": "http://localhost:5137",
+    "ADMIN_EMAILS": ["s1f102200558@toyo.jp"],
+  },
+}
