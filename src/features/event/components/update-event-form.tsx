@@ -23,7 +23,7 @@ export function UpdateEventForm({ event }: UpdateEventFormProps) {
       slug: event.slug,
     },
     validators: {
-      onDynamic: updateEventInputSchema,
+      onDynamic: updateEventInputSchema.omit({ id: true }),
       onSubmitAsync: async ({ value }) => {
         try {
           const result = await updateEventFn({
