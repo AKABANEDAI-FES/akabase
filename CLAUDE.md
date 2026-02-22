@@ -225,6 +225,7 @@ const db = env.DB; // D1 database
 
 - Requirements: `docs/requirements.md` (Japanese)
 - Design: `docs/design.md` (Japanese, DDD-based)
+- Architecture: `docs/architecture.md` (Japanese, technical details)
 - TanStack Start: https://tanstack.com/start
 - Better Auth: https://better-auth.com
 - Drizzle ORM: https://orm.drizzle.team
