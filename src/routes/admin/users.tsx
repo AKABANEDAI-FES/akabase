@@ -1,9 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { loadUsersWithRolesFn } from "@/features/user/actions";
 import { GlobalRoleSelect } from "@/features/user/components";
-import { Code, Table } from "@/components/ui";
-import { css } from "styled-system/css";
-import { Flex, Stack } from "styled-system/jsx";
+import { Button, Code, Heading, Table } from "@/components/ui";
+import { Container, Flex, Stack } from "styled-system/jsx";
+import { ArrowLeftIcon } from "lucide-react";
 
 export const Route = createFileRoute("/admin/users")({
   loader: async () => {
@@ -20,16 +20,24 @@ function UserListPage() {
   const { users } = Route.useLoaderData();
 
   return (
-    <div className={css({ padding: "8", maxWidth: "1400px", margin: "0 auto" })}>
+    <Container maxW="6xl" py="8">
       <Stack gap="6">
-        <Flex justify="space-between" align="center">
-          <h1 className={css({ fontSize: "2xl", fontWeight: "bold" })}>ユーザー管理</h1>
-        </Flex>
+        <div>
+          <Button variant="plain" size="sm" mb="4" asChild>
+            <Link to="/admin/events">
+              <ArrowLeftIcon />
+              イベント一覧に戻る
+            </Link>
+          </Button>
+          <Flex justify="space-between" align="center">
+            <Heading as="h1" textStyle="2xl" fontWeight="bold">
+              ユーザー管理
+            </Heading>
+          </Flex>
+        </div>
 
         {users.length === 0 ? (
-          <div className={css({ padding: "8", textAlign: "center", color: "gray.500" })}>
-            ユーザーがいません。
-          </div>
+          <p>ユーザーがいません。</p>
         ) : (
           <Table.Root>
             <Table.Head>
@@ -57,6 +65,6 @@ function UserListPage() {
           </Table.Root>
         )}
       </Stack>
-    </div>
+    </Container>
   );
 }

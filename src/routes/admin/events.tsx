@@ -1,8 +1,7 @@
 import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 import { EventStatusBadge } from "@/features/event/components";
-import { Button, Code, IconButton, Table } from "@/components/ui";
-import { css } from "styled-system/css";
-import { Flex, Stack } from "styled-system/jsx";
+import { Button, Code, Heading, IconButton, Table } from "@/components/ui";
+import { Container, Flex, Stack } from "styled-system/jsx";
 import { PencilIcon, PlusIcon } from "lucide-react";
 import { loadEventsFn } from "@/features/event/actions";
 
@@ -19,10 +18,12 @@ function EventListPage() {
   const { events } = Route.useLoaderData();
 
   return (
-    <div className={css({ padding: "8", maxWidth: "1200px", margin: "0 auto" })}>
+    <Container maxW="6xl" py="8">
       <Stack gap="6">
         <Flex justify="space-between" align="center">
-          <h1 className={css({ fontSize: "2xl", fontWeight: "bold" })}>イベント一覧</h1>
+          <Heading as="h1" textStyle="2xl" fontWeight="bold">
+            イベント一覧
+          </Heading>
           <Link to="/admin/events/new">
             <Button>
               <PlusIcon />
@@ -32,9 +33,7 @@ function EventListPage() {
         </Flex>
 
         {events.length === 0 ? (
-          <div className={css({ padding: "8", textAlign: "center", color: "gray.500" })}>
-            イベントがまだありません。新しいイベントを作成してください。
-          </div>
+          <p>イベントがまだありません。新しいイベントを作成してください。</p>
         ) : (
           <Table.Root>
             <Table.Head>
@@ -71,6 +70,6 @@ function EventListPage() {
         )}
       </Stack>
       <Outlet />
-    </div>
+    </Container>
   );
 }
