@@ -36,7 +36,7 @@ describe("AuthorizationServiceImpl", () => {
   describe("Event Authorization", () => {
     describe("event:create", () => {
       it("should deny non-admin users", () => {
-        const actor = createActor(cast<UserId>("user_1"), null);
+        const actor = createActor(cast<UserId>("user_1"));
         const eventId = cast<EventId>("event_1");
         const resource = eventResource(eventId);
 
@@ -51,7 +51,7 @@ describe("AuthorizationServiceImpl", () => {
       it("should deny committee admin (event-level admin)", () => {
         const eventId = cast<EventId>("event_1");
         const committeeRoles = new Map<EventId, CommitteeRole>([[eventId, "admin"]]);
-        const actor = createActor(cast<UserId>("user_1"), null, committeeRoles);
+        const actor = createActor(cast<UserId>("user_1"), "user", committeeRoles);
         const resource = eventResource(eventId);
 
         const result = authService.checkPermission(actor, resource, "event:create");
@@ -67,7 +67,7 @@ describe("AuthorizationServiceImpl", () => {
       it("should allow event committee admin", () => {
         const eventId = cast<EventId>("event_1");
         const committeeRoles = new Map<EventId, CommitteeRole>([[eventId, "admin"]]);
-        const actor = createActor(cast<UserId>("user_1"), null, committeeRoles);
+        const actor = createActor(cast<UserId>("user_1"), "user", committeeRoles);
         const resource = eventResource(eventId);
 
         expect(Result.isSuccess(authService.isAllowed(actor, resource, "event:update"))).toBe(true);
@@ -82,7 +82,7 @@ describe("AuthorizationServiceImpl", () => {
       it("should deny event committee approver (not admin)", () => {
         const eventId = cast<EventId>("event_1");
         const committeeRoles = new Map<EventId, CommitteeRole>([[eventId, "approver"]]);
-        const actor = createActor(cast<UserId>("user_1"), null, committeeRoles);
+        const actor = createActor(cast<UserId>("user_1"), "user", committeeRoles);
         const resource = eventResource(eventId);
 
         const updateResult = authService.checkPermission(actor, resource, "event:update");
@@ -95,7 +95,7 @@ describe("AuthorizationServiceImpl", () => {
 
       it("should deny user without event role", () => {
         const eventId = cast<EventId>("event_1");
-        const actor = createActor(cast<UserId>("user_1"), null);
+        const actor = createActor(cast<UserId>("user_1"));
         const resource = eventResource(eventId);
 
         const updateResult = authService.checkPermission(actor, resource, "event:update");
@@ -109,7 +109,7 @@ describe("AuthorizationServiceImpl", () => {
         const event1 = cast<EventId>("event_1");
         const event2 = cast<EventId>("event_2");
         const committeeRoles = new Map<EventId, CommitteeRole>([[event1, "admin"]]);
-        const actor = createActor(cast<UserId>("user_1"), null, committeeRoles);
+        const actor = createActor(cast<UserId>("user_1"), "user", committeeRoles);
 
         const resource1 = eventResource(event1);
         const resource2 = eventResource(event2);
@@ -129,7 +129,7 @@ describe("AuthorizationServiceImpl", () => {
     describe("event:read", () => {
       it("should allow anyone to read events", () => {
         const eventId = cast<EventId>("event_1");
-        const actor = createActor(cast<UserId>("user_1"), null);
+        const actor = createActor(cast<UserId>("user_1"), "user");
         const resource = eventResource(eventId);
 
         expect(Result.isSuccess(authService.isAllowed(actor, resource, "event:read"))).toBe(true);
@@ -144,7 +144,7 @@ describe("AuthorizationServiceImpl", () => {
         const eventId = cast<EventId>("event_1");
         const orgId = cast<OrgId>("org_1");
         const orgRoles = new Map<OrgId, OrgRole>([[orgId, "manager"]]);
-        const actor = createActor(cast<UserId>("user_1"), null, new Map(), orgRoles);
+        const actor = createActor(cast<UserId>("user_1"), "user", new Map(), orgRoles);
         const resource = projectResource(projectId, eventId, orgId);
 
         expect(Result.isSuccess(authService.isAllowed(actor, resource, "project:create"))).toBe(
@@ -160,7 +160,7 @@ describe("AuthorizationServiceImpl", () => {
         const eventId = cast<EventId>("event_1");
         const orgId = cast<OrgId>("org_1");
         const orgRoles = new Map<OrgId, OrgRole>([[orgId, "editor"]]);
-        const actor = createActor(cast<UserId>("user_1"), null, new Map(), orgRoles);
+        const actor = createActor(cast<UserId>("user_1"), "user", new Map(), orgRoles);
         const resource = projectResource(projectId, eventId, orgId);
 
         expect(Result.isSuccess(authService.isAllowed(actor, resource, "project:create"))).toBe(
@@ -175,7 +175,7 @@ describe("AuthorizationServiceImpl", () => {
         const projectId = cast<ProjectId>("project_1");
         const eventId = cast<EventId>("event_1");
         const orgId = cast<OrgId>("org_1");
-        const actor = createActor(cast<UserId>("user_1"), null);
+        const actor = createActor(cast<UserId>("user_1"), "user");
         const resource = projectResource(projectId, eventId, orgId);
 
         const createResult = authService.checkPermission(actor, resource, "project:create");
@@ -193,7 +193,7 @@ describe("AuthorizationServiceImpl", () => {
         const eventId = cast<EventId>("event_1");
         const orgId = cast<OrgId>("org_1");
         const orgRoles = new Map<OrgId, OrgRole>([[orgId, "manager"]]);
-        const actor = createActor(cast<UserId>("user_1"), null, new Map(), orgRoles);
+        const actor = createActor(cast<UserId>("user_1"), "user", new Map(), orgRoles);
         const resource = projectResource(projectId, eventId, orgId);
 
         expect(Result.isSuccess(authService.isAllowed(actor, resource, "project:submit"))).toBe(
@@ -206,7 +206,7 @@ describe("AuthorizationServiceImpl", () => {
         const eventId = cast<EventId>("event_1");
         const orgId = cast<OrgId>("org_1");
         const orgRoles = new Map<OrgId, OrgRole>([[orgId, "editor"]]);
-        const actor = createActor(cast<UserId>("user_1"), null, new Map(), orgRoles);
+        const actor = createActor(cast<UserId>("user_1"), "user", new Map(), orgRoles);
         const resource = projectResource(projectId, eventId, orgId);
 
         const submitResult = authService.checkPermission(actor, resource, "project:submit");
@@ -224,7 +224,7 @@ describe("AuthorizationServiceImpl", () => {
         const eventId = cast<EventId>("event_1");
         const orgId = cast<OrgId>("org_1");
         const committeeRoles = new Map<EventId, CommitteeRole>([[eventId, "admin"]]);
-        const actor = createActor(cast<UserId>("user_1"), null, committeeRoles);
+        const actor = createActor(cast<UserId>("user_1"), "user", committeeRoles);
         const resource = projectResource(projectId, eventId, orgId);
 
         expect(Result.isSuccess(authService.isAllowed(actor, resource, "project:approve"))).toBe(
@@ -240,7 +240,7 @@ describe("AuthorizationServiceImpl", () => {
         const eventId = cast<EventId>("event_1");
         const orgId = cast<OrgId>("org_1");
         const committeeRoles = new Map<EventId, CommitteeRole>([[eventId, "approver"]]);
-        const actor = createActor(cast<UserId>("user_1"), null, committeeRoles);
+        const actor = createActor(cast<UserId>("user_1"), "user", committeeRoles);
         const resource = projectResource(projectId, eventId, orgId);
 
         expect(Result.isSuccess(authService.isAllowed(actor, resource, "project:approve"))).toBe(
@@ -256,7 +256,7 @@ describe("AuthorizationServiceImpl", () => {
         const eventId = cast<EventId>("event_1");
         const orgId = cast<OrgId>("org_1");
         const committeeRoles = new Map<EventId, CommitteeRole>([[eventId, "member"]]);
-        const actor = createActor(cast<UserId>("user_1"), null, committeeRoles);
+        const actor = createActor(cast<UserId>("user_1"), "user", committeeRoles);
         const resource = projectResource(projectId, eventId, orgId);
 
         const approveResult = authService.checkPermission(actor, resource, "project:approve");
@@ -274,7 +274,7 @@ describe("AuthorizationServiceImpl", () => {
       it("should allow any authenticated user", () => {
         const orgId = cast<OrgId>("org_1");
         const eventId = cast<EventId>("event_1");
-        const actor = createActor(cast<UserId>("user_1"), null);
+        const actor = createActor(cast<UserId>("user_1"), "user");
         const resource = organizationResource(orgId, eventId);
 
         expect(
@@ -288,7 +288,7 @@ describe("AuthorizationServiceImpl", () => {
         const orgId = cast<OrgId>("org_1");
         const eventId = cast<EventId>("event_1");
         const orgRoles = new Map<OrgId, OrgRole>([[orgId, "manager"]]);
-        const actor = createActor(cast<UserId>("user_1"), null, new Map(), orgRoles);
+        const actor = createActor(cast<UserId>("user_1"), "user", new Map(), orgRoles);
         const resource = organizationResource(orgId, eventId);
 
         expect(
@@ -300,7 +300,7 @@ describe("AuthorizationServiceImpl", () => {
         const orgId = cast<OrgId>("org_1");
         const eventId = cast<EventId>("event_1");
         const orgRoles = new Map<OrgId, OrgRole>([[orgId, "editor"]]);
-        const actor = createActor(cast<UserId>("user_1"), null, new Map(), orgRoles);
+        const actor = createActor(cast<UserId>("user_1"), "user", new Map(), orgRoles);
         const resource = organizationResource(orgId, eventId);
 
         expect(
@@ -311,7 +311,7 @@ describe("AuthorizationServiceImpl", () => {
       it("should deny user without organization role", () => {
         const orgId = cast<OrgId>("org_1");
         const eventId = cast<EventId>("event_1");
-        const actor = createActor(cast<UserId>("user_1"), null);
+        const actor = createActor(cast<UserId>("user_1"), "user");
         const resource = organizationResource(orgId, eventId);
 
         const updateResult = authService.checkPermission(actor, resource, "organization:update");
@@ -328,7 +328,7 @@ describe("AuthorizationServiceImpl", () => {
         const orgId = cast<OrgId>("org_1");
         const eventId = cast<EventId>("event_1");
         const orgRoles = new Map<OrgId, OrgRole>([[orgId, "manager"]]);
-        const actor = createActor(cast<UserId>("user_1"), null, new Map(), orgRoles);
+        const actor = createActor(cast<UserId>("user_1"), "user", new Map(), orgRoles);
         const resource = organizationResource(orgId, eventId);
 
         expect(
@@ -340,7 +340,7 @@ describe("AuthorizationServiceImpl", () => {
         const orgId = cast<OrgId>("org_1");
         const eventId = cast<EventId>("event_1");
         const orgRoles = new Map<OrgId, OrgRole>([[orgId, "editor"]]);
-        const actor = createActor(cast<UserId>("user_1"), null, new Map(), orgRoles);
+        const actor = createActor(cast<UserId>("user_1"), "user", new Map(), orgRoles);
         const resource = organizationResource(orgId, eventId);
 
         const manageResult = authService.checkPermission(
@@ -371,7 +371,7 @@ describe("AuthorizationServiceImpl", () => {
     });
 
     it("should fail if not allowed", () => {
-      const actor = createActor(cast<UserId>("user_1"), null);
+      const actor = createActor(cast<UserId>("user_1"), "user");
       const eventId = cast<EventId>("event_1");
       const resource = eventResource(eventId);
 
