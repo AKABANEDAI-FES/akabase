@@ -4,15 +4,14 @@
  */
 
 import { z } from "zod";
-import type { EventId, UserId } from "@/domain/shared/ids";
-import { globalRoleSchema } from "@/domain/authorization/schema";
-import type { CommitteeRole } from "@/domain/authorization/schema";
+import { eventIdSchema, userIdSchema } from "@/domain/shared/ids";
+import { committeeRoleSchema, globalRoleSchema } from "@/domain/authorization/schema";
 
 /**
  * User entity schema
  */
 export const userSchema = z.object({
-  id: z.custom<UserId>(),
+  id: userIdSchema,
   name: z.string(),
   email: z.email(),
   emailVerified: z.boolean(),
@@ -30,9 +29,9 @@ export type User = z.infer<typeof userSchema>;
  */
 export const committeeRoleAssignmentSchema = z.object({
   id: z.string(),
-  eventId: z.custom<EventId>(),
-  userId: z.custom<UserId>(),
-  role: z.custom<CommitteeRole>(),
+  eventId: eventIdSchema,
+  userId: userIdSchema,
+  role: committeeRoleSchema,
   createdAt: z.date(),
 });
 

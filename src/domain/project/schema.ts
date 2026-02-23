@@ -1,18 +1,25 @@
 import { z } from "zod";
-import type { EventId, OrgId, ProjectId, SubmissionId, TagId, UserId } from "../shared/ids";
+import {
+  eventIdSchema,
+  orgIdSchema,
+  projectIdSchema,
+  submissionIdSchema,
+  tagIdSchema,
+  userIdSchema,
+} from "../shared/ids";
 
 /**
  * Project (Aggregate Root)
  * 企画の集約ルート
  */
 export const projectSchema = z.object({
-  id: z.custom<ProjectId>(),
-  eventId: z.custom<EventId>(),
-  orgId: z.custom<OrgId>(),
+  id: projectIdSchema,
+  eventId: eventIdSchema,
+  orgId: orgIdSchema,
   name: z.string(),
   placeText: z.string().nullable(),
   logoKey: z.string().nullable(),
-  activeSubmissionId: z.custom<SubmissionId>().nullable(),
+  activeSubmissionId: submissionIdSchema.nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
@@ -24,11 +31,11 @@ export type Project = z.infer<typeof projectSchema>;
  * 編集可能な作業データ
  */
 export const projectDraftSchema = z.object({
-  projectId: z.custom<ProjectId>(),
+  projectId: projectIdSchema,
   pamphletText: z.string().max(120).nullable(),
   webContentJson: z.json().nullable(), // TipTap JSON
   updatedAt: z.date(),
-  updatedBy: z.custom<UserId>(),
+  updatedBy: userIdSchema,
 });
 
 export type ProjectDraft = z.infer<typeof projectDraftSchema>;
@@ -45,15 +52,15 @@ export type SubmissionStatus = z.infer<typeof submissionStatusSchema>;
  * 不変なスナップショット（履歴）
  */
 export const projectSubmissionSchema = z.object({
-  id: z.custom<SubmissionId>(),
-  projectId: z.custom<ProjectId>(),
+  id: submissionIdSchema,
+  projectId: projectIdSchema,
   status: submissionStatusSchema,
   pamphletText: z.string().max(120).nullable(),
   webContentJson: z.json().nullable(),
   submittedAt: z.date(),
-  submittedBy: z.custom<UserId>(),
+  submittedBy: userIdSchema,
   decidedAt: z.date().nullable(),
-  decidedBy: z.custom<UserId>().nullable(),
+  decidedBy: userIdSchema.nullable(),
 });
 
 export type ProjectSubmission = z.infer<typeof projectSubmissionSchema>;
@@ -63,11 +70,11 @@ export type ProjectSubmission = z.infer<typeof projectSubmissionSchema>;
  * 承認済みデータのスナップショット
  */
 export const projectPublishedSchema = z.object({
-  projectId: z.custom<ProjectId>(),
+  projectId: projectIdSchema,
   pamphletText: z.string().max(120).nullable(),
   webContentJson: z.json().nullable(),
   publishedAt: z.date(),
-  publishedBy: z.custom<UserId>(),
+  publishedBy: userIdSchema,
 });
 
 export type ProjectPublished = z.infer<typeof projectPublishedSchema>;
@@ -77,19 +84,19 @@ export type ProjectPublished = z.infer<typeof projectPublishedSchema>;
  */
 
 export const draftWithTagsSchema = projectDraftSchema.extend({
-  tags: z.array(z.custom<TagId>()),
+  tags: z.array(tagIdSchema),
 });
 
 export type DraftWithTags = z.infer<typeof draftWithTagsSchema>;
 
 export const submissionWithTagsSchema = projectSubmissionSchema.extend({
-  tags: z.array(z.custom<TagId>()),
+  tags: z.array(tagIdSchema),
 });
 
 export type SubmissionWithTags = z.infer<typeof submissionWithTagsSchema>;
 
 export const publishedWithTagsSchema = projectPublishedSchema.extend({
-  tags: z.array(z.custom<TagId>()),
+  tags: z.array(tagIdSchema),
 });
 
 export type PublishedWithTags = z.infer<typeof publishedWithTagsSchema>;

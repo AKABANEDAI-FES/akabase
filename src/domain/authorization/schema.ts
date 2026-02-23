@@ -4,7 +4,12 @@
  */
 
 import { z } from "zod";
-import type { EventId, OrgId, ProjectId, UserId } from "@/domain/shared/ids";
+import {
+  eventIdSchema,
+  orgIdSchema,
+  projectIdSchema,
+  userIdSchema,
+} from "@/domain/shared/ids";
 import type { Event } from "@/domain/event/schema";
 import type { Project } from "@/domain/project/schema";
 import type { Organization } from "@/domain/organization/schema";
@@ -62,14 +67,14 @@ export type OrgRole = z.infer<typeof orgRoleSchema>;
  * Encapsulates all authorization-related information
  */
 export const actorSchema = z.object({
-  userId: z.custom<UserId>(),
+  userId: userIdSchema,
   globalRole: globalRoleSchema,
 
   // Event-level permissions (loaded on-demand or eagerly)
-  committeeRoles: z.map(z.custom<EventId>(), committeeRoleSchema),
+  committeeRoles: z.map(eventIdSchema, committeeRoleSchema),
 
   // Organization-level permissions (loaded on-demand or eagerly)
-  orgRoles: z.map(z.custom<OrgId>(), orgRoleSchema),
+  orgRoles: z.map(orgIdSchema, orgRoleSchema),
 });
 
 export type Actor = z.infer<typeof actorSchema>;
@@ -85,7 +90,7 @@ export type Actor = z.infer<typeof actorSchema>;
  */
 export const eventResourceSchema = z.object({
   type: z.literal("event"),
-  eventId: z.custom<EventId>(),
+  eventId: eventIdSchema,
   // Optional: include full entity for context-aware checks
   event: z.custom<Event>().optional(),
 });
@@ -97,9 +102,9 @@ export type EventResource = z.infer<typeof eventResourceSchema>;
  */
 export const projectResourceSchema = z.object({
   type: z.literal("project"),
-  projectId: z.custom<ProjectId>(),
-  eventId: z.custom<EventId>(), // Projects belong to events
-  orgId: z.custom<OrgId>(), // Projects belong to organizations
+  projectId: projectIdSchema,
+  eventId: eventIdSchema, // Projects belong to events
+  orgId: orgIdSchema, // Projects belong to organizations
   // Optional: include full entity for context-aware checks
   project: z.custom<Project>().optional(),
 });
@@ -111,8 +116,8 @@ export type ProjectResource = z.infer<typeof projectResourceSchema>;
  */
 export const organizationResourceSchema = z.object({
   type: z.literal("organization"),
-  orgId: z.custom<OrgId>(),
-  eventId: z.custom<EventId>(), // Organizations belong to events
+  orgId: orgIdSchema,
+  eventId: eventIdSchema, // Organizations belong to events
   // Optional: include full entity for context-aware checks
   organization: z.custom<Organization>().optional(),
 });
@@ -124,7 +129,7 @@ export type OrganizationResource = z.infer<typeof organizationResourceSchema>;
  */
 export const userResourceSchema = z.object({
   type: z.literal("user"),
-  userId: z.custom<UserId>(),
+  userId: userIdSchema,
 });
 
 export type UserResource = z.infer<typeof userResourceSchema>;

@@ -1,13 +1,13 @@
 import { z } from "zod";
-import type { EventId, OrgId, UserId } from "../shared/ids";
+import { eventIdSchema, orgIdSchema, userIdSchema } from "../shared/ids";
 
 /**
  * Organization
  * 団体の集約ルート
  */
 export const organizationSchema = z.object({
-  id: z.custom<OrgId>(),
-  eventId: z.custom<EventId>(),
+  id: orgIdSchema,
+  eventId: eventIdSchema,
   name: z.string(),
   description: z.string().max(100).nullable(),
   logoKey: z.string().nullable(),
@@ -30,8 +30,8 @@ export type OrgMemberRole = z.infer<typeof orgMemberRoleSchema>;
  */
 export const orgMemberSchema = z.object({
   id: z.string(),
-  orgId: z.custom<OrgId>(),
-  userId: z.custom<UserId>(),
+  orgId: orgIdSchema,
+  userId: userIdSchema,
   role: orgMemberRoleSchema,
   createdAt: z.date(),
 });

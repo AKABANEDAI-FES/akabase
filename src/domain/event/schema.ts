@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { DeadlineId, EventId, PlaceId, TagId } from "../shared/ids";
+import { deadlineIdSchema, eventIdSchema, placeIdSchema, tagIdSchema } from "../shared/ids";
 
 /**
  * Event Status
@@ -13,7 +13,7 @@ export type EventStatus = z.infer<typeof eventStatusSchema>;
  * イベント全体の設定を管理
  */
 export const eventSchema = z.object({
-  id: z.custom<EventId>(),
+  id: eventIdSchema,
   name: z
     .string()
     .min(1, "イベント名を入力してください")
@@ -34,8 +34,8 @@ export type Event = z.infer<typeof eventSchema>;
  * タグマスタ（イベント単位で管理）
  */
 export const tagSchema = z.object({
-  id: z.custom<TagId>(),
-  eventId: z.custom<EventId>(),
+  id: tagIdSchema,
+  eventId: eventIdSchema,
   name: z.string().min(1).max(100),
   slug: z
     .string()
@@ -51,8 +51,8 @@ export type Tag = z.infer<typeof tagSchema>;
  * 場所マスタ（イベント単位で管理）
  */
 export const placeSchema = z.object({
-  id: z.custom<PlaceId>(),
-  eventId: z.custom<EventId>(),
+  id: placeIdSchema,
+  eventId: eventIdSchema,
   name: z.string().min(1).max(100),
   slug: z
     .string()
@@ -68,8 +68,8 @@ export type Place = z.infer<typeof placeSchema>;
  * 締切設定（フィールド単位）
  */
 export const deadlineSchema = z.object({
-  id: z.custom<DeadlineId>(),
-  eventId: z.custom<EventId>(),
+  id: deadlineIdSchema,
+  eventId: eventIdSchema,
   fieldKey: z.string(),
   deadlineAt: z.date(),
   createdAt: z.date(),
