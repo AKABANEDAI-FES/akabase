@@ -3,9 +3,9 @@ import { gen, suspend } from "@/libs/result";
 import { generateId } from "@/libs/id";
 import { cast } from "@/domain/shared/ids";
 import type { EventId } from "@/domain/shared/ids";
-import type { Event } from "@/domain/event/schema";
 import type { EventError } from "@/domain/event/errors";
 import { eventError } from "@/domain/event/errors";
+import { createEventEntity } from "@/domain/event/logic";
 import type { RepositoryError } from "@/infrastructure/repositories/interfaces";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/actor";
@@ -70,15 +70,11 @@ export async function createEvent(
       }
 
       // Create event entity
-      const now = new Date();
-      const event: Event = {
+      const event = createEventEntity({
         id: eventId,
         name: input.name,
         slug: input.slug,
-        status: "active",
-        createdAt: now,
-        updatedAt: now,
-      };
+      });
 
       // Save event to database
       yield* $(await deps.eventRepo.saveEvent(event));

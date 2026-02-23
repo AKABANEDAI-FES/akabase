@@ -8,11 +8,13 @@ import {
   addTag,
   archiveEvent,
   canModifyEvent,
+  createEventEntity,
   isFieldEditable,
   isPlaceUnique,
   isTagSlugUnique,
   removePlace,
   removeTag,
+  updateEventEntity,
   updatePlace,
   updateTag,
 } from "./logic";
@@ -277,6 +279,50 @@ describe("Event Domain Logic", () => {
   });
 
   describe("Event Updates", () => {
+    describe("createEventEntity", () => {
+      it("creates active event with same createdAt and updatedAt", () => {
+        const now = new Date("2025-02-01T10:00:00.000Z");
+        const created = createEventEntity({
+          id: mockEventId,
+          name: "Created Event",
+          slug: "created-event",
+          now,
+        });
+
+        expect(created.id).toBe(mockEventId);
+        expect(created.name).toBe("Created Event");
+        expect(created.slug).toBe("created-event");
+        expect(created.status).toBe("active");
+        expect(created.createdAt).toBe(now);
+        expect(created.updatedAt).toBe(now);
+      });
+    });
+
+    describe("updateEventEntity", () => {
+      it("updates name/slug and updatedAt while keeping other fields", () => {
+        const event = createMockEvent({
+          name: "Old Name",
+          slug: "old-slug",
+          createdAt: new Date("2025-01-01T00:00:00.000Z"),
+          updatedAt: new Date("2025-01-02T00:00:00.000Z"),
+        });
+        const now = new Date("2025-02-01T10:00:00.000Z");
+
+        const updated = updateEventEntity(event, {
+          name: "New Name",
+          slug: "new-slug",
+          now,
+        });
+
+        expect(updated.id).toBe(event.id);
+        expect(updated.status).toBe(event.status);
+        expect(updated.createdAt).toBe(event.createdAt);
+        expect(updated.name).toBe("New Name");
+        expect(updated.slug).toBe("new-slug");
+        expect(updated.updatedAt).toBe(now);
+      });
+    });
+
     describe("archiveEvent", () => {
       it("changes event status to archived", () => {
         const event = createMockEvent({ status: "active" });

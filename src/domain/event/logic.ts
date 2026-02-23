@@ -2,7 +2,47 @@ import { Result } from "@praha/byethrow";
 import type { Deadline, Event, Place, Tag } from "./schema";
 import type { EventError } from "./errors";
 import { eventError } from "./errors";
-import type { PlaceId, TagId } from "../shared/ids";
+import type { EventId, PlaceId, TagId } from "../shared/ids";
+
+/**
+ * Create a new event entity
+ */
+export function createEventEntity(input: {
+  id: EventId;
+  name: string;
+  slug: string;
+  now?: Date;
+}): Event {
+  const now = input.now ?? new Date();
+
+  return {
+    id: input.id,
+    name: input.name,
+    slug: input.slug,
+    status: "active",
+    createdAt: now,
+    updatedAt: now,
+  };
+}
+
+/**
+ * Update event basic fields
+ */
+export function updateEventEntity(
+  event: Event,
+  input: {
+    name: string;
+    slug: string;
+    now?: Date;
+  },
+): Event {
+  return {
+    ...event,
+    name: input.name,
+    slug: input.slug,
+    updatedAt: input.now ?? new Date(),
+  };
+}
 
 /**
  * =============================================================================

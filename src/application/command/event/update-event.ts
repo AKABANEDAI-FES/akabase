@@ -1,10 +1,9 @@
 import { Result } from "@praha/byethrow";
 import { gen, suspend } from "@/libs/result";
 import type { EventId } from "@/domain/shared/ids";
-import type { Event } from "@/domain/event/schema";
 import type { EventError } from "@/domain/event/errors";
 import { eventError } from "@/domain/event/errors";
-import { canModifyEvent } from "@/domain/event/logic";
+import { canModifyEvent, updateEventEntity } from "@/domain/event/logic";
 import type { RepositoryError } from "@/infrastructure/repositories/interfaces";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/actor";
@@ -77,12 +76,10 @@ export async function updateEvent(
       }
 
       // Update event entity
-      const updatedEvent: Event = {
-        ...event,
+      const updatedEvent = updateEventEntity(event, {
         name: input.name,
         slug: input.slug,
-        updatedAt: new Date(),
-      };
+      });
 
       // Save updated event to database
       yield* $(await deps.eventRepo.updateEvent(updatedEvent));
