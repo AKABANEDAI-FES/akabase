@@ -47,7 +47,9 @@ function AdminLayout() {
           backgroundColor: "bg.default",
           shadow: "sm",
           padding: "4",
-          flexShrink: 0,
+          h: "100vh",
+          position: "sticky",
+          top: "0",
         })}
       >
         <Stack gap="8">
@@ -75,7 +77,7 @@ function AdminLayout() {
       </nav>
 
       {/* Main Content */}
-      <main className={css({ flex: 1, overflow: "auto" })}>
+      <main>
         <Outlet />
       </main>
     </div>
