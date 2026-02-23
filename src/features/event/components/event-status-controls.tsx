@@ -67,7 +67,7 @@ export function EventStatusControls({ eventId, eventName, status }: EventStatusC
       <Fieldset.Content>
         <Button
           variant="outline"
-          colorPalette={isArchived ? "iris" : "red"}
+          colorPalette={isArchived ? undefined : "red"}
           onClick={handleToggleArchive}
           loading={isPending}
           w="fit"
