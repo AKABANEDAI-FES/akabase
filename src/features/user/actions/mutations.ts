@@ -9,7 +9,6 @@ import { authMiddleware } from "@/libs/session-server";
 import { cast, eventIdSchema, userIdSchema } from "@/domain/shared/ids";
 import type { EventId, UserId } from "@/domain/shared/ids";
 import { committeeRoleSchema, globalRoleSchema } from "@/domain/authorization/schema";
-import type { GlobalRole } from "@/domain/authorization/schema";
 
 export const updateCommitteeRoleInputSchema = z.object({
   userId: userIdSchema,
@@ -23,7 +22,6 @@ export const updateCommitteeRoleFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const actorResult = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
-      globalRole: context.session.user.role as GlobalRole,
       eventIds: [cast<EventId>(data.eventId)], // Load permissions for the target event
     });
 
@@ -52,7 +50,6 @@ export const updateGlobalRoleFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const actorResult = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
-      globalRole: context.session.user.role as GlobalRole,
       eventIds: [], // No event context needed for global role updates
     });
 

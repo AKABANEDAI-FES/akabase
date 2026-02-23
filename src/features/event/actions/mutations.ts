@@ -10,7 +10,6 @@ import { resolveActor } from "@/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/session-server";
 import { cast, eventIdSchema } from "@/domain/shared/ids";
 import type { EventId, UserId } from "@/domain/shared/ids";
-import type { GlobalRole } from "@/domain/authorization/schema";
 import { eventSchema } from "@/domain/event/schema";
 
 /**
@@ -33,7 +32,6 @@ export const createEventFn = createServerFn({ method: "POST" })
     // Resolve actor from session (no event context needed for creation)
     const actorResult = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
-      globalRole: context.session.user.role as GlobalRole,
     });
 
     if (Result.isFailure(actorResult)) {
@@ -59,7 +57,6 @@ export const updateEventFn = createServerFn({ method: "POST" })
     // Resolve actor with event context
     const actorResult = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
-      globalRole: context.session.user.role as GlobalRole,
       eventIds: [cast<EventId>(data.id)],
     });
 
@@ -87,7 +84,6 @@ export const archiveEventFn = createServerFn({ method: "POST" })
     // Resolve actor with event context
     const actorResult = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
-      globalRole: context.session.user.role as GlobalRole,
       eventIds: [cast<EventId>(data.eventId)],
     });
 
@@ -113,7 +109,6 @@ export const activateEventFn = createServerFn({ method: "POST" })
     // Resolve actor with event context
     const actorResult = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
-      globalRole: context.session.user.role as GlobalRole,
       eventIds: [cast<EventId>(data.eventId)],
     });
 
