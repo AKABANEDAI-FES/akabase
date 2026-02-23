@@ -37,8 +37,8 @@ describe("submitProject", () => {
       projectRepo: {
         findById: vi.fn().mockResolvedValue(Result.succeed(mockProject)),
         findDraftWithTags: vi.fn().mockResolvedValue(Result.succeed(mockDraft)),
-        saveSubmissionWithTags: vi.fn().mockResolvedValue(Result.succeed(undefined)),
-        updateProject: vi.fn().mockResolvedValue(Result.succeed(undefined)),
+        saveSubmission: vi.fn().mockResolvedValue(Result.succeed(undefined)),
+        saveProject: vi.fn().mockResolvedValue(Result.succeed(undefined)),
       } as any,
     };
 
@@ -56,8 +56,8 @@ describe("submitProject", () => {
 
     expect(mockDeps.projectRepo.findById).toHaveBeenCalledWith(mockProjectId);
     expect(mockDeps.projectRepo.findDraftWithTags).toHaveBeenCalledWith(mockProjectId);
-    expect(mockDeps.projectRepo.saveSubmissionWithTags).toHaveBeenCalled();
-    expect(mockDeps.projectRepo.updateProject).toHaveBeenCalled();
+    expect(mockDeps.projectRepo.saveSubmission).toHaveBeenCalled();
+    expect(mockDeps.projectRepo.saveProject).toHaveBeenCalled();
   });
 
   it("should fail when project not found", async () => {
@@ -66,8 +66,8 @@ describe("submitProject", () => {
       projectRepo: {
         findById: vi.fn().mockResolvedValue(Result.succeed(null)),
         findDraftWithTags: vi.fn(),
-        saveSubmissionWithTags: vi.fn(),
-        updateProject: vi.fn(),
+        saveSubmission: vi.fn(),
+        saveProject: vi.fn(),
       } as any,
     };
 
@@ -90,8 +90,8 @@ describe("submitProject", () => {
       projectRepo: {
         findById: vi.fn().mockResolvedValue(Result.succeed(mockProject)),
         findDraftWithTags: vi.fn().mockResolvedValue(Result.succeed(null)),
-        saveSubmissionWithTags: vi.fn(),
-        updateProject: vi.fn(),
+        saveSubmission: vi.fn(),
+        saveProject: vi.fn(),
       } as any,
     };
 
@@ -119,8 +119,8 @@ describe("submitProject", () => {
       projectRepo: {
         findById: vi.fn().mockResolvedValue(Result.succeed(projectWithActiveSubmission)),
         findDraftWithTags: vi.fn().mockResolvedValue(Result.succeed(mockDraft)),
-        saveSubmissionWithTags: vi.fn(),
-        updateProject: vi.fn(),
+        saveSubmission: vi.fn(),
+        saveProject: vi.fn(),
       } as any,
     };
 
@@ -137,8 +137,8 @@ describe("submitProject", () => {
     }
 
     // Should not call persistence methods
-    expect(mockDeps.projectRepo.saveSubmissionWithTags).not.toHaveBeenCalled();
-    expect(mockDeps.projectRepo.updateProject).not.toHaveBeenCalled();
+    expect(mockDeps.projectRepo.saveSubmission).not.toHaveBeenCalled();
+    expect(mockDeps.projectRepo.saveProject).not.toHaveBeenCalled();
   });
 
   it("should fail when repository operation fails", async () => {
@@ -147,10 +147,10 @@ describe("submitProject", () => {
       projectRepo: {
         findById: vi.fn().mockResolvedValue(Result.succeed(mockProject)),
         findDraftWithTags: vi.fn().mockResolvedValue(Result.succeed(mockDraft)),
-        saveSubmissionWithTags: vi
+        saveSubmission: vi
           .fn()
           .mockResolvedValue(Result.fail({ code: "DATABASE_ERROR", message: "DB error" })),
-        updateProject: vi.fn(),
+        saveProject: vi.fn(),
       } as any,
     };
 
@@ -167,7 +167,7 @@ describe("submitProject", () => {
     }
 
     // Should not proceed to update project
-    expect(mockDeps.projectRepo.updateProject).not.toHaveBeenCalled();
+    expect(mockDeps.projectRepo.saveProject).not.toHaveBeenCalled();
   });
 
   it("should set activeSubmissionId on the project", async () => {
@@ -176,8 +176,8 @@ describe("submitProject", () => {
       projectRepo: {
         findById: vi.fn().mockResolvedValue(Result.succeed(mockProject)),
         findDraftWithTags: vi.fn().mockResolvedValue(Result.succeed(mockDraft)),
-        saveSubmissionWithTags: vi.fn().mockResolvedValue(Result.succeed(undefined)),
-        updateProject: vi.fn().mockResolvedValue(Result.succeed(undefined)),
+        saveSubmission: vi.fn().mockResolvedValue(Result.succeed(undefined)),
+        saveProject: vi.fn().mockResolvedValue(Result.succeed(undefined)),
       } as any,
     };
 
@@ -191,8 +191,8 @@ describe("submitProject", () => {
     expect(Result.isSuccess(result)).toBe(true);
 
     // Verify the updated project has activeSubmissionId set
-    const updateCall = (mockDeps.projectRepo.updateProject as any).mock.calls[0];
-    const updatedProject = updateCall[0];
+    const saveCall = (mockDeps.projectRepo.saveProject as any).mock.calls[0];
+    const updatedProject = saveCall[0];
     expect(updatedProject.activeSubmissionId).toBeDefined();
     expect(updatedProject.activeSubmissionId).not.toBeNull();
   });

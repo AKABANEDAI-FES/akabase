@@ -55,7 +55,7 @@ export interface ProjectRepository {
   ): Promise<Result.Result<ProjectSubmission[], RepositoryError>>;
 
   /**
-   * Save a new project (atomic operation - project + draft)
+   * Save project (insert or update - atomic operation for project + draft)
    */
   saveProject(
     project: Project,
@@ -63,26 +63,9 @@ export interface ProjectRepository {
   ): Promise<Result.Result<void, RepositoryError>>;
 
   /**
-   * Update project metadata
+   * Save submission (insert or update)
    */
-  updateProject(project: Project): Promise<Result.Result<void, RepositoryError>>;
-
-  /**
-   * Update draft
-   */
-  updateDraft(draft: DraftWithTags): Promise<Result.Result<void, RepositoryError>>;
-
-  /**
-   * Save submission with tags
-   */
-  saveSubmissionWithTags(
-    submission: SubmissionWithTags,
-  ): Promise<Result.Result<void, RepositoryError>>;
-
-  /**
-   * Update submission (for status changes)
-   */
-  updateSubmission(submission: ProjectSubmission): Promise<Result.Result<void, RepositoryError>>;
+  saveSubmission(submission: SubmissionWithTags): Promise<Result.Result<void, RepositoryError>>;
 
   /**
    * Save or update published data

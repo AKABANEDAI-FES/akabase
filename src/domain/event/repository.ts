@@ -41,14 +41,9 @@ export interface EventRepository {
   findDeadlines(eventId: EventId): Promise<Result.Result<Deadline[], RepositoryError>>;
 
   /**
-   * Save a new event
+   * Save event (insert or update)
    */
   saveEvent(event: Event): Promise<Result.Result<void, RepositoryError>>;
-
-  /**
-   * Update event
-   */
-  updateEvent(event: Event): Promise<Result.Result<void, RepositoryError>>;
 
   /**
    * Save a new tag

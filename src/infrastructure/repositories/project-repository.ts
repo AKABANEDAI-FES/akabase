@@ -224,29 +224,56 @@ export class ProjectRepositoryImpl implements ProjectRepository {
     draft: DraftWithTags,
   ): Promise<Result.Result<void, RepositoryError>> {
     try {
-      // Save project
-      await db.insert(projects).values({
-        id: project.id,
-        eventId: project.eventId,
-        orgId: project.orgId,
-        name: project.name,
-        placeText: project.placeText,
-        logoKey: project.logoKey,
-        activeSubmissionId: project.activeSubmissionId,
-        createdAt: project.createdAt,
-        updatedAt: project.updatedAt,
-      });
+      // Upsert project
+      await db
+        .insert(projects)
+        .values({
+          id: project.id,
+          eventId: project.eventId,
+          orgId: project.orgId,
+          name: project.name,
+          placeText: project.placeText,
+          logoKey: project.logoKey,
+          activeSubmissionId: project.activeSubmissionId,
+          createdAt: project.createdAt,
+          updatedAt: project.updatedAt,
+        })
+        .onConflictDoUpdate({
+          target: projects.id,
+          set: {
+            // Immutable fields excluded: id, eventId, orgId, createdAt
+            name: project.name,
+            placeText: project.placeText,
+            logoKey: project.logoKey,
+            activeSubmissionId: project.activeSubmissionId,
+            updatedAt: project.updatedAt,
+          },
+        });
 
-      // Save draft
-      await db.insert(projectDrafts).values({
-        projectId: draft.projectId,
-        pamphletText: draft.pamphletText,
-        webContentJson: draft.webContentJson,
-        updatedAt: draft.updatedAt,
-        updatedBy: draft.updatedBy,
-      });
+      // Upsert draft
+      await db
+        .insert(projectDrafts)
+        .values({
+          projectId: draft.projectId,
+          pamphletText: draft.pamphletText,
+          webContentJson: draft.webContentJson,
+          updatedAt: draft.updatedAt,
+          updatedBy: draft.updatedBy,
+        })
+        .onConflictDoUpdate({
+          target: projectDrafts.projectId,
+          set: {
+            // Immutable fields excluded: projectId
+            pamphletText: draft.pamphletText,
+            webContentJson: draft.webContentJson,
+            updatedAt: draft.updatedAt,
+            updatedBy: draft.updatedBy,
+          },
+        });
 
-      // Save tags
+      // Replace tags (delete + insert)
+      await db.delete(projectDraftTags).where(eq(projectDraftTags.projectId, draft.projectId));
+
       if (draft.tags.length > 0) {
         await db.insert(projectDraftTags).values(
           draft.tags.map((tagId) => ({
@@ -263,75 +290,40 @@ export class ProjectRepositoryImpl implements ProjectRepository {
     }
   }
 
-  async updateProject(project: Project): Promise<Result.Result<void, RepositoryError>> {
-    try {
-      await db
-        .update(projects)
-        .set({
-          name: project.name,
-          placeText: project.placeText,
-          logoKey: project.logoKey,
-          activeSubmissionId: project.activeSubmissionId,
-          updatedAt: project.updatedAt,
-        })
-        .where(eq(projects.id, project.id));
-
-      return Result.succeed(undefined);
-    } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to update project", error));
-    }
-  }
-
-  async updateDraft(draft: DraftWithTags): Promise<Result.Result<void, RepositoryError>> {
-    try {
-      // Update draft
-      await db
-        .update(projectDrafts)
-        .set({
-          pamphletText: draft.pamphletText,
-          webContentJson: draft.webContentJson,
-          updatedAt: draft.updatedAt,
-          updatedBy: draft.updatedBy,
-        })
-        .where(eq(projectDrafts.projectId, draft.projectId));
-
-      // Update tags: delete old ones and insert new ones
-      await db.delete(projectDraftTags).where(eq(projectDraftTags.projectId, draft.projectId));
-
-      if (draft.tags.length > 0) {
-        await db.insert(projectDraftTags).values(
-          draft.tags.map((tagId) => ({
-            id: generateId(),
-            projectId: draft.projectId,
-            tagId,
-          })),
-        );
-      }
-
-      return Result.succeed(undefined);
-    } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to update draft", error));
-    }
-  }
-
-  async saveSubmissionWithTags(
+  async saveSubmission(
     submission: SubmissionWithTags,
   ): Promise<Result.Result<void, RepositoryError>> {
     try {
-      // Save submission
-      await db.insert(projectSubmissions).values({
-        id: submission.id,
-        projectId: submission.projectId,
-        status: submission.status,
-        pamphletText: submission.pamphletText,
-        webContentJson: submission.webContentJson,
-        submittedAt: submission.submittedAt,
-        submittedBy: submission.submittedBy,
-        decidedAt: submission.decidedAt,
-        decidedBy: submission.decidedBy,
-      });
+      // Upsert submission
+      await db
+        .insert(projectSubmissions)
+        .values({
+          id: submission.id,
+          projectId: submission.projectId,
+          status: submission.status,
+          pamphletText: submission.pamphletText,
+          webContentJson: submission.webContentJson,
+          submittedAt: submission.submittedAt,
+          submittedBy: submission.submittedBy,
+          decidedAt: submission.decidedAt,
+          decidedBy: submission.decidedBy,
+        })
+        .onConflictDoUpdate({
+          target: projectSubmissions.id,
+          set: {
+            // Submission content is immutable, only status/decision can change
+            status: submission.status,
+            decidedAt: submission.decidedAt,
+            decidedBy: submission.decidedBy,
+            // Immutable fields excluded: id, projectId, pamphletText, webContentJson, submittedAt, submittedBy
+          },
+        });
 
-      // Save tags
+      // Replace tags (delete + insert)
+      await db
+        .delete(projectSubmissionTags)
+        .where(eq(projectSubmissionTags.submissionId, submission.id));
+
       if (submission.tags.length > 0) {
         await db.insert(projectSubmissionTags).values(
           submission.tags.map((tagId) => ({
@@ -345,25 +337,6 @@ export class ProjectRepositoryImpl implements ProjectRepository {
       return Result.succeed(undefined);
     } catch (error) {
       return Result.fail(repositoryError("DATABASE_ERROR", "Failed to save submission", error));
-    }
-  }
-
-  async updateSubmission(
-    submission: ProjectSubmission,
-  ): Promise<Result.Result<void, RepositoryError>> {
-    try {
-      await db
-        .update(projectSubmissions)
-        .set({
-          status: submission.status,
-          decidedAt: submission.decidedAt,
-          decidedBy: submission.decidedBy,
-        })
-        .where(eq(projectSubmissions.id, submission.id));
-
-      return Result.succeed(undefined);
-    } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to update submission", error));
     }
   }
 

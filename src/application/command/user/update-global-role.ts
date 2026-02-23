@@ -54,7 +54,7 @@ export async function updateGlobalRole(
 
       const updatedUser = updateUserGlobalRole(user, input.role);
 
-      yield* $(await deps.userRepo.updateUser(updatedUser));
+      yield* $(await deps.userRepo.saveUser(updatedUser));
 
       return { success: true as const };
     }),

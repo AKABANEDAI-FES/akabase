@@ -73,27 +73,40 @@ export class UserRepositoryImpl implements UserRepository {
     }
   }
 
-  async updateUser(user: User): Promise<Result.Result<void, RepositoryError>> {
+  async saveUser(user: User): Promise<Result.Result<void, RepositoryError>> {
     try {
       await db
-        .update(userTable)
-        .set({
+        .insert(userTable)
+        .values({
+          id: user.id,
           name: user.name,
           email: user.email,
           emailVerified: user.emailVerified,
           image: user.image,
           role: user.role,
+          createdAt: user.createdAt,
           updatedAt: user.updatedAt,
         })
-        .where(eq(userTable.id, user.id))
+        .onConflictDoUpdate({
+          target: userTable.id,
+          set: {
+            // Immutable fields excluded: id, createdAt
+            name: user.name,
+            email: user.email,
+            emailVerified: user.emailVerified,
+            image: user.image,
+            role: user.role,
+            updatedAt: user.updatedAt,
+          },
+        })
         .run();
 
       return Result.succeed(undefined);
     } catch (error) {
-      console.error("[UserRepository] updateUser error:", error);
+      console.error("[UserRepository] saveUser error:", error);
       return Result.fail({
         code: "DATABASE_ERROR",
-        message: "ユーザーの更新に失敗しました",
+        message: "ユーザーの保存に失敗しました",
       });
     }
   }

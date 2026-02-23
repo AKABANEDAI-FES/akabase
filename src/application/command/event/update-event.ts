@@ -82,7 +82,7 @@ export async function updateEvent(
       });
 
       // Save updated event to database
-      yield* $(await deps.eventRepo.updateEvent(updatedEvent));
+      yield* $(await deps.eventRepo.saveEvent(updatedEvent));
 
       return { eventId: input.eventId };
     }),

@@ -26,13 +26,13 @@ export interface UserRepository {
   listAll(): Promise<Result.Result<User[], RepositoryError>>;
 
   /**
-   * Update user (accepts full User entity)
-   * Use domain logic functions to compute the updated user before calling this
+   * Save user (insert or update)
+   * Use domain logic functions to compute the user before calling this
    *
-   * @param user - User entity to update
+   * @param user - User entity to save
    * @returns Success or repository error
    */
-  updateUser(user: User): Promise<Result.Result<void, RepositoryError>>;
+  saveUser(user: User): Promise<Result.Result<void, RepositoryError>>;
 
   /**
    * Find committee role assignment

@@ -1,7 +1,7 @@
 import { Result } from "@praha/byethrow";
 import { db } from "@/db";
 import { events } from "@/db/schema";
-import { desc, eq } from "drizzle-orm";
+import { desc } from "drizzle-orm";
 import { eventSchema } from "@/domain/event/schema";
 import type { Event } from "@/domain/event/schema";
 import type { EventId } from "@/domain/shared/ids";
@@ -88,36 +88,30 @@ export class EventRepositoryImpl implements EventRepository {
 
   async saveEvent(event: Event): Promise<Result.Result<void, RepositoryError>> {
     try {
-      await db.insert(events).values({
-        id: event.id,
-        name: event.name,
-        slug: event.slug,
-        status: event.status,
-        createdAt: event.createdAt,
-        updatedAt: event.updatedAt,
-      });
+      await db
+        .insert(events)
+        .values({
+          id: event.id,
+          name: event.name,
+          slug: event.slug,
+          status: event.status,
+          createdAt: event.createdAt,
+          updatedAt: event.updatedAt,
+        })
+        .onConflictDoUpdate({
+          target: events.id,
+          set: {
+            // Immutable fields excluded: id, createdAt
+            name: event.name,
+            slug: event.slug,
+            status: event.status,
+            updatedAt: event.updatedAt,
+          },
+        });
 
       return Result.succeed(undefined);
     } catch (error) {
       return Result.fail(repositoryError("DATABASE_ERROR", "Failed to save event", error));
-    }
-  }
-
-  async updateEvent(event: Event): Promise<Result.Result<void, RepositoryError>> {
-    try {
-      await db
-        .update(events)
-        .set({
-          name: event.name,
-          slug: event.slug,
-          status: event.status,
-          updatedAt: event.updatedAt,
-        })
-        .where(eq(events.id, event.id));
-
-      return Result.succeed(undefined);
-    } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to update event", error));
     }
   }
 

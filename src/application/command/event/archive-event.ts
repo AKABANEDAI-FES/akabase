@@ -72,7 +72,7 @@ export async function archiveEvent(
       const archivedEvent = archiveEventLogic(event);
 
       // Save archived event to database
-      yield* $(await deps.eventRepo.updateEvent(archivedEvent));
+      yield* $(await deps.eventRepo.saveEvent(archivedEvent));
 
       return { eventId: input.eventId };
     }),

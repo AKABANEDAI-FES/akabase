@@ -72,7 +72,7 @@ export async function activateEvent(
       const activatedEvent = activateEventLogic(event);
 
       // Save activated event to database
-      yield* $(await deps.eventRepo.updateEvent(activatedEvent));
+      yield* $(await deps.eventRepo.saveEvent(activatedEvent));
 
       return { eventId: input.eventId };
     }),

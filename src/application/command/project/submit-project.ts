@@ -86,10 +86,10 @@ export function submitProject(
       const updatedProject = projectAfterSubmit(projectResult, submissionId);
 
       // 6. Persist submission to repository
-      yield* $(await deps.projectRepo.saveSubmissionWithTags(submission));
+      yield* $(await deps.projectRepo.saveSubmission(submission));
 
       // 7. Update project in repository
-      yield* $(await deps.projectRepo.updateProject(updatedProject));
+      yield* $(await deps.projectRepo.saveProject(updatedProject, draftResult));
 
       // Return success with submission ID
       return { submissionId };
