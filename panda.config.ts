@@ -80,6 +80,13 @@ export default defineConfig({
             },
           },
 
+          bg: {
+            canvas: {
+              value: { _light: "{colors.gray.1}", _dark: "{colors.gray.1}" },
+            },
+            default: { value: { _light: "white", _dark: "{colors.gray.2}" } },
+          },
+
           iris: iris,
           gray: slate,
           red: red,
