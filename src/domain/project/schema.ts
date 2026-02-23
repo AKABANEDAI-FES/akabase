@@ -9,6 +9,14 @@ import {
 } from "../shared/ids";
 
 /**
+ * Schema constraints
+ */
+export const PROJECT_NAME_MIN_LENGTH = 1;
+export const PROJECT_NAME_MAX_LENGTH = 100;
+export const PROJECT_PLACE_TEXT_MAX_LENGTH = 100;
+export const PROJECT_PAMPHLET_TEXT_MAX_LENGTH = 120;
+
+/**
  * Project (Aggregate Root)
  * 企画の集約ルート
  */
@@ -16,8 +24,14 @@ export const projectSchema = z.object({
   id: projectIdSchema,
   eventId: eventIdSchema,
   orgId: orgIdSchema,
-  name: z.string(),
-  placeText: z.string().nullable(),
+  name: z
+    .string()
+    .min(PROJECT_NAME_MIN_LENGTH, "企画名を入力してください")
+    .max(PROJECT_NAME_MAX_LENGTH, "企画名は100文字以内で入力してください"),
+  placeText: z
+    .string()
+    .max(PROJECT_PLACE_TEXT_MAX_LENGTH, "場所は100文字以内で入力してください")
+    .nullable(),
   logoKey: z.string().nullable(),
   activeSubmissionId: submissionIdSchema.nullable(),
   createdAt: z.date(),
@@ -32,7 +46,10 @@ export type Project = z.infer<typeof projectSchema>;
  */
 export const projectDraftSchema = z.object({
   projectId: projectIdSchema,
-  pamphletText: z.string().max(120).nullable(),
+  pamphletText: z
+    .string()
+    .max(PROJECT_PAMPHLET_TEXT_MAX_LENGTH, "パンフレットテキストは120文字以内で入力してください")
+    .nullable(),
   webContentJson: z.json().nullable(), // TipTap JSON
   updatedAt: z.date(),
   updatedBy: userIdSchema,
@@ -55,7 +72,10 @@ export const projectSubmissionSchema = z.object({
   id: submissionIdSchema,
   projectId: projectIdSchema,
   status: submissionStatusSchema,
-  pamphletText: z.string().max(120).nullable(),
+  pamphletText: z
+    .string()
+    .max(PROJECT_PAMPHLET_TEXT_MAX_LENGTH, "パンフレットテキストは120文字以内で入力してください")
+    .nullable(),
   webContentJson: z.json().nullable(),
   submittedAt: z.date(),
   submittedBy: userIdSchema,
@@ -71,7 +91,10 @@ export type ProjectSubmission = z.infer<typeof projectSubmissionSchema>;
  */
 export const projectPublishedSchema = z.object({
   projectId: projectIdSchema,
-  pamphletText: z.string().max(120).nullable(),
+  pamphletText: z
+    .string()
+    .max(PROJECT_PAMPHLET_TEXT_MAX_LENGTH, "パンフレットテキストは120文字以内で入力してください")
+    .nullable(),
   webContentJson: z.json().nullable(),
   publishedAt: z.date(),
   publishedBy: userIdSchema,

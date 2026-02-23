@@ -2,6 +2,18 @@ import { z } from "zod";
 import { deadlineIdSchema, eventIdSchema, placeIdSchema, tagIdSchema } from "../shared/ids";
 
 /**
+ * Schema constraints
+ */
+export const EVENT_NAME_MIN_LENGTH = 1;
+export const EVENT_NAME_MAX_LENGTH = 100;
+export const TAG_NAME_MIN_LENGTH = 1;
+export const TAG_NAME_MAX_LENGTH = 100;
+export const PLACE_NAME_MIN_LENGTH = 1;
+export const PLACE_NAME_MAX_LENGTH = 100;
+export const SLUG_MIN_LENGTH = 1;
+export const SLUG_PATTERN = /^[a-z0-9-]+$/;
+
+/**
  * Event Status
  */
 export const eventStatusSchema = z.enum(["active", "archived"]);
@@ -16,12 +28,12 @@ export const eventSchema = z.object({
   id: eventIdSchema,
   name: z
     .string()
-    .min(1, "イベント名を入力してください")
-    .max(100, "イベント名は100文字以内で入力してください"),
+    .min(EVENT_NAME_MIN_LENGTH, "イベント名を入力してください")
+    .max(EVENT_NAME_MAX_LENGTH, "イベント名は100文字以内で入力してください"),
   slug: z
     .string()
-    .min(1, "スラッグを入力してください")
-    .regex(/^[a-z0-9-]+$/, "スラッグは小文字英数字とハイフンのみ使用できます"),
+    .min(SLUG_MIN_LENGTH, "スラッグを入力してください")
+    .regex(SLUG_PATTERN, "スラッグは小文字英数字とハイフンのみ使用できます"),
   status: eventStatusSchema,
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -36,11 +48,14 @@ export type Event = z.infer<typeof eventSchema>;
 export const tagSchema = z.object({
   id: tagIdSchema,
   eventId: eventIdSchema,
-  name: z.string().min(1).max(100),
+  name: z
+    .string()
+    .min(TAG_NAME_MIN_LENGTH, "タグ名を入力してください")
+    .max(TAG_NAME_MAX_LENGTH, "タグ名は100文字以内で入力してください"),
   slug: z
     .string()
-    .min(1)
-    .regex(/^[a-z0-9-]+$/),
+    .min(SLUG_MIN_LENGTH, "スラッグを入力してください")
+    .regex(SLUG_PATTERN, "スラッグは小文字英数字とハイフンのみ使用できます"),
   createdAt: z.date(),
 });
 
@@ -53,11 +68,14 @@ export type Tag = z.infer<typeof tagSchema>;
 export const placeSchema = z.object({
   id: placeIdSchema,
   eventId: eventIdSchema,
-  name: z.string().min(1).max(100),
+  name: z
+    .string()
+    .min(PLACE_NAME_MIN_LENGTH, "場所名を入力してください")
+    .max(PLACE_NAME_MAX_LENGTH, "場所名は100文字以内で入力してください"),
   slug: z
     .string()
-    .min(1)
-    .regex(/^[a-z0-9-]+$/),
+    .min(SLUG_MIN_LENGTH, "スラッグを入力してください")
+    .regex(SLUG_PATTERN, "スラッグは小文字英数字とハイフンのみ使用できます"),
   createdAt: z.date(),
 });
 

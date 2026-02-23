@@ -8,12 +8,21 @@ import { eventIdSchema, userIdSchema } from "@/domain/shared/ids";
 import { committeeRoleSchema, globalRoleSchema } from "@/domain/authorization/schema";
 
 /**
+ * Schema constraints
+ */
+export const USER_NAME_MIN_LENGTH = 1;
+export const USER_NAME_MAX_LENGTH = 100;
+
+/**
  * User entity schema
  */
 export const userSchema = z.object({
   id: userIdSchema,
-  name: z.string(),
-  email: z.email(),
+  name: z
+    .string()
+    .min(USER_NAME_MIN_LENGTH, "ユーザー名を入力してください")
+    .max(USER_NAME_MAX_LENGTH, "ユーザー名は100文字以内で入力してください"),
+  email: z.string().email("有効なメールアドレスを入力してください"),
   emailVerified: z.boolean(),
   image: z.string().nullable(),
   role: globalRoleSchema, // Global role
