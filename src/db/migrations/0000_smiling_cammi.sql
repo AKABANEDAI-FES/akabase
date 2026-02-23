@@ -70,7 +70,7 @@ CREATE TABLE `organizations` (
 	`id` text PRIMARY KEY NOT NULL,
 	`event_id` text NOT NULL,
 	`name` text NOT NULL,
-	`description` text,
+	`description` text NOT NULL,
 	`logo_key` text,
 	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	`updated_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
@@ -102,7 +102,7 @@ CREATE INDEX `project_draft_tags_tag_id_idx` ON `project_draft_tags` (`tag_id`);
 CREATE UNIQUE INDEX `project_draft_tags_unique` ON `project_draft_tags` (`project_id`,`tag_id`);--> statement-breakpoint
 CREATE TABLE `project_drafts` (
 	`project_id` text PRIMARY KEY NOT NULL,
-	`pamphlet_text` text,
+	`pamphlet_text` text NOT NULL,
 	`web_content_json` text,
 	`updated_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	`updated_by` text NOT NULL,
@@ -112,7 +112,7 @@ CREATE TABLE `project_drafts` (
 --> statement-breakpoint
 CREATE TABLE `project_published` (
 	`project_id` text PRIMARY KEY NOT NULL,
-	`pamphlet_text` text,
+	`pamphlet_text` text NOT NULL,
 	`web_content_json` text,
 	`published_at` integer NOT NULL,
 	`published_by` text NOT NULL,
@@ -146,7 +146,7 @@ CREATE TABLE `project_submissions` (
 	`id` text PRIMARY KEY NOT NULL,
 	`project_id` text NOT NULL,
 	`status` text DEFAULT 'submitted' NOT NULL,
-	`pamphlet_text` text,
+	`pamphlet_text` text NOT NULL,
 	`web_content_json` text,
 	`submitted_at` integer NOT NULL,
 	`submitted_by` text NOT NULL,

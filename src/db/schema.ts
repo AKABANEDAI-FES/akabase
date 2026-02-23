@@ -142,7 +142,7 @@ export const organizations = sqliteTable(
       .notNull()
       .references(() => events.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
-    description: text("description"),
+    description: text("description").notNull(),
     logoKey: text("logo_key"), // R2 storage key
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
@@ -226,7 +226,7 @@ export const projectDrafts = sqliteTable("project_drafts", {
   projectId: text("project_id")
     .primaryKey()
     .references(() => projects.id, { onDelete: "cascade" }),
-  pamphletText: text("pamphlet_text"), // 120文字以内
+  pamphletText: text("pamphlet_text").notNull(), // 120文字以内
   webContentJson: text("web_content_json", { mode: "json" }), // TipTap JSON
   updatedAt: integer("updated_at", { mode: "timestamp_ms" })
     .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
@@ -253,7 +253,7 @@ export const projectSubmissions = sqliteTable(
     })
       .notNull()
       .default("submitted"),
-    pamphletText: text("pamphlet_text"),
+    pamphletText: text("pamphlet_text").notNull(),
     webContentJson: text("web_content_json", { mode: "json" }),
     submittedAt: integer("submitted_at", { mode: "timestamp_ms" }).notNull(),
     submittedBy: text("submitted_by")
@@ -276,7 +276,7 @@ export const projectPublished = sqliteTable("project_published", {
   projectId: text("project_id")
     .primaryKey()
     .references(() => projects.id, { onDelete: "cascade" }),
-  pamphletText: text("pamphlet_text"),
+  pamphletText: text("pamphlet_text").notNull(),
   webContentJson: text("web_content_json", { mode: "json" }),
   publishedAt: integer("published_at", { mode: "timestamp_ms" }).notNull(),
   publishedBy: text("published_by")

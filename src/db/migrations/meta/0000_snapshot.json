@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "70d999a8-5183-476f-9921-f4eb4a60f04a",
+  "id": "f3b83b31-ca1c-4d5e-92c4-d5b27704d597",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "committee_roles": {
@@ -451,7 +451,7 @@
           "name": "description",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "logo_key": {
@@ -647,7 +647,7 @@
           "name": "pamphlet_text",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "web_content_json": {
@@ -712,7 +712,7 @@
           "name": "pamphlet_text",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "web_content_json": {
@@ -923,7 +923,7 @@
           "name": "pamphlet_text",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "web_content_json": {
