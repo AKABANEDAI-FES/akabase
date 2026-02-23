@@ -1,8 +1,8 @@
-import { useRouter } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { useTransition } from "react";
 import { Result } from "@praha/byethrow";
 import { createListCollection } from "@ark-ui/react/collection";
-import { updateCommitteeRoleFn } from "@/features/user/actions";
+import { generateLoadUsersForEventCacheKey, updateCommitteeRoleFn } from "@/features/user/actions";
 import { Select, toaster } from "@/components/ui";
 import { COMMITTEE_ROLES, COMMITTEE_ROLE_LABELS } from "@/domain/authorization/schema";
 import type { CommitteeRole } from "@/domain/authorization/schema";
@@ -21,7 +21,7 @@ interface CommitteeRoleSelectProps {
 }
 
 export function CommitteeRoleSelect({ userId, eventId, currentRole }: CommitteeRoleSelectProps) {
-  const router = useRouter();
+  const queryClient = useQueryClient();
   const [isPending, startTransition] = useTransition();
 
   const handleRoleChange = (newRole: CommitteeRole) => {
@@ -47,7 +47,8 @@ export function CommitteeRoleSelect({ userId, eventId, currentRole }: CommitteeR
           title: "ロールを更新しました",
         });
 
-        router.invalidate();
+        // Invalidate users for event query
+        queryClient.invalidateQueries({ queryKey: generateLoadUsersForEventCacheKey(eventId) });
       } catch {
         toaster.create({
           type: "error",

@@ -1,9 +1,14 @@
 import { useTransition } from "react";
 import { Result } from "@praha/byethrow";
-import { activateEventFn, archiveEventFn } from "@/features/event/actions";
+import {
+  activateEventFn,
+  archiveEventFn,
+  generateLoadEventDetailCacheKey,
+  generateLoadEventsCacheKey,
+} from "@/features/event/actions";
 import { Button, Fieldset, toaster } from "@/components/ui";
 import { ArchiveIcon, ArchiveRestoreIcon } from "lucide-react";
-import { useRouter } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface EventStatusControlsProps {
   eventId: string;
@@ -17,7 +22,7 @@ interface EventStatusControlsProps {
  */
 export function EventStatusControls({ eventId, eventName, status }: EventStatusControlsProps) {
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
+  const queryClient = useQueryClient();
 
   const isArchived = status === "archived";
 
@@ -43,7 +48,9 @@ export function EventStatusControls({ eventId, eventName, status }: EventStatusC
             ? `「${eventName}」が編集可能になりました`
             : `「${eventName}」は読み取り専用になりました`,
         });
-        router.invalidate();
+        // Invalidate event detail and event list queries
+        queryClient.invalidateQueries({ queryKey: generateLoadEventDetailCacheKey(eventId) });
+        queryClient.invalidateQueries({ queryKey: generateLoadEventsCacheKey() });
       } catch (error) {
         toaster.create({
           type: "error",

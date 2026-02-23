@@ -1,23 +1,19 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { loadUsersWithRolesFn } from "@/features/user/actions";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { generateLoadUsersWithRolesQueryOptions } from "@/features/user/actions";
 import { GlobalRoleSelect } from "@/features/user/components";
 import { Button, Code, Heading, Table } from "@/components/ui";
 import { Container, Flex, Stack } from "styled-system/jsx";
 import { ArrowLeftIcon } from "lucide-react";
 
 export const Route = createFileRoute("/admin/users")({
-  loader: async () => {
-    const users = await loadUsersWithRolesFn();
-
-    return {
-      users,
-    };
-  },
+  loader: async ({ context }) =>
+    context.queryClient.ensureQueryData(generateLoadUsersWithRolesQueryOptions()),
   component: UserListPage,
 });
 
 function UserListPage() {
-  const { users } = Route.useLoaderData();
+  const { data: users } = useSuspenseQuery(generateLoadUsersWithRolesQueryOptions());
 
   return (
     <Container maxW="6xl" py="8">

@@ -3,19 +3,17 @@ import { EventStatusBadge } from "@/features/event/components";
 import { Button, Code, Heading, IconButton, Table } from "@/components/ui";
 import { Container, Flex, Stack } from "styled-system/jsx";
 import { PencilIcon, PlusIcon } from "lucide-react";
-import { loadEventsFn } from "@/features/event/actions";
+import { generateLoadEventsQueryOptions } from "@/features/event/actions";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/admin/events")({
-  loader: async () => {
-    return {
-      events: await loadEventsFn(),
-    };
-  },
+  loader: async ({ context }) =>
+    context.queryClient.ensureQueryData(generateLoadEventsQueryOptions()),
   component: EventListPage,
 });
 
 function EventListPage() {
-  const { events } = Route.useLoaderData();
+  const { data: events } = useSuspenseQuery(generateLoadEventsQueryOptions());
 
   return (
     <Container maxW="6xl" py="8">

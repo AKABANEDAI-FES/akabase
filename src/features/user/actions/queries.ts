@@ -6,6 +6,7 @@ import { listUsersWithRoles } from "@/application/query/user/list-users-with-rol
 import { listUsersForEvent } from "@/application/query/user/list-users-for-event";
 import { cast, eventIdSchema } from "@/domain/shared/ids";
 import type { EventId } from "@/domain/shared/ids";
+import { queryOptions } from "@tanstack/react-query";
 
 export const loadUsersWithRolesFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
@@ -19,6 +20,17 @@ export const loadUsersWithRolesFn = createServerFn({ method: "GET" })
     return result.value;
   });
 
+export function generateLoadUsersWithRolesCacheKey() {
+  return ["users", "with-roles"];
+}
+
+export function generateLoadUsersWithRolesQueryOptions() {
+  return queryOptions({
+    queryKey: generateLoadUsersWithRolesCacheKey(),
+    queryFn: loadUsersWithRolesFn,
+  });
+}
+
 export const loadUsersForEventFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
@@ -31,3 +43,14 @@ export const loadUsersForEventFn = createServerFn({ method: "GET" })
 
     return result.value;
   });
+
+export function generateLoadUsersForEventCacheKey(eventId: string) {
+  return ["users", "for-event", eventId];
+}
+
+export function generateLoadUsersForEventQueryOptions(eventId: string) {
+  return queryOptions({
+    queryKey: generateLoadUsersForEventCacheKey(eventId),
+    queryFn: () => loadUsersForEventFn({ data: { eventId } }),
+  });
+}

@@ -1,29 +1,27 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { loadUsersForEventFn } from "@/features/user/actions";
-import { loadEventDetailFn } from "@/features/event/actions";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { generateLoadUsersForEventQueryOptions } from "@/features/user/actions";
+import { generateLoadEventDetailQueryOptions } from "@/features/event/actions";
 import { EventUsersTable } from "@/features/user/components";
 import { Container, Stack } from "styled-system/jsx";
 import { Button, Heading, Text } from "@/components/ui";
 import { ArrowLeftIcon } from "lucide-react";
 
 export const Route = createFileRoute("/admin/events_/$eventId_/users")({
-  loader: async ({ params }) => {
+  loader: async ({ params, context }) => {
     const eventId = params.eventId;
-    const [users, event] = await Promise.all([
-      loadUsersForEventFn({ data: { eventId } }),
-      loadEventDetailFn({ data: { eventId } }),
+    await Promise.all([
+      context.queryClient.ensureQueryData(generateLoadUsersForEventQueryOptions(eventId)),
+      context.queryClient.ensureQueryData(generateLoadEventDetailQueryOptions(eventId)),
     ]);
-
-    return {
-      users,
-      event,
-    };
   },
   component: EventUserListPage,
 });
 
 function EventUserListPage() {
-  const { users, event } = Route.useLoaderData();
+  const { eventId } = Route.useParams();
+  const { data: users } = useSuspenseQuery(generateLoadUsersForEventQueryOptions(eventId));
+  const { data: event } = useSuspenseQuery(generateLoadEventDetailQueryOptions(eventId));
 
   return (
     <Container maxW="6xl" py="8">

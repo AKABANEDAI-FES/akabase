@@ -1,23 +1,23 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { cast } from "@/domain/shared/ids";
 import type { EventId } from "@/domain/shared/ids";
 import { EventStatusAlert, EventStatusControls } from "@/features/event/components";
-import { loadEventDetailFn } from "@/features/event/actions";
+import { generateLoadEventDetailQueryOptions } from "@/features/event/actions";
 import { Container, Flex, Stack } from "styled-system/jsx";
 import { Button, Heading } from "@/components/ui";
 import { ArrowLeftIcon, UsersIcon } from "lucide-react";
 import { UpdateEventForm } from "@/features/event/components/update-event-form";
 
 export const Route = createFileRoute("/admin/events_/$eventId")({
-  loader: async ({ params }) => {
-    const event = await loadEventDetailFn({ data: { eventId: cast<EventId>(params.eventId) } });
-    return { event };
-  },
+  loader: async ({ params, context }) =>
+    context.queryClient.ensureQueryData(generateLoadEventDetailQueryOptions(params.eventId)),
   component: EditEventPage,
 });
 
 function EditEventPage() {
-  const { event } = Route.useLoaderData();
+  const { eventId } = Route.useParams();
+  const { data: event } = useSuspenseQuery(generateLoadEventDetailQueryOptions(eventId));
 
   return (
     <Container maxW="6xl" py="8">

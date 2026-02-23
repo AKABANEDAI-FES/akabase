@@ -1,9 +1,11 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { loadRecentActiveEventFn } from "@/features/event/actions";
+import { generateLoadRecentActiveEventQueryOptions } from "@/features/event/actions";
 
 export const Route = createFileRoute("/")({
-  beforeLoad: async () => {
-    const recentActiveEvent = await loadRecentActiveEventFn();
+  beforeLoad: async ({ context }) => {
+    const recentActiveEvent = await context.queryClient.ensureQueryData(
+      generateLoadRecentActiveEventQueryOptions(),
+    );
 
     if (recentActiveEvent) {
       throw redirect({

@@ -1,8 +1,8 @@
-import { useRouter } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { useTransition } from "react";
 import { Result } from "@praha/byethrow";
 import { createListCollection } from "@ark-ui/react/collection";
-import { updateGlobalRoleFn } from "@/features/user/actions";
+import { generateLoadUsersWithRolesCacheKey, updateGlobalRoleFn } from "@/features/user/actions";
 import { Select, toaster } from "@/components/ui";
 import { GLOBAL_ROLES, GLOBAL_ROLE_LABELS } from "@/domain/authorization/schema";
 import type { GlobalRole } from "@/domain/authorization/schema";
@@ -20,7 +20,7 @@ interface GlobalRoleSelectProps {
 }
 
 export function GlobalRoleSelect({ userId, currentRole }: GlobalRoleSelectProps) {
-  const router = useRouter();
+  const queryClient = useQueryClient();
   const [isPending, startTransition] = useTransition();
 
   const handleRoleChange = (newRole: GlobalRole) => {
@@ -46,7 +46,8 @@ export function GlobalRoleSelect({ userId, currentRole }: GlobalRoleSelectProps)
           title: "ロールを更新しました",
         });
 
-        router.invalidate();
+        // Invalidate users with roles query
+        queryClient.invalidateQueries({ queryKey: generateLoadUsersWithRolesCacheKey() });
       } catch {
         toaster.create({
           type: "error",
