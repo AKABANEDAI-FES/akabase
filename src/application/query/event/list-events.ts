@@ -4,10 +4,6 @@ import { db } from "@/db";
 import { events } from "@/db/schema";
 import { desc } from "drizzle-orm";
 
-/**
- * Event list item DTO schema
- * イベント一覧表示用のDTOスキーマ
- */
 export const eventListItemSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -16,23 +12,13 @@ export const eventListItemSchema = z.object({
   createdAt: z.date(),
 });
 
-/**
- * Event list item DTO type (derived from schema)
- */
 export type EventListItem = z.infer<typeof eventListItemSchema>;
 
-/**
- * Query error type
- */
 export type QueryError = {
   code: "DATABASE_ERROR";
   message: string;
 };
 
-/**
- * List all events
- * 全イベントを一覧表示用に取得
- */
 export async function listEvents(): Promise<Result.Result<EventListItem[], QueryError>> {
   try {
     const rows = await db.query.events.findMany({

@@ -1,29 +1,11 @@
 import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { Result } from "@praha/byethrow";
-import { listEvents } from "@/application/query/event/list-events";
 import { EventStatusBadge } from "@/features/event/components";
 import { Button, Code, IconButton, Table } from "@/components/ui";
 import { css } from "styled-system/css";
 import { Flex, Stack } from "styled-system/jsx";
 import { PencilIcon, PlusIcon } from "lucide-react";
+import { loadEventsFn } from "@/features/event/actions";
 
-/**
- * Server function to load all events
- */
-const loadEventsFn = createServerFn({ method: "GET" }).handler(async () => {
-  const result = await listEvents();
-
-  if (Result.isFailure(result)) {
-    throw new Error(result.error.message);
-  }
-
-  return result.value;
-});
-
-/**
- * Admin events list route
- */
 export const Route = createFileRoute("/admin/events")({
   loader: async () => {
     return {
@@ -33,16 +15,12 @@ export const Route = createFileRoute("/admin/events")({
   component: EventListPage,
 });
 
-/**
- * Event list page component
- */
 function EventListPage() {
   const { events } = Route.useLoaderData();
 
   return (
     <div className={css({ padding: "8", maxWidth: "1200px", margin: "0 auto" })}>
       <Stack gap="6">
-        {/* Header */}
         <Flex justify="space-between" align="center">
           <h1 className={css({ fontSize: "2xl", fontWeight: "bold" })}>イベント一覧</h1>
           <Link to="/admin/events/new">
@@ -53,7 +31,6 @@ function EventListPage() {
           </Link>
         </Flex>
 
-        {/* Events table */}
         {events.length === 0 ? (
           <div className={css({ padding: "8", textAlign: "center", color: "gray.500" })}>
             イベントがまだありません。新しいイベントを作成してください。

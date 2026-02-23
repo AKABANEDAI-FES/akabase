@@ -3,10 +3,6 @@ import { Result } from "@praha/byethrow";
 import { db } from "@/db";
 import type { EventId } from "@/domain/shared/ids";
 
-/**
- * Event detail DTO schema
- * イベント詳細表示・編集用のDTOスキーマ
- */
 export const eventDetailSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -16,23 +12,13 @@ export const eventDetailSchema = z.object({
   updatedAt: z.date(),
 });
 
-/**
- * Event detail DTO type (derived from schema)
- */
 export type EventDetail = z.infer<typeof eventDetailSchema>;
 
-/**
- * Query error type
- */
 export type QueryError = {
   code: "DATABASE_ERROR" | "NOT_FOUND";
   message: string;
 };
 
-/**
- * Get event detail by ID
- * イベント詳細を取得（編集フォームの初期値用）
- */
 export async function getEventDetail(
   eventId: EventId,
 ): Promise<Result.Result<EventDetail, QueryError>> {

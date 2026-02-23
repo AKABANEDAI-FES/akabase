@@ -5,10 +5,18 @@ import { getEventDetail } from "@/application/query/event/get-event-detail";
 import { authMiddleware } from "@/libs/session-server";
 import { eventIdSchema } from "@/domain/shared/ids";
 import type { EventId } from "@/domain/shared/ids";
+import { listEvents } from "@/application/query/event/list-events";
 
-/**
- * Server function to load event detail
- */
+export const loadEventsFn = createServerFn({ method: "GET" }).handler(async () => {
+  const result = await listEvents();
+
+  if (Result.isFailure(result)) {
+    throw new Error(result.error.message);
+  }
+
+  return result.value;
+});
+
 export const loadEventDetailFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
