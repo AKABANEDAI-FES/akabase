@@ -24,10 +24,10 @@ describe("createActor", () => {
     const eventId = cast<EventId>("event_1");
     const committeeRoles = new Map<EventId, CommitteeRole>([[eventId, "admin"]]);
 
-    const actor = createActor(userId, null, committeeRoles);
+    const actor = createActor(userId, "user", committeeRoles);
 
     expect(actor.userId).toBe(userId);
-    expect(actor.globalRole).toBe(null);
+    expect(actor.globalRole).toBe("user");
     expect(actor.committeeRoles.get(eventId)).toBe("admin");
   });
 
@@ -36,10 +36,10 @@ describe("createActor", () => {
     const orgId = cast<OrgId>("org_1");
     const orgRoles = new Map<OrgId, OrgRole>([[orgId, "manager"]]);
 
-    const actor = createActor(userId, null, new Map(), orgRoles);
+    const actor = createActor(userId, "user", new Map(), orgRoles);
 
     expect(actor.userId).toBe(userId);
-    expect(actor.globalRole).toBe(null);
+    expect(actor.globalRole).toBe("user");
     expect(actor.orgRoles.get(orgId)).toBe("manager");
   });
 
@@ -66,14 +66,14 @@ describe("isGlobalAdmin", () => {
   });
 
   it("should return false for non-admin", () => {
-    const actor = createActor(cast<UserId>("user_123"), null);
+    const actor = createActor(cast<UserId>("user_123"), "user");
     expect(isGlobalAdmin(actor)).toBe(false);
   });
 
   it("should return false even if user has committee admin role", () => {
     const eventId = cast<EventId>("event_1");
     const committeeRoles = new Map<EventId, CommitteeRole>([[eventId, "admin"]]);
-    const actor = createActor(cast<UserId>("user_123"), null, committeeRoles);
+    const actor = createActor(cast<UserId>("user_123"), "user", committeeRoles);
 
     expect(isGlobalAdmin(actor)).toBe(false);
   });
@@ -83,18 +83,18 @@ describe("getCommitteeRoleForEvent", () => {
   it("should return committee role for event", () => {
     const eventId = cast<EventId>("event_1");
     const committeeRoles = new Map<EventId, CommitteeRole>([[eventId, "admin"]]);
-    const actor = createActor(cast<UserId>("user_123"), null, committeeRoles);
+    const actor = createActor(cast<UserId>("user_123"), "user", committeeRoles);
 
     expect(getCommitteeRoleForEvent(actor, eventId)).toBe("admin");
   });
 
-  it("should return null for event without role", () => {
+  it("should return default for event without role", () => {
     const eventId1 = cast<EventId>("event_1");
     const eventId2 = cast<EventId>("event_2");
     const committeeRoles = new Map<EventId, CommitteeRole>([[eventId1, "admin"]]);
-    const actor = createActor(cast<UserId>("user_123"), null, committeeRoles);
+    const actor = createActor(cast<UserId>("user_123"), "user", committeeRoles);
 
-    expect(getCommitteeRoleForEvent(actor, eventId2)).toBe(null);
+    expect(getCommitteeRoleForEvent(actor, eventId2)).toBe("default");
   });
 
   it("should handle different committee roles", () => {
@@ -106,7 +106,7 @@ describe("getCommitteeRoleForEvent", () => {
       [event2, "approver"],
       [event3, "member"],
     ]);
-    const actor = createActor(cast<UserId>("user_123"), null, committeeRoles);
+    const actor = createActor(cast<UserId>("user_123"), "user", committeeRoles);
 
     expect(getCommitteeRoleForEvent(actor, event1)).toBe("admin");
     expect(getCommitteeRoleForEvent(actor, event2)).toBe("approver");
@@ -118,7 +118,7 @@ describe("getOrgRoleForOrg", () => {
   it("should return organization role for org", () => {
     const orgId = cast<OrgId>("org_1");
     const orgRoles = new Map<OrgId, OrgRole>([[orgId, "manager"]]);
-    const actor = createActor(cast<UserId>("user_123"), null, new Map(), orgRoles);
+    const actor = createActor(cast<UserId>("user_123"), "user", new Map(), orgRoles);
 
     expect(getOrgRoleForOrg(actor, orgId)).toBe("manager");
   });
@@ -127,7 +127,7 @@ describe("getOrgRoleForOrg", () => {
     const orgId1 = cast<OrgId>("org_1");
     const orgId2 = cast<OrgId>("org_2");
     const orgRoles = new Map<OrgId, OrgRole>([[orgId1, "manager"]]);
-    const actor = createActor(cast<UserId>("user_123"), null, new Map(), orgRoles);
+    const actor = createActor(cast<UserId>("user_123"), "user", new Map(), orgRoles);
 
     expect(getOrgRoleForOrg(actor, orgId2)).toBe(null);
   });
@@ -139,7 +139,7 @@ describe("getOrgRoleForOrg", () => {
       [org1, "manager"],
       [org2, "editor"],
     ]);
-    const actor = createActor(cast<UserId>("user_123"), null, new Map(), orgRoles);
+    const actor = createActor(cast<UserId>("user_123"), "user", new Map(), orgRoles);
 
     expect(getOrgRoleForOrg(actor, org1)).toBe("manager");
     expect(getOrgRoleForOrg(actor, org2)).toBe("editor");

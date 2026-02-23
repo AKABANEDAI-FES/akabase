@@ -23,7 +23,7 @@ export type QueryError = {
  */
 export type ResolveActorOptions = {
   userId: UserId;
-  globalRole: GlobalRole;
+  globalRole?: GlobalRole;
 
   // Pre-load specific event permissions
   eventIds?: EventId[];

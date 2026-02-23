@@ -8,12 +8,12 @@ import type { EventId, OrgId, UserId } from "@/domain/shared/ids";
 /**
  * Global role assigned to a user
  */
-export type GlobalRole = "admin" | null;
+export type GlobalRole = "admin" | "user";
 
 /**
  * Committee role within a specific event
  */
-export type CommitteeRole = "admin" | "approver" | "member" | "default" | null;
+export type CommitteeRole = "admin" | "approver" | "member" | "default";
 
 /**
  * Organization role within a specific organization
@@ -46,7 +46,7 @@ export type Actor = {
  */
 export function createActor(
   userId: UserId,
-  globalRole: GlobalRole,
+  globalRole: GlobalRole = "user",
   committeeRoles: Map<EventId, CommitteeRole> = new Map(),
   orgRoles: Map<OrgId, OrgRole> = new Map(),
 ): Actor {
@@ -76,7 +76,7 @@ export function isGlobalAdmin(actor: Actor): boolean {
  * @returns Committee role for the event, or null if no role
  */
 export function getCommitteeRoleForEvent(actor: Actor, eventId: EventId): CommitteeRole {
-  return actor.committeeRoles.get(eventId) ?? null;
+  return actor.committeeRoles.get(eventId) ?? "default";
 }
 
 /**
