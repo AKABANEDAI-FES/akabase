@@ -9,6 +9,8 @@ import { authMiddleware } from "@/libs/session-server";
 import { cast, eventIdSchema, userIdSchema } from "@/domain/shared/ids";
 import type { EventId, UserId } from "@/domain/shared/ids";
 import { committeeRoleSchema, globalRoleSchema } from "@/domain/authorization/schema";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { generateLoadUsersForEventCacheKey, generateLoadUsersWithRolesCacheKey } from "./queries";
 
 export const updateCommitteeRoleInputSchema = z.object({
   userId: userIdSchema,
@@ -39,6 +41,20 @@ export const updateCommitteeRoleFn = createServerFn({ method: "POST" })
     return result;
   });
 
+export function useUpdateCommitteeRoleMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateCommitteeRoleFn,
+    onSuccess: (result, variables) => {
+      Result.inspect(() => {
+        queryClient.invalidateQueries({
+          queryKey: generateLoadUsersForEventCacheKey(variables.data.eventId),
+        });
+      })(result);
+    },
+  });
+}
+
 export const updateGlobalRoleInputSchema = z.object({
   userId: userIdSchema,
   role: globalRoleSchema,
@@ -65,3 +81,13 @@ export const updateGlobalRoleFn = createServerFn({ method: "POST" })
 
     return result;
   });
+
+export function useUpdateGlobalRoleMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateGlobalRoleFn,
+    onSuccess: Result.inspect(() => {
+      queryClient.invalidateQueries({ queryKey: generateLoadUsersWithRolesCacheKey() });
+    }),
+  });
+}

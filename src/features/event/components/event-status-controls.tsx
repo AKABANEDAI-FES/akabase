@@ -1,14 +1,7 @@
-import { useTransition } from "react";
 import { Result } from "@praha/byethrow";
-import {
-  activateEventFn,
-  archiveEventFn,
-  generateLoadEventDetailCacheKey,
-  generateLoadEventsCacheKey,
-} from "@/features/event/actions";
+import { useActivateEventMutation, useArchiveEventMutation } from "@/features/event/actions";
 import { Button, Fieldset, toaster } from "@/components/ui";
 import { ArchiveIcon, ArchiveRestoreIcon } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
 
 interface EventStatusControlsProps {
   eventId: string;
@@ -21,44 +14,40 @@ interface EventStatusControlsProps {
  * Provides archive/activate buttons with loading state and error handling
  */
 export function EventStatusControls({ eventId, eventName, status }: EventStatusControlsProps) {
-  const [isPending, startTransition] = useTransition();
-  const queryClient = useQueryClient();
+  const { mutateAsync: archiveEvent, isPending: isArchiving } = useArchiveEventMutation();
+  const { mutateAsync: activateEvent, isPending: isActivating } = useActivateEventMutation();
 
   const isArchived = status === "archived";
+  const isPending = isArchiving || isActivating;
 
-  const handleToggleArchive = () => {
-    startTransition(async () => {
-      try {
-        const f = isArchived ? activateEventFn : archiveEventFn;
-        const result = await f({ data: { eventId } });
+  const handleToggleArchive = async () => {
+    try {
+      const mutation = isArchived ? activateEvent : archiveEvent;
+      const result = await mutation({ data: { eventId } });
 
-        if (Result.isFailure(result)) {
-          toaster.create({
-            type: "error",
-            title: "エラー",
-            description: result.error.message,
-          });
-          return;
-        }
-
-        toaster.create({
-          type: "success",
-          title: isArchived ? "イベントをアクティブ化しました" : "イベントをアーカイブしました",
-          description: isArchived
-            ? `「${eventName}」が編集可能になりました`
-            : `「${eventName}」は読み取り専用になりました`,
-        });
-        // Invalidate event detail and event list queries
-        queryClient.invalidateQueries({ queryKey: generateLoadEventDetailCacheKey(eventId) });
-        queryClient.invalidateQueries({ queryKey: generateLoadEventsCacheKey() });
-      } catch (error) {
+      if (Result.isFailure(result)) {
         toaster.create({
           type: "error",
           title: "エラー",
-          description: "予期しないエラーが発生しました",
+          description: result.error.message,
         });
+        return;
       }
-    });
+
+      toaster.create({
+        type: "success",
+        title: isArchived ? "イベントをアクティブ化しました" : "イベントをアーカイブしました",
+        description: isArchived
+          ? `「${eventName}」が編集可能になりました`
+          : `「${eventName}」は読み取り専用になりました`,
+      });
+    } catch (error) {
+      toaster.create({
+        type: "error",
+        title: "エラー",
+        description: "予期しないエラーが発生しました",
+      });
+    }
   };
 
   return (

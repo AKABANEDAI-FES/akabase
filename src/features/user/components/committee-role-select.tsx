@@ -1,8 +1,6 @@
-import { useQueryClient } from "@tanstack/react-query";
-import { useTransition } from "react";
 import { Result } from "@praha/byethrow";
 import { createListCollection } from "@ark-ui/react/collection";
-import { generateLoadUsersForEventCacheKey, updateCommitteeRoleFn } from "@/features/user/actions";
+import { useUpdateCommitteeRoleMutation } from "@/features/user/actions";
 import { Select, toaster } from "@/components/ui";
 import { COMMITTEE_ROLES, COMMITTEE_ROLE_LABELS } from "@/domain/authorization/schema";
 import type { CommitteeRole } from "@/domain/authorization/schema";
@@ -21,42 +19,36 @@ interface CommitteeRoleSelectProps {
 }
 
 export function CommitteeRoleSelect({ userId, eventId, currentRole }: CommitteeRoleSelectProps) {
-  const queryClient = useQueryClient();
-  const [isPending, startTransition] = useTransition();
+  const { mutateAsync, isPending } = useUpdateCommitteeRoleMutation();
 
-  const handleRoleChange = (newRole: CommitteeRole) => {
+  const handleRoleChange = async (newRole: CommitteeRole) => {
     if (newRole === currentRole) return;
 
-    startTransition(async () => {
-      try {
-        const result = await updateCommitteeRoleFn({
-          data: { userId, eventId, role: newRole },
-        });
+    try {
+      const result = await mutateAsync({
+        data: { userId, eventId, role: newRole },
+      });
 
-        if (Result.isFailure(result)) {
-          toaster.create({
-            type: "error",
-            title: "エラー",
-            description: result.error.message,
-          });
-          return;
-        }
-
-        toaster.create({
-          type: "success",
-          title: "ロールを更新しました",
-        });
-
-        // Invalidate users for event query
-        queryClient.invalidateQueries({ queryKey: generateLoadUsersForEventCacheKey(eventId) });
-      } catch {
+      if (Result.isFailure(result)) {
         toaster.create({
           type: "error",
           title: "エラー",
-          description: "予期しないエラーが発生しました",
+          description: result.error.message,
         });
+        return;
       }
-    });
+
+      toaster.create({
+        type: "success",
+        title: "ロールを更新しました",
+      });
+    } catch {
+      toaster.create({
+        type: "error",
+        title: "エラー",
+        description: "予期しないエラーが発生しました",
+      });
+    }
   };
 
   return (

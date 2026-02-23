@@ -1,6 +1,6 @@
 import { revalidateLogic, useForm } from "@tanstack/react-form";
 import { Result } from "@praha/byethrow";
-import { createEventFn, createEventInputSchema } from "@/features/event/actions";
+import { createEventInputSchema, useCreateEventMutation } from "@/features/event/actions";
 import { Button, CloseButton, Dialog, Field, Input, toaster } from "@/components/ui";
 import { Portal } from "@ark-ui/react/portal";
 import { Stack } from "styled-system/jsx";
@@ -18,6 +18,7 @@ interface CreateEventDialogProps {
  */
 export function CreateEventDialog({ defaultOpen, onClose }: CreateEventDialogProps) {
   const [open, setOpen] = useState(defaultOpen ?? false);
+  const { mutateAsync } = useCreateEventMutation();
 
   const form = useForm({
     defaultValues: {
@@ -28,7 +29,7 @@ export function CreateEventDialog({ defaultOpen, onClose }: CreateEventDialogPro
       onDynamic: createEventInputSchema,
       onSubmitAsync: async ({ value }) => {
         try {
-          const result = await createEventFn({ data: value });
+          const result = await mutateAsync({ data: value });
 
           if (Result.isFailure(result)) {
             // Slug重複エラーの場合、フィールドエラーとして返す

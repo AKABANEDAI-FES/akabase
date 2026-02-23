@@ -1,6 +1,6 @@
 import { revalidateLogic, useForm } from "@tanstack/react-form";
 import { Result } from "@praha/byethrow";
-import { updateEventFn, updateEventInputSchema } from "@/features/event/actions";
+import { updateEventInputSchema, useUpdateEventMutation } from "@/features/event/actions";
 import { cast } from "@/domain/shared/ids";
 import type { EventId } from "@/domain/shared/ids";
 import type { EventDetail } from "@/application/query/event/get-event-detail";
@@ -17,6 +17,7 @@ interface UpdateEventFormProps {
  */
 export function UpdateEventForm({ event }: UpdateEventFormProps) {
   const isArchived = event.status === "archived";
+  const { mutateAsync } = useUpdateEventMutation();
 
   const form = useForm({
     defaultValues: {
@@ -27,7 +28,7 @@ export function UpdateEventForm({ event }: UpdateEventFormProps) {
       onDynamic: updateEventInputSchema.omit({ id: true }),
       onSubmitAsync: async ({ value }) => {
         try {
-          const result = await updateEventFn({
+          const result = await mutateAsync({
             data: {
               id: cast<EventId>(event.id),
               name: value.name,

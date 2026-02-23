@@ -1,8 +1,6 @@
-import { useQueryClient } from "@tanstack/react-query";
-import { useTransition } from "react";
 import { Result } from "@praha/byethrow";
 import { createListCollection } from "@ark-ui/react/collection";
-import { generateLoadUsersWithRolesCacheKey, updateGlobalRoleFn } from "@/features/user/actions";
+import { useUpdateGlobalRoleMutation } from "@/features/user/actions";
 import { Select, toaster } from "@/components/ui";
 import { GLOBAL_ROLES, GLOBAL_ROLE_LABELS } from "@/domain/authorization/schema";
 import type { GlobalRole } from "@/domain/authorization/schema";
@@ -20,42 +18,36 @@ interface GlobalRoleSelectProps {
 }
 
 export function GlobalRoleSelect({ userId, currentRole }: GlobalRoleSelectProps) {
-  const queryClient = useQueryClient();
-  const [isPending, startTransition] = useTransition();
+  const { mutateAsync, isPending } = useUpdateGlobalRoleMutation();
 
-  const handleRoleChange = (newRole: GlobalRole) => {
+  const handleRoleChange = async (newRole: GlobalRole) => {
     if (newRole === currentRole) return;
 
-    startTransition(async () => {
-      try {
-        const result = await updateGlobalRoleFn({
-          data: { userId, role: newRole },
-        });
+    try {
+      const result = await mutateAsync({
+        data: { userId, role: newRole },
+      });
 
-        if (Result.isFailure(result)) {
-          toaster.create({
-            type: "error",
-            title: "エラー",
-            description: result.error.message,
-          });
-          return;
-        }
-
-        toaster.create({
-          type: "success",
-          title: "ロールを更新しました",
-        });
-
-        // Invalidate users with roles query
-        queryClient.invalidateQueries({ queryKey: generateLoadUsersWithRolesCacheKey() });
-      } catch {
+      if (Result.isFailure(result)) {
         toaster.create({
           type: "error",
           title: "エラー",
-          description: "予期しないエラーが発生しました",
+          description: result.error.message,
         });
+        return;
       }
-    });
+
+      toaster.create({
+        type: "success",
+        title: "ロールを更新しました",
+      });
+    } catch {
+      toaster.create({
+        type: "error",
+        title: "エラー",
+        description: "予期しないエラーが発生しました",
+      });
+    }
   };
 
   return (

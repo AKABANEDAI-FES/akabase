@@ -11,6 +11,8 @@ import { authMiddleware } from "@/libs/session-server";
 import { cast, eventIdSchema } from "@/domain/shared/ids";
 import type { EventId, UserId } from "@/domain/shared/ids";
 import { eventSchema } from "@/domain/event/schema";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { generateLoadEventDetailCacheKey, generateLoadEventsCacheKey } from "./queries";
 
 /**
  * Create event input validation schema
@@ -47,6 +49,16 @@ export const createEventFn = createServerFn({ method: "POST" })
     return result;
   });
 
+export function useCreateEventMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createEventFn,
+    onSuccess: Result.inspect(() => {
+      queryClient.invalidateQueries({ queryKey: generateLoadEventsCacheKey() });
+    }),
+  });
+}
+
 /**
  * Server function to update event
  */
@@ -74,6 +86,17 @@ export const updateEventFn = createServerFn({ method: "POST" })
     return result;
   });
 
+export function useUpdateEventMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateEventFn,
+    onSuccess: Result.inspect(({ eventId }) => {
+      queryClient.invalidateQueries({ queryKey: generateLoadEventsCacheKey() });
+      queryClient.invalidateQueries({ queryKey: generateLoadEventDetailCacheKey(eventId) });
+    }),
+  });
+}
+
 /**
  * Server function to archive event
  */
@@ -99,6 +122,16 @@ export const archiveEventFn = createServerFn({ method: "POST" })
     return result;
   });
 
+export function useArchiveEventMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: archiveEventFn,
+    onSuccess: Result.inspect(() => {
+      queryClient.invalidateQueries({ queryKey: generateLoadEventsCacheKey() });
+    }),
+  });
+}
+
 /**
  * Server function to activate event
  */
@@ -123,3 +156,13 @@ export const activateEventFn = createServerFn({ method: "POST" })
 
     return result;
   });
+
+export function useActivateEventMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: activateEventFn,
+    onSuccess: Result.inspect(() => {
+      queryClient.invalidateQueries({ queryKey: generateLoadEventsCacheKey() });
+    }),
+  });
+}
