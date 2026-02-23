@@ -11,6 +11,7 @@ import type {
   OrgRole,
   OrganizationResource,
   ProjectResource,
+  UserResource,
 } from "./schema";
 import type { EventId, OrgId, ProjectId, UserId } from "@/domain/shared/ids";
 import type { Event } from "@/domain/event/schema";
@@ -127,4 +128,14 @@ export function organizationResource(
   organization?: Organization,
 ): OrganizationResource {
   return { type: "organization", orgId, eventId, organization };
+}
+
+/**
+ * Create a user resource
+ *
+ * @param userId - User ID
+ * @returns User resource
+ */
+export function userResource(userId: UserId): UserResource {
+  return { type: "user", userId };
 }

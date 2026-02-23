@@ -18,21 +18,42 @@ import type { Organization } from "@/domain/organization/schema";
 /**
  * Global role assigned to a user
  */
-export const globalRoleSchema = z.enum(["admin", "user"]);
+export const GLOBAL_ROLES = ["admin", "user"] as const;
+export const globalRoleSchema = z.enum(GLOBAL_ROLES).default("user");
 
 export type GlobalRole = z.infer<typeof globalRoleSchema>;
 
 /**
  * Committee role within a specific event
  */
-export const committeeRoleSchema = z.enum(["admin", "approver", "member", "default"]);
+export const COMMITTEE_ROLES = ["admin", "approver", "member", "default"] as const;
+export const committeeRoleSchema = z.enum(COMMITTEE_ROLES).default("default");
 
 export type CommitteeRole = z.infer<typeof committeeRoleSchema>;
 
 /**
+ * Global role display labels (Japanese)
+ */
+export const GLOBAL_ROLE_LABELS: Record<GlobalRole, string> = {
+  admin: "管理者",
+  user: "一般ユーザー",
+} as const;
+
+/**
+ * Committee role display labels (Japanese)
+ */
+export const COMMITTEE_ROLE_LABELS: Record<CommitteeRole, string> = {
+  admin: "管理者",
+  approver: "承認者",
+  member: "メンバー",
+  default: "デフォルト",
+} as const;
+
+/**
  * Organization role within a specific organization
  */
-export const orgRoleSchema = z.enum(["manager", "editor"]).nullable();
+export const ORG_ROLES = ["manager", "editor"] as const;
+export const orgRoleSchema = z.enum(ORG_ROLES).nullable();
 
 export type OrgRole = z.infer<typeof orgRoleSchema>;
 
@@ -99,12 +120,23 @@ export const organizationResourceSchema = z.object({
 export type OrganizationResource = z.infer<typeof organizationResourceSchema>;
 
 /**
+ * User resource (for user management operations)
+ */
+export const userResourceSchema = z.object({
+  type: z.literal("user"),
+  userId: z.custom<UserId>(),
+});
+
+export type UserResource = z.infer<typeof userResourceSchema>;
+
+/**
  * Resource types that can be protected by authorization
  */
 export const resourceSchema = z.discriminatedUnion("type", [
   eventResourceSchema,
   projectResourceSchema,
   organizationResourceSchema,
+  userResourceSchema,
 ]);
 
 export type Resource = z.infer<typeof resourceSchema>;
@@ -139,6 +171,9 @@ export const actionSchema = z.enum([
   "organization:read",
   "organization:update",
   "organization:manage_members",
+
+  // User actions
+  "user:update_role",
 ]);
 
 export type Action = z.infer<typeof actionSchema>;

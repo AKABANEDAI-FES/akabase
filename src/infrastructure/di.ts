@@ -1,8 +1,10 @@
 import type { ProjectRepository } from "@/domain/project/repository";
 import type { EventRepository } from "@/domain/event/repository";
+import type { UserRepository } from "@/domain/user/repository";
 import type { AuthorizationService } from "@/domain/authorization/service";
 import { EventRepositoryImpl } from "./repositories/event-repository";
 import { ProjectRepositoryImpl } from "./repositories/project-repository";
+import { UserRepositoryImpl } from "./repositories/user-repository";
 import { AuthorizationServiceImpl } from "./authorization/authorization-service-impl";
 
 /**
@@ -12,9 +14,9 @@ import { AuthorizationServiceImpl } from "./authorization/authorization-service-
 export type Dependencies = {
   projectRepo: ProjectRepository;
   eventRepo: EventRepository;
+  userRepo: UserRepository;
   authService: AuthorizationService;
   // organizationRepo: OrganizationRepository; // TODO: Implement
-  // userRepo: UserRepository;                 // TODO: Implement
 };
 
 /**
@@ -26,9 +28,9 @@ export function createDependencies(): Dependencies {
   return {
     projectRepo: new ProjectRepositoryImpl(),
     eventRepo: new EventRepositoryImpl(),
+    userRepo: new UserRepositoryImpl(),
     authService: new AuthorizationServiceImpl(),
     // organizationRepo: new OrganizationRepositoryImpl(),
-    // userRepo: new UserRepositoryImpl(),
   };
 }
 

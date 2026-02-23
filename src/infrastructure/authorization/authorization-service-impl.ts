@@ -49,6 +49,8 @@ export class AuthorizationServiceImpl implements AuthorizationService {
         return this.checkProjectPermission(actor, resource, action);
       case "organization":
         return this.checkOrganizationPermission(actor, resource, action);
+      case "user":
+        return this.checkUserPermission(actor, resource, action);
       default:
         return Result.fail(authorizationError("UNKNOWN_RESOURCE", "不明なリソースタイプ"));
     }
@@ -196,6 +198,24 @@ export class AuthorizationServiceImpl implements AuthorizationService {
         return Result.succeed({
           allowed: false,
           reason: "組織マネージャーのみがメンバーを管理できます",
+        });
+
+      default:
+        return Result.succeed({ allowed: false, reason: "不明なアクション" });
+    }
+  }
+
+  private checkUserPermission(
+    _actor: Actor,
+    _resource: Extract<Resource, { type: "user" }>,
+    action: Action,
+  ): Result.Result<AuthorizationDecision, AuthorizationError> {
+    switch (action) {
+      case "user:update_role":
+        // Only global admins can update user roles (already checked at top of checkPermission)
+        return Result.succeed({
+          allowed: false,
+          reason: "グローバル管理者のみがユーザーのロールを更新できます",
         });
 
       default:
