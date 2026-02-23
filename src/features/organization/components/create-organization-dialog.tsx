@@ -31,7 +31,7 @@ export function CreateOrganizationDialog({
   const form = useForm({
     defaultValues: {
       name: "",
-      description: null as string | null,
+      description: "",
       logoKey: null as string | null,
     },
     validators: {
@@ -47,7 +47,7 @@ export function CreateOrganizationDialog({
               title: "エラー",
               description: result.error.message,
             });
-            return;
+            return {};
           }
 
           // Success - return undefined to trigger onSubmit
@@ -58,7 +58,7 @@ export function CreateOrganizationDialog({
             title: "エラー",
             description: "予期しないエラーが発生しました",
           });
-          return;
+          return {};
         }
       },
     },
@@ -137,7 +137,7 @@ export function CreateOrganizationDialog({
                           name={field.name}
                           value={field.state.value ?? ""}
                           onBlur={field.handleBlur}
-                          onChange={(e) => field.handleChange(e.target.value || null)}
+                          onChange={(e) => field.handleChange(e.target.value)}
                           placeholder="団体の説明を100文字以内で入力"
                           rows={3}
                         />

@@ -125,16 +125,33 @@ export class AuthorizationServiceImpl implements AuthorizationService {
     const orgRole = getOrgRoleForOrg(actor, resource.orgId);
 
     switch (action) {
-      case "project:create":
-      case "project:update":
-        // Organization managers and editors can create/update projects
+      case "project:create": {
+        // Only committee admins can create projects
+        const committeeRole = getCommitteeRoleForEvent(actor, resource.eventId);
+        if (committeeRole === "admin") {
+          return Result.succeed({ allowed: true, reason: "委員会管理者" });
+        }
+        return Result.succeed({
+          allowed: false,
+          reason: "委員会管理者のみがプロジェクトを作成できます",
+        });
+      }
+
+      case "project:update": {
+        // Committee admins can update any project
+        const committeeRole = getCommitteeRoleForEvent(actor, resource.eventId);
+        if (committeeRole === "admin") {
+          return Result.succeed({ allowed: true, reason: "委員会管理者" });
+        }
+        // Organization managers and editors can update their projects
         if (orgRole === "manager" || orgRole === "editor") {
           return Result.succeed({ allowed: true, reason: "組織メンバー" });
         }
         return Result.succeed({
           allowed: false,
-          reason: "組織メンバーのみがプロジェクトを作成・更新できます",
+          reason: "委員会管理者または組織メンバーのみがプロジェクトを更新できます",
         });
+      }
 
       case "project:submit":
         // Organization managers can submit projects

@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { CreateOrganizationDialog } from "@/features/organization/components";
 import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions";
@@ -12,15 +12,24 @@ export const Route = createFileRoute("/_authenticated/$slug/committee/organizati
 });
 
 function CreateOrganizationPage() {
+  const router = useRouter();
   const navigate = useNavigate();
   const { slug } = Route.useParams();
   const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
+
+  const handleClose = () => {
+    if (router.history.canGoBack()) {
+      router.history.back();
+    } else {
+      navigate({ to: "..", replace: true });
+    }
+  };
 
   return (
     <CreateOrganizationDialog
       eventId={cast<EventId>(event.id)}
       defaultOpen={true}
-      onClose={() => navigate({ to: "/$slug/committee/organizations", params: { slug } })}
+      onClose={handleClose}
     />
   );
 }

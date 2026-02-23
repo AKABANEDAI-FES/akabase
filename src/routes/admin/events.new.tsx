@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { CreateEventDialog } from "@/features/event/components";
 
 export const Route = createFileRoute("/admin/events/new")({
@@ -6,7 +6,16 @@ export const Route = createFileRoute("/admin/events/new")({
 });
 
 function CreateEventPage() {
+  const router = useRouter();
   const navigate = useNavigate();
 
-  return <CreateEventDialog defaultOpen={true} onClose={() => navigate({ to: "/admin/events" })} />;
+  const handleClose = () => {
+    if (router.history.canGoBack()) {
+      router.history.back();
+    } else {
+      navigate({ to: "..", replace: true });
+    }
+  };
+
+  return <CreateEventDialog defaultOpen={true} onClose={handleClose} />;
 }

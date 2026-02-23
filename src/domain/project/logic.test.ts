@@ -15,10 +15,7 @@ import {
   projectAfterSubmit,
   projectAfterWithdraw,
   returnSubmission,
-  updateProjectLogoKey,
-  updateProjectName,
-  updateProjectPlaceText,
-  validatePamphletText,
+  updateProject,
   withdrawSubmission,
 } from "./logic";
 
@@ -289,57 +286,63 @@ describe("Project Domain Logic", () => {
     });
   });
 
-  describe("Draft Validation", () => {
-    describe("validatePamphletText", () => {
-      it("succeeds for null text", () => {
-        const result = validatePamphletText(null);
+  describe("Project Updates", () => {
+    describe("updateProject", () => {
+      it("updates project name", () => {
+        const project = createMockProject({ name: "Old Name" });
+        const result = updateProject(project, { name: "New Name" });
+
         expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.name).toBe("New Name");
+          expect(result.value.updatedAt).not.toEqual(project.updatedAt);
+        }
       });
 
-      it("succeeds for text within 120 characters", () => {
-        const text = "a".repeat(120);
-        const result = validatePamphletText(text);
+      it("updates project place text", () => {
+        const project = createMockProject({ placeText: null });
+        const result = updateProject(project, { placeText: "New Place" });
+
         expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.placeText).toBe("New Place");
+        }
       });
 
-      it("fails for text exceeding 120 characters", () => {
-        const text = "a".repeat(121);
-        const result = validatePamphletText(text);
+      it("updates project logo key", () => {
+        const project = createMockProject({ logoKey: null });
+        const result = updateProject(project, { logoKey: "logos/test.png" });
+
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.logoKey).toBe("logos/test.png");
+        }
+      });
+
+      it("updates multiple fields at once", () => {
+        const project = createMockProject();
+        const result = updateProject(project, {
+          name: "New Name",
+          placeText: "New Place",
+          logoKey: "logos/new.png",
+        });
+
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.name).toBe("New Name");
+          expect(result.value.placeText).toBe("New Place");
+          expect(result.value.logoKey).toBe("logos/new.png");
+        }
+      });
+
+      it("fails when validation fails", () => {
+        const project = createMockProject();
+        const result = updateProject(project, { name: "" }); // Empty name should fail
 
         expect(Result.isFailure(result)).toBe(true);
         if (Result.isFailure(result)) {
-          expect(result.error.code).toBe("FIELD_NOT_EDITABLE");
+          expect(result.error.code).toBe("VALIDATION_ERROR");
         }
-      });
-    });
-  });
-
-  describe("Project Updates", () => {
-    describe("updateProjectName", () => {
-      it("updates project name", () => {
-        const project = createMockProject({ name: "Old Name" });
-        const updated = updateProjectName(project, "New Name");
-
-        expect(updated.name).toBe("New Name");
-        expect(updated.updatedAt).not.toEqual(project.updatedAt);
-      });
-    });
-
-    describe("updateProjectPlaceText", () => {
-      it("updates project place text", () => {
-        const project = createMockProject({ placeText: null });
-        const updated = updateProjectPlaceText(project, "New Place");
-
-        expect(updated.placeText).toBe("New Place");
-      });
-    });
-
-    describe("updateProjectLogoKey", () => {
-      it("updates project logo key", () => {
-        const project = createMockProject({ logoKey: null });
-        const updated = updateProjectLogoKey(project, "logos/test.png");
-
-        expect(updated.logoKey).toBe("logos/test.png");
       });
     });
   });

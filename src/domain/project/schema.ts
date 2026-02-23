@@ -48,8 +48,7 @@ export const projectDraftSchema = z.object({
   projectId: projectIdSchema,
   pamphletText: z
     .string()
-    .max(PROJECT_PAMPHLET_TEXT_MAX_LENGTH, "パンフレットテキストは120文字以内で入力してください")
-    .nullable(),
+    .max(PROJECT_PAMPHLET_TEXT_MAX_LENGTH, "パンフレットテキストは120文字以内で入力してください"),
   webContentJson: z.json().nullable(), // TipTap JSON
   updatedAt: z.date(),
   updatedBy: userIdSchema,
@@ -74,8 +73,7 @@ export const projectSubmissionSchema = z.object({
   status: submissionStatusSchema,
   pamphletText: z
     .string()
-    .max(PROJECT_PAMPHLET_TEXT_MAX_LENGTH, "パンフレットテキストは120文字以内で入力してください")
-    .nullable(),
+    .max(PROJECT_PAMPHLET_TEXT_MAX_LENGTH, "パンフレットテキストは120文字以内で入力してください"),
   webContentJson: z.json().nullable(),
   submittedAt: z.date(),
   submittedBy: userIdSchema,
@@ -93,8 +91,7 @@ export const projectPublishedSchema = z.object({
   projectId: projectIdSchema,
   pamphletText: z
     .string()
-    .max(PROJECT_PAMPHLET_TEXT_MAX_LENGTH, "パンフレットテキストは120文字以内で入力してください")
-    .nullable(),
+    .max(PROJECT_PAMPHLET_TEXT_MAX_LENGTH, "パンフレットテキストは120文字以内で入力してください"),
   webContentJson: z.json().nullable(),
   publishedAt: z.date(),
   publishedBy: userIdSchema,

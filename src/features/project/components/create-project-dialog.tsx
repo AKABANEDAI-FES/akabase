@@ -1,49 +1,63 @@
 import { revalidateLogic, useForm } from "@tanstack/react-form";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { createListCollection } from "@ark-ui/react/collection";
 import { Result } from "@praha/byethrow";
-import { createEventInputSchema, useCreateEventMutation } from "@/features/event/actions";
-import { Button, CloseButton, Dialog, Field, Input, toaster } from "@/components/ui";
+import {
+  createProjectInputSchema,
+  generateLoadPlacesQueryOptions,
+  useCreateProjectMutation,
+} from "@/features/project/actions";
+import { Button, CloseButton, Dialog, Field, Input, Select, toaster } from "@/components/ui";
 import { Portal } from "@ark-ui/react/portal";
 import { Stack } from "styled-system/jsx";
 import { useState } from "react";
 import { nl2br } from "@/libs/text";
-import { EVENT_ERROR_CODE } from "@/domain/event/errors";
+import type { EventId, OrgId } from "@/domain/shared/ids";
 
-interface CreateEventDialogProps {
+interface CreateProjectDialogProps {
+  eventId: EventId;
+  orgId: OrgId;
   defaultOpen?: boolean;
   onClose?: () => void;
 }
 
 /**
- * Create event dialog component
+ * Create project dialog component
  */
-export function CreateEventDialog({ defaultOpen, onClose }: CreateEventDialogProps) {
+export function CreateProjectDialog({
+  eventId,
+  orgId,
+  defaultOpen,
+  onClose,
+}: CreateProjectDialogProps) {
   const [open, setOpen] = useState(defaultOpen ?? false);
-  const { mutateAsync } = useCreateEventMutation();
+  const { mutateAsync } = useCreateProjectMutation();
+
+  // Load places for select dropdown
+  const { data: places } = useSuspenseQuery(generateLoadPlacesQueryOptions(eventId));
+
+  // Create collection for Select component
+  const placesCollection = createListCollection({
+    items: places.map((place) => ({
+      label: place.name,
+      value: place.name, // Store place name as value
+    })),
+  });
 
   const form = useForm({
     defaultValues: {
       name: "",
-      slug: "",
+      placeText: null as string | null,
+      logoKey: null as string | null,
     },
     validators: {
-      onDynamic: createEventInputSchema,
+      onDynamic: createProjectInputSchema.omit({ eventId: true, orgId: true }),
       onSubmitAsync: async ({ value }) => {
         try {
-          const result = await mutateAsync({ data: value });
+          const result = await mutateAsync({ data: { ...value, eventId, orgId } });
 
           if (Result.isFailure(result)) {
-            // Slug重複エラーの場合、フィールドエラーとして返す
-            if (result.error.code === EVENT_ERROR_CODE.SLUG_NOT_UNIQUE) {
-              return {
-                fields: {
-                  slug: {
-                    message: result.error.message,
-                  },
-                },
-              };
-            }
-
-            // その他のエラーはtoastで表示
+            // Display error as toast
             toaster.create({
               type: "error",
               title: "エラー",
@@ -52,7 +66,7 @@ export function CreateEventDialog({ defaultOpen, onClose }: CreateEventDialogPro
             return {};
           }
 
-          // 成功時は何も返さない（onSubmitが実行される）
+          // Success - return undefined to trigger onSubmit
           return undefined;
         } catch (error) {
           toaster.create({
@@ -71,7 +85,7 @@ export function CreateEventDialog({ defaultOpen, onClose }: CreateEventDialogPro
     onSubmit: async ({ value }) => {
       toaster.create({
         type: "success",
-        title: "イベントを作成しました",
+        title: "企画を作成しました",
         description: `「${value.name}」を作成しました`,
       });
 
@@ -98,16 +112,17 @@ export function CreateEventDialog({ defaultOpen, onClose }: CreateEventDialogPro
               }}
             >
               <Dialog.Header>
-                <Dialog.Title>イベントを作成</Dialog.Title>
-                <Dialog.Description>新しいイベントの情報を入力してください</Dialog.Description>
+                <Dialog.Title>企画を作成</Dialog.Title>
+                <Dialog.Description>新しい企画の情報を入力してください</Dialog.Description>
               </Dialog.Header>
               <Dialog.Body>
                 <Stack gap="6" w="full">
+                  {/* Project name field */}
                   <form.Field name="name">
                     {(field) => (
                       <Field.Root invalid={!field.state.meta.isValid}>
                         <Field.Label htmlFor={field.name}>
-                          イベント名 <Field.RequiredIndicator />
+                          企画名 <Field.RequiredIndicator />
                         </Field.Label>
                         <Input
                           id={field.name}
@@ -115,7 +130,7 @@ export function CreateEventDialog({ defaultOpen, onClose }: CreateEventDialogPro
                           value={field.state.value}
                           onBlur={field.handleBlur}
                           onChange={(e) => field.handleChange(e.target.value)}
-                          placeholder="例: 2025年度白山祭"
+                          placeholder="例: 模擬店、展示、ステージ発表"
                         />
                         {!field.state.meta.isValid && (
                           <Field.ErrorText>
@@ -126,25 +141,42 @@ export function CreateEventDialog({ defaultOpen, onClose }: CreateEventDialogPro
                             )}
                           </Field.ErrorText>
                         )}
-                        <Field.HelperText>イベントの正式名称を入力してください</Field.HelperText>
                       </Field.Root>
                     )}
                   </form.Field>
 
-                  <form.Field name="slug">
+                  {/* Place selection field */}
+                  <form.Field name="placeText">
                     {(field) => (
                       <Field.Root invalid={!field.state.meta.isValid}>
-                        <Field.Label htmlFor={field.name}>
-                          スラッグ (URL識別子) <Field.RequiredIndicator />
-                        </Field.Label>
-                        <Input
-                          id={field.name}
-                          name={field.name}
-                          value={field.state.value}
-                          onBlur={field.handleBlur}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          placeholder="例: 2025"
-                        />
+                        <Field.Label htmlFor={field.name}>開催場所（任意）</Field.Label>
+                        <Select.Root
+                          collection={placesCollection}
+                          value={field.state.value ? [field.state.value] : []}
+                          onValueChange={({ value }) => {
+                            field.handleChange(value[0] || null);
+                          }}
+                          positioning={{ sameWidth: true }}
+                        >
+                          <Select.Control>
+                            <Select.Trigger>
+                              <Select.ValueText placeholder="場所を選択" />
+                              <Select.Indicator />
+                            </Select.Trigger>
+                          </Select.Control>
+                          <Portal>
+                            <Select.Positioner>
+                              <Select.Content>
+                                {placesCollection.items.map((option) => (
+                                  <Select.Item key={option.value} item={option}>
+                                    <Select.ItemText>{option.label}</Select.ItemText>
+                                    <Select.ItemIndicator />
+                                  </Select.Item>
+                                ))}
+                              </Select.Content>
+                            </Select.Positioner>
+                          </Portal>
+                        </Select.Root>
                         {!field.state.meta.isValid && (
                           <Field.ErrorText>
                             {nl2br(
@@ -154,12 +186,12 @@ export function CreateEventDialog({ defaultOpen, onClose }: CreateEventDialogPro
                             )}
                           </Field.ErrorText>
                         )}
-                        <Field.HelperText>
-                          URLに使用される一意の識別子です（小文字英数字とハイフンのみ）
-                        </Field.HelperText>
+                        <Field.HelperText>企画を実施する場所を選択してください</Field.HelperText>
                       </Field.Root>
                     )}
                   </form.Field>
+
+                  {/* TODO: ロゴアップロード機能は将来実装 */}
                 </Stack>
               </Dialog.Body>
               <Dialog.Footer>

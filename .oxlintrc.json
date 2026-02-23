@@ -262,6 +262,13 @@
       "rules": {
         "@typescript-eslint/no-explicit-any": "off"
       }
+    },
+    {
+      "files": ["src/routes/**/*.{ts,tsx}"],
+      "plugins": ["unicorn"],
+      "rules": {
+        "unicorn/filename-case": "off"
+      }
     }
   ]
 }

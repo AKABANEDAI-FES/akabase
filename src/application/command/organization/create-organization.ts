@@ -25,6 +25,7 @@ export type CreateOrganizationInput = {
  * Output of organization creation
  */
 export type CreateOrganizationOutput = {
+  eventId: EventId;
   organizationId: OrgId;
 };
 
@@ -72,6 +73,6 @@ export async function createOrganization(
     // Save organization to database
     yield* $(await deps.organizationRepo.saveOrganization(organization));
 
-    return { organizationId };
+    return { organizationId: organization.id, eventId: organization.eventId };
   });
 }

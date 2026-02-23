@@ -1,5 +1,6 @@
 import { Result } from "@praha/byethrow";
 import type { OrgMember, OrgMemberRole, Organization } from "./schema";
+import { organizationSchema } from "./schema";
 import type { OrganizationError } from "./errors";
 import { organizationError } from "./errors";
 import type { UserId } from "../shared/ids";
@@ -128,47 +129,29 @@ export function updateMemberRole(
  */
 
 /**
- * Update organization name
+ * Update organization fields
+ * Validates the updated organization using zod schema
+ * Only specified fields will be updated
  */
-export function updateOrganizationName(org: Organization, name: string): Organization {
-  return {
+export function updateOrganization(
+  org: Organization,
+  input: { name?: string; description?: string; logoKey?: string | null },
+): Result.Result<Organization, OrganizationError> {
+  // Build updated organization
+  const updated = {
     ...org,
-    name,
+    name: input.name ?? org.name,
+    description: input.description ?? org.description,
+    logoKey: input.logoKey !== undefined ? input.logoKey : org.logoKey,
     updatedAt: new Date(),
   };
-}
 
-/**
- * Update organization description
- * Rule: Maximum 100 characters
- */
-export function updateOrganizationDescription(
-  org: Organization,
-  description: string | null,
-): Result.Result<Organization, OrganizationError> {
-  if (description !== null && description.length > 100) {
-    return Result.fail(
-      organizationError(
-        "INVALID_ROLE",
-        `団体説明は100文字以内で入力してください。現在: ${description.length}文字`,
-      ),
-    );
+  // Validate using zod schema
+  const validationResult = organizationSchema.safeParse(updated);
+
+  if (!validationResult.success) {
+    return Result.fail(organizationError("VALIDATION_ERROR", "入力値が不正です"));
   }
 
-  return Result.succeed({
-    ...org,
-    description,
-    updatedAt: new Date(),
-  });
-}
-
-/**
- * Update organization logo key
- */
-export function updateOrganizationLogoKey(org: Organization, logoKey: string | null): Organization {
-  return {
-    ...org,
-    logoKey,
-    updatedAt: new Date(),
-  };
+  return Result.succeed(validationResult.data);
 }

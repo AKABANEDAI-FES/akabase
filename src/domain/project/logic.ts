@@ -6,6 +6,7 @@ import type {
   PublishedWithTags,
   SubmissionWithTags,
 } from "./schema";
+import { projectSchema } from "./schema";
 import type { ProjectError } from "./errors";
 import { projectError } from "./errors";
 import type { SubmissionId, UserId } from "../shared/ids";
@@ -227,60 +228,34 @@ export function projectAfterWithdraw(project: Project): Project {
 
 /**
  * =============================================================================
- * Draft Validation
+ * Project Updates
  * =============================================================================
  */
 
 /**
- * Validate pamphlet text length
- * Rule: Maximum 120 characters
+ * Update project fields
+ * Validates the updated project using zod schema
+ * Only specified fields will be updated
  */
-export function validatePamphletText(text: string | null): Result.Result<true, ProjectError> {
-  if (text === null) {
-    return Result.succeed(true);
+export function updateProject(
+  project: Project,
+  input: { name?: string; placeText?: string | null; logoKey?: string | null },
+): Result.Result<Project, ProjectError> {
+  // Build updated project
+  const updated = {
+    ...project,
+    name: input.name ?? project.name,
+    placeText: input.placeText !== undefined ? input.placeText : project.placeText,
+    logoKey: input.logoKey !== undefined ? input.logoKey : project.logoKey,
+    updatedAt: new Date(),
+  };
+
+  // Validate using zod schema
+  const validationResult = projectSchema.safeParse(updated);
+
+  if (!validationResult.success) {
+    return Result.fail(projectError("VALIDATION_ERROR", "入力値が不正です"));
   }
 
-  if (text.length > 120) {
-    return Result.fail(
-      projectError(
-        "FIELD_NOT_EDITABLE",
-        `パンフレット用説明は120文字以内で入力してください。現在: ${text.length}文字`,
-      ),
-    );
-  }
-
-  return Result.succeed(true);
-}
-
-/**
- * Update project name
- */
-export function updateProjectName(project: Project, name: string): Project {
-  return {
-    ...project,
-    name,
-    updatedAt: new Date(),
-  };
-}
-
-/**
- * Update project place text
- */
-export function updateProjectPlaceText(project: Project, placeText: string | null): Project {
-  return {
-    ...project,
-    placeText,
-    updatedAt: new Date(),
-  };
-}
-
-/**
- * Update project logo key
- */
-export function updateProjectLogoKey(project: Project, logoKey: string | null): Project {
-  return {
-    ...project,
-    logoKey,
-    updatedAt: new Date(),
-  };
+  return Result.succeed(validationResult.data);
 }

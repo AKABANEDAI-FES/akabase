@@ -9,9 +9,7 @@ import {
   isManager,
   removeMember,
   updateMemberRole,
-  updateOrganizationDescription,
-  updateOrganizationLogoKey,
-  updateOrganizationName,
+  updateOrganization,
 } from "./logic";
 
 // Test fixtures
@@ -24,7 +22,7 @@ const createMockOrganization = (overrides?: Partial<Organization>): Organization
   id: mockOrgId,
   eventId: mockEventId,
   name: "Test Organization",
-  description: null,
+  description: "",
   logoKey: null,
   createdAt: new Date("2025-01-01"),
   updatedAt: new Date("2025-01-01"),
@@ -211,20 +209,21 @@ describe("Organization Domain Logic", () => {
   });
 
   describe("Organization Updates", () => {
-    describe("updateOrganizationName", () => {
+    describe("updateOrganization", () => {
       it("updates organization name", () => {
         const org = createMockOrganization({ name: "Old Name" });
-        const updated = updateOrganizationName(org, "New Name");
+        const result = updateOrganization(org, { name: "New Name" });
 
-        expect(updated.name).toBe("New Name");
-        expect(updated.updatedAt).not.toEqual(org.updatedAt);
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.name).toBe("New Name");
+          expect(result.value.updatedAt).not.toEqual(org.updatedAt);
+        }
       });
-    });
 
-    describe("updateOrganizationDescription", () => {
       it("updates organization description when within 100 characters", () => {
-        const org = createMockOrganization({ description: null });
-        const result = updateOrganizationDescription(org, "New description");
+        const org = createMockOrganization({ description: "" });
+        const result = updateOrganization(org, { description: "New description" });
 
         expect(Result.isSuccess(result)).toBe(true);
         if (Result.isSuccess(result)) {
@@ -232,42 +231,59 @@ describe("Organization Domain Logic", () => {
         }
       });
 
-      it("succeeds for null description", () => {
-        const org = createMockOrganization({ description: "Old" });
-        const result = updateOrganizationDescription(org, null);
-
-        expect(Result.isSuccess(result)).toBe(true);
-        if (Result.isSuccess(result)) {
-          expect(result.value.description).toBeNull();
-        }
-      });
-
       it("fails when description exceeds 100 characters", () => {
         const org = createMockOrganization();
         const longDescription = "a".repeat(101);
-        const result = updateOrganizationDescription(org, longDescription);
+        const result = updateOrganization(org, { description: longDescription });
 
         expect(Result.isFailure(result)).toBe(true);
         if (Result.isFailure(result)) {
-          expect(result.error.code).toBe("INVALID_ROLE");
+          expect(result.error.code).toBe("VALIDATION_ERROR");
         }
       });
 
       it("succeeds for exactly 100 characters", () => {
         const org = createMockOrganization();
         const description = "a".repeat(100);
-        const result = updateOrganizationDescription(org, description);
+        const result = updateOrganization(org, { description });
 
         expect(Result.isSuccess(result)).toBe(true);
       });
-    });
 
-    describe("updateOrganizationLogoKey", () => {
       it("updates organization logo key", () => {
         const org = createMockOrganization({ logoKey: null });
-        const updated = updateOrganizationLogoKey(org, "logos/test.png");
+        const result = updateOrganization(org, { logoKey: "logos/test.png" });
 
-        expect(updated.logoKey).toBe("logos/test.png");
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.logoKey).toBe("logos/test.png");
+        }
+      });
+
+      it("updates multiple fields at once", () => {
+        const org = createMockOrganization();
+        const result = updateOrganization(org, {
+          name: "New Name",
+          description: "New description",
+          logoKey: "logos/new.png",
+        });
+
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.name).toBe("New Name");
+          expect(result.value.description).toBe("New description");
+          expect(result.value.logoKey).toBe("logos/new.png");
+        }
+      });
+
+      it("fails when validation fails", () => {
+        const org = createMockOrganization();
+        const result = updateOrganization(org, { name: "" }); // Empty name should fail
+
+        expect(Result.isFailure(result)).toBe(true);
+        if (Result.isFailure(result)) {
+          expect(result.error.code).toBe("VALIDATION_ERROR");
+        }
       });
     });
   });

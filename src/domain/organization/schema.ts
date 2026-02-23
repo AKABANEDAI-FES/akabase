@@ -19,10 +19,7 @@ export const organizationSchema = z.object({
     .string()
     .min(ORG_NAME_MIN_LENGTH, "団体名を入力してください")
     .max(ORG_NAME_MAX_LENGTH, "団体名は100文字以内で入力してください"),
-  description: z
-    .string()
-    .max(ORG_DESCRIPTION_MAX_LENGTH, "説明は100文字以内で入力してください")
-    .nullable(),
+  description: z.string().max(ORG_DESCRIPTION_MAX_LENGTH, "説明は100文字以内で入力してください"),
   logoKey: z.string().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),

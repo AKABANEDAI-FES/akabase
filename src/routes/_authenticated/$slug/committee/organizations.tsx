@@ -2,7 +2,7 @@ import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Button, Heading, Table } from "@/components/ui";
 import { Container, Flex, Stack } from "styled-system/jsx";
-import { PlusIcon } from "lucide-react";
+import { PencilIcon, PlusIcon } from "lucide-react";
 import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions";
 import { generateLoadOrganizationsQueryOptions } from "@/features/organization/actions";
 import { generateCheckIsCommitteeAdminQueryOptions } from "@/features/authorization/actions";
@@ -45,6 +45,7 @@ function OrganizationsPage() {
                 <Table.Header>団体名</Table.Header>
                 <Table.Header>説明</Table.Header>
                 <Table.Header>作成日</Table.Header>
+                <Table.Header>操作</Table.Header>
               </Table.Row>
             </Table.Head>
             <Table.Body>
@@ -53,6 +54,9 @@ function OrganizationsPage() {
                   <Table.Cell fontWeight="medium">{org.name}</Table.Cell>
                   <Table.Cell>{org.description || "—"}</Table.Cell>
                   <Table.Cell>{new Date(org.createdAt).toLocaleDateString("ja-JP")}</Table.Cell>
+                  <Table.Cell>
+                    <EditOrganizationButton slug={slug} orgId={org.id} />
+                  </Table.Cell>
                 </Table.Row>
               ))}
             </Table.Body>
@@ -83,5 +87,28 @@ function AddOrganizationButton({ slug, eventId }: AddOrganizationButtonProps) {
         団体を作成
       </Button>
     </Link>
+  );
+}
+
+type EditOrganizationButtonProps = {
+  slug: string;
+  orgId: string;
+};
+
+function EditOrganizationButton({ slug, orgId }: EditOrganizationButtonProps) {
+  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
+  const { data: authCheck } = useSuspenseQuery(generateCheckIsCommitteeAdminQueryOptions(event.id));
+
+  if (!authCheck.isCommitteeAdmin) {
+    return null;
+  }
+
+  return (
+    <Button variant="plain" size="sm" asChild>
+      <Link to="/$slug/committee/organizations/$orgId" params={{ slug, orgId }}>
+        <PencilIcon />
+        編集
+      </Link>
+    </Button>
   );
 }
