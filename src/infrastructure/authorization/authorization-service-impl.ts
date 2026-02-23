@@ -174,9 +174,17 @@ export class AuthorizationServiceImpl implements AuthorizationService {
     const orgRole = getOrgRoleForOrg(actor, resource.orgId);
 
     switch (action) {
-      case "organization:create":
-        // Any authenticated user can create organizations
-        return Result.succeed({ allowed: true });
+      case "organization:create": {
+        // Only committee admins can create organizations
+        const committeeRole = getCommitteeRoleForEvent(actor, resource.eventId);
+        if (committeeRole === "admin") {
+          return Result.succeed({ allowed: true, reason: "委員会管理者" });
+        }
+        return Result.succeed({
+          allowed: false,
+          reason: "委員会管理者のみが団体を作成できます",
+        });
+      }
 
       case "organization:read":
         // Anyone can read organizations

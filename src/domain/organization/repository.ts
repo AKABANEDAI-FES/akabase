@@ -26,14 +26,9 @@ export interface OrganizationRepository {
   listByEvent(eventId: EventId): Promise<Result.Result<Organization[], RepositoryError>>;
 
   /**
-   * Save a new organization
+   * Save a new organization (upsert)
    */
   saveOrganization(org: Organization): Promise<Result.Result<void, RepositoryError>>;
-
-  /**
-   * Update organization
-   */
-  updateOrganization(org: Organization): Promise<Result.Result<void, RepositoryError>>;
 
   /**
    * Add a member
