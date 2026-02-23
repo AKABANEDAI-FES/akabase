@@ -8,12 +8,13 @@ import { Result } from "@praha/byethrow";
 import { db } from "@/db";
 import { committeeRoles, user } from "@/db/schema";
 import { and, desc, eq } from "drizzle-orm";
+import { userIdSchema } from "@/domain/shared/ids";
 import type { EventId } from "@/domain/shared/ids";
 import { committeeRoleSchema } from "@/domain/authorization/schema";
 
 // DTO schema for user in event context
 export const userForEventSchema = z.object({
-  id: z.string(),
+  id: userIdSchema,
   name: z.string(),
   email: z.string(),
   role: committeeRoleSchema, // Committee role in this event (or "default")
@@ -52,13 +53,15 @@ export async function listUsersForEvent(
       .orderBy(desc(user.createdAt));
 
     // Map to DTO, using "default" for users without an assigned role
-    const usersForEvent = rows.map((row) => ({
-      id: row.id,
-      name: row.name,
-      email: row.email,
-      role: row.role ?? "default",
-      createdAt: row.createdAt,
-    }));
+    const usersForEvent = rows.map((row) => {
+      return userForEventSchema.parse({
+        id: row.id,
+        name: row.name,
+        email: row.email,
+        role: row.role ?? "default",
+        createdAt: row.createdAt,
+      });
+    });
 
     return Result.succeed(usersForEvent);
   } catch (error) {

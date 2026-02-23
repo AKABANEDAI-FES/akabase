@@ -7,7 +7,7 @@ import { updateGlobalRole } from "@/application/command/user/update-global-role"
 import { resolveActor } from "@/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/session-server";
 import { cast, eventIdSchema, userIdSchema } from "@/domain/shared/ids";
-import type { EventId, UserId } from "@/domain/shared/ids";
+import type { UserId } from "@/domain/shared/ids";
 import { committeeRoleSchema, globalRoleSchema } from "@/domain/authorization/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { generateLoadUsersForEventCacheKey, generateLoadUsersWithRolesCacheKey } from "./queries";
@@ -24,7 +24,7 @@ export const updateCommitteeRoleFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const actorResult = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
-      eventIds: [cast<EventId>(data.eventId)], // Load permissions for the target event
+      eventIds: [data.eventId], // Load permissions for the target event
     });
 
     if (Result.isFailure(actorResult)) {

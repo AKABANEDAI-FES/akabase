@@ -4,8 +4,7 @@ import { Result } from "@praha/byethrow";
 import { authMiddleware } from "@/libs/session-server";
 import { listUsersWithRoles } from "@/application/query/user/list-users-with-roles";
 import { listUsersForEvent } from "@/application/query/user/list-users-for-event";
-import { cast, eventIdSchema } from "@/domain/shared/ids";
-import type { EventId } from "@/domain/shared/ids";
+import { eventIdSchema } from "@/domain/shared/ids";
 import { queryOptions } from "@tanstack/react-query";
 
 export const loadUsersWithRolesFn = createServerFn({ method: "GET" })
@@ -35,7 +34,7 @@ export const loadUsersForEventFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
   .handler(async ({ data }) => {
-    const result = await listUsersForEvent(cast<EventId>(data.eventId));
+    const result = await listUsersForEvent(data.eventId);
 
     if (Result.isFailure(result)) {
       throw new Error(result.error.message);

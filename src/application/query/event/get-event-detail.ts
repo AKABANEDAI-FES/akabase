@@ -1,10 +1,11 @@
 import { z } from "zod";
 import { Result } from "@praha/byethrow";
 import { db } from "@/db";
+import { eventIdSchema } from "@/domain/shared/ids";
 import type { EventId } from "@/domain/shared/ids";
 
 export const eventDetailSchema = z.object({
-  id: z.string(),
+  id: eventIdSchema,
   name: z.string(),
   slug: z.string(),
   status: z.enum(["active", "archived"]),

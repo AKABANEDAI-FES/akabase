@@ -7,12 +7,13 @@ import { z } from "zod";
 import { Result } from "@praha/byethrow";
 import { db } from "@/db";
 import { globalRoleSchema } from "@/domain/authorization/schema";
+import { userIdSchema } from "@/domain/shared/ids";
 
 /**
  * User list item DTO
  */
 export const userListItemSchema = z.object({
-  id: z.string(),
+  id: userIdSchema,
   name: z.string(),
   email: z.string(),
   globalRole: globalRoleSchema,

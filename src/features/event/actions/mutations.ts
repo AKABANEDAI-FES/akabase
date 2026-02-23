@@ -9,7 +9,7 @@ import { activateEvent } from "@/application/command/event/activate-event";
 import { resolveActor } from "@/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/session-server";
 import { cast, eventIdSchema } from "@/domain/shared/ids";
-import type { EventId, UserId } from "@/domain/shared/ids";
+import type { UserId } from "@/domain/shared/ids";
 import { eventSchema } from "@/domain/event/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { generateLoadEventDetailCacheKey, generateLoadEventsCacheKey } from "./queries";
@@ -69,7 +69,7 @@ export const updateEventFn = createServerFn({ method: "POST" })
     // Resolve actor with event context
     const actorResult = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
-      eventIds: [cast<EventId>(data.id)],
+      eventIds: [data.id],
     });
 
     if (Result.isFailure(actorResult)) {
@@ -107,7 +107,7 @@ export const archiveEventFn = createServerFn({ method: "POST" })
     // Resolve actor with event context
     const actorResult = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
-      eventIds: [cast<EventId>(data.eventId)],
+      eventIds: [data.eventId],
     });
 
     if (Result.isFailure(actorResult)) {
@@ -115,7 +115,7 @@ export const archiveEventFn = createServerFn({ method: "POST" })
     }
 
     const result = await archiveEvent(dependencies, {
-      eventId: cast<EventId>(data.eventId),
+      eventId: data.eventId,
       actor: actorResult.value,
     });
 
@@ -142,7 +142,7 @@ export const activateEventFn = createServerFn({ method: "POST" })
     // Resolve actor with event context
     const actorResult = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
-      eventIds: [cast<EventId>(data.eventId)],
+      eventIds: [data.eventId],
     });
 
     if (Result.isFailure(actorResult)) {
@@ -150,7 +150,7 @@ export const activateEventFn = createServerFn({ method: "POST" })
     }
 
     const result = await activateEvent(dependencies, {
-      eventId: cast<EventId>(data.eventId),
+      eventId: data.eventId,
       actor: actorResult.value,
     });
 

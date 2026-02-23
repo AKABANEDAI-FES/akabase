@@ -3,12 +3,13 @@ import { Result } from "@praha/byethrow";
 import { db } from "@/db";
 import { events } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { eventIdSchema } from "@/domain/shared/ids";
 
 /**
  * DTO schema for event retrieved by slug
  */
 export const eventBySlugSchema = z.object({
-  id: z.string(),
+  id: eventIdSchema,
   name: z.string(),
   slug: z.string(),
   status: z.enum(["active", "archived"]),

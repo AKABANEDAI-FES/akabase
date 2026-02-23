@@ -1,8 +1,6 @@
 import { revalidateLogic, useForm } from "@tanstack/react-form";
 import { Result } from "@praha/byethrow";
 import { updateEventInputSchema, useUpdateEventMutation } from "@/features/event/actions";
-import { cast } from "@/domain/shared/ids";
-import type { EventId } from "@/domain/shared/ids";
 import type { EventDetail } from "@/application/query/event/get-event-detail";
 import { Button, Field, Fieldset, Input, toaster } from "@/components/ui";
 import { nl2br } from "@/libs/text";
@@ -30,7 +28,7 @@ export function UpdateEventForm({ event }: UpdateEventFormProps) {
         try {
           const result = await mutateAsync({
             data: {
-              id: cast<EventId>(event.id),
+              id: event.id,
               name: value.name,
               slug: value.slug,
             },

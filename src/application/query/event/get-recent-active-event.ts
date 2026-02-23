@@ -3,9 +3,10 @@ import { Result } from "@praha/byethrow";
 import { db } from "@/db";
 import { events } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
+import { eventIdSchema } from "@/domain/shared/ids";
 
 export const recentActiveEventSchema = z.object({
-  id: z.string(),
+  id: eventIdSchema,
   name: z.string(),
   slug: z.string(),
   createdAt: z.date(),
