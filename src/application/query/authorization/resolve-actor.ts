@@ -7,8 +7,8 @@ import { db } from "@/db";
 import { committeeRoles, orgMembers } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import type { EventId, OrgId, UserId } from "@/domain/shared/ids";
-import { createActor } from "@/domain/authorization/actor";
-import type { Actor, CommitteeRole, GlobalRole, OrgRole } from "@/domain/authorization/actor";
+import type { Actor, CommitteeRole, GlobalRole, OrgRole } from "@/domain/authorization/schema";
+import { createActor } from "@/domain/authorization/logic";
 
 /**
  * Query error type

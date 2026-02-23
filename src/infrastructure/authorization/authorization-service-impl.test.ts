@@ -5,13 +5,13 @@
 import { describe, expect, it } from "vitest";
 import { Result } from "@praha/byethrow";
 import { AuthorizationServiceImpl } from "./authorization-service-impl";
-import { createActor } from "@/domain/authorization/actor";
-import type { CommitteeRole, OrgRole } from "@/domain/authorization/actor";
+import type { CommitteeRole, OrgRole } from "@/domain/authorization/schema";
 import {
+  createActor,
   eventResource,
   organizationResource,
   projectResource,
-} from "@/domain/authorization/resource";
+} from "@/domain/authorization/logic";
 import { cast } from "@/domain/shared/ids";
 import type { EventId, OrgId, ProjectId, UserId } from "@/domain/shared/ids";
 

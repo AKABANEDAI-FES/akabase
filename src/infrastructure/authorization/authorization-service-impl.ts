@@ -4,14 +4,13 @@
  */
 
 import { Result } from "@praha/byethrow";
-import type { Actor } from "@/domain/authorization/actor";
+import type { Action, Actor, AuthorizationDecision, Resource } from "@/domain/authorization/schema";
 import {
   getCommitteeRoleForEvent,
   getOrgRoleForOrg,
   isGlobalAdmin,
-} from "@/domain/authorization/actor";
-import type { Action, Resource } from "@/domain/authorization/resource";
-import type { AuthorizationDecision, AuthorizationService } from "@/domain/authorization/service";
+} from "@/domain/authorization/logic";
+import type { AuthorizationService } from "@/domain/authorization/service";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import { authorizationError } from "@/domain/authorization/errors";
 

@@ -6,8 +6,8 @@ import { eventError } from "@/domain/event/errors";
 import { canModifyEvent, updateEventEntity } from "@/domain/event/logic";
 import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
-import type { Actor } from "@/domain/authorization/actor";
-import { eventResource } from "@/domain/authorization/resource";
+import type { Actor } from "@/domain/authorization/schema";
+import { eventResource } from "@/domain/authorization/logic";
 import type { Dependencies } from "@/infrastructure/di";
 
 /**

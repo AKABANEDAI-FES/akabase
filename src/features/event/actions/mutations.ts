@@ -10,7 +10,7 @@ import { resolveActor } from "@/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/session-server";
 import { cast, eventIdSchema } from "@/domain/shared/ids";
 import type { EventId, UserId } from "@/domain/shared/ids";
-import type { GlobalRole } from "@/domain/authorization/actor";
+import type { GlobalRole } from "@/domain/authorization/schema";
 import { eventSchema } from "@/domain/event/schema";
 
 /**

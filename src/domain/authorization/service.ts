@@ -3,17 +3,8 @@
  */
 
 import type { Result } from "@praha/byethrow";
-import type { Actor } from "./actor";
-import type { Action, Resource } from "./resource";
+import type { Action, Actor, AuthorizationDecision, Resource } from "./schema";
 import type { AuthorizationError } from "./errors";
-
-/**
- * Authorization decision with optional reason
- */
-export type AuthorizationDecision = {
-  allowed: boolean;
-  reason?: string; // Optional explanation for denial
-};
 
 /**
  * Authorization service interface

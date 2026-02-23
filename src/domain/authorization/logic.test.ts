@@ -1,10 +1,10 @@
 /**
- * Actor helper functions unit tests
+ * Authorization logic helper functions unit tests
  */
 
 import { describe, expect, it } from "vitest";
-import { createActor, getCommitteeRoleForEvent, getOrgRoleForOrg, isGlobalAdmin } from "./actor";
-import type { CommitteeRole, OrgRole } from "./actor";
+import { createActor, getCommitteeRoleForEvent, getOrgRoleForOrg, isGlobalAdmin } from "./logic";
+import type { CommitteeRole, OrgRole } from "./schema";
 import { cast } from "@/domain/shared/ids";
 import type { EventId, OrgId, UserId } from "@/domain/shared/ids";
 
