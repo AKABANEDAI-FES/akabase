@@ -13,6 +13,13 @@
       "migrations_dir": "src/db/migrations",
     },
   ],
+  "r2_buckets": [
+    {
+      "binding": "STORAGE",
+      "bucket_name": "archive-images",
+      "preview_bucket_name": "archive-images-dev",
+    },
+  ],
   "vars": {
     "BETTER_AUTH_URL": "http://localhost:5137",
     "ADMIN_EMAILS": ["s1f102200558@toyo.jp"],
