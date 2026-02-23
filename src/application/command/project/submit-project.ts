@@ -3,7 +3,7 @@ import { gen, suspend } from "@/libs/result";
 import { generateId } from "@/libs/id";
 import type { ProjectId, SubmissionId, UserId } from "@/domain/shared/ids";
 import type { ProjectError } from "@/domain/project/errors";
-import type { RepositoryError } from "@/infrastructure/repositories/interfaces";
+import type { RepositoryError } from "@/domain/shared/repository";
 import { canSubmit, createSubmissionFromDraft, projectAfterSubmit } from "@/domain/project/logic";
 import type { Dependencies } from "@/infrastructure/di";
 

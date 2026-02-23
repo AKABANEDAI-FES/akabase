@@ -5,8 +5,9 @@ import { desc, eq } from "drizzle-orm";
 import { eventSchema } from "@/domain/event/schema";
 import type { Event } from "@/domain/event/schema";
 import type { EventId } from "@/domain/shared/ids";
-import type { EventRepository, RepositoryError } from "./interfaces";
-import { repositoryError } from "./interfaces";
+import type { EventRepository } from "@/domain/event/repository";
+import type { RepositoryError } from "@/domain/shared/repository";
+import { repositoryError } from "@/domain/shared/repository";
 
 /**
  * Event Repository Implementation using Drizzle ORM

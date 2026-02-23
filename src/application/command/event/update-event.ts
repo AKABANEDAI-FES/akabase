@@ -4,7 +4,7 @@ import type { EventId } from "@/domain/shared/ids";
 import type { EventError } from "@/domain/event/errors";
 import { eventError } from "@/domain/event/errors";
 import { canModifyEvent, updateEventEntity } from "@/domain/event/logic";
-import type { RepositoryError } from "@/infrastructure/repositories/interfaces";
+import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/actor";
 import { eventResource } from "@/domain/authorization/resource";

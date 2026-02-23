@@ -1,4 +1,5 @@
-import type { EventRepository, ProjectRepository } from "./repositories/interfaces";
+import type { ProjectRepository } from "@/domain/project/repository";
+import type { EventRepository } from "@/domain/event/repository";
 import type { AuthorizationService } from "@/domain/authorization/service";
 import { EventRepositoryImpl } from "./repositories/event-repository";
 import { ProjectRepositoryImpl } from "./repositories/project-repository";

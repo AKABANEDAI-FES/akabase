@@ -25,8 +25,9 @@ import type {
   SubmissionWithTags,
 } from "@/domain/project/schema";
 import type { OrgId, ProjectId, SubmissionId } from "@/domain/shared/ids";
-import type { ProjectRepository, RepositoryError } from "./interfaces";
-import { repositoryError } from "./interfaces";
+import type { ProjectRepository } from "@/domain/project/repository";
+import type { RepositoryError } from "@/domain/shared/repository";
+import { repositoryError } from "@/domain/shared/repository";
 import { generateId } from "@/libs/id";
 
 /**
