@@ -4,12 +4,7 @@
  */
 
 import { z } from "zod";
-import {
-  eventIdSchema,
-  orgIdSchema,
-  projectIdSchema,
-  userIdSchema,
-} from "@/domain/shared/ids";
+import { eventIdSchema, orgIdSchema, projectIdSchema, userIdSchema } from "@/domain/shared/ids";
 import type { Event } from "@/domain/event/schema";
 import type { Project } from "@/domain/project/schema";
 import type { Organization } from "@/domain/organization/schema";

@@ -1,5 +1,5 @@
 import { Result } from "@praha/byethrow";
-import { gen, suspend } from "@/libs/result";
+import { gen } from "@/libs/result";
 import type { EventId } from "@/domain/shared/ids";
 import type { EventError } from "@/domain/event/errors";
 import { eventError } from "@/domain/event/errors";
@@ -48,33 +48,31 @@ export async function archiveEvent(
   deps: Pick<Dependencies, "eventRepo" | "authService">,
   input: ArchiveEventInput,
 ): Result.ResultAsync<ArchiveEventOutput, ArchiveEventError> {
-  return suspend(() =>
-    gen(async function* ($) {
-      // Fetch the event
-      const event = yield* $(await deps.eventRepo.findById(input.eventId));
+  return gen(async function* ($) {
+    // Fetch the event
+    const event = yield* $(await deps.eventRepo.findById(input.eventId));
 
-      if (!event) {
-        return yield* $(Result.fail(eventError("EVENT_NOT_FOUND", "イベントが見つかりません")));
-      }
+    if (!event) {
+      return yield* $(Result.fail(eventError("EVENT_NOT_FOUND", "イベントが見つかりません")));
+    }
 
-      // Authorization check: global admin or event committee admin
-      const resource = eventResource(input.eventId, event);
-      yield* $(deps.authService.enforce(input.actor, resource, "event:archive"));
+    // Authorization check: global admin or event committee admin
+    const resource = eventResource(input.eventId, event);
+    yield* $(deps.authService.enforce(input.actor, resource, "event:archive"));
 
-      // Check if event is already archived
-      if (event.status === "archived") {
-        return yield* $(
-          Result.fail(eventError("EVENT_ARCHIVED", "このイベントは既にアーカイブされています")),
-        );
-      }
+    // Check if event is already archived
+    if (event.status === "archived") {
+      return yield* $(
+        Result.fail(eventError("EVENT_ARCHIVED", "このイベントは既にアーカイブされています")),
+      );
+    }
 
-      // Archive the event using domain logic
-      const archivedEvent = archiveEventLogic(event);
+    // Archive the event using domain logic
+    const archivedEvent = archiveEventLogic(event);
 
-      // Save archived event to database
-      yield* $(await deps.eventRepo.saveEvent(archivedEvent));
+    // Save archived event to database
+    yield* $(await deps.eventRepo.saveEvent(archivedEvent));
 
-      return { eventId: input.eventId };
-    }),
-  );
+    return { eventId: input.eventId };
+  });
 }

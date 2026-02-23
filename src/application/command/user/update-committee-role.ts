@@ -4,7 +4,7 @@
  */
 
 import type { Result } from "@praha/byethrow";
-import { gen, suspend } from "@/libs/result";
+import { gen } from "@/libs/result";
 import type { EventId, UserId } from "@/domain/shared/ids";
 import type { Actor, CommitteeRole } from "@/domain/authorization/schema";
 import type { Dependencies } from "@/infrastructure/di";
@@ -44,22 +44,20 @@ export async function updateCommitteeRole(
   deps: Pick<Dependencies, "userRepo" | "authService">,
   input: UpdateCommitteeRoleInput,
 ): Result.ResultAsync<UpdateCommitteeRoleOutput, UpdateCommitteeRoleError> {
-  return suspend(() =>
-    gen(async function* ($) {
-      const resource = eventResource(input.eventId);
-      yield* $(deps.authService.enforce(input.actor, resource, "event:update"));
+  return gen(async function* ($) {
+    const resource = eventResource(input.eventId);
+    yield* $(deps.authService.enforce(input.actor, resource, "event:update"));
 
-      const existingAssignment = yield* $(
-        await deps.userRepo.findCommitteeRoleAssignment(input.userId, input.eventId),
-      );
+    const existingAssignment = yield* $(
+      await deps.userRepo.findCommitteeRoleAssignment(input.userId, input.eventId),
+    );
 
-      const assignment = existingAssignment
-        ? updateCommitteeRoleAssignment(existingAssignment, input.role)
-        : createCommitteeRoleAssignment(generateId(), input.eventId, input.userId, input.role);
+    const assignment = existingAssignment
+      ? updateCommitteeRoleAssignment(existingAssignment, input.role)
+      : createCommitteeRoleAssignment(generateId(), input.eventId, input.userId, input.role);
 
-      yield* $(await deps.userRepo.saveCommitteeRoleAssignment(assignment));
+    yield* $(await deps.userRepo.saveCommitteeRoleAssignment(assignment));
 
-      return { success: true as const };
-    }),
-  );
+    return { success: true as const };
+  });
 }

@@ -1,5 +1,5 @@
 import { Result } from "@praha/byethrow";
-import { gen, suspend } from "@/libs/result";
+import { gen } from "@/libs/result";
 import { generateId } from "@/libs/id";
 import { cast } from "@/domain/shared/ids";
 import type { EventId } from "@/domain/shared/ids";
@@ -49,39 +49,37 @@ export async function createEvent(
   deps: Pick<Dependencies, "eventRepo" | "authService">,
   input: CreateEventInput,
 ): Result.ResultAsync<CreateEventOutput, CreateEventError> {
-  return suspend(() =>
-    gen(async function* ($) {
-      // Authorization check: only global admins can create events
-      // Note: event:create permission check only validates global admin role,
-      // not the specific eventId, so we use an empty placeholder
-      const placeholderResource = eventResource(cast<EventId>(""));
-      yield* $(deps.authService.enforce(input.actor, placeholderResource, "event:create"));
+  return gen(async function* ($) {
+    // Authorization check: only global admins can create events
+    // Note: event:create permission check only validates global admin role,
+    // not the specific eventId, so we use an empty placeholder
+    const placeholderResource = eventResource(cast<EventId>(""));
+    yield* $(deps.authService.enforce(input.actor, placeholderResource, "event:create"));
 
-      // Generate new event ID after authorization passes
-      const eventId = generateId<EventId>();
+    // Generate new event ID after authorization passes
+    const eventId = generateId<EventId>();
 
-      // Check if slug is already in use
-      const existingEvent = yield* $(await deps.eventRepo.findBySlug(input.slug));
+    // Check if slug is already in use
+    const existingEvent = yield* $(await deps.eventRepo.findBySlug(input.slug));
 
-      if (existingEvent) {
-        return yield* $(
-          Result.fail(
-            eventError(EVENT_ERROR_CODE.SLUG_NOT_UNIQUE, "このスラッグは既に使用されています"),
-          ),
-        );
-      }
+    if (existingEvent) {
+      return yield* $(
+        Result.fail(
+          eventError(EVENT_ERROR_CODE.SLUG_NOT_UNIQUE, "このスラッグは既に使用されています"),
+        ),
+      );
+    }
 
-      // Create event entity
-      const event = createEventEntity({
-        id: eventId,
-        name: input.name,
-        slug: input.slug,
-      });
+    // Create event entity
+    const event = createEventEntity({
+      id: eventId,
+      name: input.name,
+      slug: input.slug,
+    });
 
-      // Save event to database
-      yield* $(await deps.eventRepo.saveEvent(event));
+    // Save event to database
+    yield* $(await deps.eventRepo.saveEvent(event));
 
-      return { eventId };
-    }),
-  );
+    return { eventId };
+  });
 }

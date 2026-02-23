@@ -1,5 +1,5 @@
 import { Result } from "@praha/byethrow";
-import { gen, suspend } from "@/libs/result";
+import { gen } from "@/libs/result";
 import type { EventId } from "@/domain/shared/ids";
 import type { EventError } from "@/domain/event/errors";
 import { eventError } from "@/domain/event/errors";
@@ -48,33 +48,31 @@ export async function activateEvent(
   deps: Pick<Dependencies, "eventRepo" | "authService">,
   input: ActivateEventInput,
 ): Result.ResultAsync<ActivateEventOutput, ActivateEventError> {
-  return suspend(() =>
-    gen(async function* ($) {
-      // Fetch the event
-      const event = yield* $(await deps.eventRepo.findById(input.eventId));
+  return gen(async function* ($) {
+    // Fetch the event
+    const event = yield* $(await deps.eventRepo.findById(input.eventId));
 
-      if (!event) {
-        return yield* $(Result.fail(eventError("EVENT_NOT_FOUND", "イベントが見つかりません")));
-      }
+    if (!event) {
+      return yield* $(Result.fail(eventError("EVENT_NOT_FOUND", "イベントが見つかりません")));
+    }
 
-      // Authorization check: global admin or event committee admin
-      const resource = eventResource(input.eventId, event);
-      yield* $(deps.authService.enforce(input.actor, resource, "event:activate"));
+    // Authorization check: global admin or event committee admin
+    const resource = eventResource(input.eventId, event);
+    yield* $(deps.authService.enforce(input.actor, resource, "event:activate"));
 
-      // Check if event is already active
-      if (event.status === "active") {
-        return yield* $(
-          Result.fail(eventError("EVENT_ALREADY_ACTIVE", "このイベントは既にアクティブです")),
-        );
-      }
+    // Check if event is already active
+    if (event.status === "active") {
+      return yield* $(
+        Result.fail(eventError("EVENT_ALREADY_ACTIVE", "このイベントは既にアクティブです")),
+      );
+    }
 
-      // Activate the event using domain logic
-      const activatedEvent = activateEventLogic(event);
+    // Activate the event using domain logic
+    const activatedEvent = activateEventLogic(event);
 
-      // Save activated event to database
-      yield* $(await deps.eventRepo.saveEvent(activatedEvent));
+    // Save activated event to database
+    yield* $(await deps.eventRepo.saveEvent(activatedEvent));
 
-      return { eventId: input.eventId };
-    }),
-  );
+    return { eventId: input.eventId };
+  });
 }

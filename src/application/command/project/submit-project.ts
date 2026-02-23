@@ -1,5 +1,5 @@
 import { Result } from "@praha/byethrow";
-import { gen, suspend } from "@/libs/result";
+import { gen } from "@/libs/result";
 import { generateId } from "@/libs/id";
 import type { ProjectId, SubmissionId, UserId } from "@/domain/shared/ids";
 import type { ProjectError } from "@/domain/project/errors";
@@ -49,50 +49,48 @@ export function submitProject(
   deps: Pick<Dependencies, "projectRepo">,
   input: SubmitProjectInput,
 ): Result.ResultAsync<SubmitProjectOutput, SubmitProjectError> {
-  return suspend(() =>
-    gen(async function* ($) {
-      // 1. Load project from repository
-      const projectResult = yield* $(await deps.projectRepo.findById(input.projectId));
+  return gen(async function* ($) {
+    // 1. Load project from repository
+    const projectResult = yield* $(await deps.projectRepo.findById(input.projectId));
 
-      if (!projectResult) {
-        return yield* $(
-          Result.fail({
-            code: "PROJECT_NOT_FOUND" as const,
-            message: "企画が見つかりません。",
-          }),
-        );
-      }
+    if (!projectResult) {
+      return yield* $(
+        Result.fail({
+          code: "PROJECT_NOT_FOUND" as const,
+          message: "企画が見つかりません。",
+        }),
+      );
+    }
 
-      // 2. Load draft from repository
-      const draftResult = yield* $(await deps.projectRepo.findDraftWithTags(input.projectId));
+    // 2. Load draft from repository
+    const draftResult = yield* $(await deps.projectRepo.findDraftWithTags(input.projectId));
 
-      if (!draftResult) {
-        return yield* $(
-          Result.fail({
-            code: "DRAFT_NOT_FOUND" as const,
-            message: "下書きが見つかりません。",
-          }),
-        );
-      }
+    if (!draftResult) {
+      return yield* $(
+        Result.fail({
+          code: "DRAFT_NOT_FOUND" as const,
+          message: "下書きが見つかりません。",
+        }),
+      );
+    }
 
-      // 3. Check if project can be submitted (domain logic - pure function)
-      yield* $(canSubmit(projectResult));
+    // 3. Check if project can be submitted (domain logic - pure function)
+    yield* $(canSubmit(projectResult));
 
-      // 4. Create submission snapshot from draft (domain logic - pure function)
-      const submissionId = generateId<SubmissionId>();
-      const submission = createSubmissionFromDraft(draftResult, input.userId, submissionId);
+    // 4. Create submission snapshot from draft (domain logic - pure function)
+    const submissionId = generateId<SubmissionId>();
+    const submission = createSubmissionFromDraft(draftResult, input.userId, submissionId);
 
-      // 5. Update project with active submission ID (domain logic - pure function)
-      const updatedProject = projectAfterSubmit(projectResult, submissionId);
+    // 5. Update project with active submission ID (domain logic - pure function)
+    const updatedProject = projectAfterSubmit(projectResult, submissionId);
 
-      // 6. Persist submission to repository
-      yield* $(await deps.projectRepo.saveSubmission(submission));
+    // 6. Persist submission to repository
+    yield* $(await deps.projectRepo.saveSubmission(submission));
 
-      // 7. Update project in repository
-      yield* $(await deps.projectRepo.saveProject(updatedProject, draftResult));
+    // 7. Update project in repository
+    yield* $(await deps.projectRepo.saveProject(updatedProject, draftResult));
 
-      // Return success with submission ID
-      return { submissionId };
-    }),
-  );
+    // Return success with submission ID
+    return { submissionId };
+  });
 }
