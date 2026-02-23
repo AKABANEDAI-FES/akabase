@@ -4,10 +4,9 @@
  */
 
 import type { Result } from "@praha/byethrow";
-import type { User } from "./schema";
+import type { CommitteeRoleAssignment, User } from "./schema";
 import type { EventId, UserId } from "@/domain/shared/ids";
 import type { RepositoryError } from "@/domain/shared/repository";
-import type { CommitteeRole, GlobalRole } from "@/domain/authorization/schema";
 
 export interface UserRepository {
   /**
@@ -27,26 +26,34 @@ export interface UserRepository {
   listAll(): Promise<Result.Result<User[], RepositoryError>>;
 
   /**
-   * Upsert committee role assignment
-   * If the assignment already exists, update it; otherwise, create it
+   * Update user (accepts full User entity)
+   * Use domain logic functions to compute the updated user before calling this
+   *
+   * @param user - User entity to update
+   * @returns Success or repository error
+   */
+  updateUser(user: User): Promise<Result.Result<void, RepositoryError>>;
+
+  /**
+   * Find committee role assignment
    *
    * @param userId - User ID
    * @param eventId - Event ID
-   * @param role - Committee role to assign
-   * @returns Success or repository error
+   * @returns CommitteeRoleAssignment if found, null otherwise
    */
-  upsertCommitteeRole(
+  findCommitteeRoleAssignment(
     userId: UserId,
     eventId: EventId,
-    role: CommitteeRole,
-  ): Promise<Result.Result<void, RepositoryError>>;
+  ): Promise<Result.Result<CommitteeRoleAssignment | null, RepositoryError>>;
 
   /**
-   * Update user's global role
+   * Save committee role assignment (handles INSERT or UPDATE)
+   * Use domain logic functions to create or update the assignment before calling this
    *
-   * @param userId - User ID
-   * @param role - Global role to assign (admin or user)
+   * @param assignment - CommitteeRoleAssignment entity to save
    * @returns Success or repository error
    */
-  updateGlobalRole(userId: UserId, role: GlobalRole): Promise<Result.Result<void, RepositoryError>>;
+  saveCommitteeRoleAssignment(
+    assignment: CommitteeRoleAssignment,
+  ): Promise<Result.Result<void, RepositoryError>>;
 }

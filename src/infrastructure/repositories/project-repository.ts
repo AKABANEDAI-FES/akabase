@@ -409,25 +409,4 @@ export class ProjectRepositoryImpl implements ProjectRepository {
       return Result.fail(repositoryError("DATABASE_ERROR", "Failed to save published data", error));
     }
   }
-
-  async updateActiveSubmissionId(
-    projectId: ProjectId,
-    submissionId: SubmissionId | null,
-  ): Promise<Result.Result<void, RepositoryError>> {
-    try {
-      await db
-        .update(projects)
-        .set({
-          activeSubmissionId: submissionId,
-          updatedAt: new Date(),
-        })
-        .where(eq(projects.id, projectId));
-
-      return Result.succeed(undefined);
-    } catch (error) {
-      return Result.fail(
-        repositoryError("DATABASE_ERROR", "Failed to update active submission ID", error),
-      );
-    }
-  }
 }

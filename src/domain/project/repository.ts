@@ -88,12 +88,4 @@ export interface ProjectRepository {
    * Save or update published data
    */
   savePublished(published: PublishedWithTags): Promise<Result.Result<void, RepositoryError>>;
-
-  /**
-   * Update active submission ID
-   */
-  updateActiveSubmissionId(
-    projectId: ProjectId,
-    submissionId: SubmissionId | null,
-  ): Promise<Result.Result<void, RepositoryError>>;
 }

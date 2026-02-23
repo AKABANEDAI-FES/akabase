@@ -3,15 +3,17 @@
  * Updates a user's global role (admin or user)
  */
 
-import type { Result } from "@praha/byethrow";
+import { Result } from "@praha/byethrow";
 import { gen, suspend } from "@/libs/result";
 import type { UserId } from "@/domain/shared/ids";
 import type { Actor, GlobalRole } from "@/domain/authorization/schema";
 import type { Dependencies } from "@/infrastructure/di";
 import type { UserError } from "@/domain/user/errors";
+import { userError } from "@/domain/user/errors";
 import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import { userResource } from "@/domain/authorization/logic";
+import { updateUserGlobalRole } from "@/domain/user/logic";
 
 export type UpdateGlobalRoleInput = {
   userId: UserId;
@@ -42,13 +44,17 @@ export async function updateGlobalRole(
 ): Result.ResultAsync<UpdateGlobalRoleOutput, UpdateGlobalRoleError> {
   return suspend(() =>
     gen(async function* ($) {
-      // Authorization check: user:update_role permission required
-      // This allows only global admins to update user roles
       const resource = userResource(input.userId);
       yield* $(deps.authService.enforce(input.actor, resource, "user:update_role"));
 
-      // Persist the role update
-      yield* $(await deps.userRepo.updateGlobalRole(input.userId, input.role));
+      const user = yield* $(await deps.userRepo.findById(input.userId));
+      if (!user) {
+        return yield* $(Result.fail(userError("USER_NOT_FOUND", "ユーザーが見つかりません")));
+      }
+
+      const updatedUser = updateUserGlobalRole(user, input.role);
+
+      yield* $(await deps.userRepo.updateUser(updatedUser));
 
       return { success: true as const };
     }),

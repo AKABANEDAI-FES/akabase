@@ -7,13 +7,12 @@ import { Result } from "@praha/byethrow";
 import { db } from "@/db";
 import { committeeRoles, user as userTable } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
-import { generateId } from "@/libs/id";
 import type { UserRepository } from "@/domain/user/repository";
-import type { User } from "@/domain/user/schema";
+import type { CommitteeRoleAssignment, User } from "@/domain/user/schema";
 import type { EventId, UserId } from "@/domain/shared/ids";
-import type { CommitteeRole, GlobalRole } from "@/domain/authorization/schema";
 import type { RepositoryError } from "@/domain/shared/repository";
 import { cast } from "@/domain/shared/ids";
+import type { CommitteeRole } from "@/domain/authorization/schema";
 
 export class UserRepositoryImpl implements UserRepository {
   async findById(userId: UserId): Promise<Result.Result<User | null, RepositoryError>> {
@@ -74,62 +73,90 @@ export class UserRepositoryImpl implements UserRepository {
     }
   }
 
-  async upsertCommitteeRole(
+  async updateUser(user: User): Promise<Result.Result<void, RepositoryError>> {
+    try {
+      await db
+        .update(userTable)
+        .set({
+          name: user.name,
+          email: user.email,
+          emailVerified: user.emailVerified,
+          image: user.image,
+          role: user.role,
+          updatedAt: user.updatedAt,
+        })
+        .where(eq(userTable.id, user.id))
+        .run();
+
+      return Result.succeed(undefined);
+    } catch (error) {
+      console.error("[UserRepository] updateUser error:", error);
+      return Result.fail({
+        code: "DATABASE_ERROR",
+        message: "ユーザーの更新に失敗しました",
+      });
+    }
+  }
+
+  async findCommitteeRoleAssignment(
     userId: UserId,
     eventId: EventId,
-    role: CommitteeRole,
-  ): Promise<Result.Result<void, RepositoryError>> {
+  ): Promise<Result.Result<CommitteeRoleAssignment | null, RepositoryError>> {
     try {
-      // Check if a role assignment already exists
-      const existing = await db
+      const row = await db
         .select()
         .from(committeeRoles)
         .where(and(eq(committeeRoles.userId, userId), eq(committeeRoles.eventId, eventId)))
         .get();
 
-      if (existing) {
-        // Update existing role
-        await db
-          .update(committeeRoles)
-          .set({ role })
-          .where(eq(committeeRoles.id, existing.id))
-          .run();
-      } else {
-        // Create new role assignment
-        await db
-          .insert(committeeRoles)
-          .values({
-            id: generateId(),
-            userId,
-            eventId,
-            role,
-          })
-          .run();
+      if (!row) {
+        return Result.succeed(null);
       }
 
-      return Result.succeed(undefined);
+      const assignment: CommitteeRoleAssignment = {
+        id: row.id,
+        eventId: cast<EventId>(row.eventId),
+        userId: cast<UserId>(row.userId),
+        role: row.role as CommitteeRole,
+        createdAt: new Date(row.createdAt),
+      };
+
+      return Result.succeed(assignment);
     } catch (error) {
-      console.error("[UserRepository] upsertCommitteeRole error:", error);
+      console.error("[UserRepository] findCommitteeRoleAssignment error:", error);
       return Result.fail({
         code: "DATABASE_ERROR",
-        message: "委員会ロールの更新に失敗しました",
+        message: "委員会ロール割り当ての取得に失敗しました",
       });
     }
   }
 
-  async updateGlobalRole(
-    userId: UserId,
-    role: GlobalRole,
+  async saveCommitteeRoleAssignment(
+    assignment: CommitteeRoleAssignment,
   ): Promise<Result.Result<void, RepositoryError>> {
     try {
-      await db.update(userTable).set({ role }).where(eq(userTable.id, userId)).run();
+      // UPSERT using onConflictDoUpdate
+      await db
+        .insert(committeeRoles)
+        .values({
+          id: assignment.id,
+          userId: assignment.userId,
+          eventId: assignment.eventId,
+          role: assignment.role,
+          createdAt: assignment.createdAt,
+        })
+        .onConflictDoUpdate({
+          target: [committeeRoles.userId, committeeRoles.eventId],
+          set: { role: assignment.role },
+        })
+        .run();
 
       return Result.succeed(undefined);
     } catch (error) {
-      console.error("[UserRepository] updateGlobalRole error:", error);
+      console.error("[UserRepository] saveCommitteeRoleAssignment error:", error);
       return Result.fail({
         code: "DATABASE_ERROR",
-        message: "グローバルロールの更新に失敗しました",
+        message: "委員会ロール割り当ての保存に失敗しました",
       });
     }
   }

@@ -12,6 +12,8 @@ import type { UserError } from "@/domain/user/errors";
 import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import { eventResource } from "@/domain/authorization/logic";
+import { generateId } from "@/libs/id";
+import { createCommitteeRoleAssignment, updateCommitteeRoleAssignment } from "@/domain/user/logic";
 
 export type UpdateCommitteeRoleInput = {
   userId: UserId;
@@ -44,13 +46,18 @@ export async function updateCommitteeRole(
 ): Result.ResultAsync<UpdateCommitteeRoleOutput, UpdateCommitteeRoleError> {
   return suspend(() =>
     gen(async function* ($) {
-      // Authorization check: event:update permission required
-      // This allows both global admins and event admins to manage roles
       const resource = eventResource(input.eventId);
       yield* $(deps.authService.enforce(input.actor, resource, "event:update"));
 
-      // Persist the role assignment (UPSERT)
-      yield* $(await deps.userRepo.upsertCommitteeRole(input.userId, input.eventId, input.role));
+      const existingAssignment = yield* $(
+        await deps.userRepo.findCommitteeRoleAssignment(input.userId, input.eventId),
+      );
+
+      const assignment = existingAssignment
+        ? updateCommitteeRoleAssignment(existingAssignment, input.role)
+        : createCommitteeRoleAssignment(generateId(), input.eventId, input.userId, input.role);
+
+      yield* $(await deps.userRepo.saveCommitteeRoleAssignment(assignment));
 
       return { success: true as const };
     }),
