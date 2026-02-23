@@ -5,13 +5,18 @@ import { Container, Flex, Stack } from "styled-system/jsx";
 import { PlusIcon } from "lucide-react";
 import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions";
 import { generateLoadOrganizationsQueryOptions } from "@/features/organization/actions";
+import { generateCheckIsCommitteeAdminQueryOptions } from "@/features/authorization/actions";
+import type { EventId } from "@/domain/shared/ids";
 
 export const Route = createFileRoute("/_authenticated/$slug/committee/organizations")({
   loader: async ({ params, context }) => {
     const event = await context.queryClient.ensureQueryData(
       generateLoadEventBySlugQueryOptions(params.slug),
     );
-    await context.queryClient.ensureQueryData(generateLoadOrganizationsQueryOptions(event.id));
+    await Promise.all([
+      context.queryClient.ensureQueryData(generateLoadOrganizationsQueryOptions(event.id)),
+      context.queryClient.ensureQueryData(generateCheckIsCommitteeAdminQueryOptions(event.id)),
+    ]);
   },
   component: OrganizationsPage,
 });
@@ -21,9 +26,6 @@ function OrganizationsPage() {
   const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
   const { data: organizations } = useSuspenseQuery(generateLoadOrganizationsQueryOptions(event.id));
 
-  // TODO: 委員会管理者かどうかの判定が必要（現状はボタンを常に表示）
-  // 将来実装: isCommitteeAdmin(actor, eventId) ヘルパー関数
-
   return (
     <Container maxW="6xl" py="8">
       <Stack gap="6">
@@ -31,12 +33,7 @@ function OrganizationsPage() {
           <Heading as="h1" textStyle="2xl" fontWeight="bold">
             団体一覧
           </Heading>
-          <Link to="/$slug/committee/organizations/new" params={{ slug }}>
-            <Button>
-              <PlusIcon />
-              団体を作成
-            </Button>
-          </Link>
+          <AddOrganizationButton slug={slug} eventId={event.id} />
         </Flex>
 
         {organizations.length === 0 ? (
@@ -64,5 +61,27 @@ function OrganizationsPage() {
       </Stack>
       <Outlet />
     </Container>
+  );
+}
+
+type AddOrganizationButtonProps = {
+  slug: string;
+  eventId: EventId;
+};
+
+function AddOrganizationButton({ slug, eventId }: AddOrganizationButtonProps) {
+  const { data: authCheck } = useSuspenseQuery(generateCheckIsCommitteeAdminQueryOptions(eventId));
+
+  if (!authCheck.isCommitteeAdmin) {
+    return null;
+  }
+
+  return (
+    <Link to="/$slug/committee/organizations/new" params={{ slug }}>
+      <Button>
+        <PlusIcon />
+        団体を作成
+      </Button>
+    </Link>
   );
 }
