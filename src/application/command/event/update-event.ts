@@ -2,7 +2,7 @@ import { Result } from "@praha/byethrow";
 import { gen, suspend } from "@/libs/result";
 import type { EventId } from "@/domain/shared/ids";
 import type { EventError } from "@/domain/event/errors";
-import { eventError } from "@/domain/event/errors";
+import { EVENT_ERROR_CODE, eventError } from "@/domain/event/errors";
 import { canModifyEvent, updateEventEntity } from "@/domain/event/logic";
 import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
@@ -71,7 +71,9 @@ export async function updateEvent(
 
       if (existingEvent && existingEvent.id !== input.eventId) {
         return yield* $(
-          Result.fail(eventError("SLUG_NOT_UNIQUE", "このスラッグは既に使用されています")),
+          Result.fail(
+            eventError(EVENT_ERROR_CODE.SLUG_NOT_UNIQUE, "このスラッグは既に使用されています"),
+          ),
         );
       }
 

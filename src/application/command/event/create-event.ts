@@ -4,7 +4,7 @@ import { generateId } from "@/libs/id";
 import { cast } from "@/domain/shared/ids";
 import type { EventId } from "@/domain/shared/ids";
 import type { EventError } from "@/domain/event/errors";
-import { eventError } from "@/domain/event/errors";
+import { EVENT_ERROR_CODE, eventError } from "@/domain/event/errors";
 import { createEventEntity } from "@/domain/event/logic";
 import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
@@ -65,7 +65,9 @@ export async function createEvent(
 
       if (existingEvent) {
         return yield* $(
-          Result.fail(eventError("SLUG_NOT_UNIQUE", "このスラッグは既に使用されています")),
+          Result.fail(
+            eventError(EVENT_ERROR_CODE.SLUG_NOT_UNIQUE, "このスラッグは既に使用されています"),
+          ),
         );
       }
 

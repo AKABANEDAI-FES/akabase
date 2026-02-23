@@ -26,7 +26,7 @@ export const updateCommitteeRoleFn = createServerFn({ method: "POST" })
     });
 
     if (Result.isFailure(actorResult)) {
-      throw new Error(actorResult.error.message);
+      return actorResult;
     }
 
     const result = await updateCommitteeRole(dependencies, {
@@ -54,7 +54,7 @@ export const updateGlobalRoleFn = createServerFn({ method: "POST" })
     });
 
     if (Result.isFailure(actorResult)) {
-      throw new Error(actorResult.error.message);
+      return actorResult;
     }
 
     const result = await updateGlobalRole(dependencies, {

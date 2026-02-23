@@ -10,6 +10,7 @@ import type { EventId, OrgId, UserId } from "@/domain/shared/ids";
 import type { Actor, CommitteeRole, GlobalRole, OrgRole } from "@/domain/authorization/schema";
 import { createActor } from "@/domain/authorization/logic";
 import { globalRoleSchema } from "@/domain/authorization/schema";
+import { AUTHORIZATION_ERROR_CODE } from "@/domain/authorization/errors";
 
 /**
  * Query error type
@@ -61,7 +62,7 @@ export async function resolveActor(
 
     if (!userRow) {
       return Result.fail({
-        code: "ACTOR_RESOLUTION_FAILED",
+        code: AUTHORIZATION_ERROR_CODE.ACTOR_RESOLUTION_FAILED,
         message: `ユーザー ${options.userId} が見つかりません`,
       });
     }
@@ -113,7 +114,7 @@ export async function resolveActor(
     return Result.succeed(actor);
   } catch (error) {
     return Result.fail({
-      code: "ACTOR_RESOLUTION_FAILED",
+      code: AUTHORIZATION_ERROR_CODE.ACTOR_RESOLUTION_FAILED,
       message: `Actor の解決に失敗しました: ${error}`,
     });
   }

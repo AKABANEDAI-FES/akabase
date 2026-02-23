@@ -6,6 +6,7 @@ import type { EventId } from "@/domain/shared/ids";
 import type { EventDetail } from "@/application/query/event/get-event-detail";
 import { Button, Field, Fieldset, Input, toaster } from "@/components/ui";
 import { nl2br } from "@/libs/text";
+import { EVENT_ERROR_CODE } from "@/domain/event/errors";
 
 interface UpdateEventFormProps {
   event: EventDetail;
@@ -36,7 +37,7 @@ export function UpdateEventForm({ event }: UpdateEventFormProps) {
 
           if (Result.isFailure(result)) {
             // Slug重複エラーの場合、フィールドエラーとして返す
-            if (result.error.code === "SLUG_NOT_UNIQUE") {
+            if (result.error.code === EVENT_ERROR_CODE.SLUG_NOT_UNIQUE) {
               return {
                 fields: {
                   slug: {

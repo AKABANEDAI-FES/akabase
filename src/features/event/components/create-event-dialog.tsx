@@ -6,6 +6,7 @@ import { Portal } from "@ark-ui/react/portal";
 import { Stack } from "styled-system/jsx";
 import { useState } from "react";
 import { nl2br } from "@/libs/text";
+import { EVENT_ERROR_CODE } from "@/domain/event/errors";
 
 interface CreateEventDialogProps {
   defaultOpen?: boolean;
@@ -31,7 +32,7 @@ export function CreateEventDialog({ defaultOpen, onClose }: CreateEventDialogPro
 
           if (Result.isFailure(result)) {
             // Slug重複エラーの場合、フィールドエラーとして返す
-            if (result.error.code === "SLUG_NOT_UNIQUE") {
+            if (result.error.code === EVENT_ERROR_CODE.SLUG_NOT_UNIQUE) {
               return {
                 fields: {
                   slug: {

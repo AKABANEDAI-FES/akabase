@@ -12,7 +12,7 @@ import {
 } from "@/domain/authorization/logic";
 import type { AuthorizationService } from "@/domain/authorization/service";
 import type { AuthorizationError } from "@/domain/authorization/errors";
-import { authorizationError } from "@/domain/authorization/errors";
+import { AUTHORIZATION_ERROR_CODE, authorizationError } from "@/domain/authorization/errors";
 
 /**
  * Authorization service implementation
@@ -52,7 +52,9 @@ export class AuthorizationServiceImpl implements AuthorizationService {
       case "user":
         return this.checkUserPermission(actor, resource, action);
       default:
-        return Result.fail(authorizationError("UNKNOWN_RESOURCE", "不明なリソースタイプ"));
+        return Result.fail(
+          authorizationError(AUTHORIZATION_ERROR_CODE.UNKNOWN_RESOURCE, "不明なリソースタイプ"),
+        );
     }
   }
 
@@ -69,7 +71,7 @@ export class AuthorizationServiceImpl implements AuthorizationService {
     if (!decision.value.allowed) {
       return Result.fail(
         authorizationError(
-          "PERMISSION_DENIED",
+          AUTHORIZATION_ERROR_CODE.PERMISSION_DENIED,
           decision.value.reason ?? "この操作を実行する権限がありません",
         ),
       );

@@ -35,7 +35,7 @@ export const createEventFn = createServerFn({ method: "POST" })
     });
 
     if (Result.isFailure(actorResult)) {
-      throw new Error(actorResult.error.message);
+      return actorResult;
     }
 
     const result = await createEvent(dependencies, {
@@ -61,7 +61,7 @@ export const updateEventFn = createServerFn({ method: "POST" })
     });
 
     if (Result.isFailure(actorResult)) {
-      throw new Error(actorResult.error.message);
+      return actorResult;
     }
 
     const result = await updateEvent(dependencies, {
@@ -88,7 +88,7 @@ export const archiveEventFn = createServerFn({ method: "POST" })
     });
 
     if (Result.isFailure(actorResult)) {
-      throw new Error(actorResult.error.message);
+      return actorResult;
     }
 
     const result = await archiveEvent(dependencies, {
@@ -113,7 +113,7 @@ export const activateEventFn = createServerFn({ method: "POST" })
     });
 
     if (Result.isFailure(actorResult)) {
-      throw new Error(actorResult.error.message);
+      return actorResult;
     }
 
     const result = await activateEvent(dependencies, {

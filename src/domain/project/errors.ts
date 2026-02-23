@@ -1,17 +1,20 @@
 import type { BaseError } from "../shared/errors";
 import { createError } from "../shared/errors";
 
-export type ProjectErrorCode =
-  | "ALREADY_SUBMITTED"
-  | "NOT_SUBMITTED"
-  | "INVALID_STATUS"
-  | "CANNOT_WITHDRAW"
-  | "CANNOT_APPROVE"
-  | "CANNOT_RETURN"
-  | "PROJECT_NOT_FOUND"
-  | "DRAFT_NOT_FOUND"
-  | "SUBMISSION_NOT_FOUND"
-  | "FIELD_NOT_EDITABLE";
+export const PROJECT_ERROR_CODE = {
+  ALREADY_SUBMITTED: "ALREADY_SUBMITTED",
+  NOT_SUBMITTED: "NOT_SUBMITTED",
+  INVALID_STATUS: "INVALID_STATUS",
+  CANNOT_WITHDRAW: "CANNOT_WITHDRAW",
+  CANNOT_APPROVE: "CANNOT_APPROVE",
+  CANNOT_RETURN: "CANNOT_RETURN",
+  PROJECT_NOT_FOUND: "PROJECT_NOT_FOUND",
+  DRAFT_NOT_FOUND: "DRAFT_NOT_FOUND",
+  SUBMISSION_NOT_FOUND: "SUBMISSION_NOT_FOUND",
+  FIELD_NOT_EDITABLE: "FIELD_NOT_EDITABLE",
+} as const;
+
+export type ProjectErrorCode = (typeof PROJECT_ERROR_CODE)[keyof typeof PROJECT_ERROR_CODE];
 
 export type ProjectError = BaseError<ProjectErrorCode>;
 
