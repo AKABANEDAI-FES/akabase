@@ -2,7 +2,7 @@ import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { css } from "styled-system/css";
 import { Stack } from "styled-system/jsx";
-import { Building2Icon, CalendarClockIcon, MapPinIcon, TagIcon } from "lucide-react";
+import { Building2Icon, CalendarClockIcon, MapPinIcon, TagIcon, UsersIcon } from "lucide-react";
 import { Button, Heading, Text } from "@/components/ui";
 import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions/queries";
 
@@ -55,6 +55,10 @@ function SlugLayout() {
               <NavLink to="/$slug/committee/deadlines" params={{ slug }}>
                 <CalendarClockIcon />
                 締切管理
+              </NavLink>
+              <NavLink to="/$slug/committee/members" params={{ slug }}>
+                <UsersIcon />
+                メンバー管理
               </NavLink>
             </Stack>
           </Stack>
