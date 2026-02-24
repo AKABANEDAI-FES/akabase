@@ -16,7 +16,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminEventsRouteImport } from './routes/admin/events'
 import { Route as PublicLoginRouteImport } from './routes/_public/login'
-import { Route as AuthenticatedTestRouteImport } from './routes/_authenticated/test'
 import { Route as AuthenticatedSlugRouteImport } from './routes/_authenticated/$slug'
 import { Route as ApiAuthSplatRouteImport } from './routes/api.auth.$'
 import { Route as AdminEventsEventIdRouteImport } from './routes/admin/events_.$eventId'
@@ -69,11 +68,6 @@ const PublicLoginRoute = PublicLoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => PublicRoute,
-} as any)
-const AuthenticatedTestRoute = AuthenticatedTestRouteImport.update({
-  id: '/test',
-  path: '/test',
-  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedSlugRoute = AuthenticatedSlugRouteImport.update({
   id: '/$slug',
@@ -189,7 +183,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/$slug': typeof AuthenticatedSlugRouteWithChildren
-  '/test': typeof AuthenticatedTestRoute
   '/login': typeof PublicLoginRoute
   '/admin/events': typeof AdminEventsRouteWithChildren
   '/admin/users': typeof AdminUsersRoute
@@ -216,7 +209,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/$slug': typeof AuthenticatedSlugRouteWithChildren
-  '/test': typeof AuthenticatedTestRoute
   '/login': typeof PublicLoginRoute
   '/admin/events': typeof AdminEventsRouteWithChildren
   '/admin/users': typeof AdminUsersRoute
@@ -244,7 +236,6 @@ export interface FileRoutesById {
   '/_public': typeof PublicRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
   '/_authenticated/$slug': typeof AuthenticatedSlugRouteWithChildren
-  '/_authenticated/test': typeof AuthenticatedTestRoute
   '/_public/login': typeof PublicLoginRoute
   '/admin/events': typeof AdminEventsRouteWithChildren
   '/admin/users': typeof AdminUsersRoute
@@ -273,7 +264,6 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/$slug'
-    | '/test'
     | '/login'
     | '/admin/events'
     | '/admin/users'
@@ -300,7 +290,6 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/$slug'
-    | '/test'
     | '/login'
     | '/admin/events'
     | '/admin/users'
@@ -327,7 +316,6 @@ export interface FileRouteTypes {
     | '/_public'
     | '/admin'
     | '/_authenticated/$slug'
-    | '/_authenticated/test'
     | '/_public/login'
     | '/admin/events'
     | '/admin/users'
@@ -409,13 +397,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/login'
       preLoaderRoute: typeof PublicLoginRouteImport
       parentRoute: typeof PublicRoute
-    }
-    '/_authenticated/test': {
-      id: '/_authenticated/test'
-      path: '/test'
-      fullPath: '/test'
-      preLoaderRoute: typeof AuthenticatedTestRouteImport
-      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/$slug': {
       id: '/_authenticated/$slug'
@@ -674,12 +655,10 @@ const AuthenticatedSlugRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedSlugRoute: typeof AuthenticatedSlugRouteWithChildren
-  AuthenticatedTestRoute: typeof AuthenticatedTestRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedSlugRoute: AuthenticatedSlugRouteWithChildren,
-  AuthenticatedTestRoute: AuthenticatedTestRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
