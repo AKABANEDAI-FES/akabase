@@ -1,5 +1,11 @@
 export { CreateDeadlineDialog } from "./create-deadline-dialog";
 export { CreateEventDialog } from "./create-event-dialog";
+export { CreatePlaceDialog } from "./create-place-dialog";
+export { CreateTagDialog } from "./create-tag-dialog";
+export { DeletePlaceDialog } from "./delete-place-dialog";
+export { DeleteTagDialog } from "./delete-tag-dialog";
+export { EditPlaceDialog } from "./edit-place-dialog";
+export { EditTagDialog } from "./edit-tag-dialog";
 export { EventStatusBadge } from "./event-status-badge";
 export { EventStatusAlert } from "./event-status-alert";
 export { EventStatusControls } from "./event-status-controls";

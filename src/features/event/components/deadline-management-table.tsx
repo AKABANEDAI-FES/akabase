@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { Button, IconButton, Table } from "@/components/ui";
 import { Flex } from "styled-system/jsx";
 import { PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
@@ -7,7 +6,6 @@ import type { EventId } from "@/domain/shared/ids";
 import type { DeadlineListItem } from "@/application/query/event/list-deadlines";
 import { DEADLINE_FIELD_LABELS } from "@/domain/event/schema";
 import type { DeadlineFieldKey } from "@/domain/event/schema";
-import { generateCheckIsCommitteeAdminQueryOptions } from "@/features/authorization/actions";
 import { EditDeadlineDialog } from "./edit-deadline-dialog";
 import { DeleteDeadlineDialog } from "./delete-deadline-dialog";
 
@@ -25,12 +23,6 @@ export function DeadlineManagementTable({
   eventId,
   slug,
 }: DeadlineManagementTableProps) {
-  const { data: authCheck } = useSuspenseQuery(generateCheckIsCommitteeAdminQueryOptions(eventId));
-
-  if (!authCheck.isCommitteeAdmin) {
-    return <p>締切管理は委員会管理者のみが利用できます。</p>;
-  }
-
   return (
     <>
       <Flex justify="space-between" align="center" mb="4">

@@ -1,15 +1,13 @@
-import { Outlet, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Heading } from "@/components/ui";
-import { Container, Stack } from "styled-system/jsx";
 import {
   generateLoadEventBySlugQueryOptions,
   generateLoadPlacesQueryOptions,
 } from "@/features/event/actions/queries";
 import { generateCheckIsCommitteeAdminQueryOptions } from "@/features/authorization/actions";
-import { PlaceManagementTable } from "@/features/event/components/place-management-table";
+import { CreatePlaceDialog } from "@/features/event/components";
 
-export const Route = createFileRoute("/_authenticated/$slug/committee/places")({
+export const Route = createFileRoute("/_authenticated/$slug/committee/places/new")({
   loader: async ({ params, context }) => {
     const event = await context.queryClient.ensureQueryData(
       generateLoadEventBySlugQueryOptions(params.slug),
@@ -19,26 +17,30 @@ export const Route = createFileRoute("/_authenticated/$slug/committee/places")({
       context.queryClient.ensureQueryData(generateCheckIsCommitteeAdminQueryOptions(event.id)),
     ]);
   },
-  component: PlacesManagementPage,
+  component: CreatePlacePage,
 });
 
-function PlacesManagementPage() {
+function CreatePlacePage() {
+  const router = useRouter();
+  const navigate = useNavigate();
   const { slug } = Route.useParams();
   const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
   const { data: places } = useSuspenseQuery(generateLoadPlacesQueryOptions(event.id));
 
-  return (
-    <>
-      <Container maxW="6xl" py="8">
-        <Stack gap="6">
-          <Heading as="h1" textStyle="2xl" fontWeight="bold">
-            場所管理 - {event.name}
-          </Heading>
+  const handleClose = () => {
+    if (router.history.canGoBack()) {
+      router.history.back();
+    } else {
+      navigate({ to: "..", replace: true });
+    }
+  };
 
-          <PlaceManagementTable places={places} eventId={event.id} slug={slug} />
-        </Stack>
-      </Container>
-      <Outlet />
-    </>
+  return (
+    <CreatePlaceDialog
+      eventId={event.id}
+      places={places}
+      defaultOpen={true}
+      onClose={handleClose}
+    />
   );
 }
