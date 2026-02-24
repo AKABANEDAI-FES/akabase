@@ -11,6 +11,8 @@ import { and, desc, eq } from "drizzle-orm";
 import { userIdSchema } from "@/domain/shared/ids";
 import type { EventId } from "@/domain/shared/ids";
 import { committeeRoleSchema } from "@/domain/authorization/schema";
+import type { Actor } from "@/domain/authorization/schema";
+import { getCommitteeRoleForEvent, isGlobalAdmin } from "@/domain/authorization/logic";
 
 // DTO schema for user in event context
 export const userForEventSchema = z.object({
@@ -24,17 +26,28 @@ export const userForEventSchema = z.object({
 export type UserForEvent = z.infer<typeof userForEventSchema>;
 
 export type QueryError = {
-  code: "DATABASE_ERROR";
+  code: "DATABASE_ERROR" | "PERMISSION_DENIED";
   message: string;
 };
 
 /**
  * List all users with their committee role in the specified event
  * Users without an explicit role are assigned "default"
+ *
+ * Authorization: Only global admins and committee admin/approver/member can access
  */
 export async function listUsersForEvent(
   eventId: EventId,
+  actor: Actor,
 ): Promise<Result.Result<UserForEvent[], QueryError>> {
+  const committeeRole = getCommitteeRoleForEvent(actor, eventId);
+  if (!isGlobalAdmin(actor) && !["admin", "approver", "member"].includes(committeeRole)) {
+    return Result.fail({
+      code: "PERMISSION_DENIED",
+      message: "ユーザー一覧を閲覧する権限がありません。",
+    });
+  }
+
   try {
     // Get all users with their committee role for this event in a single query
     const rows = await db

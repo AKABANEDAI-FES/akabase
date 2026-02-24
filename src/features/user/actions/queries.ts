@@ -4,8 +4,10 @@ import { Result } from "@praha/byethrow";
 import { authMiddleware } from "@/libs/session-server";
 import { listUsersWithRoles } from "@/application/query/user/list-users-with-roles";
 import { listUsersForEvent } from "@/application/query/user/list-users-for-event";
-import { eventIdSchema } from "@/domain/shared/ids";
+import { cast, eventIdSchema } from "@/domain/shared/ids";
+import type { UserId } from "@/domain/shared/ids";
 import { queryOptions } from "@tanstack/react-query";
+import { resolveActor } from "@/application/query/authorization/resolve-actor";
 
 export const loadUsersWithRolesFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
@@ -33,8 +35,17 @@ export function generateLoadUsersWithRolesQueryOptions() {
 export const loadUsersForEventFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
-  .handler(async ({ data }) => {
-    const result = await listUsersForEvent(data.eventId);
+  .handler(async ({ data, context }) => {
+    const actorResult = await resolveActor({
+      userId: cast<UserId>(context.session.user.id),
+      eventIds: [data.eventId],
+    });
+
+    if (Result.isFailure(actorResult)) {
+      throw new Error(actorResult.error.message);
+    }
+
+    const result = await listUsersForEvent(data.eventId, actorResult.value);
 
     if (Result.isFailure(result)) {
       throw new Error(result.error.message);
