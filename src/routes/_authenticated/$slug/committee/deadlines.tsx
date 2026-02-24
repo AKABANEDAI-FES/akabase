@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Outlet, createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Heading } from "@/components/ui";
 import { Container, Stack } from "styled-system/jsx";
@@ -34,8 +34,9 @@ function DeadlinesManagementPage() {
           締切管理 - {event.name}
         </Heading>
 
-        <DeadlineManagementTable deadlines={deadlines} eventId={event.id} />
+        <DeadlineManagementTable deadlines={deadlines} eventId={event.id} slug={slug} />
       </Stack>
+      <Outlet />
     </Container>
   );
 }
