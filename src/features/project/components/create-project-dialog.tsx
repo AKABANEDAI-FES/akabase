@@ -69,6 +69,7 @@ export function CreateProjectDialog({
           // Success - return undefined to trigger onSubmit
           return undefined;
         } catch (error) {
+          console.error("Failed to create project:", error);
           toaster.create({
             type: "error",
             title: "エラー",

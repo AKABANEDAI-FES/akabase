@@ -46,6 +46,7 @@ export function UpdateOrganizationForm({ organization }: UpdateOrganizationFormP
 
           return undefined;
         } catch (error) {
+          console.error("Failed to update organization:", error);
           toaster.create({
             type: "error",
             title: "エラー",

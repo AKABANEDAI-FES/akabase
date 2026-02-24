@@ -59,6 +59,7 @@ export function UpdateEventForm({ event }: UpdateEventFormProps) {
           return undefined;
         } catch (error) {
           // Handle unexpected errors
+          console.error("Failed to update event:", error);
           toaster.create({
             type: "error",
             title: "エラー",

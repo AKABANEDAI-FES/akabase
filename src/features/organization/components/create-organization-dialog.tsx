@@ -53,6 +53,7 @@ export function CreateOrganizationDialog({
           // Success - return undefined to trigger onSubmit
           return undefined;
         } catch (error) {
+          console.error("Failed to create organization:", error);
           toaster.create({
             type: "error",
             title: "エラー",

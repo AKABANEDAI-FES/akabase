@@ -42,6 +42,7 @@ export function EventStatusControls({ eventId, eventName, status }: EventStatusC
           : `「${eventName}」は読み取り専用になりました`,
       });
     } catch (error) {
+      console.error("Failed to toggle event status:", error);
       toaster.create({
         type: "error",
         title: "エラー",

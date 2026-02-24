@@ -55,6 +55,7 @@ export function CreateEventDialog({ defaultOpen, onClose }: CreateEventDialogPro
           // 成功時は何も返さない（onSubmitが実行される）
           return undefined;
         } catch (error) {
+          console.error("Failed to create event:", error);
           toaster.create({
             type: "error",
             title: "エラー",
