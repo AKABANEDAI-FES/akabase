@@ -1,23 +1,18 @@
 import { Result } from "@praha/byethrow";
 import { describe, expect, it } from "vitest";
-import type { Deadline, Event, Place } from "./schema";
-import type { EventId, PlaceId } from "../shared/ids";
+import type { Deadline, Event } from "./schema";
+import type { EventId } from "../shared/ids";
 import {
   activateEvent,
-  addPlace,
   archiveEvent,
   canModifyEvent,
   createEventEntity,
   isFieldEditable,
-  removePlace,
   updateEventEntity,
-  updatePlace,
 } from "./logic";
 
 // Test fixtures
 const mockEventId = "event_123" as EventId;
-const mockPlaceId1 = "place_1" as PlaceId;
-const mockPlaceId2 = "place_2" as PlaceId;
 
 const createMockEvent = (overrides?: Partial<Event>): Event => ({
   id: mockEventId,
@@ -27,14 +22,6 @@ const createMockEvent = (overrides?: Partial<Event>): Event => ({
   createdAt: new Date("2025-01-01"),
   updatedAt: new Date("2025-01-01"),
   ...overrides,
-});
-
-const createMockPlace = (id: PlaceId, name: string): Place => ({
-  id,
-  eventId: mockEventId,
-  name,
-  parentId: null,
-  createdAt: new Date("2025-01-01"),
 });
 
 const createMockDeadline = (fieldKey: Deadline["fieldKey"], deadlineAt: Date): Deadline => ({
@@ -107,62 +94,26 @@ describe("Event Domain Logic", () => {
     });
   });
 
-  describe("Place Management Functions", () => {
-    describe("addPlace", () => {
-      it("adds a new place to the list", () => {
-        const places = [createMockPlace(mockPlaceId1, "Building 1")];
-        const newPlace = createMockPlace(mockPlaceId2, "Building 2");
-
-        const updatedPlaces = addPlace(places, newPlace);
-
-        expect(updatedPlaces).toHaveLength(2);
-        expect(updatedPlaces).toContain(newPlace);
-      });
-    });
-
-    describe("removePlace", () => {
-      it("removes the place from the list", () => {
-        const places = [
-          createMockPlace(mockPlaceId1, "Building 1"),
-          createMockPlace(mockPlaceId2, "Building 2"),
-        ];
-
-        const updatedPlaces = removePlace(places, mockPlaceId1);
-
-        expect(updatedPlaces).toHaveLength(1);
-        expect(updatedPlaces[0].id).toBe(mockPlaceId2);
-      });
-    });
-
-    describe("updatePlace", () => {
-      it("updates the place in the list", () => {
-        const places = [createMockPlace(mockPlaceId1, "Building 1")];
-        const updatedPlace = { ...places[0], name: "Updated Building" };
-
-        const updatedPlaces = updatePlace(places, updatedPlace);
-
-        expect(updatedPlaces[0].name).toBe("Updated Building");
-      });
-    });
-  });
-
   describe("Event Updates", () => {
     describe("createEventEntity", () => {
       it("creates active event with same createdAt and updatedAt", () => {
         const now = new Date("2025-02-01T10:00:00.000Z");
-        const created = createEventEntity({
+        const result = createEventEntity({
           id: mockEventId,
           name: "Created Event",
           slug: "created-event",
           now,
         });
 
-        expect(created.id).toBe(mockEventId);
-        expect(created.name).toBe("Created Event");
-        expect(created.slug).toBe("created-event");
-        expect(created.status).toBe("active");
-        expect(created.createdAt).toBe(now);
-        expect(created.updatedAt).toBe(now);
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.id).toBe(mockEventId);
+          expect(result.value.name).toBe("Created Event");
+          expect(result.value.slug).toBe("created-event");
+          expect(result.value.status).toBe("active");
+          expect(result.value.createdAt).toBe(now);
+          expect(result.value.updatedAt).toBe(now);
+        }
       });
     });
 
@@ -176,38 +127,49 @@ describe("Event Domain Logic", () => {
         });
         const now = new Date("2025-02-01T10:00:00.000Z");
 
-        const updated = updateEventEntity(event, {
+        const result = updateEventEntity(event, {
           name: "New Name",
           slug: "new-slug",
           now,
         });
 
-        expect(updated.id).toBe(event.id);
-        expect(updated.status).toBe(event.status);
-        expect(updated.createdAt).toBe(event.createdAt);
-        expect(updated.name).toBe("New Name");
-        expect(updated.slug).toBe("new-slug");
-        expect(updated.updatedAt).toBe(now);
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.id).toBe(event.id);
+          expect(result.value.status).toBe(event.status);
+          expect(result.value.createdAt).toBe(event.createdAt);
+          expect(result.value.name).toBe("New Name");
+          expect(result.value.slug).toBe("new-slug");
+          expect(result.value.updatedAt).toBe(now);
+        }
       });
     });
 
     describe("archiveEvent", () => {
       it("changes event status to archived", () => {
         const event = createMockEvent({ status: "active" });
-        const archived = archiveEvent(event);
+        const now = new Date("2025-02-01T10:00:00.000Z");
+        const result = archiveEvent(event, now);
 
-        expect(archived.status).toBe("archived");
-        expect(archived.updatedAt).not.toEqual(event.updatedAt);
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.status).toBe("archived");
+          expect(result.value.updatedAt).toBe(now);
+        }
       });
     });
 
     describe("activateEvent", () => {
       it("changes event status to active", () => {
         const event = createMockEvent({ status: "archived" });
-        const activated = activateEvent(event);
+        const now = new Date("2025-02-01T10:00:00.000Z");
+        const result = activateEvent(event, now);
 
-        expect(activated.status).toBe("active");
-        expect(activated.updatedAt).not.toEqual(event.updatedAt);
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.status).toBe("active");
+          expect(result.value.updatedAt).toBe(now);
+        }
       });
     });
   });

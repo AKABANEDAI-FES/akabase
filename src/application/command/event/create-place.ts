@@ -2,10 +2,9 @@ import { Result } from "@praha/byethrow";
 import { gen } from "@/libs/result";
 import { generateId } from "@/libs/id";
 import type { EventId, PlaceId } from "@/domain/shared/ids";
-import type { Place } from "@/domain/event/schema";
 import type { EventError } from "@/domain/event/errors";
 import { EVENT_ERROR_CODE, eventError } from "@/domain/event/errors";
-import { canModifyEvent } from "@/domain/event/logic";
+import { canModifyEvent, createPlaceEntity } from "@/domain/event/logic";
 import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
@@ -72,14 +71,14 @@ export async function createPlace(
 
     // Create place entity
     const placeId = generateId<PlaceId>();
-
-    const place: Place = {
-      id: placeId,
-      eventId: input.eventId,
-      name: input.name,
-      parentId: input.parentId,
-      createdAt: new Date(),
-    };
+    const place = yield* $(
+      createPlaceEntity({
+        id: placeId,
+        eventId: input.eventId,
+        name: input.name,
+        parentId: input.parentId,
+      }),
+    );
 
     // Save place
     yield* $(await deps.eventRepo.savePlace(place));

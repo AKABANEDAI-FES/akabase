@@ -20,6 +20,6 @@ export type EventErrorCode = (typeof EVENT_ERROR_CODE)[keyof typeof EVENT_ERROR_
 
 export type EventError = BaseError<EventErrorCode>;
 
-export function eventError(code: EventErrorCode, message: string): EventError {
+export function eventError(code: EventError["code"], message: string): EventError {
   return createError(code, message);
 }

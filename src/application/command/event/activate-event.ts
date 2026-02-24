@@ -72,7 +72,7 @@ export async function activateEvent(
     }
 
     // Activate the event using domain logic
-    const activatedEvent = activateEventLogic(event);
+    const activatedEvent = yield* $(activateEventLogic(event));
 
     // Save activated event to database
     yield* $(await deps.eventRepo.saveEvent(activatedEvent));

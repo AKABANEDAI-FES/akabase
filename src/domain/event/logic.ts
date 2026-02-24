@@ -1,9 +1,10 @@
 import { Result } from "@praha/byethrow";
-import type { Deadline, Event, Place, Tag } from "./schema";
-import { tagSchema } from "./schema";
+import type { Deadline, DeadlineFieldKey, Event, Place, Tag } from "./schema";
+import { deadlineSchema, eventSchema, placeSchema, tagSchema } from "./schema";
 import type { EventError } from "./errors";
 import { EVENT_ERROR_CODE, eventError } from "./errors";
-import type { EventId, PlaceId } from "../shared/ids";
+import type { DeadlineId, EventId, PlaceId, TagId } from "../shared/ids";
+import { DOMAIN_ERROR_CODE } from "../shared/errors";
 
 /**
  * Create a new event entity
@@ -13,10 +14,10 @@ export function createEventEntity(input: {
   name: string;
   slug: string;
   now?: Date;
-}): Event {
+}): Result.Result<Event, EventError> {
   const now = input.now ?? new Date();
 
-  return {
+  const data = {
     id: input.id,
     name: input.name,
     slug: input.slug,
@@ -24,6 +25,11 @@ export function createEventEntity(input: {
     createdAt: now,
     updatedAt: now,
   };
+
+  return Result.try({
+    try: () => eventSchema.parse(data),
+    catch: () => eventError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "イベントの作成に失敗しました"),
+  });
 }
 
 /**
@@ -36,13 +42,18 @@ export function updateEventEntity(
     slug: string;
     now?: Date;
   },
-): Event {
-  return {
+): Result.Result<Event, EventError> {
+  const data = {
     ...event,
     name: input.name,
     slug: input.slug,
     updatedAt: input.now ?? new Date(),
   };
+
+  return Result.try({
+    try: () => eventSchema.parse(data),
+    catch: () => eventError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "イベントの更新に失敗しました"),
+  });
 }
 
 /**
@@ -131,63 +142,47 @@ export function isFieldEditable(
  */
 
 /**
+ * Create a new tag entity
+ */
+export function createTagEntity(input: {
+  id: TagId;
+  eventId: EventId;
+  name: string;
+  now?: Date;
+}): Result.Result<Tag, EventError> {
+  const data = {
+    id: input.id,
+    eventId: input.eventId,
+    name: input.name,
+    createdAt: input.now ?? new Date(),
+  };
+
+  return Result.try({
+    try: () => tagSchema.parse(data),
+    catch: () => eventError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "タグの作成に失敗しました"),
+  });
+}
+
+/**
  * Update tag entity
  * Returns new tag with updated fields (only mutable fields)
  * Validates the updated tag against schema
  */
-export function updateTag(
+export function updateTagEntity(
   tag: Tag,
   input: {
     name: string;
   },
 ): Result.Result<Tag, EventError> {
-  const updated = {
+  const data = {
     ...tag,
     name: input.name,
   };
 
-  // Validate against schema to ensure updated tag is valid
-  const parseResult = tagSchema.safeParse(updated);
-  if (!parseResult.success) {
-    return Result.fail(
-      eventError(
-        EVENT_ERROR_CODE.TAG_INVALID,
-        parseResult.error.issues[0]?.message || "タグの検証に失敗しました",
-      ),
-    );
-  }
-
-  return Result.succeed(parseResult.data);
-}
-
-/**
- * =============================================================================
- * Place Management Functions (Pure Functions)
- * =============================================================================
- */
-
-/**
- * Add a new place to the list
- * Returns new places array
- */
-export function addPlace(places: Place[], newPlace: Place): Place[] {
-  return [...places, newPlace];
-}
-
-/**
- * Remove a place from the list
- * Returns new places array
- */
-export function removePlace(places: Place[], placeId: PlaceId): Place[] {
-  return places.filter((p) => p.id !== placeId);
-}
-
-/**
- * Update a place
- * Returns new places array
- */
-export function updatePlace(places: Place[], updatedPlace: Place): Place[] {
-  return places.map((p) => (p.id === updatedPlace.id ? updatedPlace : p));
+  return Result.try({
+    try: () => tagSchema.parse(data),
+    catch: () => eventError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "タグの更新に失敗しました"),
+  });
 }
 
 /**
@@ -200,22 +195,135 @@ export function updatePlace(places: Place[], updatedPlace: Place): Place[] {
  * Archive an event
  * Changes status to "archived"
  */
-export function archiveEvent(event: Event): Event {
-  return {
+export function archiveEvent(event: Event, now?: Date): Result.Result<Event, EventError> {
+  const data = {
     ...event,
     status: "archived",
-    updatedAt: new Date(),
+    updatedAt: now ?? new Date(),
   };
+
+  return Result.try({
+    try: () => eventSchema.parse(data),
+    catch: () =>
+      eventError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "イベントのアーカイブに失敗しました"),
+  });
 }
 
 /**
  * Activate an event
  * Changes status to "active"
  */
-export function activateEvent(event: Event): Event {
-  return {
+export function activateEvent(event: Event, now?: Date): Result.Result<Event, EventError> {
+  const data = {
     ...event,
     status: "active",
-    updatedAt: new Date(),
+    updatedAt: now ?? new Date(),
   };
+
+  return Result.try({
+    try: () => eventSchema.parse(data),
+    catch: () => eventError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "イベントの有効化に失敗しました"),
+  });
+}
+
+/**
+ * =============================================================================
+ * Place Management Functions (Pure Functions)
+ * =============================================================================
+ */
+
+/**
+ * Create a new place entity
+ */
+export function createPlaceEntity(input: {
+  id: PlaceId;
+  eventId: EventId;
+  name: string;
+  parentId: PlaceId | null;
+  now?: Date;
+}): Result.Result<Place, EventError> {
+  const data = {
+    id: input.id,
+    eventId: input.eventId,
+    name: input.name,
+    parentId: input.parentId,
+    createdAt: input.now ?? new Date(),
+  };
+
+  return Result.try({
+    try: () => placeSchema.parse(data),
+    catch: () => eventError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "場所の作成に失敗しました"),
+  });
+}
+
+/**
+ * Update place entity
+ * Only name can be updated (parentId is immutable)
+ */
+export function updatePlaceEntity(
+  place: Place,
+  input: {
+    name: string;
+  },
+): Result.Result<Place, EventError> {
+  const data = {
+    ...place,
+    name: input.name,
+  };
+
+  return Result.try({
+    try: () => placeSchema.parse(data),
+    catch: () => eventError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "場所の更新に失敗しました"),
+  });
+}
+
+/**
+ * =============================================================================
+ * Deadline Management Functions (Pure Functions)
+ * =============================================================================
+ */
+
+/**
+ * Create a new deadline entity
+ */
+export function createDeadlineEntity(input: {
+  id: DeadlineId;
+  eventId: EventId;
+  fieldKey: DeadlineFieldKey;
+  deadlineAt: Date;
+  now?: Date;
+}): Result.Result<Deadline, EventError> {
+  const data = {
+    id: input.id,
+    eventId: input.eventId,
+    fieldKey: input.fieldKey,
+    deadlineAt: input.deadlineAt,
+    createdAt: input.now ?? new Date(),
+  };
+
+  return Result.try({
+    try: () => deadlineSchema.parse(data),
+    catch: () => eventError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "締切の作成に失敗しました"),
+  });
+}
+
+/**
+ * Update deadline entity
+ * Only deadlineAt can be updated (fieldKey is immutable)
+ */
+export function updateDeadlineEntity(
+  deadline: Deadline,
+  input: {
+    deadlineAt: Date;
+  },
+): Result.Result<Deadline, EventError> {
+  const data = {
+    ...deadline,
+    deadlineAt: input.deadlineAt,
+  };
+
+  return Result.try({
+    try: () => deadlineSchema.parse(data),
+    catch: () => eventError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "締切の更新に失敗しました"),
+  });
 }

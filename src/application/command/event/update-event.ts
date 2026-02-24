@@ -71,10 +71,12 @@ export async function updateEvent(
     yield* $(await deps.eventDomainService.ensureSlugUnique(input.slug, input.eventId));
 
     // Update event entity
-    const updatedEvent = updateEventEntity(event, {
-      name: input.name,
-      slug: input.slug,
-    });
+    const updatedEvent = yield* $(
+      updateEventEntity(event, {
+        name: input.name,
+        slug: input.slug,
+      }),
+    );
 
     // Save updated event to database
     yield* $(await deps.eventRepo.saveEvent(updatedEvent));

@@ -2,10 +2,10 @@ import { Result } from "@praha/byethrow";
 import { gen } from "@/libs/result";
 import { generateId } from "@/libs/id";
 import type { DeadlineId, EventId } from "@/domain/shared/ids";
-import type { Deadline, DeadlineFieldKey } from "@/domain/event/schema";
+import type { DeadlineFieldKey } from "@/domain/event/schema";
 import type { EventError } from "@/domain/event/errors";
 import { EVENT_ERROR_CODE, eventError } from "@/domain/event/errors";
-import { canModifyEvent } from "@/domain/event/logic";
+import { canModifyEvent, createDeadlineEntity } from "@/domain/event/logic";
 import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
@@ -72,13 +72,14 @@ export async function createDeadline(
 
     // Create deadline entity
     const deadlineId = generateId<DeadlineId>();
-    const deadline: Deadline = {
-      id: deadlineId,
-      eventId: input.eventId,
-      fieldKey: input.fieldKey,
-      deadlineAt: input.deadlineAt,
-      createdAt: new Date(),
-    };
+    const deadline = yield* $(
+      createDeadlineEntity({
+        id: deadlineId,
+        eventId: input.eventId,
+        fieldKey: input.fieldKey,
+        deadlineAt: input.deadlineAt,
+      }),
+    );
 
     // Save deadline (UPSERT in repository layer)
     yield* $(await deps.eventRepo.saveDeadline(deadline));

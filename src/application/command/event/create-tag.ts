@@ -2,10 +2,9 @@ import { Result } from "@praha/byethrow";
 import { gen } from "@/libs/result";
 import { generateId } from "@/libs/id";
 import type { EventId, TagId } from "@/domain/shared/ids";
-import type { Tag } from "@/domain/event/schema";
 import type { EventError } from "@/domain/event/errors";
 import { EVENT_ERROR_CODE, eventError } from "@/domain/event/errors";
-import { canModifyEvent } from "@/domain/event/logic";
+import { canModifyEvent, createTagEntity } from "@/domain/event/logic";
 import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
@@ -59,12 +58,13 @@ export async function createTag(
 
     // Create tag entity
     const tagId = generateId<TagId>();
-    const tag: Tag = {
-      id: tagId,
-      eventId: input.eventId,
-      name: input.name,
-      createdAt: new Date(),
-    };
+    const tag = yield* $(
+      createTagEntity({
+        id: tagId,
+        eventId: input.eventId,
+        name: input.name,
+      }),
+    );
 
     // Save tag
     yield* $(await deps.eventRepo.saveTag(tag));

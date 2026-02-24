@@ -72,7 +72,7 @@ export async function archiveEvent(
     }
 
     // Archive the event using domain logic
-    const archivedEvent = archiveEventLogic(event);
+    const archivedEvent = yield* $(archiveEventLogic(event));
 
     // Save archived event to database
     yield* $(await deps.eventRepo.saveEvent(archivedEvent));

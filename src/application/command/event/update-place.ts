@@ -1,10 +1,9 @@
 import { Result } from "@praha/byethrow";
 import { gen } from "@/libs/result";
 import type { EventId, PlaceId } from "@/domain/shared/ids";
-import type { Place } from "@/domain/event/schema";
 import type { EventError } from "@/domain/event/errors";
 import { EVENT_ERROR_CODE, eventError } from "@/domain/event/errors";
-import { canModifyEvent } from "@/domain/event/logic";
+import { canModifyEvent, updatePlaceEntity } from "@/domain/event/logic";
 import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
@@ -71,10 +70,7 @@ export async function updatePlace(
     );
 
     // Update place (name only, parent cannot be changed)
-    const updatedPlace: Place = {
-      ...existingPlace,
-      name: input.name,
-    };
+    const updatedPlace = yield* $(updatePlaceEntity(existingPlace, { name: input.name }));
 
     yield* $(await deps.eventRepo.savePlace(updatedPlace));
 

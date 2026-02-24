@@ -62,11 +62,13 @@ export async function createEvent(
     yield* $(await deps.eventDomainService.ensureSlugUnique(input.slug));
 
     // Create event entity
-    const event = createEventEntity({
-      id: eventId,
-      name: input.name,
-      slug: input.slug,
-    });
+    const event = yield* $(
+      createEventEntity({
+        id: eventId,
+        name: input.name,
+        slug: input.slug,
+      }),
+    );
 
     // Save event to database
     yield* $(await deps.eventRepo.saveEvent(event));

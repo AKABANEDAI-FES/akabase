@@ -3,7 +3,7 @@ import { gen } from "@/libs/result";
 import type { EventId, TagId } from "@/domain/shared/ids";
 import type { EventError } from "@/domain/event/errors";
 import { EVENT_ERROR_CODE, eventError } from "@/domain/event/errors";
-import { canModifyEvent, updateTag as updateTagEntity } from "@/domain/event/logic";
+import { canModifyEvent, updateTagEntity } from "@/domain/event/logic";
 import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
