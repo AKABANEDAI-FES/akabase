@@ -1,10 +1,9 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { generateLoadUsersWithRolesQueryOptions } from "@/features/user/actions";
 import { GlobalRoleSelect } from "@/features/user/components";
-import { Button, Code, Heading, Table } from "@/components/ui";
+import { Code, Heading, Table } from "@/components/ui";
 import { Container, Flex, Stack } from "styled-system/jsx";
-import { ArrowLeftIcon } from "lucide-react";
 
 export const Route = createFileRoute("/admin/users")({
   loader: async ({ context }) =>
@@ -18,19 +17,11 @@ function UserListPage() {
   return (
     <Container maxW="6xl" py="8">
       <Stack gap="6">
-        <div>
-          <Button variant="plain" size="sm" mb="4" asChild>
-            <Link to="/admin/events">
-              <ArrowLeftIcon />
-              イベント一覧に戻る
-            </Link>
-          </Button>
-          <Flex justify="space-between" align="center">
-            <Heading as="h1" textStyle="2xl" fontWeight="bold">
-              ユーザー管理
-            </Heading>
-          </Flex>
-        </div>
+        <Flex justify="space-between" align="center">
+          <Heading as="h1" textStyle="2xl" fontWeight="bold">
+            ユーザー管理
+          </Heading>
+        </Flex>
 
         {users.length === 0 ? (
           <p>ユーザーがいません。</p>
