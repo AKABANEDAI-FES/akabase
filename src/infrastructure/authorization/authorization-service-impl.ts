@@ -229,6 +229,18 @@ export class AuthorizationServiceImpl implements AuthorizationService {
           reason: "組織メンバーのみが組織情報を更新できます",
         });
 
+      case "organization:delete": {
+        // Only committee admins can delete organizations
+        const committeeRoleForDelete = getCommitteeRoleForEvent(actor, resource.eventId);
+        if (committeeRoleForDelete === "admin") {
+          return Result.succeed({ allowed: true, reason: "委員会管理者" });
+        }
+        return Result.succeed({
+          allowed: false,
+          reason: "委員会管理者のみが団体を削除できます",
+        });
+      }
+
       case "organization:manage_members":
         // Only managers can manage members
         if (orgRole === "manager") {

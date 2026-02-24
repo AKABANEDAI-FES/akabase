@@ -119,6 +119,15 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
     }
   }
 
+  async deleteOrganization(id: OrgId): Promise<Result.Result<void, RepositoryError>> {
+    try {
+      await db.delete(organizations).where(eq(organizations.id, id));
+      return Result.succeed(undefined);
+    } catch (error) {
+      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to delete organization", error));
+    }
+  }
+
   async addMember(member: OrgMember): Promise<Result.Result<void, RepositoryError>> {
     try {
       await db.insert(orgMembers).values({

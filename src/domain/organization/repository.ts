@@ -41,6 +41,11 @@ export interface OrganizationRepository {
   removeMember(orgId: OrgId, userId: UserId): Promise<Result.Result<void, RepositoryError>>;
 
   /**
+   * Delete an organization
+   */
+  deleteOrganization(id: OrgId): Promise<Result.Result<void, RepositoryError>>;
+
+  /**
    * Update member role
    */
   updateMemberRole(

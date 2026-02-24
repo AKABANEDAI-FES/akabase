@@ -170,6 +170,7 @@ export const actionSchema = z.enum([
   "organization:create",
   "organization:read",
   "organization:update",
+  "organization:delete",
   "organization:manage_members",
 
   // User actions
