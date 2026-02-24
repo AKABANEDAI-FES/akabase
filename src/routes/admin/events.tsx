@@ -1,6 +1,6 @@
 import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 import { EventStatusBadge } from "@/features/event/components";
-import { Button, Code, Heading, IconButton, Table } from "@/components/ui";
+import { Button, Code, Heading, Table } from "@/components/ui";
 import { Container, Flex, Stack } from "styled-system/jsx";
 import { PencilIcon, PlusIcon } from "lucide-react";
 import { generateLoadEventsQueryOptions } from "@/features/event/actions";
@@ -40,7 +40,7 @@ function EventListPage() {
                 <Table.Header>スラッグ</Table.Header>
                 <Table.Header>ステータス</Table.Header>
                 <Table.Header>作成日</Table.Header>
-                <Table.Header>アクション</Table.Header>
+                <Table.Header>操作</Table.Header>
               </Table.Row>
             </Table.Head>
             <Table.Body>
@@ -55,11 +55,12 @@ function EventListPage() {
                   </Table.Cell>
                   <Table.Cell>{new Date(event.createdAt).toLocaleDateString("ja-JP")}</Table.Cell>
                   <Table.Cell>
-                    <IconButton size="sm" variant="plain" aria-label="編集" asChild>
+                    <Button size="sm" variant="plain" asChild>
                       <Link to="/admin/events/$eventId" params={{ eventId: event.id }}>
                         <PencilIcon />
+                        編集
                       </Link>
-                    </IconButton>
+                    </Button>
                   </Table.Cell>
                 </Table.Row>
               ))}
