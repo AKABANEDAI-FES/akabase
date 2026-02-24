@@ -9,6 +9,7 @@ import type { UserId } from "@/domain/shared/ids";
 import { projectSchema } from "@/domain/project/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { generateLoadProjectsCacheKey } from "./queries";
+import { gen } from "@/libs/result";
 
 /**
  * Create project input validation schema
@@ -28,26 +29,26 @@ export const createProjectFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .inputValidator(createProjectInputSchema)
   .handler(async ({ data, context }) => {
-    // Resolve actor with event context
-    const actorResult = await resolveActor({
-      userId: cast<UserId>(context.session.user.id),
-      eventIds: [data.eventId],
+    return gen(async function* ($) {
+      // Resolve actor with event context
+      const actor = yield* $(
+        await resolveActor({
+          userId: cast<UserId>(context.session.user.id),
+          eventIds: [data.eventId],
+        }),
+      );
+
+      return yield* $(
+        await createProject(dependencies, {
+          eventId: data.eventId,
+          orgId: data.orgId,
+          name: data.name,
+          placeText: data.placeText,
+          logoKey: data.logoKey,
+          actor,
+        }),
+      );
     });
-
-    if (Result.isFailure(actorResult)) {
-      return actorResult;
-    }
-
-    const result = await createProject(dependencies, {
-      eventId: data.eventId,
-      orgId: data.orgId,
-      name: data.name,
-      placeText: data.placeText,
-      logoKey: data.logoKey,
-      actor: actorResult.value,
-    });
-
-    return result;
   });
 
 export function useCreateProjectMutation() {

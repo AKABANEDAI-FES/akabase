@@ -11,6 +11,7 @@ import type { UserId } from "@/domain/shared/ids";
 import { committeeRoleSchema, globalRoleSchema } from "@/domain/authorization/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { generateLoadUsersForEventCacheKey, generateLoadUsersWithRolesCacheKey } from "./queries";
+import { gen } from "@/libs/result";
 
 export const updateCommitteeRoleInputSchema = z.object({
   userId: userIdSchema,
@@ -22,23 +23,23 @@ export const updateCommitteeRoleFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .inputValidator(updateCommitteeRoleInputSchema)
   .handler(async ({ data, context }) => {
-    const actorResult = await resolveActor({
-      userId: cast<UserId>(context.session.user.id),
-      eventIds: [data.eventId], // Load permissions for the target event
+    return gen(async function* ($) {
+      const actor = yield* $(
+        await resolveActor({
+          userId: cast<UserId>(context.session.user.id),
+          eventIds: [data.eventId], // Load permissions for the target event
+        }),
+      );
+
+      return yield* $(
+        await updateCommitteeRole(dependencies, {
+          userId: data.userId,
+          eventId: data.eventId,
+          role: data.role,
+          actor,
+        }),
+      );
     });
-
-    if (Result.isFailure(actorResult)) {
-      return actorResult;
-    }
-
-    const result = await updateCommitteeRole(dependencies, {
-      userId: data.userId,
-      eventId: data.eventId,
-      role: data.role,
-      actor: actorResult.value,
-    });
-
-    return result;
   });
 
 export function useUpdateCommitteeRoleMutation() {
@@ -64,22 +65,22 @@ export const updateGlobalRoleFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .inputValidator(updateGlobalRoleInputSchema)
   .handler(async ({ data, context }) => {
-    const actorResult = await resolveActor({
-      userId: cast<UserId>(context.session.user.id),
-      eventIds: [], // No event context needed for global role updates
+    return gen(async function* ($) {
+      const actor = yield* $(
+        await resolveActor({
+          userId: cast<UserId>(context.session.user.id),
+          eventIds: [], // No event context needed for global role updates
+        }),
+      );
+
+      return yield* $(
+        await updateGlobalRole(dependencies, {
+          userId: data.userId,
+          role: data.role,
+          actor,
+        }),
+      );
     });
-
-    if (Result.isFailure(actorResult)) {
-      return actorResult;
-    }
-
-    const result = await updateGlobalRole(dependencies, {
-      userId: data.userId,
-      role: data.role,
-      actor: actorResult.value,
-    });
-
-    return result;
   });
 
 export function useUpdateGlobalRoleMutation() {

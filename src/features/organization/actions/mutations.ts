@@ -13,6 +13,7 @@ import {
   generateLoadOrganizationDetailCacheKey,
   generateLoadOrganizationsCacheKey,
 } from "./queries";
+import { gen } from "@/libs/result";
 
 /**
  * Create organization input validation schema
@@ -31,25 +32,25 @@ export const createOrganizationFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .inputValidator(createOrganizationInputSchema)
   .handler(async ({ data, context }) => {
-    // Resolve actor with event context
-    const actorResult = await resolveActor({
-      userId: cast<UserId>(context.session.user.id),
-      eventIds: [data.eventId],
+    return await gen(async function* ($) {
+      // Resolve actor with event context
+      const actor = yield* $(
+        await resolveActor({
+          userId: cast<UserId>(context.session.user.id),
+          eventIds: [data.eventId],
+        }),
+      );
+
+      return yield* $(
+        await createOrganization(dependencies, {
+          eventId: data.eventId,
+          name: data.name,
+          description: data.description,
+          logoKey: data.logoKey,
+          actor,
+        }),
+      );
     });
-
-    if (Result.isFailure(actorResult)) {
-      return actorResult;
-    }
-
-    const result = await createOrganization(dependencies, {
-      eventId: data.eventId,
-      name: data.name,
-      description: data.description,
-      logoKey: data.logoKey,
-      actor: actorResult.value,
-    });
-
-    return result;
   });
 
 export function useCreateOrganizationMutation() {
@@ -80,34 +81,36 @@ export const updateOrganizationFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .inputValidator(updateOrganizationInputSchema)
   .handler(async ({ data, context }) => {
-    // Resolve actor with event context
-    // Note: We need to fetch the org first to get eventId for actor resolution
-    const orgResult = await dependencies.organizationRepo.findById(data.id);
+    return gen(async function* ($) {
+      // Resolve actor with event context
+      // Note: We need to fetch the org first to get eventId for actor resolution
+      const org = yield* $(await dependencies.organizationRepo.findById(data.id));
 
-    if (Result.isFailure(orgResult) || !orgResult.value) {
-      return Result.fail({
-        code: "ORGANIZATION_NOT_FOUND" as const,
-        message: "団体が見つかりません。",
-      });
-    }
+      if (!org) {
+        return yield* $(
+          Result.fail({
+            code: "ORGANIZATION_NOT_FOUND" as const,
+            message: "団体が見つかりません。",
+          }),
+        );
+      }
 
-    const actorResult = await resolveActor({
-      userId: cast<UserId>(context.session.user.id),
-      eventIds: [orgResult.value.eventId],
+      const actor = yield* $(
+        await resolveActor({
+          userId: cast<UserId>(context.session.user.id),
+          eventIds: [org.eventId],
+        }),
+      );
+
+      return yield* $(
+        await updateOrganization(dependencies, {
+          orgId: data.id,
+          name: data.name,
+          description: data.description,
+          actor,
+        }),
+      );
     });
-
-    if (Result.isFailure(actorResult)) {
-      return actorResult;
-    }
-
-    const result = await updateOrganization(dependencies, {
-      orgId: data.id,
-      name: data.name,
-      description: data.description,
-      actor: actorResult.value,
-    });
-
-    return result;
   });
 
 export function useUpdateOrganizationMutation() {

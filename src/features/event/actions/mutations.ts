@@ -13,6 +13,7 @@ import type { UserId } from "@/domain/shared/ids";
 import { eventSchema } from "@/domain/event/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { generateLoadEventDetailCacheKey, generateLoadEventsCacheKey } from "./queries";
+import { gen } from "@/libs/result";
 
 /**
  * Create event input validation schema
@@ -31,22 +32,22 @@ export const createEventFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .inputValidator(createEventInputSchema)
   .handler(async ({ data, context }) => {
-    // Resolve actor from session (no event context needed for creation)
-    const actorResult = await resolveActor({
-      userId: cast<UserId>(context.session.user.id),
+    return gen(async function* ($) {
+      // Resolve actor from session (no event context needed for creation)
+      const actor = yield* $(
+        await resolveActor({
+          userId: cast<UserId>(context.session.user.id),
+        }),
+      );
+
+      return yield* $(
+        await createEvent(dependencies, {
+          name: data.name,
+          slug: data.slug,
+          actor,
+        }),
+      );
     });
-
-    if (Result.isFailure(actorResult)) {
-      return actorResult;
-    }
-
-    const result = await createEvent(dependencies, {
-      name: data.name,
-      slug: data.slug,
-      actor: actorResult.value,
-    });
-
-    return result;
   });
 
 export function useCreateEventMutation() {
@@ -66,24 +67,24 @@ export const updateEventFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .inputValidator(updateEventInputSchema)
   .handler(async ({ data, context }) => {
-    // Resolve actor with event context
-    const actorResult = await resolveActor({
-      userId: cast<UserId>(context.session.user.id),
-      eventIds: [data.id],
+    return await gen(async function* ($) {
+      // Resolve actor with event context
+      const actor = yield* $(
+        await resolveActor({
+          userId: cast<UserId>(context.session.user.id),
+          eventIds: [data.id],
+        }),
+      );
+
+      return yield* $(
+        await updateEvent(dependencies, {
+          eventId: data.id,
+          name: data.name,
+          slug: data.slug,
+          actor,
+        }),
+      );
     });
-
-    if (Result.isFailure(actorResult)) {
-      return actorResult;
-    }
-
-    const result = await updateEvent(dependencies, {
-      eventId: data.id,
-      name: data.name,
-      slug: data.slug,
-      actor: actorResult.value,
-    });
-
-    return result;
   });
 
 export function useUpdateEventMutation() {
@@ -104,22 +105,22 @@ export const archiveEventFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
   .handler(async ({ data, context }) => {
-    // Resolve actor with event context
-    const actorResult = await resolveActor({
-      userId: cast<UserId>(context.session.user.id),
-      eventIds: [data.eventId],
+    return await gen(async function* ($) {
+      // Resolve actor with event context
+      const actor = yield* $(
+        await resolveActor({
+          userId: cast<UserId>(context.session.user.id),
+          eventIds: [data.eventId],
+        }),
+      );
+
+      return yield* $(
+        await archiveEvent(dependencies, {
+          eventId: data.eventId,
+          actor,
+        }),
+      );
     });
-
-    if (Result.isFailure(actorResult)) {
-      return actorResult;
-    }
-
-    const result = await archiveEvent(dependencies, {
-      eventId: data.eventId,
-      actor: actorResult.value,
-    });
-
-    return result;
   });
 
 export function useArchiveEventMutation() {
@@ -139,22 +140,22 @@ export const activateEventFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
   .handler(async ({ data, context }) => {
-    // Resolve actor with event context
-    const actorResult = await resolveActor({
-      userId: cast<UserId>(context.session.user.id),
-      eventIds: [data.eventId],
+    return await gen(async function* ($) {
+      // Resolve actor with event context
+      const actor = yield* $(
+        await resolveActor({
+          userId: cast<UserId>(context.session.user.id),
+          eventIds: [data.eventId],
+        }),
+      );
+
+      return yield* $(
+        await activateEvent(dependencies, {
+          eventId: data.eventId,
+          actor,
+        }),
+      );
     });
-
-    if (Result.isFailure(actorResult)) {
-      return actorResult;
-    }
-
-    const result = await activateEvent(dependencies, {
-      eventId: data.eventId,
-      actor: actorResult.value,
-    });
-
-    return result;
   });
 
 export function useActivateEventMutation() {
