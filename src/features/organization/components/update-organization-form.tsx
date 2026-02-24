@@ -10,12 +10,13 @@ import { nl2br } from "@/libs/text";
 
 interface UpdateOrganizationFormProps {
   organization: OrganizationDetail;
+  disabled?: boolean;
 }
 
 /**
  * Organization basic information edit form
  */
-export function UpdateOrganizationForm({ organization }: UpdateOrganizationFormProps) {
+export function UpdateOrganizationForm({ organization, disabled }: UpdateOrganizationFormProps) {
   const { mutateAsync } = useUpdateOrganizationMutation();
 
   const form = useForm({
@@ -77,7 +78,7 @@ export function UpdateOrganizationForm({ organization }: UpdateOrganizationFormP
         form.handleSubmit();
       }}
     >
-      <Fieldset.Root>
+      <Fieldset.Root disabled={disabled}>
         <Fieldset.Control>
           <Fieldset.Legend>基本情報</Fieldset.Legend>
           <Fieldset.HelperText>団体の基本情報を編集します</Fieldset.HelperText>
@@ -135,7 +136,7 @@ export function UpdateOrganizationForm({ organization }: UpdateOrganizationFormP
           {/* Submit button */}
           <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
             {([canSubmit, isSubmitting]) => (
-              <Button type="submit" loading={isSubmitting} disabled={!canSubmit}>
+              <Button type="submit" loading={isSubmitting} disabled={disabled || !canSubmit}>
                 更新
               </Button>
             )}

@@ -7,7 +7,7 @@ import {
   generateLoadDeadlinesQueryOptions,
   generateLoadEventBySlugQueryOptions,
 } from "@/features/event/actions/queries";
-import { generateCheckIsCommitteeAdminQueryOptions } from "@/features/authorization/actions";
+import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions";
 import { DeadlineManagementTable } from "@/features/event/components/deadline-management-table";
 
 export const Route = createFileRoute("/_authenticated/$slug/committee/deadlines")({
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/_authenticated/$slug/committee/deadlines"
     );
     await Promise.all([
       context.queryClient.ensureQueryData(generateLoadDeadlinesQueryOptions(event.id)),
-      context.queryClient.ensureQueryData(generateCheckIsCommitteeAdminQueryOptions(event.id)),
+      context.queryClient.ensureQueryData(generateCheckCommitteePermissionsQueryOptions(event.id)),
     ]);
   },
   component: DeadlinesManagementPage,
@@ -27,6 +27,9 @@ function DeadlinesManagementPage() {
   const { slug } = Route.useParams();
   const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
   const { data: deadlines } = useSuspenseQuery(generateLoadDeadlinesQueryOptions(event.id));
+  const { data: permissions } = useSuspenseQuery(
+    generateCheckCommitteePermissionsQueryOptions(event.id),
+  );
 
   return (
     <Container maxW="6xl" py="8">
@@ -35,15 +38,22 @@ function DeadlinesManagementPage() {
           <Heading as="h1" textStyle="2xl" fontWeight="bold">
             締切管理
           </Heading>
-          <Button asChild>
-            <Link to="/$slug/committee/deadlines/new" params={{ slug }}>
-              <PlusIcon />
-              締切を追加
-            </Link>
-          </Button>
+          {permissions.canCreateDeadline && (
+            <Button asChild>
+              <Link to="/$slug/committee/deadlines/new" params={{ slug }}>
+                <PlusIcon />
+                締切を追加
+              </Link>
+            </Button>
+          )}
         </Flex>
 
-        <DeadlineManagementTable deadlines={deadlines} eventId={event.id} />
+        <DeadlineManagementTable
+          deadlines={deadlines}
+          eventId={event.id}
+          canUpdate={permissions.canUpdateDeadline}
+          canDelete={permissions.canDeleteDeadline}
+        />
       </Stack>
       <Outlet />
     </Container>

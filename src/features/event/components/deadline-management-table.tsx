@@ -11,12 +11,21 @@ import { DeleteDeadlineDialog } from "./delete-deadline-dialog";
 interface DeadlineManagementTableProps {
   deadlines: DeadlineListItem[];
   eventId: EventId;
+  canUpdate?: boolean;
+  canDelete?: boolean;
 }
 
 /**
  * Deadline management table component with CRUD operations
  */
-export function DeadlineManagementTable({ deadlines, eventId }: DeadlineManagementTableProps) {
+export function DeadlineManagementTable({
+  deadlines,
+  eventId,
+  canUpdate,
+  canDelete,
+}: DeadlineManagementTableProps) {
+  const showActions = canUpdate || canDelete;
+
   return (
     <>
       {deadlines.length === 0 ? (
@@ -28,7 +37,7 @@ export function DeadlineManagementTable({ deadlines, eventId }: DeadlineManageme
               <Table.Header>フィールド</Table.Header>
               <Table.Header>締切日時</Table.Header>
               <Table.Header>作成日</Table.Header>
-              <Table.Header>操作</Table.Header>
+              {showActions && <Table.Header>操作</Table.Header>}
             </Table.Row>
           </Table.Head>
           <Table.Body>
@@ -48,20 +57,31 @@ export function DeadlineManagementTable({ deadlines, eventId }: DeadlineManageme
                   })}
                 </Table.Cell>
                 <Table.Cell>{new Date(deadline.createdAt).toLocaleDateString("ja-JP")}</Table.Cell>
-                <Table.Cell>
-                  <Flex gap="2">
-                    <EditDeadlineDialog eventId={eventId} deadline={deadline}>
-                      <IconButton aria-label="編集" variant="plain" size="sm">
-                        <PencilIcon />
-                      </IconButton>
-                    </EditDeadlineDialog>
-                    <DeleteDeadlineDialog eventId={eventId} deadline={deadline}>
-                      <IconButton aria-label="削除" variant="plain" size="sm" colorPalette="red">
-                        <Trash2Icon />
-                      </IconButton>
-                    </DeleteDeadlineDialog>
-                  </Flex>
-                </Table.Cell>
+                {showActions && (
+                  <Table.Cell>
+                    <Flex gap="2">
+                      {canUpdate && (
+                        <EditDeadlineDialog eventId={eventId} deadline={deadline}>
+                          <IconButton aria-label="編集" variant="plain" size="sm">
+                            <PencilIcon />
+                          </IconButton>
+                        </EditDeadlineDialog>
+                      )}
+                      {canDelete && (
+                        <DeleteDeadlineDialog eventId={eventId} deadline={deadline}>
+                          <IconButton
+                            aria-label="削除"
+                            variant="plain"
+                            size="sm"
+                            colorPalette="red"
+                          >
+                            <Trash2Icon />
+                          </IconButton>
+                        </DeleteDeadlineDialog>
+                      )}
+                    </Flex>
+                  </Table.Cell>
+                )}
               </Table.Row>
             ))}
           </Table.Body>

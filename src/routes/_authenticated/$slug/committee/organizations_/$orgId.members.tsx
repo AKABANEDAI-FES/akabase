@@ -6,7 +6,7 @@ import {
   generateLoadOrganizationDetailQueryOptions,
   generateLoadOrganizationMembersQueryOptions,
 } from "@/features/organization/actions";
-import { generateCheckCanManageOrgMembersQueryOptions } from "@/features/authorization/actions";
+import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions";
 import { OrgMembersTable } from "@/features/organization/components/org-members-table";
 import { Button, Text } from "@/components/ui";
 import { cast } from "@/domain/shared/ids";
@@ -24,7 +24,7 @@ export const Route = createFileRoute(
         generateLoadOrganizationMembersQueryOptions(params.orgId),
       ),
       context.queryClient.ensureQueryData(
-        generateCheckCanManageOrgMembersQueryOptions(params.orgId, organization.eventId),
+        generateCheckCommitteePermissionsQueryOptions(organization.eventId),
       ),
     ]);
   },
@@ -56,8 +56,8 @@ function MemberManagementSection({
   eventId: string;
 }) {
   const { data: members } = useSuspenseQuery(generateLoadOrganizationMembersQueryOptions(orgId));
-  const { data: authCheck } = useSuspenseQuery(
-    generateCheckCanManageOrgMembersQueryOptions(orgId, eventId),
+  const { data: permissions } = useSuspenseQuery(
+    generateCheckCommitteePermissionsQueryOptions(eventId),
   );
 
   return (
@@ -67,7 +67,7 @@ function MemberManagementSection({
           <Text color="fg.muted" textStyle="sm">
             マネージャーは企画の提出やメンバーの管理ができます。エディターは企画の編集のみ可能です。
           </Text>
-          {authCheck.canManageMembers && (
+          {permissions.canManageOrgMembers && (
             <Button variant="outline" flexShrink={0} asChild>
               <Link to="/$slug/committee/organizations/$orgId/members/new" params={{ slug, orgId }}>
                 <UserPlusIcon />
@@ -79,7 +79,7 @@ function MemberManagementSection({
         <OrgMembersTable
           members={members}
           orgId={orgId}
-          canManageMembers={authCheck.canManageMembers}
+          canManageMembers={permissions.canManageOrgMembers}
         />
       </Stack>
       <Outlet />

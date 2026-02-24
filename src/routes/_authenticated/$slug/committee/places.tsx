@@ -7,7 +7,7 @@ import {
   generateLoadEventBySlugQueryOptions,
   generateLoadPlacesQueryOptions,
 } from "@/features/event/actions/queries";
-import { generateCheckIsCommitteeAdminQueryOptions } from "@/features/authorization/actions";
+import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions";
 import { PlaceManagementTable } from "@/features/event/components/place-management-table";
 
 export const Route = createFileRoute("/_authenticated/$slug/committee/places")({
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/_authenticated/$slug/committee/places")({
     );
     await Promise.all([
       context.queryClient.ensureQueryData(generateLoadPlacesQueryOptions(event.id)),
-      context.queryClient.ensureQueryData(generateCheckIsCommitteeAdminQueryOptions(event.id)),
+      context.queryClient.ensureQueryData(generateCheckCommitteePermissionsQueryOptions(event.id)),
     ]);
   },
   component: PlacesManagementPage,
@@ -27,6 +27,9 @@ function PlacesManagementPage() {
   const { slug } = Route.useParams();
   const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
   const { data: places } = useSuspenseQuery(generateLoadPlacesQueryOptions(event.id));
+  const { data: permissions } = useSuspenseQuery(
+    generateCheckCommitteePermissionsQueryOptions(event.id),
+  );
 
   return (
     <>
@@ -36,15 +39,22 @@ function PlacesManagementPage() {
             <Heading as="h1" textStyle="2xl" fontWeight="bold">
               場所管理
             </Heading>
-            <Button asChild>
-              <Link to="/$slug/committee/places/new" params={{ slug }}>
-                <PlusIcon />
-                場所を追加
-              </Link>
-            </Button>
+            {permissions.canCreatePlace && (
+              <Button asChild>
+                <Link to="/$slug/committee/places/new" params={{ slug }}>
+                  <PlusIcon />
+                  場所を追加
+                </Link>
+              </Button>
+            )}
           </Flex>
 
-          <PlaceManagementTable places={places} eventId={event.id} />
+          <PlaceManagementTable
+            places={places}
+            eventId={event.id}
+            canUpdate={permissions.canUpdatePlace}
+            canDelete={permissions.canDeletePlace}
+          />
         </Stack>
       </Container>
       <Outlet />

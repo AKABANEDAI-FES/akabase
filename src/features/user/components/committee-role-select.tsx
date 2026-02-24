@@ -16,9 +16,15 @@ interface CommitteeRoleSelectProps {
   userId: string;
   eventId: string;
   currentRole: CommitteeRole;
+  disabled?: boolean;
 }
 
-export function CommitteeRoleSelect({ userId, eventId, currentRole }: CommitteeRoleSelectProps) {
+export function CommitteeRoleSelect({
+  userId,
+  eventId,
+  currentRole,
+  disabled,
+}: CommitteeRoleSelectProps) {
   const { mutateAsync, isPending } = useUpdateCommitteeRoleMutation();
 
   const handleRoleChange = async (newRole: CommitteeRole) => {
@@ -61,7 +67,7 @@ export function CommitteeRoleSelect({ userId, eventId, currentRole }: CommitteeR
           handleRoleChange(selectedItem.value);
         }
       }}
-      disabled={isPending}
+      disabled={disabled || isPending}
       size="sm"
       positioning={{ sameWidth: true }}
     >

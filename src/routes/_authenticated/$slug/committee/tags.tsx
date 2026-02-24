@@ -7,7 +7,7 @@ import {
   generateLoadEventBySlugQueryOptions,
   generateLoadTagsQueryOptions,
 } from "@/features/event/actions/queries";
-import { generateCheckIsCommitteeAdminQueryOptions } from "@/features/authorization/actions";
+import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions";
 import { TagManagementTable } from "@/features/event/components/tag-management-table";
 
 export const Route = createFileRoute("/_authenticated/$slug/committee/tags")({
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/_authenticated/$slug/committee/tags")({
     );
     await Promise.all([
       context.queryClient.ensureQueryData(generateLoadTagsQueryOptions(event.id)),
-      context.queryClient.ensureQueryData(generateCheckIsCommitteeAdminQueryOptions(event.id)),
+      context.queryClient.ensureQueryData(generateCheckCommitteePermissionsQueryOptions(event.id)),
     ]);
   },
   component: TagsManagementPage,
@@ -27,6 +27,9 @@ function TagsManagementPage() {
   const { slug } = Route.useParams();
   const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
   const { data: tags } = useSuspenseQuery(generateLoadTagsQueryOptions(event.id));
+  const { data: permissions } = useSuspenseQuery(
+    generateCheckCommitteePermissionsQueryOptions(event.id),
+  );
 
   return (
     <Container maxW="6xl" py="8">
@@ -35,15 +38,22 @@ function TagsManagementPage() {
           <Heading as="h1" textStyle="2xl" fontWeight="bold">
             タグ管理
           </Heading>
-          <Button asChild>
-            <Link to="/$slug/committee/tags/new" params={{ slug }}>
-              <PlusIcon />
-              タグを追加
-            </Link>
-          </Button>
+          {permissions.canCreateTag && (
+            <Button asChild>
+              <Link to="/$slug/committee/tags/new" params={{ slug }}>
+                <PlusIcon />
+                タグを追加
+              </Link>
+            </Button>
+          )}
         </Flex>
 
-        <TagManagementTable tags={tags} eventId={event.id} />
+        <TagManagementTable
+          tags={tags}
+          eventId={event.id}
+          canUpdate={permissions.canUpdateTag}
+          canDelete={permissions.canDeleteTag}
+        />
       </Stack>
       <Outlet />
     </Container>

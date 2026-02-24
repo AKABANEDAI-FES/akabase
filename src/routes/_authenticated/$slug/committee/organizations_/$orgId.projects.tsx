@@ -7,7 +7,7 @@ import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions";
 import { generateLoadProjectsQueryOptions } from "@/features/project/actions";
 import { cast } from "@/domain/shared/ids";
 import type { EventId } from "@/domain/shared/ids";
-import { generateCheckIsCommitteeAdminQueryOptions } from "@/features/authorization/actions";
+import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions";
 
 export const Route = createFileRoute(
   "/_authenticated/$slug/committee/organizations_/$orgId/projects",
@@ -18,7 +18,7 @@ export const Route = createFileRoute(
     );
     await Promise.all([
       context.queryClient.ensureQueryData(generateLoadProjectsQueryOptions(params.orgId)),
-      context.queryClient.ensureQueryData(generateCheckIsCommitteeAdminQueryOptions(event.id)),
+      context.queryClient.ensureQueryData(generateCheckCommitteePermissionsQueryOptions(event.id)),
     ]);
   },
   component: ProjectsPage,
@@ -69,9 +69,11 @@ type AddProjectButtonProps = {
 };
 
 function AddProjectButton({ slug, eventId, orgId }: AddProjectButtonProps) {
-  const { data: authCheck } = useSuspenseQuery(generateCheckIsCommitteeAdminQueryOptions(eventId));
+  const { data: permissions } = useSuspenseQuery(
+    generateCheckCommitteePermissionsQueryOptions(eventId),
+  );
 
-  if (!authCheck.isCommitteeAdmin) {
+  if (!permissions.canCreateProject) {
     return null;
   }
 

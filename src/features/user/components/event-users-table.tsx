@@ -12,9 +12,10 @@ interface User {
 interface EventUsersTableProps {
   users: User[];
   eventId: string;
+  disabled?: boolean;
 }
 
-export function EventUsersTable({ users, eventId }: EventUsersTableProps) {
+export function EventUsersTable({ users, eventId, disabled }: EventUsersTableProps) {
   return (
     <Table.Root>
       <Table.Head>
@@ -32,7 +33,12 @@ export function EventUsersTable({ users, eventId }: EventUsersTableProps) {
               <Code size="sm">{user.email}</Code>
             </Table.Cell>
             <Table.Cell>
-              <CommitteeRoleSelect userId={user.id} eventId={eventId} currentRole={user.role} />
+              <CommitteeRoleSelect
+                userId={user.id}
+                eventId={eventId}
+                currentRole={user.role}
+                disabled={disabled}
+              />
             </Table.Cell>
           </Table.Row>
         ))}

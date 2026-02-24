@@ -123,6 +123,42 @@ export class AuthorizationServiceImpl implements AuthorizationService {
           reason: "システム管理者のみがイベントを有効化できます",
         });
 
+      case "deadline:create":
+      case "deadline:update":
+      case "deadline:delete":
+        // Only committee admins can manage deadlines
+        if (committeeRole === "admin") {
+          return Result.succeed({ allowed: true, reason: "委員会管理者" });
+        }
+        return Result.succeed({
+          allowed: false,
+          reason: "委員会管理者のみが締切を管理できます",
+        });
+
+      case "place:create":
+      case "place:update":
+      case "place:delete":
+        // Only committee admins can manage places
+        if (committeeRole === "admin") {
+          return Result.succeed({ allowed: true, reason: "委員会管理者" });
+        }
+        return Result.succeed({
+          allowed: false,
+          reason: "委員会管理者のみが場所を管理できます",
+        });
+
+      case "tag:create":
+      case "tag:update":
+      case "tag:delete":
+        // Only committee admins can manage tags
+        if (committeeRole === "admin") {
+          return Result.succeed({ allowed: true, reason: "委員会管理者" });
+        }
+        return Result.succeed({
+          allowed: false,
+          reason: "委員会管理者のみがタグを管理できます",
+        });
+
       default:
         return Result.succeed({ allowed: false, reason: "不明なアクション" });
     }
@@ -203,15 +239,17 @@ export class AuthorizationServiceImpl implements AuthorizationService {
     const orgRole = getOrgRoleForOrg(actor, resource.orgId);
 
     switch (action) {
-      case "organization:create": {
-        // Only committee admins can create organizations
+      case "organization:create":
+      case "organization:update":
+      case "organization:delete": {
+        // Only committee admins can create/update/delete organizations
         const committeeRole = getCommitteeRoleForEvent(actor, resource.eventId);
         if (committeeRole === "admin") {
           return Result.succeed({ allowed: true, reason: "委員会管理者" });
         }
         return Result.succeed({
           allowed: false,
-          reason: "委員会管理者のみが団体を作成できます",
+          reason: "委員会管理者のみがこの操作を実行できます",
         });
       }
 
@@ -219,37 +257,20 @@ export class AuthorizationServiceImpl implements AuthorizationService {
         // Anyone can read organizations
         return Result.succeed({ allowed: true });
 
-      case "organization:update":
-        // Organization members can update
-        if (orgRole === "manager" || orgRole === "editor") {
-          return Result.succeed({ allowed: true, reason: "組織メンバー" });
-        }
-        return Result.succeed({
-          allowed: false,
-          reason: "組織メンバーのみが組織情報を更新できます",
-        });
-
-      case "organization:delete": {
-        // Only committee admins can delete organizations
-        const committeeRoleForDelete = getCommitteeRoleForEvent(actor, resource.eventId);
-        if (committeeRoleForDelete === "admin") {
+      case "organization:manage_members": {
+        // Committee admins and organization managers can manage members
+        const committeeRoleForMembers = getCommitteeRoleForEvent(actor, resource.eventId);
+        if (committeeRoleForMembers === "admin") {
           return Result.succeed({ allowed: true, reason: "委員会管理者" });
         }
-        return Result.succeed({
-          allowed: false,
-          reason: "委員会管理者のみが団体を削除できます",
-        });
-      }
-
-      case "organization:manage_members":
-        // Only managers can manage members
         if (orgRole === "manager") {
           return Result.succeed({ allowed: true, reason: "組織マネージャー" });
         }
         return Result.succeed({
           allowed: false,
-          reason: "組織マネージャーのみがメンバーを管理できます",
+          reason: "委員会管理者または組織マネージャーのみがメンバーを管理できます",
         });
+      }
 
       default:
         return Result.succeed({ allowed: false, reason: "不明なアクション" });

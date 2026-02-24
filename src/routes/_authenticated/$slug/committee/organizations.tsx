@@ -2,11 +2,10 @@ import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Button, Heading, Table } from "@/components/ui";
 import { Container, Flex, Stack } from "styled-system/jsx";
-import { PencilIcon, PlusIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions";
 import { generateLoadOrganizationsQueryOptions } from "@/features/organization/actions";
-import { generateCheckIsCommitteeAdminQueryOptions } from "@/features/authorization/actions";
-import type { EventId } from "@/domain/shared/ids";
+import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions";
 
 export const Route = createFileRoute("/_authenticated/$slug/committee/organizations")({
   loader: async ({ params, context }) => {
@@ -15,7 +14,7 @@ export const Route = createFileRoute("/_authenticated/$slug/committee/organizati
     );
     await Promise.all([
       context.queryClient.ensureQueryData(generateLoadOrganizationsQueryOptions(event.id)),
-      context.queryClient.ensureQueryData(generateCheckIsCommitteeAdminQueryOptions(event.id)),
+      context.queryClient.ensureQueryData(generateCheckCommitteePermissionsQueryOptions(event.id)),
     ]);
   },
   component: OrganizationsPage,
@@ -25,6 +24,9 @@ function OrganizationsPage() {
   const { slug } = Route.useParams();
   const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
   const { data: organizations } = useSuspenseQuery(generateLoadOrganizationsQueryOptions(event.id));
+  const { data: permissions } = useSuspenseQuery(
+    generateCheckCommitteePermissionsQueryOptions(event.id),
+  );
 
   return (
     <Container maxW="6xl" py="8">
@@ -33,7 +35,14 @@ function OrganizationsPage() {
           <Heading as="h1" textStyle="2xl" fontWeight="bold">
             団体一覧
           </Heading>
-          <AddOrganizationButton slug={slug} eventId={event.id} />
+          {permissions.canCreateOrganization && (
+            <Link to="/$slug/committee/organizations/new" params={{ slug }}>
+              <Button>
+                <PlusIcon />
+                団体を作成
+              </Button>
+            </Link>
+          )}
         </Flex>
 
         {organizations.length === 0 ? (
@@ -45,7 +54,7 @@ function OrganizationsPage() {
                 <Table.Header>団体名</Table.Header>
                 <Table.Header>説明</Table.Header>
                 <Table.Header>作成日</Table.Header>
-                <Table.Header>操作</Table.Header>
+                <Table.Header />
               </Table.Row>
             </Table.Head>
             <Table.Body>
@@ -55,7 +64,14 @@ function OrganizationsPage() {
                   <Table.Cell>{org.description || "—"}</Table.Cell>
                   <Table.Cell>{new Date(org.createdAt).toLocaleDateString("ja-JP")}</Table.Cell>
                   <Table.Cell>
-                    <EditOrganizationButton slug={slug} orgId={org.id} />
+                    <Button variant="plain" size="sm" asChild>
+                      <Link
+                        to="/$slug/committee/organizations/$orgId"
+                        params={{ slug, orgId: org.id }}
+                      >
+                        詳細
+                      </Link>
+                    </Button>
                   </Table.Cell>
                 </Table.Row>
               ))}
@@ -65,50 +81,5 @@ function OrganizationsPage() {
       </Stack>
       <Outlet />
     </Container>
-  );
-}
-
-type AddOrganizationButtonProps = {
-  slug: string;
-  eventId: EventId;
-};
-
-function AddOrganizationButton({ slug, eventId }: AddOrganizationButtonProps) {
-  const { data: authCheck } = useSuspenseQuery(generateCheckIsCommitteeAdminQueryOptions(eventId));
-
-  if (!authCheck.isCommitteeAdmin) {
-    return null;
-  }
-
-  return (
-    <Link to="/$slug/committee/organizations/new" params={{ slug }}>
-      <Button>
-        <PlusIcon />
-        団体を作成
-      </Button>
-    </Link>
-  );
-}
-
-type EditOrganizationButtonProps = {
-  slug: string;
-  orgId: string;
-};
-
-function EditOrganizationButton({ slug, orgId }: EditOrganizationButtonProps) {
-  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
-  const { data: authCheck } = useSuspenseQuery(generateCheckIsCommitteeAdminQueryOptions(event.id));
-
-  if (!authCheck.isCommitteeAdmin) {
-    return null;
-  }
-
-  return (
-    <Button variant="plain" size="sm" asChild>
-      <Link to="/$slug/committee/organizations/$orgId" params={{ slug, orgId }}>
-        <PencilIcon />
-        編集
-      </Link>
-    </Button>
   );
 }

@@ -3,7 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Stack } from "styled-system/jsx";
 import { Trash2Icon } from "lucide-react";
 import { generateLoadOrganizationDetailQueryOptions } from "@/features/organization/actions";
-import { generateCheckIsCommitteeAdminQueryOptions } from "@/features/authorization/actions";
+import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions";
 import { UpdateOrganizationForm } from "@/features/organization/components/update-organization-form";
 import { DeleteOrganizationDialog } from "@/features/organization/components/delete-organization-dialog";
 import { Button, Fieldset } from "@/components/ui";
@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_authenticated/$slug/committee/organizati
       generateLoadOrganizationDetailQueryOptions(params.orgId),
     );
     await context.queryClient.ensureQueryData(
-      generateCheckIsCommitteeAdminQueryOptions(organization.eventId),
+      generateCheckCommitteePermissionsQueryOptions(organization.eventId),
     );
   },
   component: EditOrganizationPage,
@@ -27,15 +27,23 @@ function EditOrganizationPage() {
     generateLoadOrganizationDetailQueryOptions(orgId),
   );
 
+  const { data: permissions } = useSuspenseQuery(
+    generateCheckCommitteePermissionsQueryOptions(organization.eventId),
+  );
+
   return (
     <Stack gap="8">
-      <UpdateOrganizationForm organization={organization} />
-      <DeleteOrganizationSection
-        orgId={organization.id as OrgId}
-        orgName={organization.name}
-        eventId={organization.eventId}
-        slug={slug}
+      <UpdateOrganizationForm
+        organization={organization}
+        disabled={!permissions.canUpdateOrganization}
       />
+      {permissions.canDeleteOrganization && (
+        <DeleteOrganizationSection
+          orgId={organization.id as OrgId}
+          orgName={organization.name}
+          slug={slug}
+        />
+      )}
     </Stack>
   );
 }
@@ -43,20 +51,12 @@ function EditOrganizationPage() {
 function DeleteOrganizationSection({
   orgId,
   orgName,
-  eventId,
   slug,
 }: {
   orgId: OrgId;
   orgName: string;
-  eventId: string;
   slug: string;
 }) {
-  const { data: authCheck } = useSuspenseQuery(generateCheckIsCommitteeAdminQueryOptions(eventId));
-
-  if (!authCheck.isCommitteeAdmin) {
-    return null;
-  }
-
   return (
     <Fieldset.Root>
       <Fieldset.Control>

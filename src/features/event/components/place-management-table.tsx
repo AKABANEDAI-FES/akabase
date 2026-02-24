@@ -10,6 +10,8 @@ import { EditPlaceDialog } from "./edit-place-dialog";
 interface PlaceManagementTableProps {
   places: PlaceListItem[];
   eventId: EventId;
+  canUpdate?: boolean;
+  canDelete?: boolean;
 }
 
 /**
@@ -51,8 +53,14 @@ function buildPlaceHierarchy(places: PlaceListItem[]) {
 /**
  * Place management table component with CRUD operations
  */
-export function PlaceManagementTable({ places, eventId }: PlaceManagementTableProps) {
+export function PlaceManagementTable({
+  places,
+  eventId,
+  canUpdate,
+  canDelete,
+}: PlaceManagementTableProps) {
   const hierarchicalPlaces = useMemo(() => buildPlaceHierarchy(places), [places]);
+  const showActions = canUpdate || canDelete;
 
   return (
     <>
@@ -64,7 +72,7 @@ export function PlaceManagementTable({ places, eventId }: PlaceManagementTablePr
             <Table.Row>
               <Table.Header>場所名</Table.Header>
               <Table.Header>作成日</Table.Header>
-              <Table.Header>操作</Table.Header>
+              {showActions && <Table.Header>操作</Table.Header>}
             </Table.Row>
           </Table.Head>
           <Table.Body>
@@ -74,20 +82,31 @@ export function PlaceManagementTable({ places, eventId }: PlaceManagementTablePr
                   <span style={{ paddingLeft: `${place.depth * 24}px` }}>{place.name}</span>
                 </Table.Cell>
                 <Table.Cell>{new Date(place.createdAt).toLocaleDateString("ja-JP")}</Table.Cell>
-                <Table.Cell>
-                  <Flex gap="2">
-                    <EditPlaceDialog eventId={eventId} place={place}>
-                      <IconButton aria-label="編集" variant="plain" size="sm">
-                        <PencilIcon />
-                      </IconButton>
-                    </EditPlaceDialog>
-                    <DeletePlaceDialog eventId={eventId} place={place}>
-                      <IconButton aria-label="削除" variant="plain" size="sm" colorPalette="red">
-                        <Trash2Icon />
-                      </IconButton>
-                    </DeletePlaceDialog>
-                  </Flex>
-                </Table.Cell>
+                {showActions && (
+                  <Table.Cell>
+                    <Flex gap="2">
+                      {canUpdate && (
+                        <EditPlaceDialog eventId={eventId} place={place}>
+                          <IconButton aria-label="編集" variant="plain" size="sm">
+                            <PencilIcon />
+                          </IconButton>
+                        </EditPlaceDialog>
+                      )}
+                      {canDelete && (
+                        <DeletePlaceDialog eventId={eventId} place={place}>
+                          <IconButton
+                            aria-label="削除"
+                            variant="plain"
+                            size="sm"
+                            colorPalette="red"
+                          >
+                            <Trash2Icon />
+                          </IconButton>
+                        </DeletePlaceDialog>
+                      )}
+                    </Flex>
+                  </Table.Cell>
+                )}
               </Table.Row>
             ))}
           </Table.Body>

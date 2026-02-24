@@ -5,10 +5,14 @@ import { Stack } from "styled-system/jsx";
 import { Building2Icon, CalendarClockIcon, MapPinIcon, TagIcon, UsersIcon } from "lucide-react";
 import { Button, Heading, Text } from "@/components/ui";
 import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions/queries";
+import { generateCheckCommitteeRoleQueryOptions } from "@/features/authorization/actions";
 
 export const Route = createFileRoute("/_authenticated/$slug")({
   loader: async ({ params, context }) => {
-    await context.queryClient.ensureQueryData(generateLoadEventBySlugQueryOptions(params.slug));
+    const event = await context.queryClient.ensureQueryData(
+      generateLoadEventBySlugQueryOptions(params.slug),
+    );
+    await context.queryClient.ensureQueryData(generateCheckCommitteeRoleQueryOptions(event.id));
   },
   component: SlugLayout,
 });
@@ -16,6 +20,11 @@ export const Route = createFileRoute("/_authenticated/$slug")({
 function SlugLayout() {
   const { slug } = Route.useParams();
   const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
+  const {
+    data: { committeeRole },
+  } = useSuspenseQuery(generateCheckCommitteeRoleQueryOptions(event.id));
+
+  const isCommitteeMember = committeeRole !== "default";
 
   return (
     <div className={css({ display: "grid", gridTemplateColumns: "auto 1fr", minHeight: "100svh" })}>
@@ -35,33 +44,35 @@ function SlugLayout() {
             {event.name}
           </Heading>
 
-          <Stack gap="2">
-            <Text textStyle="xs" fontWeight="semibold" color="fg.muted" pl="3.5">
-              委員会管理
-            </Text>
-            <Stack gap="1">
-              <NavLink to="/$slug/committee/organizations" params={{ slug }}>
-                <Building2Icon />
-                団体管理
-              </NavLink>
-              <NavLink to="/$slug/committee/tags" params={{ slug }}>
-                <TagIcon />
-                タグ管理
-              </NavLink>
-              <NavLink to="/$slug/committee/places" params={{ slug }}>
-                <MapPinIcon />
-                場所管理
-              </NavLink>
-              <NavLink to="/$slug/committee/deadlines" params={{ slug }}>
-                <CalendarClockIcon />
-                締切管理
-              </NavLink>
-              <NavLink to="/$slug/committee/members" params={{ slug }}>
-                <UsersIcon />
-                メンバー管理
-              </NavLink>
+          {isCommitteeMember && (
+            <Stack gap="2">
+              <Text textStyle="xs" fontWeight="semibold" color="fg.muted" pl="3.5">
+                委員会管理
+              </Text>
+              <Stack gap="1">
+                <NavLink to="/$slug/committee/organizations" params={{ slug }}>
+                  <Building2Icon />
+                  団体管理
+                </NavLink>
+                <NavLink to="/$slug/committee/tags" params={{ slug }}>
+                  <TagIcon />
+                  タグ管理
+                </NavLink>
+                <NavLink to="/$slug/committee/places" params={{ slug }}>
+                  <MapPinIcon />
+                  場所管理
+                </NavLink>
+                <NavLink to="/$slug/committee/deadlines" params={{ slug }}>
+                  <CalendarClockIcon />
+                  締切管理
+                </NavLink>
+                <NavLink to="/$slug/committee/members" params={{ slug }}>
+                  <UsersIcon />
+                  メンバー管理
+                </NavLink>
+              </Stack>
             </Stack>
-          </Stack>
+          )}
         </Stack>
       </nav>
 
