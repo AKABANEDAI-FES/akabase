@@ -1,7 +1,6 @@
-import { Link } from "@tanstack/react-router";
-import { Button, IconButton, Table } from "@/components/ui";
+import { IconButton, Table } from "@/components/ui";
 import { Flex } from "styled-system/jsx";
-import { PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { PencilIcon, Trash2Icon } from "lucide-react";
 import type { EventId } from "@/domain/shared/ids";
 import type { DeadlineListItem } from "@/application/query/event/list-deadlines";
 import { DEADLINE_FIELD_LABELS } from "@/domain/event/schema";
@@ -12,29 +11,14 @@ import { DeleteDeadlineDialog } from "./delete-deadline-dialog";
 interface DeadlineManagementTableProps {
   deadlines: DeadlineListItem[];
   eventId: EventId;
-  slug: string;
 }
 
 /**
  * Deadline management table component with CRUD operations
  */
-export function DeadlineManagementTable({
-  deadlines,
-  eventId,
-  slug,
-}: DeadlineManagementTableProps) {
+export function DeadlineManagementTable({ deadlines, eventId }: DeadlineManagementTableProps) {
   return (
     <>
-      <Flex justify="space-between" align="center" mb="4">
-        <p>{deadlines.length}件の締切</p>
-        <Link to="/$slug/committee/deadlines/new" params={{ slug }}>
-          <Button>
-            <PlusIcon />
-            締切を追加
-          </Button>
-        </Link>
-      </Flex>
-
       {deadlines.length === 0 ? (
         <p>締切がまだありません。新しい締切を追加してください。</p>
       ) : (

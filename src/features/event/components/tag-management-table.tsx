@@ -1,7 +1,6 @@
-import { Link } from "@tanstack/react-router";
-import { Button, IconButton, Table } from "@/components/ui";
+import { IconButton, Table } from "@/components/ui";
 import { Flex } from "styled-system/jsx";
-import { PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { PencilIcon, Trash2Icon } from "lucide-react";
 import type { EventId } from "@/domain/shared/ids";
 import type { TagListItem } from "@/application/query/event/list-tags";
 import { EditTagDialog } from "./edit-tag-dialog";
@@ -10,25 +9,14 @@ import { DeleteTagDialog } from "./delete-tag-dialog";
 interface TagManagementTableProps {
   tags: TagListItem[];
   eventId: EventId;
-  slug: string;
 }
 
 /**
  * Tag management table component with CRUD operations
  */
-export function TagManagementTable({ tags, eventId, slug }: TagManagementTableProps) {
+export function TagManagementTable({ tags, eventId }: TagManagementTableProps) {
   return (
     <>
-      <Flex justify="space-between" align="center" mb="4">
-        <p>{tags.length}件のタグ</p>
-        <Button asChild>
-          <Link to="/$slug/committee/tags/new" params={{ slug }}>
-            <PlusIcon />
-            タグを追加
-          </Link>
-        </Button>
-      </Flex>
-
       {tags.length === 0 ? (
         <p>タグがまだありません。新しいタグを追加してください。</p>
       ) : (

@@ -1,8 +1,7 @@
 import { useMemo } from "react";
-import { Link } from "@tanstack/react-router";
-import { Button, IconButton, Table } from "@/components/ui";
+import { IconButton, Table } from "@/components/ui";
 import { Flex } from "styled-system/jsx";
-import { PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { PencilIcon, Trash2Icon } from "lucide-react";
 import type { EventId } from "@/domain/shared/ids";
 import type { PlaceListItem } from "@/application/query/event/list-places";
 import { DeletePlaceDialog } from "./delete-place-dialog";
@@ -11,7 +10,6 @@ import { EditPlaceDialog } from "./edit-place-dialog";
 interface PlaceManagementTableProps {
   places: PlaceListItem[];
   eventId: EventId;
-  slug: string;
 }
 
 /**
@@ -53,21 +51,11 @@ function buildPlaceHierarchy(places: PlaceListItem[]) {
 /**
  * Place management table component with CRUD operations
  */
-export function PlaceManagementTable({ places, eventId, slug }: PlaceManagementTableProps) {
+export function PlaceManagementTable({ places, eventId }: PlaceManagementTableProps) {
   const hierarchicalPlaces = useMemo(() => buildPlaceHierarchy(places), [places]);
 
   return (
     <>
-      <Flex justify="space-between" align="center" mb="4">
-        <p>{places.length}件の場所</p>
-        <Button asChild>
-          <Link to="/$slug/committee/places/new" params={{ slug }}>
-            <PlusIcon />
-            場所を追加
-          </Link>
-        </Button>
-      </Flex>
-
       {places.length === 0 ? (
         <p>場所がまだありません。新しい場所を追加してください。</p>
       ) : (

@@ -1,7 +1,8 @@
-import { Outlet, createFileRoute } from "@tanstack/react-router";
+import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Heading } from "@/components/ui";
-import { Container, Stack } from "styled-system/jsx";
+import { Button, Heading } from "@/components/ui";
+import { Container, Flex, Stack } from "styled-system/jsx";
+import { PlusIcon } from "lucide-react";
 import {
   generateLoadEventBySlugQueryOptions,
   generateLoadTagsQueryOptions,
@@ -30,11 +31,19 @@ function TagsManagementPage() {
   return (
     <Container maxW="6xl" py="8">
       <Stack gap="6">
-        <Heading as="h1" textStyle="2xl" fontWeight="bold">
-          タグ管理 - {event.name}
-        </Heading>
+        <Flex justify="space-between" align="center">
+          <Heading as="h1" textStyle="2xl" fontWeight="bold">
+            タグ管理
+          </Heading>
+          <Button asChild>
+            <Link to="/$slug/committee/tags/new" params={{ slug }}>
+              <PlusIcon />
+              タグを追加
+            </Link>
+          </Button>
+        </Flex>
 
-        <TagManagementTable tags={tags} eventId={event.id} slug={slug} />
+        <TagManagementTable tags={tags} eventId={event.id} />
       </Stack>
       <Outlet />
     </Container>
