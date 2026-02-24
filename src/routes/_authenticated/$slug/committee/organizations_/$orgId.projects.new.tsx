@@ -7,7 +7,7 @@ import { cast } from "@/domain/shared/ids";
 import type { OrgId } from "@/domain/shared/ids";
 
 export const Route = createFileRoute(
-  "/_authenticated/$slug/committee/organizations_/$orgId_/projects/new",
+  "/_authenticated/$slug/committee/organizations_/$orgId/projects/new",
 )({
   loader: async ({ params, context }) => {
     const event = await context.queryClient.ensureQueryData(

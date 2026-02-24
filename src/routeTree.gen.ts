@@ -21,12 +21,14 @@ import { Route as AuthenticatedSlugRouteImport } from './routes/_authenticated/$
 import { Route as ApiAuthSplatRouteImport } from './routes/api.auth.$'
 import { Route as AdminEventsEventIdRouteImport } from './routes/admin/events_.$eventId'
 import { Route as AdminEventsNewRouteImport } from './routes/admin/events.new'
-import { Route as AdminEventsEventIdUsersRouteImport } from './routes/admin/events_.$eventId_.users'
+import { Route as AdminEventsEventIdIndexRouteImport } from './routes/admin/events_.$eventId.index'
+import { Route as AdminEventsEventIdUsersRouteImport } from './routes/admin/events_.$eventId.users'
 import { Route as AuthenticatedSlugCommitteeOrganizationsRouteImport } from './routes/_authenticated/$slug/committee/organizations'
 import { Route as AuthenticatedSlugCommitteeOrganizationsOrgIdRouteImport } from './routes/_authenticated/$slug/committee/organizations_/$orgId'
 import { Route as AuthenticatedSlugCommitteeOrganizationsNewRouteImport } from './routes/_authenticated/$slug/committee/organizations.new'
-import { Route as AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsRouteImport } from './routes/_authenticated/$slug/committee/organizations_/$orgId_.projects'
-import { Route as AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsNewRouteImport } from './routes/_authenticated/$slug/committee/organizations_/$orgId_.projects.new'
+import { Route as AuthenticatedSlugCommitteeOrganizationsOrgIdIndexRouteImport } from './routes/_authenticated/$slug/committee/organizations_/$orgId.index'
+import { Route as AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsRouteImport } from './routes/_authenticated/$slug/committee/organizations_/$orgId.projects'
+import { Route as AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsNewRouteImport } from './routes/_authenticated/$slug/committee/organizations_/$orgId.projects.new'
 
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
@@ -86,10 +88,15 @@ const AdminEventsNewRoute = AdminEventsNewRouteImport.update({
   path: '/new',
   getParentRoute: () => AdminEventsRoute,
 } as any)
+const AdminEventsEventIdIndexRoute = AdminEventsEventIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminEventsEventIdRoute,
+} as any)
 const AdminEventsEventIdUsersRoute = AdminEventsEventIdUsersRouteImport.update({
-  id: '/events_/$eventId_/users',
-  path: '/events/$eventId/users',
-  getParentRoute: () => AdminRoute,
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminEventsEventIdRoute,
 } as any)
 const AuthenticatedSlugCommitteeOrganizationsRoute =
   AuthenticatedSlugCommitteeOrganizationsRouteImport.update({
@@ -109,11 +116,17 @@ const AuthenticatedSlugCommitteeOrganizationsNewRoute =
     path: '/new',
     getParentRoute: () => AuthenticatedSlugCommitteeOrganizationsRoute,
   } as any)
+const AuthenticatedSlugCommitteeOrganizationsOrgIdIndexRoute =
+  AuthenticatedSlugCommitteeOrganizationsOrgIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedSlugCommitteeOrganizationsOrgIdRoute,
+  } as any)
 const AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsRoute =
   AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsRouteImport.update({
-    id: '/committee/organizations_/$orgId_/projects',
-    path: '/committee/organizations/$orgId/projects',
-    getParentRoute: () => AuthenticatedSlugRoute,
+    id: '/projects',
+    path: '/projects',
+    getParentRoute: () => AuthenticatedSlugCommitteeOrganizationsOrgIdRoute,
   } as any)
 const AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsNewRoute =
   AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsNewRouteImport.update({
@@ -132,13 +145,15 @@ export interface FileRoutesByFullPath {
   '/admin/events': typeof AdminEventsRouteWithChildren
   '/admin/users': typeof AdminUsersRoute
   '/admin/events/new': typeof AdminEventsNewRoute
-  '/admin/events/$eventId': typeof AdminEventsEventIdRoute
+  '/admin/events/$eventId': typeof AdminEventsEventIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/$slug/committee/organizations': typeof AuthenticatedSlugCommitteeOrganizationsRouteWithChildren
   '/admin/events/$eventId/users': typeof AdminEventsEventIdUsersRoute
+  '/admin/events/$eventId/': typeof AdminEventsEventIdIndexRoute
   '/$slug/committee/organizations/new': typeof AuthenticatedSlugCommitteeOrganizationsNewRoute
-  '/$slug/committee/organizations/$orgId': typeof AuthenticatedSlugCommitteeOrganizationsOrgIdRoute
+  '/$slug/committee/organizations/$orgId': typeof AuthenticatedSlugCommitteeOrganizationsOrgIdRouteWithChildren
   '/$slug/committee/organizations/$orgId/projects': typeof AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsRouteWithChildren
+  '/$slug/committee/organizations/$orgId/': typeof AuthenticatedSlugCommitteeOrganizationsOrgIdIndexRoute
   '/$slug/committee/organizations/$orgId/projects/new': typeof AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsNewRoute
 }
 export interface FileRoutesByTo {
@@ -150,13 +165,13 @@ export interface FileRoutesByTo {
   '/admin/events': typeof AdminEventsRouteWithChildren
   '/admin/users': typeof AdminUsersRoute
   '/admin/events/new': typeof AdminEventsNewRoute
-  '/admin/events/$eventId': typeof AdminEventsEventIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/$slug/committee/organizations': typeof AuthenticatedSlugCommitteeOrganizationsRouteWithChildren
   '/admin/events/$eventId/users': typeof AdminEventsEventIdUsersRoute
+  '/admin/events/$eventId': typeof AdminEventsEventIdIndexRoute
   '/$slug/committee/organizations/new': typeof AuthenticatedSlugCommitteeOrganizationsNewRoute
-  '/$slug/committee/organizations/$orgId': typeof AuthenticatedSlugCommitteeOrganizationsOrgIdRoute
   '/$slug/committee/organizations/$orgId/projects': typeof AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsRouteWithChildren
+  '/$slug/committee/organizations/$orgId': typeof AuthenticatedSlugCommitteeOrganizationsOrgIdIndexRoute
   '/$slug/committee/organizations/$orgId/projects/new': typeof AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsNewRoute
 }
 export interface FileRoutesById {
@@ -171,14 +186,16 @@ export interface FileRoutesById {
   '/admin/events': typeof AdminEventsRouteWithChildren
   '/admin/users': typeof AdminUsersRoute
   '/admin/events/new': typeof AdminEventsNewRoute
-  '/admin/events_/$eventId': typeof AdminEventsEventIdRoute
+  '/admin/events_/$eventId': typeof AdminEventsEventIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_authenticated/$slug/committee/organizations': typeof AuthenticatedSlugCommitteeOrganizationsRouteWithChildren
-  '/admin/events_/$eventId_/users': typeof AdminEventsEventIdUsersRoute
+  '/admin/events_/$eventId/users': typeof AdminEventsEventIdUsersRoute
+  '/admin/events_/$eventId/': typeof AdminEventsEventIdIndexRoute
   '/_authenticated/$slug/committee/organizations/new': typeof AuthenticatedSlugCommitteeOrganizationsNewRoute
-  '/_authenticated/$slug/committee/organizations_/$orgId': typeof AuthenticatedSlugCommitteeOrganizationsOrgIdRoute
-  '/_authenticated/$slug/committee/organizations_/$orgId_/projects': typeof AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsRouteWithChildren
-  '/_authenticated/$slug/committee/organizations_/$orgId_/projects/new': typeof AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsNewRoute
+  '/_authenticated/$slug/committee/organizations_/$orgId': typeof AuthenticatedSlugCommitteeOrganizationsOrgIdRouteWithChildren
+  '/_authenticated/$slug/committee/organizations_/$orgId/projects': typeof AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsRouteWithChildren
+  '/_authenticated/$slug/committee/organizations_/$orgId/': typeof AuthenticatedSlugCommitteeOrganizationsOrgIdIndexRoute
+  '/_authenticated/$slug/committee/organizations_/$orgId/projects/new': typeof AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -195,9 +212,11 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/$slug/committee/organizations'
     | '/admin/events/$eventId/users'
+    | '/admin/events/$eventId/'
     | '/$slug/committee/organizations/new'
     | '/$slug/committee/organizations/$orgId'
     | '/$slug/committee/organizations/$orgId/projects'
+    | '/$slug/committee/organizations/$orgId/'
     | '/$slug/committee/organizations/$orgId/projects/new'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -209,13 +228,13 @@ export interface FileRouteTypes {
     | '/admin/events'
     | '/admin/users'
     | '/admin/events/new'
-    | '/admin/events/$eventId'
     | '/api/auth/$'
     | '/$slug/committee/organizations'
     | '/admin/events/$eventId/users'
+    | '/admin/events/$eventId'
     | '/$slug/committee/organizations/new'
-    | '/$slug/committee/organizations/$orgId'
     | '/$slug/committee/organizations/$orgId/projects'
+    | '/$slug/committee/organizations/$orgId'
     | '/$slug/committee/organizations/$orgId/projects/new'
   id:
     | '__root__'
@@ -232,11 +251,13 @@ export interface FileRouteTypes {
     | '/admin/events_/$eventId'
     | '/api/auth/$'
     | '/_authenticated/$slug/committee/organizations'
-    | '/admin/events_/$eventId_/users'
+    | '/admin/events_/$eventId/users'
+    | '/admin/events_/$eventId/'
     | '/_authenticated/$slug/committee/organizations/new'
     | '/_authenticated/$slug/committee/organizations_/$orgId'
-    | '/_authenticated/$slug/committee/organizations_/$orgId_/projects'
-    | '/_authenticated/$slug/committee/organizations_/$orgId_/projects/new'
+    | '/_authenticated/$slug/committee/organizations_/$orgId/projects'
+    | '/_authenticated/$slug/committee/organizations_/$orgId/'
+    | '/_authenticated/$slug/committee/organizations_/$orgId/projects/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -333,12 +354,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEventsNewRouteImport
       parentRoute: typeof AdminEventsRoute
     }
-    '/admin/events_/$eventId_/users': {
-      id: '/admin/events_/$eventId_/users'
-      path: '/events/$eventId/users'
+    '/admin/events_/$eventId/': {
+      id: '/admin/events_/$eventId/'
+      path: '/'
+      fullPath: '/admin/events/$eventId/'
+      preLoaderRoute: typeof AdminEventsEventIdIndexRouteImport
+      parentRoute: typeof AdminEventsEventIdRoute
+    }
+    '/admin/events_/$eventId/users': {
+      id: '/admin/events_/$eventId/users'
+      path: '/users'
       fullPath: '/admin/events/$eventId/users'
       preLoaderRoute: typeof AdminEventsEventIdUsersRouteImport
-      parentRoute: typeof AdminRoute
+      parentRoute: typeof AdminEventsEventIdRoute
     }
     '/_authenticated/$slug/committee/organizations': {
       id: '/_authenticated/$slug/committee/organizations'
@@ -361,15 +389,22 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSlugCommitteeOrganizationsNewRouteImport
       parentRoute: typeof AuthenticatedSlugCommitteeOrganizationsRoute
     }
-    '/_authenticated/$slug/committee/organizations_/$orgId_/projects': {
-      id: '/_authenticated/$slug/committee/organizations_/$orgId_/projects'
-      path: '/committee/organizations/$orgId/projects'
+    '/_authenticated/$slug/committee/organizations_/$orgId/': {
+      id: '/_authenticated/$slug/committee/organizations_/$orgId/'
+      path: '/'
+      fullPath: '/$slug/committee/organizations/$orgId/'
+      preLoaderRoute: typeof AuthenticatedSlugCommitteeOrganizationsOrgIdIndexRouteImport
+      parentRoute: typeof AuthenticatedSlugCommitteeOrganizationsOrgIdRoute
+    }
+    '/_authenticated/$slug/committee/organizations_/$orgId/projects': {
+      id: '/_authenticated/$slug/committee/organizations_/$orgId/projects'
+      path: '/projects'
       fullPath: '/$slug/committee/organizations/$orgId/projects'
       preLoaderRoute: typeof AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsRouteImport
-      parentRoute: typeof AuthenticatedSlugRoute
+      parentRoute: typeof AuthenticatedSlugCommitteeOrganizationsOrgIdRoute
     }
-    '/_authenticated/$slug/committee/organizations_/$orgId_/projects/new': {
-      id: '/_authenticated/$slug/committee/organizations_/$orgId_/projects/new'
+    '/_authenticated/$slug/committee/organizations_/$orgId/projects/new': {
+      id: '/_authenticated/$slug/committee/organizations_/$orgId/projects/new'
       path: '/new'
       fullPath: '/$slug/committee/organizations/$orgId/projects/new'
       preLoaderRoute: typeof AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsNewRouteImport
@@ -408,19 +443,34 @@ const AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsRouteWithChildren =
     AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsRouteChildren,
   )
 
+interface AuthenticatedSlugCommitteeOrganizationsOrgIdRouteChildren {
+  AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsRoute: typeof AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsRouteWithChildren
+  AuthenticatedSlugCommitteeOrganizationsOrgIdIndexRoute: typeof AuthenticatedSlugCommitteeOrganizationsOrgIdIndexRoute
+}
+
+const AuthenticatedSlugCommitteeOrganizationsOrgIdRouteChildren: AuthenticatedSlugCommitteeOrganizationsOrgIdRouteChildren =
+  {
+    AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsRoute:
+      AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsRouteWithChildren,
+    AuthenticatedSlugCommitteeOrganizationsOrgIdIndexRoute:
+      AuthenticatedSlugCommitteeOrganizationsOrgIdIndexRoute,
+  }
+
+const AuthenticatedSlugCommitteeOrganizationsOrgIdRouteWithChildren =
+  AuthenticatedSlugCommitteeOrganizationsOrgIdRoute._addFileChildren(
+    AuthenticatedSlugCommitteeOrganizationsOrgIdRouteChildren,
+  )
+
 interface AuthenticatedSlugRouteChildren {
   AuthenticatedSlugCommitteeOrganizationsRoute: typeof AuthenticatedSlugCommitteeOrganizationsRouteWithChildren
-  AuthenticatedSlugCommitteeOrganizationsOrgIdRoute: typeof AuthenticatedSlugCommitteeOrganizationsOrgIdRoute
-  AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsRoute: typeof AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsRouteWithChildren
+  AuthenticatedSlugCommitteeOrganizationsOrgIdRoute: typeof AuthenticatedSlugCommitteeOrganizationsOrgIdRouteWithChildren
 }
 
 const AuthenticatedSlugRouteChildren: AuthenticatedSlugRouteChildren = {
   AuthenticatedSlugCommitteeOrganizationsRoute:
     AuthenticatedSlugCommitteeOrganizationsRouteWithChildren,
   AuthenticatedSlugCommitteeOrganizationsOrgIdRoute:
-    AuthenticatedSlugCommitteeOrganizationsOrgIdRoute,
-  AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsRoute:
-    AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsRouteWithChildren,
+    AuthenticatedSlugCommitteeOrganizationsOrgIdRouteWithChildren,
 }
 
 const AuthenticatedSlugRouteWithChildren =
@@ -463,18 +513,29 @@ const AdminEventsRouteWithChildren = AdminEventsRoute._addFileChildren(
   AdminEventsRouteChildren,
 )
 
+interface AdminEventsEventIdRouteChildren {
+  AdminEventsEventIdUsersRoute: typeof AdminEventsEventIdUsersRoute
+  AdminEventsEventIdIndexRoute: typeof AdminEventsEventIdIndexRoute
+}
+
+const AdminEventsEventIdRouteChildren: AdminEventsEventIdRouteChildren = {
+  AdminEventsEventIdUsersRoute: AdminEventsEventIdUsersRoute,
+  AdminEventsEventIdIndexRoute: AdminEventsEventIdIndexRoute,
+}
+
+const AdminEventsEventIdRouteWithChildren =
+  AdminEventsEventIdRoute._addFileChildren(AdminEventsEventIdRouteChildren)
+
 interface AdminRouteChildren {
   AdminEventsRoute: typeof AdminEventsRouteWithChildren
   AdminUsersRoute: typeof AdminUsersRoute
-  AdminEventsEventIdRoute: typeof AdminEventsEventIdRoute
-  AdminEventsEventIdUsersRoute: typeof AdminEventsEventIdUsersRoute
+  AdminEventsEventIdRoute: typeof AdminEventsEventIdRouteWithChildren
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminEventsRoute: AdminEventsRouteWithChildren,
   AdminUsersRoute: AdminUsersRoute,
-  AdminEventsEventIdRoute: AdminEventsEventIdRoute,
-  AdminEventsEventIdUsersRoute: AdminEventsEventIdUsersRoute,
+  AdminEventsEventIdRoute: AdminEventsEventIdRouteWithChildren,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)

@@ -18,6 +18,7 @@ export { Input, type InputProps } from "./input";
 export { Loader, type LoaderProps } from "./loader";
 export * as Pagination from "./pagination";
 export * as Popover from "./popover";
+export * as SegmentGroup from "./segment-group";
 export * as Select from "./select";
 export { Span, type SpanProps } from "./span";
 export { Spinner, type SpinnerProps } from "./spinner";

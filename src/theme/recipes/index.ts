@@ -1,3 +1,4 @@
+import { segmentGroup } from "./segment-group";
 import { code } from "./code";
 import { icon } from "./icon";
 import { textarea } from "./textarea";
@@ -47,5 +48,6 @@ export const recipes = {
   textarea,
   icon,
   code,
+  segmentGroup,
 };
 export const slotRecipes = {};
