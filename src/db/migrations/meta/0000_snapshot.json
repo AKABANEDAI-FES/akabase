@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "f3b83b31-ca1c-4d5e-92c4-d5b27704d597",
+  "id": "7f75c4c5-cda9-4375-a82e-721219126df7",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "committee_roles": {
@@ -524,11 +524,11 @@
           "notNull": true,
           "autoincrement": false
         },
-        "slug": {
-          "name": "slug",
+        "parent_id": {
+          "name": "parent_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "created_at": {
@@ -546,9 +546,14 @@
           "columns": ["event_id"],
           "isUnique": false
         },
-        "places_event_slug_unique": {
-          "name": "places_event_slug_unique",
-          "columns": ["event_id", "slug"],
+        "places_parent_id_idx": {
+          "name": "places_parent_id_idx",
+          "columns": ["parent_id"],
+          "isUnique": false
+        },
+        "places_event_parent_name_unique": {
+          "name": "places_event_parent_name_unique",
+          "columns": ["event_id", "parent_id", "name"],
           "isUnique": true
         }
       },
@@ -558,6 +563,15 @@
           "tableFrom": "places",
           "tableTo": "events",
           "columnsFrom": ["event_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "places_parent_id_places_id_fk": {
+          "name": "places_parent_id_places_id_fk",
+          "tableFrom": "places",
+          "tableTo": "places",
+          "columnsFrom": ["parent_id"],
           "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
@@ -1136,13 +1150,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "slug": {
-          "name": "slug",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
         "created_at": {
           "name": "created_at",
           "type": "integer",
@@ -1158,9 +1165,9 @@
           "columns": ["event_id"],
           "isUnique": false
         },
-        "tags_event_slug_unique": {
-          "name": "tags_event_slug_unique",
-          "columns": ["event_id", "slug"],
+        "tags_event_name_unique": {
+          "name": "tags_event_name_unique",
+          "columns": ["event_id", "name"],
           "isUnique": true
         }
       },

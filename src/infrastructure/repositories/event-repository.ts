@@ -1,10 +1,10 @@
 import { Result } from "@praha/byethrow";
 import { db } from "@/db";
-import { events } from "@/db/schema";
-import { desc } from "drizzle-orm";
-import { eventSchema } from "@/domain/event/schema";
-import type { Event } from "@/domain/event/schema";
-import type { EventId } from "@/domain/shared/ids";
+import { deadlines, events, places, tags } from "@/db/schema";
+import { desc, eq } from "drizzle-orm";
+import { deadlineSchema, eventSchema, placeSchema, tagSchema } from "@/domain/event/schema";
+import type { Deadline, Event, Place, Tag } from "@/domain/event/schema";
+import type { DeadlineId, EventId, PlaceId, TagId } from "@/domain/shared/ids";
 import type { EventRepository } from "@/domain/event/repository";
 import type { RepositoryError } from "@/domain/shared/repository";
 import { repositoryError } from "@/domain/shared/repository";
@@ -115,48 +115,181 @@ export class EventRepositoryImpl implements EventRepository {
     }
   }
 
-  // Tag, Place, Deadline methods are not implemented yet (not needed for MVP)
-  async findTags(): Promise<Result.Result<never[], RepositoryError>> {
-    throw new Error("Not implemented");
+  // =============================================================================
+  // Tag operations
+  // =============================================================================
+
+  async findTags(eventId: EventId): Promise<Result.Result<Tag[], RepositoryError>> {
+    try {
+      const rows = await db.query.tags.findMany({
+        where: (tags, { eq }) => eq(tags.eventId, eventId),
+      });
+
+      const tagList: Tag[] = rows.map((row) =>
+        tagSchema.parse({
+          id: row.id,
+          eventId: row.eventId,
+          name: row.name,
+          createdAt: new Date(row.createdAt),
+        }),
+      );
+
+      return Result.succeed(tagList);
+    } catch (error) {
+      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to find tags", error));
+    }
   }
 
-  async findPlaces(): Promise<Result.Result<never[], RepositoryError>> {
-    throw new Error("Not implemented");
+  async saveTag(tag: Tag): Promise<Result.Result<void, RepositoryError>> {
+    try {
+      await db
+        .insert(tags)
+        .values({
+          id: tag.id,
+          eventId: tag.eventId,
+          name: tag.name,
+          createdAt: tag.createdAt,
+        })
+        .onConflictDoUpdate({
+          target: tags.id,
+          set: {
+            // Immutable fields excluded: id, eventId, createdAt
+            name: tag.name,
+          },
+        });
+
+      return Result.succeed(undefined);
+    } catch (error) {
+      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to save tag", error));
+    }
   }
 
-  async findDeadlines(): Promise<Result.Result<never[], RepositoryError>> {
-    throw new Error("Not implemented");
+  async deleteTag(tagId: TagId): Promise<Result.Result<void, RepositoryError>> {
+    try {
+      await db.delete(tags).where(eq(tags.id, tagId));
+      return Result.succeed(undefined);
+    } catch (error) {
+      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to delete tag", error));
+    }
   }
 
-  async saveTag(): Promise<Result.Result<void, RepositoryError>> {
-    throw new Error("Not implemented");
+  // =============================================================================
+  // Place operations
+  // =============================================================================
+
+  async findPlaces(eventId: EventId): Promise<Result.Result<Place[], RepositoryError>> {
+    try {
+      const rows = await db.query.places.findMany({
+        where: (places, { eq }) => eq(places.eventId, eventId),
+      });
+
+      const placeList: Place[] = rows.map((row) =>
+        placeSchema.parse({
+          id: row.id,
+          eventId: row.eventId,
+          name: row.name,
+          parentId: row.parentId,
+          createdAt: new Date(row.createdAt),
+        }),
+      );
+
+      return Result.succeed(placeList);
+    } catch (error) {
+      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to find places", error));
+    }
   }
 
-  async updateTag(): Promise<Result.Result<void, RepositoryError>> {
-    throw new Error("Not implemented");
+  async savePlace(place: Place): Promise<Result.Result<void, RepositoryError>> {
+    try {
+      await db
+        .insert(places)
+        .values({
+          id: place.id,
+          eventId: place.eventId,
+          name: place.name,
+          parentId: place.parentId,
+          createdAt: place.createdAt,
+        })
+        .onConflictDoUpdate({
+          target: places.id,
+          set: {
+            // Immutable fields excluded: id, eventId, parentId, createdAt
+            // Note: parentId cannot be changed after creation to avoid circular reference complexity
+            name: place.name,
+          },
+        });
+
+      return Result.succeed(undefined);
+    } catch (error) {
+      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to save place", error));
+    }
   }
 
-  async deleteTag(): Promise<Result.Result<void, RepositoryError>> {
-    throw new Error("Not implemented");
+  async deletePlace(placeId: PlaceId): Promise<Result.Result<void, RepositoryError>> {
+    try {
+      await db.delete(places).where(eq(places.id, placeId));
+      return Result.succeed(undefined);
+    } catch (error) {
+      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to delete place", error));
+    }
   }
 
-  async savePlace(): Promise<Result.Result<void, RepositoryError>> {
-    throw new Error("Not implemented");
+  // =============================================================================
+  // Deadline operations
+  // =============================================================================
+
+  async findDeadlines(eventId: EventId): Promise<Result.Result<Deadline[], RepositoryError>> {
+    try {
+      const rows = await db.query.deadlines.findMany({
+        where: (deadlines, { eq }) => eq(deadlines.eventId, eventId),
+      });
+
+      const deadlineList: Deadline[] = rows.map((row) =>
+        deadlineSchema.parse({
+          id: row.id,
+          eventId: row.eventId,
+          fieldKey: row.fieldKey,
+          deadlineAt: new Date(row.deadlineAt),
+          createdAt: new Date(row.createdAt),
+        }),
+      );
+
+      return Result.succeed(deadlineList);
+    } catch (error) {
+      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to find deadlines", error));
+    }
   }
 
-  async updatePlace(): Promise<Result.Result<void, RepositoryError>> {
-    throw new Error("Not implemented");
+  async saveDeadline(deadline: Deadline): Promise<Result.Result<void, RepositoryError>> {
+    try {
+      await db
+        .insert(deadlines)
+        .values({
+          id: deadline.id,
+          eventId: deadline.eventId,
+          fieldKey: deadline.fieldKey,
+          deadlineAt: deadline.deadlineAt,
+          createdAt: deadline.createdAt,
+        })
+        .onConflictDoUpdate({
+          target: [deadlines.eventId, deadlines.fieldKey],
+          set: {
+            deadlineAt: deadline.deadlineAt,
+          },
+        });
+
+      return Result.succeed(undefined);
+    } catch (error) {
+      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to save deadline", error));
+    }
   }
 
-  async deletePlace(): Promise<Result.Result<void, RepositoryError>> {
-    throw new Error("Not implemented");
-  }
-
-  async saveDeadline(): Promise<Result.Result<void, RepositoryError>> {
-    throw new Error("Not implemented");
-  }
-
-  async deleteDeadline(): Promise<Result.Result<void, RepositoryError>> {
-    throw new Error("Not implemented");
+  async deleteDeadline(deadlineId: DeadlineId): Promise<Result.Result<void, RepositoryError>> {
+    try {
+      await db.delete(deadlines).where(eq(deadlines.id, deadlineId));
+      return Result.succeed(undefined);
+    } catch (error) {
+      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to delete deadline", error));
+    }
   }
 }

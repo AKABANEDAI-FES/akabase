@@ -1,10 +1,9 @@
-import { Result } from "@praha/byethrow";
+import type { Result } from "@praha/byethrow";
 import { gen } from "@/libs/result";
 import { generateId } from "@/libs/id";
 import { cast } from "@/domain/shared/ids";
 import type { EventId } from "@/domain/shared/ids";
 import type { EventError } from "@/domain/event/errors";
-import { EVENT_ERROR_CODE, eventError } from "@/domain/event/errors";
 import { createEventEntity } from "@/domain/event/logic";
 import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
@@ -46,7 +45,7 @@ export type CreateEventError = EventError | RepositoryError | AuthorizationError
  * @returns Result with event ID or error
  */
 export async function createEvent(
-  deps: Pick<Dependencies, "eventRepo" | "authService">,
+  deps: Pick<Dependencies, "eventRepo" | "authService" | "eventDomainService">,
   input: CreateEventInput,
 ): Result.ResultAsync<CreateEventOutput, CreateEventError> {
   return gen(async function* ($) {
@@ -59,16 +58,8 @@ export async function createEvent(
     // Generate new event ID after authorization passes
     const eventId = generateId<EventId>();
 
-    // Check if slug is already in use
-    const existingEvent = yield* $(await deps.eventRepo.findBySlug(input.slug));
-
-    if (existingEvent) {
-      return yield* $(
-        Result.fail(
-          eventError(EVENT_ERROR_CODE.SLUG_NOT_UNIQUE, "このスラッグは既に使用されています"),
-        ),
-      );
-    }
+    // Check if slug is already in use (domain service)
+    yield* $(await deps.eventDomainService.ensureSlugUnique(input.slug));
 
     // Create event entity
     const event = createEventEntity({

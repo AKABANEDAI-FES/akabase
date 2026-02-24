@@ -101,3 +101,8 @@ export function generateLoadEventBySlugQueryOptions(slug: string) {
     queryFn: () => loadEventBySlugFn({ data: { slug } }),
   });
 }
+
+// Re-export sub-modules
+export * from "./deadline";
+export * from "./place";
+export * from "./tag";

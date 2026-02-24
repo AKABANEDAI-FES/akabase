@@ -46,14 +46,9 @@ export interface EventRepository {
   saveEvent(event: Event): Promise<Result.Result<void, RepositoryError>>;
 
   /**
-   * Save a new tag
+   * Save tag (insert or update)
    */
   saveTag(tag: Tag): Promise<Result.Result<void, RepositoryError>>;
-
-  /**
-   * Update tag
-   */
-  updateTag(tag: Tag): Promise<Result.Result<void, RepositoryError>>;
 
   /**
    * Delete tag
@@ -61,14 +56,9 @@ export interface EventRepository {
   deleteTag(tagId: TagId): Promise<Result.Result<void, RepositoryError>>;
 
   /**
-   * Save a new place
+   * Save place (insert or update)
    */
   savePlace(place: Place): Promise<Result.Result<void, RepositoryError>>;
-
-  /**
-   * Update place
-   */
-  updatePlace(place: Place): Promise<Result.Result<void, RepositoryError>>;
 
   /**
    * Delete place

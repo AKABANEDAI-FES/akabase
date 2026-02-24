@@ -60,6 +60,7 @@ export const select = defineSlotRecipe({
       alignItems: "center",
       justifyContent: "center",
       color: { base: "fg.subtle" },
+      gridColumn: "3 / 4",
     },
     itemGroupLabel: {
       alignItems: "flex-start",
@@ -84,11 +85,19 @@ export const select = defineSlotRecipe({
       userSelect: "none",
       textStyle: "sm",
     },
+    control: {
+      display: "grid",
+      gridTemplateRows: "1fr",
+      gridTemplateColumns: "1fr auto auto",
+    },
     trigger: {
       alignItems: "center",
       borderRadius: "l2",
       cursor: "pointer",
-      display: "flex",
+      display: "grid",
+      gridRow: "1 / -1",
+      gridColumn: "1 / -1",
+      gridTemplateColumns: "subgrid",
       justifyContent: "space-between",
       minWidth: "0",
       outline: "0",
@@ -107,6 +116,16 @@ export const select = defineSlotRecipe({
       overflow: "hidden",
       textOverflow: "ellipsis",
       whiteSpace: "nowrap",
+      gridColumn: "1 / 2",
+    },
+    clearTrigger: {
+      cursor: "pointer",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      color: { base: "fg.subtle" },
+      gridRow: "1 / -1",
+      gridColumn: "2 / 3",
     },
   },
   defaultVariants: {
@@ -140,6 +159,7 @@ export const select = defineSlotRecipe({
         itemGroup: { gap: "0.5" },
         itemGroupLabel: { px: "1", height: "8" },
         trigger: { px: "2", h: "8", textStyle: "sm", gap: "2", _icon: { boxSize: "3.5" } },
+        clearTrigger: { _icon: { boxSize: "3.5" } },
       },
       sm: {
         content: { p: "1", gap: "0.5", textStyle: "sm" },
@@ -147,6 +167,7 @@ export const select = defineSlotRecipe({
         itemGroup: { gap: "0.5" },
         itemGroupLabel: { px: "1.5", height: "9" },
         trigger: { px: "2.5", h: "9", textStyle: "sm", gap: "2", _icon: { boxSize: "4" } },
+        clearTrigger: { _icon: { boxSize: "4" } },
       },
       md: {
         content: { p: "1", gap: "0.5", textStyle: "md" },
@@ -154,6 +175,7 @@ export const select = defineSlotRecipe({
         itemGroup: { gap: "0.5" },
         itemGroupLabel: { px: "2", height: "10" },
         trigger: { px: "3", h: "10", textStyle: "md", gap: "2", _icon: { boxSize: "4" } },
+        clearTrigger: { _icon: { boxSize: "4" } },
       },
       lg: {
         content: { p: "1", gap: "0.5", textStyle: "md" },
@@ -161,6 +183,7 @@ export const select = defineSlotRecipe({
         itemGroup: { gap: "0.5" },
         itemGroupLabel: { px: "2.5", height: "11" },
         trigger: { px: "3.5", h: "11", textStyle: "md", gap: "2", _icon: { boxSize: "4.5" } },
+        clearTrigger: { _icon: { boxSize: "4.5" } },
       },
       xl: {
         content: { p: "1", gap: "1", textStyle: "lg" },
@@ -168,6 +191,7 @@ export const select = defineSlotRecipe({
         itemGroup: { gap: "1" },
         itemGroupLabel: { px: "3", height: "12" },
         trigger: { px: "4", h: "12", textStyle: "lg", gap: "3", _icon: { boxSize: "5" } },
+        clearTrigger: { _icon: { boxSize: "5" } },
       },
     },
   },

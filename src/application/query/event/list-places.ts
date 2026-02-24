@@ -4,16 +4,16 @@ import { db } from "@/db";
 import { places } from "@/db/schema";
 import { asc, eq } from "drizzle-orm";
 import type { EventId } from "@/domain/shared/ids";
-import { placeIdSchema } from "@/domain/shared/ids";
+import { eventIdSchema, placeIdSchema } from "@/domain/shared/ids";
 
 /**
  * DTO schema for place list item
  */
 export const placeListItemSchema = z.object({
   id: placeIdSchema,
-  eventId: z.string(),
+  eventId: eventIdSchema,
   name: z.string(),
-  slug: z.string(),
+  parentId: placeIdSchema.nullable(),
   createdAt: z.date(),
 });
 
@@ -42,7 +42,7 @@ export async function listPlaces(
         id: row.id,
         eventId: row.eventId,
         name: row.name,
-        slug: row.slug,
+        parentId: row.parentId,
         createdAt: new Date(row.createdAt),
       }),
     );

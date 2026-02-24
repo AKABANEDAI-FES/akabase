@@ -1,8 +1,9 @@
 import { Result } from "@praha/byethrow";
 import type { Deadline, Event, Place, Tag } from "./schema";
+import { tagSchema } from "./schema";
 import type { EventError } from "./errors";
 import { EVENT_ERROR_CODE, eventError } from "./errors";
-import type { EventId, PlaceId, TagId } from "../shared/ids";
+import type { EventId, PlaceId } from "../shared/ids";
 
 /**
  * Create a new event entity
@@ -64,46 +65,25 @@ export function canModifyEvent(event: Event): Result.Result<true, EventError> {
 }
 
 /**
- * Check if tag slug is unique within the event
- * Rule: Each tag must have a unique slug per event
+ * Get all child places of a parent
  */
-export function isTagSlugUnique(
-  tags: Tag[],
-  slug: string,
-  excludeTagId?: TagId,
-): Result.Result<true, EventError> {
-  const existingTag = tags.find((t) => t.slug === slug && t.id !== excludeTagId);
-
-  if (existingTag) {
-    return Result.fail(
-      eventError(
-        EVENT_ERROR_CODE.TAG_SLUG_NOT_UNIQUE,
-        `タグスラッグ「${slug}」は既に使用されています。`,
-      ),
-    );
-  }
-
-  return Result.succeed(true);
+export function getChildPlaces(places: Place[], parentId: PlaceId | null): Place[] {
+  return places.filter((p) => p.parentId === parentId);
 }
 
 /**
- * Check if place name is unique within the event
- * Rule: Each place must have a unique name per event
+ * Get all descendant places (recursive)
+ * Returns all children, grandchildren, etc.
  */
-export function isPlaceUnique(
-  places: Place[],
-  name: string,
-  excludePlaceId?: PlaceId,
-): Result.Result<true, EventError> {
-  const existingPlace = places.find((p) => p.name === name && p.id !== excludePlaceId);
+export function getAllDescendantPlaces(places: Place[], parentId: PlaceId): Place[] {
+  const children = places.filter((p) => p.parentId === parentId);
+  const descendants = [...children];
 
-  if (existingPlace) {
-    return Result.fail(
-      eventError(EVENT_ERROR_CODE.PLACE_NOT_UNIQUE, `場所「${name}」は既に登録されています。`),
-    );
+  for (const child of children) {
+    descendants.push(...getAllDescendantPlaces(places, child.id));
   }
 
-  return Result.succeed(true);
+  return descendants;
 }
 
 /**
@@ -151,27 +131,33 @@ export function isFieldEditable(
  */
 
 /**
- * Add a new tag to the list
- * Returns new tags array
+ * Update tag entity
+ * Returns new tag with updated fields (only mutable fields)
+ * Validates the updated tag against schema
  */
-export function addTag(tags: Tag[], newTag: Tag): Tag[] {
-  return [...tags, newTag];
-}
+export function updateTag(
+  tag: Tag,
+  input: {
+    name: string;
+  },
+): Result.Result<Tag, EventError> {
+  const updated = {
+    ...tag,
+    name: input.name,
+  };
 
-/**
- * Remove a tag from the list
- * Returns new tags array
- */
-export function removeTag(tags: Tag[], tagId: TagId): Tag[] {
-  return tags.filter((t) => t.id !== tagId);
-}
+  // Validate against schema to ensure updated tag is valid
+  const parseResult = tagSchema.safeParse(updated);
+  if (!parseResult.success) {
+    return Result.fail(
+      eventError(
+        EVENT_ERROR_CODE.TAG_INVALID,
+        parseResult.error.issues[0]?.message || "タグの検証に失敗しました",
+      ),
+    );
+  }
 
-/**
- * Update a tag
- * Returns new tags array
- */
-export function updateTag(tags: Tag[], updatedTag: Tag): Tag[] {
-  return tags.map((t) => (t.id === updatedTag.id ? updatedTag : t));
+  return Result.succeed(parseResult.data);
 }
 
 /**

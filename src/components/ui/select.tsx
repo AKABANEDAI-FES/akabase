@@ -1,8 +1,8 @@
 "use client";
 import type { Assign, SelectRootProps } from "@ark-ui/react";
 import { ark } from "@ark-ui/react/factory";
-import { Select, useSelectItemContext } from "@ark-ui/react/select";
-import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
+import { Select, useSelectContext, useSelectItemContext } from "@ark-ui/react/select";
+import { CheckIcon, ChevronsUpDownIcon, XIcon } from "lucide-react";
 import { forwardRef } from "react";
 import type { RefAttributes } from "react";
 import { createStyleContext } from "styled-system/jsx";
@@ -18,7 +18,7 @@ export type RootProps<T> = Assign<SelectRootProps<T>, StyleProps> & RefAttribute
 
 export const Root = withProvider(Select.Root, "root") as Select.RootComponent<StyleProps>;
 
-export const ClearTrigger = withContext(Select.ClearTrigger, "clearTrigger");
+// export const ClearTrigger = withContext(Select.ClearTrigger, "clearTrigger");
 export const Content = withContext(Select.Content, "content");
 export const Control = withContext(Select.Control, "control");
 export const IndicatorGroup = withContext(ark.div, "indicatorGroup");
@@ -55,5 +55,19 @@ export const ItemIndicator = forwardRef<HTMLDivElement, HTMLStyledProps<"div">>(
     ) : (
       <svg aria-hidden="true" focusable="false" />
     );
+  },
+);
+
+const StyledClearTrigger = withContext(Select.ClearTrigger, "clearTrigger");
+
+export const ClearTrigger = forwardRef<HTMLButtonElement, HTMLStyledProps<"button">>(
+  function ClearTrigger(props, ref) {
+    const { value } = useSelectContext();
+
+    return value.length > 0 ? (
+      <StyledClearTrigger ref={ref} {...props}>
+        <XIcon />
+      </StyledClearTrigger>
+    ) : null;
   },
 );

@@ -12,18 +12,13 @@ import { cast, eventIdSchema } from "@/domain/shared/ids";
 import type { UserId } from "@/domain/shared/ids";
 import { eventSchema } from "@/domain/event/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { generateLoadEventDetailCacheKey, generateLoadEventsCacheKey } from "./queries";
+import { generateLoadEventDetailCacheKey, generateLoadEventsCacheKey } from "../queries";
 import { gen } from "@/libs/result";
 
 /**
  * Create event input validation schema
  */
 export const createEventInputSchema = eventSchema.pick({ name: true, slug: true });
-
-/**
- * Update event input validation schema
- */
-export const updateEventInputSchema = eventSchema.pick({ id: true, name: true, slug: true });
 
 /**
  * Server function to create event
@@ -59,6 +54,11 @@ export function useCreateEventMutation() {
     }),
   });
 }
+
+/**
+ * Update event input validation schema
+ */
+export const updateEventInputSchema = eventSchema.pick({ id: true, name: true, slug: true });
 
 /**
  * Server function to update event
@@ -167,3 +167,8 @@ export function useActivateEventMutation() {
     }),
   });
 }
+
+// Re-export sub-modules
+export * from "./deadline";
+export * from "./place";
+export * from "./tag";

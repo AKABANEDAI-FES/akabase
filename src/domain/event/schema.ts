@@ -52,10 +52,6 @@ export const tagSchema = z.object({
     .string()
     .min(TAG_NAME_MIN_LENGTH, "タグ名を入力してください")
     .max(TAG_NAME_MAX_LENGTH, "タグ名は100文字以内で入力してください"),
-  slug: z
-    .string()
-    .min(SLUG_MIN_LENGTH, "スラッグを入力してください")
-    .regex(SLUG_PATTERN, "スラッグは小文字英数字とハイフンのみ使用できます"),
   createdAt: z.date(),
 });
 
@@ -63,7 +59,7 @@ export type Tag = z.infer<typeof tagSchema>;
 
 /**
  * Place
- * 場所マスタ（イベント単位で管理）
+ * 場所マスタ（イベント単位で管理、階層構造）
  */
 export const placeSchema = z.object({
   id: placeIdSchema,
@@ -72,14 +68,30 @@ export const placeSchema = z.object({
     .string()
     .min(PLACE_NAME_MIN_LENGTH, "場所名を入力してください")
     .max(PLACE_NAME_MAX_LENGTH, "場所名は100文字以内で入力してください"),
-  slug: z
-    .string()
-    .min(SLUG_MIN_LENGTH, "スラッグを入力してください")
-    .regex(SLUG_PATTERN, "スラッグは小文字英数字とハイフンのみ使用できます"),
+  parentId: placeIdSchema.nullable(),
   createdAt: z.date(),
 });
 
 export type Place = z.infer<typeof placeSchema>;
+
+/**
+ * Deadline Field Keys
+ * フィールドごとの締切設定で使用可能なキー
+ */
+export const DEADLINE_FIELD_KEYS = ["pamphlet_text", "web_content", "logo", "tags"] as const;
+
+export type DeadlineFieldKey = (typeof DEADLINE_FIELD_KEYS)[number];
+
+/**
+ * Deadline Field Labels
+ * フィールドキーの日本語ラベル
+ */
+export const DEADLINE_FIELD_LABELS: Record<DeadlineFieldKey, string> = {
+  pamphlet_text: "パンフレット説明文",
+  web_content: "Webコンテンツ",
+  logo: "ロゴ画像",
+  tags: "タグ",
+} as const;
 
 /**
  * Deadline
@@ -88,7 +100,9 @@ export type Place = z.infer<typeof placeSchema>;
 export const deadlineSchema = z.object({
   id: deadlineIdSchema,
   eventId: eventIdSchema,
-  fieldKey: z.string(),
+  fieldKey: z.enum(DEADLINE_FIELD_KEYS, {
+    message: "フィールドを選択してください",
+  }),
   deadlineAt: z.date(),
   createdAt: z.date(),
 });

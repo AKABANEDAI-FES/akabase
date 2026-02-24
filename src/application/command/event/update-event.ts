@@ -47,7 +47,7 @@ export type UpdateEventError = EventError | RepositoryError | AuthorizationError
  * @returns Result with event ID or error
  */
 export async function updateEvent(
-  deps: Pick<Dependencies, "eventRepo" | "authService">,
+  deps: Pick<Dependencies, "eventRepo" | "authService" | "eventDomainService">,
   input: UpdateEventInput,
 ): Result.ResultAsync<UpdateEventOutput, UpdateEventError> {
   return gen(async function* ($) {
@@ -67,16 +67,8 @@ export async function updateEvent(
     // Check if event can be modified (not archived)
     yield* $(canModifyEvent(event));
 
-    // Check if slug is unique (exclude current event)
-    const existingEvent = yield* $(await deps.eventRepo.findBySlug(input.slug));
-
-    if (existingEvent && existingEvent.id !== input.eventId) {
-      return yield* $(
-        Result.fail(
-          eventError(EVENT_ERROR_CODE.SLUG_NOT_UNIQUE, "このスラッグは既に使用されています"),
-        ),
-      );
-    }
+    // Check if slug is unique (exclude current event, domain service)
+    yield* $(await deps.eventDomainService.ensureSlugUnique(input.slug, input.eventId));
 
     // Update event entity
     const updatedEvent = updateEventEntity(event, {

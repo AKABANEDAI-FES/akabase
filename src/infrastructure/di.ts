@@ -3,11 +3,13 @@ import type { EventRepository } from "@/domain/event/repository";
 import type { UserRepository } from "@/domain/user/repository";
 import type { OrganizationRepository } from "@/domain/organization/repository";
 import type { AuthorizationService } from "@/domain/authorization/service";
+import type { EventDomainService } from "@/domain/event/service";
 import type { StorageService } from "@/domain/shared/storage";
 import { EventRepositoryImpl } from "./repositories/event-repository";
 import { ProjectRepositoryImpl } from "./repositories/project-repository";
 import { UserRepositoryImpl } from "./repositories/user-repository";
 import { OrganizationRepositoryImpl } from "./repositories/organization-repository";
+import { EventDomainServiceImpl } from "./domain-services/event-domain-service";
 import { AuthorizationServiceImpl } from "./authorization/authorization-service-impl";
 import { StorageServiceImpl } from "./storage/storage-service";
 
@@ -20,6 +22,7 @@ export type Dependencies = {
   eventRepo: EventRepository;
   userRepo: UserRepository;
   organizationRepo: OrganizationRepository;
+  eventDomainService: EventDomainService;
   authService: AuthorizationService;
   storageService: StorageService;
 };
@@ -30,11 +33,13 @@ export type Dependencies = {
  * (e.g., mock repositories for testing)
  */
 export function createDependencies(): Dependencies {
+  const eventRepo = new EventRepositoryImpl();
   return {
     projectRepo: new ProjectRepositoryImpl(),
-    eventRepo: new EventRepositoryImpl(),
+    eventRepo,
     userRepo: new UserRepositoryImpl(),
     organizationRepo: new OrganizationRepositoryImpl(),
+    eventDomainService: new EventDomainServiceImpl(eventRepo),
     authService: new AuthorizationServiceImpl(),
     storageService: new StorageServiceImpl(),
   };

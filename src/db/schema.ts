@@ -1,4 +1,5 @@
 import { relations, sql } from "drizzle-orm";
+import type { AnySQLiteColumn } from "drizzle-orm/sqlite-core";
 import { index, integer, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
@@ -43,20 +44,19 @@ export const tags = sqliteTable(
       .notNull()
       .references(() => events.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
-    slug: text("slug").notNull(),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .notNull(),
   },
   (table) => [
     index("tags_event_id_idx").on(table.eventId),
-    unique("tags_event_slug_unique").on(table.eventId, table.slug),
+    unique("tags_event_name_unique").on(table.eventId, table.name),
   ],
 );
 
 /**
  * Place (場所マスタ)
- * イベント単位で管理
+ * イベント単位で管理、階層構造（自己参照）
  */
 export const places = sqliteTable(
   "places",
@@ -66,14 +66,17 @@ export const places = sqliteTable(
       .notNull()
       .references(() => events.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
-    slug: text("slug").notNull(),
+    parentId: text("parent_id").references((): AnySQLiteColumn => places.id, {
+      onDelete: "cascade",
+    }),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .notNull(),
   },
   (table) => [
     index("places_event_id_idx").on(table.eventId),
-    unique("places_event_slug_unique").on(table.eventId, table.slug),
+    index("places_parent_id_idx").on(table.parentId),
+    unique("places_event_parent_name_unique").on(table.eventId, table.parentId, table.name),
   ],
 );
 
@@ -420,10 +423,18 @@ export const tagsRelations = relations(tags, ({ one, many }) => ({
   publishedTags: many(projectPublishedTags),
 }));
 
-export const placesRelations = relations(places, ({ one }) => ({
+export const placesRelations = relations(places, ({ one, many }) => ({
   event: one(events, {
     fields: [places.eventId],
     references: [events.id],
+  }),
+  parent: one(places, {
+    fields: [places.parentId],
+    references: [places.id],
+    relationName: "placeHierarchy",
+  }),
+  children: many(places, {
+    relationName: "placeHierarchy",
   }),
 }));
 
