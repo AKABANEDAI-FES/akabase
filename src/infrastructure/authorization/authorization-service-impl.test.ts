@@ -87,7 +87,7 @@ describe("AuthorizationServiceImpl", () => {
       });
     });
 
-    describe("event:update / event:archive / event:activate", () => {
+    describe("event:update", () => {
       it("should allow event committee admin", () => {
         const eventId = cast<EventId>("event_1");
         const committeeRoles = new Map<EventId, CommitteeRole>([[eventId, "admin"]]);
@@ -98,18 +98,6 @@ describe("AuthorizationServiceImpl", () => {
         expect(Result.isSuccess(updateResult)).toBe(true);
         if (Result.isSuccess(updateResult)) {
           expect(updateResult.value).toBe(true);
-        }
-
-        const archiveResult = authService.isAllowed(actor, resource, "event:archive");
-        expect(Result.isSuccess(archiveResult)).toBe(true);
-        if (Result.isSuccess(archiveResult)) {
-          expect(archiveResult.value).toBe(true);
-        }
-
-        const activateResult = authService.isAllowed(actor, resource, "event:activate");
-        expect(Result.isSuccess(activateResult)).toBe(true);
-        if (Result.isSuccess(activateResult)) {
-          expect(activateResult.value).toBe(true);
         }
       });
 
@@ -158,6 +146,29 @@ describe("AuthorizationServiceImpl", () => {
         expect(Result.isSuccess(result2)).toBe(true);
         if (Result.isSuccess(result2)) {
           expect(result2.value.allowed).toBe(false);
+        }
+      });
+    });
+
+    describe("event:archive / event:activate", () => {
+      it("should deny event committee admin (only global admin allowed)", () => {
+        const eventId = cast<EventId>("event_1");
+        const committeeRoles = new Map<EventId, CommitteeRole>([[eventId, "admin"]]);
+        const actor = createActor(cast<UserId>("user_1"), "user", committeeRoles);
+        const resource = eventResource(eventId);
+
+        const archiveResult = authService.checkPermission(actor, resource, "event:archive");
+        expect(Result.isSuccess(archiveResult)).toBe(true);
+        if (Result.isSuccess(archiveResult)) {
+          expect(archiveResult.value.allowed).toBe(false);
+          expect(archiveResult.value.reason).toContain("システム管理者");
+        }
+
+        const activateResult = authService.checkPermission(actor, resource, "event:activate");
+        expect(Result.isSuccess(activateResult)).toBe(true);
+        if (Result.isSuccess(activateResult)) {
+          expect(activateResult.value.allowed).toBe(false);
+          expect(activateResult.value.reason).toContain("システム管理者");
         }
       });
     });

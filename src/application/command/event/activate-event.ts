@@ -34,7 +34,7 @@ export type ActivateEventError = EventError | RepositoryError | AuthorizationErr
  * Activate an archived event
  *
  * Business rules:
- * - Only global admins or event committee admins can activate events
+ * - Only global admins can activate events
  * - Event must exist
  * - Event must not be already active
  * - Status changes to "active"

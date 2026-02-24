@@ -34,7 +34,7 @@ export type ArchiveEventError = EventError | RepositoryError | AuthorizationErro
  * Archive an event
  *
  * Business rules:
- * - Only global admins or event committee admins can archive events
+ * - Only global admins can archive events
  * - Event must exist
  * - Event must not be already archived
  * - Status changes to "archived"

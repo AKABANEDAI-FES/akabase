@@ -100,8 +100,6 @@ export class AuthorizationServiceImpl implements AuthorizationService {
         return Result.succeed({ allowed: true });
 
       case "event:update":
-      case "event:archive":
-      case "event:activate":
         // Event admins can modify events
         if (committeeRole === "admin") {
           return Result.succeed({ allowed: true, reason: "イベント管理者" });
@@ -109,6 +107,20 @@ export class AuthorizationServiceImpl implements AuthorizationService {
         return Result.succeed({
           allowed: false,
           reason: "イベント管理者のみがイベントを変更できます",
+        });
+
+      case "event:archive":
+        // Only global admins can archive events (already checked above)
+        return Result.succeed({
+          allowed: false,
+          reason: "システム管理者のみがイベントをアーカイブできます",
+        });
+
+      case "event:activate":
+        // Only global admins can activate events (already checked above)
+        return Result.succeed({
+          allowed: false,
+          reason: "システム管理者のみがイベントを有効化できます",
         });
 
       default:
