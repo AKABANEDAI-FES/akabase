@@ -1,3 +1,4 @@
+import { combobox } from "./combobox";
 import { segmentGroup } from "./segment-group";
 import { code } from "./code";
 import { icon } from "./icon";
@@ -49,5 +50,6 @@ export const recipes = {
   icon,
   code,
   segmentGroup,
+  combobox,
 };
 export const slotRecipes = {};

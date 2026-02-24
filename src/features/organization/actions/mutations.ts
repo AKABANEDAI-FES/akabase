@@ -4,15 +4,19 @@ import { dependencies } from "@/infrastructure/di";
 import { createOrganization } from "@/application/command/organization/create-organization";
 import { updateOrganization } from "@/application/command/organization/update-organization";
 import { deleteOrganization } from "@/application/command/organization/delete-organization";
+import { addOrganizationMember } from "@/application/command/organization/add-organization-member";
+import { removeOrganizationMember } from "@/application/command/organization/remove-organization-member";
+import { updateOrganizationMemberRole } from "@/application/command/organization/update-organization-member-role";
 import { resolveActor } from "@/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/session-server";
-import { cast, orgIdSchema } from "@/domain/shared/ids";
-import type { UserId } from "@/domain/shared/ids";
+import { cast, orgIdSchema, userIdSchema } from "@/domain/shared/ids";
+import type { OrgId, UserId } from "@/domain/shared/ids";
 import { z } from "zod";
-import { organizationSchema } from "@/domain/organization/schema";
+import { orgMemberRoleSchema, organizationSchema } from "@/domain/organization/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   generateLoadOrganizationDetailCacheKey,
+  generateLoadOrganizationMembersCacheKey,
   generateLoadOrganizationsCacheKey,
 } from "./queries";
 import { gen } from "@/libs/result";
@@ -180,6 +184,145 @@ export function useDeleteOrganizationMutation() {
     onSuccess: Result.inspect(({ eventId }) => {
       queryClient.invalidateQueries({
         queryKey: generateLoadOrganizationsCacheKey(eventId),
+      });
+    }),
+  });
+}
+
+/**
+ * Add organization member input validation schema
+ */
+export const addOrganizationMemberInputSchema = z.object({
+  orgId: orgIdSchema,
+  userId: userIdSchema,
+  role: orgMemberRoleSchema,
+});
+
+/**
+ * Server function to add a member to an organization
+ */
+export const addOrganizationMemberFn = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .inputValidator(addOrganizationMemberInputSchema)
+  .handler(async ({ data, context }) => {
+    return gen(async function* ($) {
+      const actor = yield* $(
+        await resolveActor({
+          userId: cast<UserId>(context.session.user.id),
+          orgIds: [data.orgId as OrgId],
+        }),
+      );
+
+      return yield* $(
+        await addOrganizationMember(dependencies, {
+          orgId: data.orgId as OrgId,
+          userId: data.userId,
+          role: data.role,
+          actor,
+        }),
+      );
+    });
+  });
+
+export function useAddOrganizationMemberMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: addOrganizationMemberFn,
+    onSuccess: Result.inspect(({ orgId }) => {
+      queryClient.invalidateQueries({
+        queryKey: generateLoadOrganizationMembersCacheKey(orgId),
+      });
+    }),
+  });
+}
+
+/**
+ * Remove organization member input validation schema
+ */
+export const removeOrganizationMemberInputSchema = z.object({
+  orgId: orgIdSchema,
+  userId: userIdSchema,
+});
+
+/**
+ * Server function to remove a member from an organization
+ */
+export const removeOrganizationMemberFn = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .inputValidator(removeOrganizationMemberInputSchema)
+  .handler(async ({ data, context }) => {
+    return gen(async function* ($) {
+      const actor = yield* $(
+        await resolveActor({
+          userId: cast<UserId>(context.session.user.id),
+          orgIds: [data.orgId as OrgId],
+        }),
+      );
+
+      return yield* $(
+        await removeOrganizationMember(dependencies, {
+          orgId: data.orgId as OrgId,
+          userId: data.userId,
+          actor,
+        }),
+      );
+    });
+  });
+
+export function useRemoveOrganizationMemberMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: removeOrganizationMemberFn,
+    onSuccess: Result.inspect(({ orgId }) => {
+      queryClient.invalidateQueries({
+        queryKey: generateLoadOrganizationMembersCacheKey(orgId),
+      });
+    }),
+  });
+}
+
+/**
+ * Update organization member role input validation schema
+ */
+export const updateOrganizationMemberRoleInputSchema = z.object({
+  orgId: orgIdSchema,
+  userId: userIdSchema,
+  role: orgMemberRoleSchema,
+});
+
+/**
+ * Server function to update a member's role
+ */
+export const updateOrganizationMemberRoleFn = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .inputValidator(updateOrganizationMemberRoleInputSchema)
+  .handler(async ({ data, context }) => {
+    return gen(async function* ($) {
+      const actor = yield* $(
+        await resolveActor({
+          userId: cast<UserId>(context.session.user.id),
+          orgIds: [data.orgId as OrgId],
+        }),
+      );
+
+      return yield* $(
+        await updateOrganizationMemberRole(dependencies, {
+          orgId: data.orgId as OrgId,
+          userId: data.userId,
+          role: data.role,
+          actor,
+        }),
+      );
+    });
+  });
+
+export function useUpdateOrganizationMemberRoleMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateOrganizationMemberRoleFn,
+    onSuccess: Result.inspect(({ orgId }) => {
+      queryClient.invalidateQueries({
+        queryKey: generateLoadOrganizationMembersCacheKey(orgId),
       });
     }),
   });

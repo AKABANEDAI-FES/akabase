@@ -7,6 +7,7 @@ export * as Card from "./card";
 export * as Checkbox from "./checkbox";
 export { CloseButton, type CloseButtonProps } from "./close-button";
 export { Code, type CodeProps } from "./code";
+export * as Combobox from "./combobox";
 export * as Dialog from "./dialog";
 export * as Field from "./field";
 export * as Fieldset from "./fieldset";

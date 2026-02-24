@@ -128,19 +128,28 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
     }
   }
 
-  async addMember(member: OrgMember): Promise<Result.Result<void, RepositoryError>> {
+  async saveMember(member: OrgMember): Promise<Result.Result<void, RepositoryError>> {
     try {
-      await db.insert(orgMembers).values({
-        id: member.id,
-        orgId: member.orgId,
-        userId: member.userId,
-        role: member.role,
-        createdAt: member.createdAt,
-      });
+      await db
+        .insert(orgMembers)
+        .values({
+          id: member.id,
+          orgId: member.orgId,
+          userId: member.userId,
+          role: member.role,
+          createdAt: member.createdAt,
+        })
+        .onConflictDoUpdate({
+          target: orgMembers.id,
+          set: {
+            // Immutable fields excluded: id, orgId, userId, createdAt
+            role: member.role,
+          },
+        });
 
       return Result.succeed(undefined);
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to add member", error));
+      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to save member", error));
     }
   }
 
@@ -153,23 +162,6 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
       return Result.succeed(undefined);
     } catch (error) {
       return Result.fail(repositoryError("DATABASE_ERROR", "Failed to remove member", error));
-    }
-  }
-
-  async updateMemberRole(
-    orgId: OrgId,
-    userId: UserId,
-    role: "manager" | "editor",
-  ): Promise<Result.Result<void, RepositoryError>> {
-    try {
-      await db
-        .update(orgMembers)
-        .set({ role })
-        .where(and(eq(orgMembers.orgId, orgId), eq(orgMembers.userId, userId)));
-
-      return Result.succeed(undefined);
-    } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to update member role", error));
     }
   }
 }

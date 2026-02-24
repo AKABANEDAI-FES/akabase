@@ -58,6 +58,14 @@ export const orgRoleSchema = z.enum(ORG_ROLES).nullable();
 export type OrgRole = z.infer<typeof orgRoleSchema>;
 
 /**
+ * Organization role display labels (Japanese)
+ */
+export const ORG_ROLE_LABELS: Record<"manager" | "editor", string> = {
+  manager: "マネージャー",
+  editor: "エディター",
+} as const;
+
+/**
  * Actor represents an authenticated user with their permissions
  * Encapsulates all authorization-related information
  */

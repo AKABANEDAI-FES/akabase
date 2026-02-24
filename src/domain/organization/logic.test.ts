@@ -79,17 +79,14 @@ describe("Organization Domain Logic", () => {
         expect(Result.isSuccess(result)).toBe(true);
       });
 
-      it("fails when removing the last manager", () => {
+      it("succeeds when removing the last manager", () => {
         const members: OrgMember[] = [
           createMockMember(mockUserId1, "manager"),
           createMockMember(mockUserId2, "editor"),
         ];
         const result = canRemoveMember(members, mockUserId1);
 
-        expect(Result.isFailure(result)).toBe(true);
-        if (Result.isFailure(result)) {
-          expect(result.error.code).toBe("CANNOT_REMOVE_LAST_MANAGER");
-        }
+        expect(Result.isSuccess(result)).toBe(true);
       });
 
       it("fails when user is not a member", () => {

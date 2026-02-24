@@ -31,9 +31,9 @@ export interface OrganizationRepository {
   saveOrganization(org: Organization): Promise<Result.Result<void, RepositoryError>>;
 
   /**
-   * Add a member
+   * Save member (insert or update)
    */
-  addMember(member: OrgMember): Promise<Result.Result<void, RepositoryError>>;
+  saveMember(member: OrgMember): Promise<Result.Result<void, RepositoryError>>;
 
   /**
    * Remove a member
@@ -44,13 +44,4 @@ export interface OrganizationRepository {
    * Delete an organization
    */
   deleteOrganization(id: OrgId): Promise<Result.Result<void, RepositoryError>>;
-
-  /**
-   * Update member role
-   */
-  updateMemberRole(
-    orgId: OrgId,
-    userId: UserId,
-    role: "manager" | "editor",
-  ): Promise<Result.Result<void, RepositoryError>>;
 }

@@ -1,9 +1,9 @@
 import { Result } from "@praha/byethrow";
 import type { OrgMember, OrgMemberRole, Organization } from "./schema";
-import { organizationSchema } from "./schema";
+import { orgMemberSchema, organizationSchema } from "./schema";
 import type { OrganizationError } from "./errors";
 import { ORGANIZATION_ERROR_CODE, organizationError } from "./errors";
-import type { UserId } from "../shared/ids";
+import type { OrgId, UserId } from "../shared/ids";
 
 /**
  * =============================================================================
@@ -35,7 +35,7 @@ export function canAddMember(
 
 /**
  * Check if member can be removed
- * Rule: Cannot remove the last manager
+ * Rule: Target must be a member
  */
 export function canRemoveMember(
   members: OrgMember[],
@@ -50,20 +50,6 @@ export function canRemoveMember(
         "このユーザーはメンバーではありません。",
       ),
     );
-  }
-
-  // If removing a manager, check if they're the last one
-  if (targetMember.role === "manager") {
-    const managerCount = members.filter((m) => m.role === "manager").length;
-
-    if (managerCount <= 1) {
-      return Result.fail(
-        organizationError(
-          ORGANIZATION_ERROR_CODE.CANNOT_REMOVE_LAST_MANAGER,
-          "最後のマネージャーは削除できません。別のメンバーをマネージャーに昇格させてから削除してください。",
-        ),
-      );
-    }
   }
 
   return Result.succeed(true);
@@ -107,6 +93,32 @@ export function isManager(
  */
 
 /**
+ * Create a new OrgMember entity
+ * Validates input using zod schema
+ */
+export function createOrgMemberEntity(input: {
+  id: string;
+  orgId: OrgId;
+  userId: UserId;
+  role: OrgMemberRole;
+  now?: Date;
+}): Result.Result<OrgMember, OrganizationError> {
+  const data = {
+    id: input.id,
+    orgId: input.orgId,
+    userId: input.userId,
+    role: input.role,
+    createdAt: input.now ?? new Date(),
+  };
+
+  return Result.try({
+    try: () => orgMemberSchema.parse(data),
+    catch: () =>
+      organizationError(ORGANIZATION_ERROR_CODE.VALIDATION_ERROR, "メンバーの作成に失敗しました"),
+  });
+}
+
+/**
  * Add a new member to the organization
  * Returns new members array
  */
@@ -132,6 +144,26 @@ export function updateMemberRole(
   newRole: OrgMemberRole,
 ): OrgMember[] {
   return members.map((m) => (m.userId === targetUserId ? { ...m, role: newRole } : m));
+}
+
+/**
+ * Update a member entity's role
+ * Validates the updated member against schema
+ */
+export function updateOrgMemberEntity(
+  member: OrgMember,
+  input: { role: OrgMemberRole },
+): Result.Result<OrgMember, OrganizationError> {
+  const data = {
+    ...member,
+    role: input.role,
+  };
+
+  return Result.try({
+    try: () => orgMemberSchema.parse(data),
+    catch: () =>
+      organizationError(ORGANIZATION_ERROR_CODE.VALIDATION_ERROR, "メンバーの更新に失敗しました"),
+  });
 }
 
 /**
