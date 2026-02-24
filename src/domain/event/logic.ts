@@ -1,7 +1,7 @@
 import { Result } from "@praha/byethrow";
 import type { Deadline, Event, Place, Tag } from "./schema";
 import type { EventError } from "./errors";
-import { eventError } from "./errors";
+import { EVENT_ERROR_CODE, eventError } from "./errors";
 import type { EventId, PlaceId, TagId } from "../shared/ids";
 
 /**
@@ -56,7 +56,9 @@ export function updateEventEntity(
  */
 export function canModifyEvent(event: Event): Result.Result<true, EventError> {
   if (event.status === "archived") {
-    return Result.fail(eventError("EVENT_ARCHIVED", "アーカイブされたイベントは変更できません。"));
+    return Result.fail(
+      eventError(EVENT_ERROR_CODE.EVENT_ARCHIVED, "アーカイブされたイベントは変更できません。"),
+    );
   }
   return Result.succeed(true);
 }
@@ -74,7 +76,10 @@ export function isTagSlugUnique(
 
   if (existingTag) {
     return Result.fail(
-      eventError("TAG_SLUG_NOT_UNIQUE", `タグスラッグ「${slug}」は既に使用されています。`),
+      eventError(
+        EVENT_ERROR_CODE.TAG_SLUG_NOT_UNIQUE,
+        `タグスラッグ「${slug}」は既に使用されています。`,
+      ),
     );
   }
 
@@ -93,7 +98,9 @@ export function isPlaceUnique(
   const existingPlace = places.find((p) => p.name === name && p.id !== excludePlaceId);
 
   if (existingPlace) {
-    return Result.fail(eventError("PLACE_NOT_UNIQUE", `場所「${name}」は既に登録されています。`));
+    return Result.fail(
+      eventError(EVENT_ERROR_CODE.PLACE_NOT_UNIQUE, `場所「${name}」は既に登録されています。`),
+    );
   }
 
   return Result.succeed(true);
@@ -128,7 +135,7 @@ export function isFieldEditable(
   if (isPastDeadline) {
     return Result.fail(
       eventError(
-        "FIELD_PAST_DEADLINE",
+        EVENT_ERROR_CODE.FIELD_PAST_DEADLINE,
         `「${fieldKey}」の締切（${deadline.deadlineAt.toLocaleString("ja-JP")}）を過ぎているため編集できません。`,
       ),
     );

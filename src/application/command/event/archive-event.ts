@@ -2,7 +2,7 @@ import { Result } from "@praha/byethrow";
 import { gen } from "@/libs/result";
 import type { EventId } from "@/domain/shared/ids";
 import type { EventError } from "@/domain/event/errors";
-import { eventError } from "@/domain/event/errors";
+import { EVENT_ERROR_CODE, eventError } from "@/domain/event/errors";
 import { archiveEvent as archiveEventLogic } from "@/domain/event/logic";
 import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
@@ -53,7 +53,9 @@ export async function archiveEvent(
     const event = yield* $(await deps.eventRepo.findById(input.eventId));
 
     if (!event) {
-      return yield* $(Result.fail(eventError("EVENT_NOT_FOUND", "イベントが見つかりません")));
+      return yield* $(
+        Result.fail(eventError(EVENT_ERROR_CODE.EVENT_NOT_FOUND, "イベントが見つかりません")),
+      );
     }
 
     // Authorization check: global admin or event committee admin
@@ -63,7 +65,9 @@ export async function archiveEvent(
     // Check if event is already archived
     if (event.status === "archived") {
       return yield* $(
-        Result.fail(eventError("EVENT_ARCHIVED", "このイベントは既にアーカイブされています")),
+        Result.fail(
+          eventError(EVENT_ERROR_CODE.EVENT_ARCHIVED, "このイベントは既にアーカイブされています"),
+        ),
       );
     }
 

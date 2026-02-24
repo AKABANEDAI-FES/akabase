@@ -2,7 +2,7 @@ import { Result } from "@praha/byethrow";
 import type { OrgMember, OrgMemberRole, Organization } from "./schema";
 import { organizationSchema } from "./schema";
 import type { OrganizationError } from "./errors";
-import { organizationError } from "./errors";
+import { ORGANIZATION_ERROR_CODE, organizationError } from "./errors";
 import type { UserId } from "../shared/ids";
 
 /**
@@ -23,7 +23,10 @@ export function canAddMember(
 
   if (existingMember) {
     return Result.fail(
-      organizationError("USER_ALREADY_MEMBER", "このユーザーは既にメンバーです。"),
+      organizationError(
+        ORGANIZATION_ERROR_CODE.USER_ALREADY_MEMBER,
+        "このユーザーは既にメンバーです。",
+      ),
     );
   }
 
@@ -42,7 +45,10 @@ export function canRemoveMember(
 
   if (!targetMember) {
     return Result.fail(
-      organizationError("USER_NOT_MEMBER", "このユーザーはメンバーではありません。"),
+      organizationError(
+        ORGANIZATION_ERROR_CODE.USER_NOT_MEMBER,
+        "このユーザーはメンバーではありません。",
+      ),
     );
   }
 
@@ -53,7 +59,7 @@ export function canRemoveMember(
     if (managerCount <= 1) {
       return Result.fail(
         organizationError(
-          "CANNOT_REMOVE_LAST_MANAGER",
+          ORGANIZATION_ERROR_CODE.CANNOT_REMOVE_LAST_MANAGER,
           "最後のマネージャーは削除できません。別のメンバーをマネージャーに昇格させてから削除してください。",
         ),
       );
@@ -75,13 +81,19 @@ export function isManager(
 
   if (!member) {
     return Result.fail(
-      organizationError("USER_NOT_MEMBER", "このユーザーはメンバーではありません。"),
+      organizationError(
+        ORGANIZATION_ERROR_CODE.USER_NOT_MEMBER,
+        "このユーザーはメンバーではありません。",
+      ),
     );
   }
 
   if (member.role !== "manager") {
     return Result.fail(
-      organizationError("NOT_MANAGER", "この操作にはマネージャー権限が必要です。"),
+      organizationError(
+        ORGANIZATION_ERROR_CODE.NOT_MANAGER,
+        "この操作にはマネージャー権限が必要です。",
+      ),
     );
   }
 
@@ -150,7 +162,9 @@ export function updateOrganization(
   const validationResult = organizationSchema.safeParse(updated);
 
   if (!validationResult.success) {
-    return Result.fail(organizationError("VALIDATION_ERROR", "入力値が不正です"));
+    return Result.fail(
+      organizationError(ORGANIZATION_ERROR_CODE.VALIDATION_ERROR, "入力値が不正です"),
+    );
   }
 
   return Result.succeed(validationResult.data);

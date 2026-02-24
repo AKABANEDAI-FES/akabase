@@ -8,7 +8,7 @@ import type {
 } from "./schema";
 import { projectSchema } from "./schema";
 import type { ProjectError } from "./errors";
-import { projectError } from "./errors";
+import { PROJECT_ERROR_CODE, projectError } from "./errors";
 import type { SubmissionId, UserId } from "../shared/ids";
 
 /**
@@ -25,7 +25,7 @@ export function canSubmit(project: Project): Result.Result<true, ProjectError> {
   if (project.activeSubmissionId !== null) {
     return Result.fail(
       projectError(
-        "ALREADY_SUBMITTED",
+        PROJECT_ERROR_CODE.ALREADY_SUBMITTED,
         "既に提出済みです。提出中の企画を取り下げてから再提出してください。",
       ),
     );
@@ -41,7 +41,7 @@ export function canApprove(submission: ProjectSubmission): Result.Result<true, P
   if (submission.status !== "submitted") {
     return Result.fail(
       projectError(
-        "CANNOT_APPROVE",
+        PROJECT_ERROR_CODE.CANNOT_APPROVE,
         `提出中ではない企画は承認できません。現在のステータス: ${submission.status}`,
       ),
     );
@@ -57,7 +57,7 @@ export function canReturn(submission: ProjectSubmission): Result.Result<true, Pr
   if (submission.status !== "submitted") {
     return Result.fail(
       projectError(
-        "CANNOT_RETURN",
+        PROJECT_ERROR_CODE.CANNOT_RETURN,
         `提出中ではない企画は差戻しできません。現在のステータス: ${submission.status}`,
       ),
     );
@@ -73,7 +73,7 @@ export function canWithdraw(submission: ProjectSubmission): Result.Result<true, 
   if (submission.status !== "submitted") {
     return Result.fail(
       projectError(
-        "CANNOT_WITHDRAW",
+        PROJECT_ERROR_CODE.CANNOT_WITHDRAW,
         `提出中の企画のみ取り下げできます。現在のステータス: ${submission.status}`,
       ),
     );
@@ -254,7 +254,7 @@ export function updateProject(
   const validationResult = projectSchema.safeParse(updated);
 
   if (!validationResult.success) {
-    return Result.fail(projectError("VALIDATION_ERROR", "入力値が不正です"));
+    return Result.fail(projectError(PROJECT_ERROR_CODE.VALIDATION_ERROR, "入力値が不正です"));
   }
 
   return Result.succeed(validationResult.data);

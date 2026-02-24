@@ -55,7 +55,9 @@ export async function updateEvent(
     const event = yield* $(await deps.eventRepo.findById(input.eventId));
 
     if (!event) {
-      return yield* $(Result.fail(eventError("EVENT_NOT_FOUND", "イベントが見つかりません")));
+      return yield* $(
+        Result.fail(eventError(EVENT_ERROR_CODE.EVENT_NOT_FOUND, "イベントが見つかりません")),
+      );
     }
 
     // Authorization check: global admin or event committee admin

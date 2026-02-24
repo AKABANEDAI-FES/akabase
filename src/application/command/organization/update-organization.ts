@@ -2,7 +2,7 @@ import { Result } from "@praha/byethrow";
 import { gen } from "@/libs/result";
 import type { EventId, OrgId } from "@/domain/shared/ids";
 import type { OrganizationError } from "@/domain/organization/errors";
-import { organizationError } from "@/domain/organization/errors";
+import { ORGANIZATION_ERROR_CODE, organizationError } from "@/domain/organization/errors";
 import { updateOrganization as updateOrganizationLogic } from "@/domain/organization/logic";
 import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
@@ -57,7 +57,9 @@ export async function updateOrganization(
 
     if (!organization) {
       return yield* $(
-        Result.fail(organizationError("ORGANIZATION_NOT_FOUND", "団体が見つかりません")),
+        Result.fail(
+          organizationError(ORGANIZATION_ERROR_CODE.ORGANIZATION_NOT_FOUND, "団体が見つかりません"),
+        ),
       );
     }
 
