@@ -27,13 +27,6 @@ export const Route = createFileRoute("/admin")({
         to: "/",
       });
     }
-
-    // Redirect /admin to /admin/events
-    if (location.pathname === "/admin" || location.pathname === "/admin/") {
-      throw redirect({
-        to: "/admin/events",
-      });
-    }
   },
   component: AdminLayout,
 });
