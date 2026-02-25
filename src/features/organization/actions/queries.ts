@@ -11,6 +11,7 @@ import { authMiddleware } from "@/libs/session-server";
 import { cast, eventIdSchema, orgIdSchema } from "@/domain/shared/ids";
 import type { UserId } from "@/domain/shared/ids";
 import { queryOptions } from "@tanstack/react-query";
+import { dependencies } from "@/infrastructure/di";
 
 /**
  * Server function to load organizations for an event
@@ -44,9 +45,19 @@ export function generateLoadOrganizationsQueryOptions(eventId: string) {
  */
 export const loadOrganizationDetailFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
-  .inputValidator(z.object({ orgId: orgIdSchema }))
-  .handler(async ({ data }) => {
-    const result = await getOrganizationDetail(data.orgId);
+  .inputValidator(z.object({ eventId: eventIdSchema, orgId: orgIdSchema }))
+  .handler(async ({ data, context }) => {
+    const actor = await resolveActor({
+      userId: cast<UserId>(context.session.user.id),
+      eventIds: [data.eventId],
+      orgIds: [data.orgId],
+    });
+
+    if (Result.isFailure(actor)) {
+      throw new Error(actor.error.message);
+    }
+
+    const result = await getOrganizationDetail(dependencies, data.eventId, data.orgId, actor.value);
 
     if (Result.isFailure(result)) {
       throw new Error(result.error.message);
@@ -55,14 +66,14 @@ export const loadOrganizationDetailFn = createServerFn({ method: "GET" })
     return result.value;
   });
 
-export function generateLoadOrganizationDetailCacheKey(orgId: string) {
-  return ["organizations", orgId];
+export function generateLoadOrganizationDetailCacheKey(eventId: string, orgId: string) {
+  return ["organizations", [eventId, orgId]];
 }
 
-export function generateLoadOrganizationDetailQueryOptions(orgId: string) {
+export function generateLoadOrganizationDetailQueryOptions(eventId: string, orgId: string) {
   return queryOptions({
-    queryKey: generateLoadOrganizationDetailCacheKey(orgId),
-    queryFn: () => loadOrganizationDetailFn({ data: { orgId } }),
+    queryKey: generateLoadOrganizationDetailCacheKey(eventId, orgId),
+    queryFn: () => loadOrganizationDetailFn({ data: { eventId, orgId } }),
   });
 }
 
@@ -71,9 +82,24 @@ export function generateLoadOrganizationDetailQueryOptions(orgId: string) {
  */
 export const loadOrganizationMembersFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
-  .inputValidator(z.object({ orgId: orgIdSchema }))
-  .handler(async ({ data }) => {
-    const result = await listOrganizationMembers(data.orgId);
+  .inputValidator(z.object({ eventId: eventIdSchema, orgId: orgIdSchema }))
+  .handler(async ({ data, context }) => {
+    const actor = await resolveActor({
+      userId: cast<UserId>(context.session.user.id),
+      eventIds: [data.eventId],
+      orgIds: [data.orgId],
+    });
+
+    if (Result.isFailure(actor)) {
+      throw new Error(actor.error.message);
+    }
+
+    const result = await listOrganizationMembers(
+      dependencies,
+      data.eventId,
+      data.orgId,
+      actor.value,
+    );
 
     if (Result.isFailure(result)) {
       throw new Error(result.error.message);
@@ -82,14 +108,14 @@ export const loadOrganizationMembersFn = createServerFn({ method: "GET" })
     return result.value;
   });
 
-export function generateLoadOrganizationMembersCacheKey(orgId: string) {
-  return ["organizations", orgId, "members"];
+export function generateLoadOrganizationMembersCacheKey(eventId: string, orgId: string) {
+  return ["organizations", [eventId, orgId], "members"];
 }
 
-export function generateLoadOrganizationMembersQueryOptions(orgId: string) {
+export function generateLoadOrganizationMembersQueryOptions(eventId: string, orgId: string) {
   return queryOptions({
-    queryKey: generateLoadOrganizationMembersCacheKey(orgId),
-    queryFn: () => loadOrganizationMembersFn({ data: { orgId } }),
+    queryKey: generateLoadOrganizationMembersCacheKey(eventId, orgId),
+    queryFn: () => loadOrganizationMembersFn({ data: { eventId, orgId } }),
   });
 }
 

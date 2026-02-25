@@ -262,9 +262,25 @@ export class AuthorizationServiceImpl implements AuthorizationService {
         });
       }
 
-      case "organization:read":
-        // Anyone can read organizations
-        return Result.succeed({ allowed: true });
+      case "organization:read": {
+        // Committee members and organization members can read organizations
+        const committeeRole = getCommitteeRoleForEvent(actor, resource.eventId);
+        if (
+          committeeRole === "admin" ||
+          committeeRole === "approver" ||
+          committeeRole === "member"
+        ) {
+          return Result.succeed({ allowed: true, reason: "委員会メンバー" });
+        }
+        // Organization members (any role) can read
+        if (orgRole !== null) {
+          return Result.succeed({ allowed: true, reason: "組織メンバー" });
+        }
+        return Result.succeed({
+          allowed: false,
+          reason: "委員会メンバーまたは組織メンバーのみが組織情報を閲覧できます",
+        });
+      }
 
       case "organization:manage_members": {
         // Committee admins and organization managers can manage members

@@ -119,7 +119,7 @@ export function useUpdateOrganizationMutation() {
     mutationFn: updateOrganizationFn,
     onSuccess: Result.inspect(({ organizationId, eventId }) => {
       queryClient.invalidateQueries({
-        queryKey: generateLoadOrganizationDetailCacheKey(organizationId),
+        queryKey: generateLoadOrganizationDetailCacheKey(eventId, organizationId),
       });
       queryClient.invalidateQueries({
         queryKey: generateLoadOrganizationsCacheKey(eventId),
@@ -224,7 +224,7 @@ export function useAddOrganizationMemberMutation() {
     mutationFn: addOrganizationMemberFn,
     onSuccess: Result.inspect(({ orgId, eventId }) => {
       queryClient.invalidateQueries({
-        queryKey: generateLoadOrganizationMembersCacheKey(orgId),
+        queryKey: generateLoadOrganizationMembersCacheKey(eventId, orgId),
       });
       queryClient.invalidateQueries({
         queryKey: generateLoadMyOrganizationsCacheKey(eventId),
@@ -275,7 +275,7 @@ export function useRemoveOrganizationMemberMutation() {
     mutationFn: removeOrganizationMemberFn,
     onSuccess: Result.inspect(({ orgId, eventId }) => {
       queryClient.invalidateQueries({
-        queryKey: generateLoadOrganizationMembersCacheKey(orgId),
+        queryKey: generateLoadOrganizationMembersCacheKey(eventId, orgId),
       });
       queryClient.invalidateQueries({
         queryKey: generateLoadMyOrganizationsCacheKey(eventId),
@@ -328,7 +328,7 @@ export function useUpdateOrganizationMemberRoleMutation() {
     mutationFn: updateOrganizationMemberRoleFn,
     onSuccess: Result.inspect(({ orgId, eventId }) => {
       queryClient.invalidateQueries({
-        queryKey: generateLoadOrganizationMembersCacheKey(orgId),
+        queryKey: generateLoadOrganizationMembersCacheKey(eventId, orgId),
       });
       queryClient.invalidateQueries({
         queryKey: generateLoadMyOrganizationsCacheKey(eventId),
