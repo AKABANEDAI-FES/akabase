@@ -7,6 +7,7 @@ import {
   generateLoadOrganizationMembersQueryOptions,
 } from "@/features/organization/actions";
 import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions";
+import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions/queries";
 import { OrgMembersTable } from "@/features/organization/components/org-members-table";
 import { Button, Text } from "@/components/ui";
 import { cast } from "@/domain/shared/ids";
@@ -16,16 +17,17 @@ export const Route = createFileRoute(
   "/_authenticated/$slug/committee/organizations_/$orgId/members",
 )({
   loader: async ({ params, context }) => {
-    const organization = await context.queryClient.ensureQueryData(
-      generateLoadOrganizationDetailQueryOptions(params.orgId),
+    const event = await context.queryClient.ensureQueryData(
+      generateLoadEventBySlugQueryOptions(params.slug),
     );
     await Promise.all([
       context.queryClient.ensureQueryData(
-        generateLoadOrganizationMembersQueryOptions(params.orgId),
+        generateLoadOrganizationDetailQueryOptions(event.id, params.orgId),
       ),
       context.queryClient.ensureQueryData(
-        generateCheckCommitteePermissionsQueryOptions(organization.eventId),
+        generateLoadOrganizationMembersQueryOptions(event.id, params.orgId),
       ),
+      context.queryClient.ensureQueryData(generateCheckCommitteePermissionsQueryOptions(event.id)),
     ]);
   },
   component: OrganizationMembersPage,
@@ -33,8 +35,9 @@ export const Route = createFileRoute(
 
 function OrganizationMembersPage() {
   const { slug, orgId } = Route.useParams();
+  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
   const { data: organization } = useSuspenseQuery(
-    generateLoadOrganizationDetailQueryOptions(orgId),
+    generateLoadOrganizationDetailQueryOptions(event.id, orgId),
   );
 
   return (
@@ -55,7 +58,9 @@ function MemberManagementSection({
   orgId: OrgId;
   eventId: EventId;
 }) {
-  const { data: members } = useSuspenseQuery(generateLoadOrganizationMembersQueryOptions(orgId));
+  const { data: members } = useSuspenseQuery(
+    generateLoadOrganizationMembersQueryOptions(eventId, orgId),
+  );
   const { data: permissions } = useSuspenseQuery(
     generateCheckCommitteePermissionsQueryOptions(eventId),
   );

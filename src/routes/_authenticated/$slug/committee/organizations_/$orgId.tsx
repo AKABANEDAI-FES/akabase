@@ -4,11 +4,15 @@ import { Container, Stack } from "styled-system/jsx";
 import { Button, Heading, SegmentGroup } from "@/components/ui";
 import { ArrowLeftIcon } from "lucide-react";
 import { generateLoadOrganizationDetailQueryOptions } from "@/features/organization/actions";
+import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions/queries";
 
 export const Route = createFileRoute("/_authenticated/$slug/committee/organizations_/$orgId")({
   loader: async ({ params, context }) => {
+    const event = await context.queryClient.ensureQueryData(
+      generateLoadEventBySlugQueryOptions(params.slug),
+    );
     await context.queryClient.ensureQueryData(
-      generateLoadOrganizationDetailQueryOptions(params.orgId),
+      generateLoadOrganizationDetailQueryOptions(event.id, params.orgId),
     );
   },
   component: EditOrganizationPage,
@@ -17,8 +21,9 @@ export const Route = createFileRoute("/_authenticated/$slug/committee/organizati
 function EditOrganizationPage() {
   const location = useLocation();
   const { slug, orgId } = Route.useParams();
+  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
   const { data: organization } = useSuspenseQuery(
-    generateLoadOrganizationDetailQueryOptions(orgId),
+    generateLoadOrganizationDetailQueryOptions(event.id, orgId),
   );
 
   const currentTab = location.pathname.includes("/projects")

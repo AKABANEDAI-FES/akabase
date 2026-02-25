@@ -23,17 +23,24 @@ export const Route = createFileRoute(
       });
     }
   },
-  loader: async ({ params, context }) =>
-    context.queryClient.ensureQueryData(generateLoadOrganizationDetailQueryOptions(params.orgId)),
+  loader: async ({ params, context }) => {
+    const event = await context.queryClient.ensureQueryData(
+      generateLoadEventBySlugQueryOptions(params.slug),
+    );
+    await context.queryClient.ensureQueryData(
+      generateLoadOrganizationDetailQueryOptions(event.id, params.orgId),
+    );
+  },
   component: AddMemberPage,
 });
 
 function AddMemberPage() {
   const router = useRouter();
   const navigate = useNavigate();
-  const { orgId } = Route.useParams();
+  const { slug, orgId } = Route.useParams();
+  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
   const { data: organization } = useSuspenseQuery(
-    generateLoadOrganizationDetailQueryOptions(orgId),
+    generateLoadOrganizationDetailQueryOptions(event.id, orgId),
   );
 
   const handleClose = () => {

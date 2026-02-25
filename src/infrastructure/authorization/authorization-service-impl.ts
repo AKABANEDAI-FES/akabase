@@ -219,8 +219,17 @@ export class AuthorizationServiceImpl implements AuthorizationService {
         });
 
       case "project:read":
-        // Anyone can read (public data)
-        return Result.succeed({ allowed: true });
+        // Committee admins and organization members can read projects
+        if (committeeRole === "admin") {
+          return Result.succeed({ allowed: true, reason: "委員会管理者" });
+        }
+        if (orgRole === "manager" || orgRole === "editor") {
+          return Result.succeed({ allowed: true, reason: "組織マネージャーまたはエディター" });
+        }
+        return Result.succeed({
+          allowed: false,
+          reason: "委員会管理者または組織のメンバーのみがプロジェクトを閲覧できます",
+        });
 
       case "project_draft:update":
         // Committee admins and organization managers/editors can update drafts

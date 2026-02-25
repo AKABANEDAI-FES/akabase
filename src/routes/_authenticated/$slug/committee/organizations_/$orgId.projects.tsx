@@ -17,7 +17,7 @@ export const Route = createFileRoute(
       generateLoadEventBySlugQueryOptions(params.slug),
     );
     await Promise.all([
-      context.queryClient.ensureQueryData(generateLoadProjectsQueryOptions(params.orgId)),
+      context.queryClient.ensureQueryData(generateLoadProjectsQueryOptions(event.id, params.orgId)),
       context.queryClient.ensureQueryData(generateCheckCommitteePermissionsQueryOptions(event.id)),
     ]);
   },
@@ -27,7 +27,7 @@ export const Route = createFileRoute(
 function ProjectsPage() {
   const { slug, orgId } = Route.useParams();
   const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
-  const { data: projects } = useSuspenseQuery(generateLoadProjectsQueryOptions(orgId));
+  const { data: projects } = useSuspenseQuery(generateLoadProjectsQueryOptions(event.id, orgId));
 
   return (
     <Stack gap="6">
