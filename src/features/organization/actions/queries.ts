@@ -4,6 +4,7 @@ import { Result } from "@praha/byethrow";
 import { listOrganizations } from "@/application/query/organization/list-organizations";
 import { getOrganizationDetail } from "@/application/query/organization/get-organization-detail";
 import { listOrganizationMembers } from "@/application/query/organization/list-organization-members";
+import { listMyOrganizations } from "@/application/query/organization/list-my-organizations";
 import { searchUsersByEmail } from "@/application/query/user/search-users-by-email";
 import { resolveActor } from "@/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/session-server";
@@ -116,3 +117,38 @@ export const searchUsersByEmailFn = createServerFn({ method: "GET" })
 
     return result.value;
   });
+
+/**
+ * Server function to load organizations the current user belongs to
+ */
+export const loadMyOrganizationsFn = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
+  .inputValidator(z.object({ eventId: eventIdSchema }))
+  .handler(async ({ data, context }) => {
+    const actorResult = await resolveActor({
+      userId: cast<UserId>(context.session.user.id),
+    });
+
+    if (Result.isFailure(actorResult)) {
+      throw new Error(actorResult.error.message);
+    }
+
+    const result = await listMyOrganizations(data.eventId, actorResult.value);
+
+    if (Result.isFailure(result)) {
+      throw new Error(result.error.message);
+    }
+
+    return result.value;
+  });
+
+export function generateLoadMyOrganizationsCacheKey(eventId: string) {
+  return ["organizations", "my", eventId];
+}
+
+export function generateLoadMyOrganizationsQueryOptions(eventId: string) {
+  return queryOptions({
+    queryKey: generateLoadMyOrganizationsCacheKey(eventId),
+    queryFn: () => loadMyOrganizationsFn({ data: { eventId } }),
+  });
+}

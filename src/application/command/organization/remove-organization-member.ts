@@ -19,6 +19,7 @@ export type RemoveOrganizationMemberInput = {
 
 export type RemoveOrganizationMemberOutput = {
   orgId: OrgId;
+  eventId: EventId;
 };
 
 export type RemoveOrganizationMemberError =
@@ -69,6 +70,6 @@ export async function removeOrganizationMember(
     // Remove member
     yield* $(await deps.organizationRepo.removeMember(input.orgId, input.userId));
 
-    return { orgId: input.orgId };
+    return { orgId: org.id, eventId: org.eventId };
   });
 }

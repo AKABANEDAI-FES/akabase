@@ -23,6 +23,7 @@ export type AddOrganizationMemberInput = {
 
 export type AddOrganizationMemberOutput = {
   orgId: OrgId;
+  eventId: EventId;
 };
 
 export type AddOrganizationMemberError =
@@ -82,6 +83,6 @@ export async function addOrganizationMember(
 
     yield* $(await deps.organizationRepo.saveMember(member));
 
-    return { orgId: input.orgId };
+    return { orgId: org.id, eventId: org.eventId };
   });
 }

@@ -15,6 +15,7 @@ import { z } from "zod";
 import { orgMemberRoleSchema, organizationSchema } from "@/domain/organization/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
+  generateLoadMyOrganizationsCacheKey,
   generateLoadOrganizationDetailCacheKey,
   generateLoadOrganizationMembersCacheKey,
   generateLoadOrganizationsCacheKey,
@@ -66,6 +67,9 @@ export function useCreateOrganizationMutation() {
     onSuccess: Result.inspect(({ eventId }) => {
       queryClient.invalidateQueries({
         queryKey: generateLoadOrganizationsCacheKey(eventId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: generateLoadMyOrganizationsCacheKey(eventId),
       });
     }),
   });
@@ -120,6 +124,9 @@ export function useUpdateOrganizationMutation() {
       queryClient.invalidateQueries({
         queryKey: generateLoadOrganizationsCacheKey(eventId),
       });
+      queryClient.invalidateQueries({
+        queryKey: generateLoadMyOrganizationsCacheKey(eventId),
+      });
     }),
   });
 }
@@ -165,6 +172,9 @@ export function useDeleteOrganizationMutation() {
     onSuccess: Result.inspect(({ eventId }) => {
       queryClient.invalidateQueries({
         queryKey: generateLoadOrganizationsCacheKey(eventId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: generateLoadMyOrganizationsCacheKey(eventId),
       });
     }),
   });
@@ -212,9 +222,12 @@ export function useAddOrganizationMemberMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: addOrganizationMemberFn,
-    onSuccess: Result.inspect(({ orgId }) => {
+    onSuccess: Result.inspect(({ orgId, eventId }) => {
       queryClient.invalidateQueries({
         queryKey: generateLoadOrganizationMembersCacheKey(orgId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: generateLoadMyOrganizationsCacheKey(eventId),
       });
     }),
   });
@@ -260,9 +273,12 @@ export function useRemoveOrganizationMemberMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: removeOrganizationMemberFn,
-    onSuccess: Result.inspect(({ orgId }) => {
+    onSuccess: Result.inspect(({ orgId, eventId }) => {
       queryClient.invalidateQueries({
         queryKey: generateLoadOrganizationMembersCacheKey(orgId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: generateLoadMyOrganizationsCacheKey(eventId),
       });
     }),
   });
@@ -310,9 +326,12 @@ export function useUpdateOrganizationMemberRoleMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updateOrganizationMemberRoleFn,
-    onSuccess: Result.inspect(({ orgId }) => {
+    onSuccess: Result.inspect(({ orgId, eventId }) => {
       queryClient.invalidateQueries({
         queryKey: generateLoadOrganizationMembersCacheKey(orgId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: generateLoadMyOrganizationsCacheKey(eventId),
       });
     }),
   });

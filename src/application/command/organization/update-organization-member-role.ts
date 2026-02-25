@@ -22,6 +22,7 @@ export type UpdateOrganizationMemberRoleInput = {
 
 export type UpdateOrganizationMemberRoleOutput = {
   orgId: OrgId;
+  eventId: EventId;
 };
 
 export type UpdateOrganizationMemberRoleError =
@@ -74,6 +75,6 @@ export async function updateOrganizationMemberRole(
     // Persist
     yield* $(await deps.organizationRepo.saveMember(updatedMember));
 
-    return { orgId: input.orgId };
+    return { orgId: org.id, eventId: org.eventId };
   });
 }
