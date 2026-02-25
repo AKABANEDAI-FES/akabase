@@ -54,25 +54,35 @@ function SlugLayout() {
                 委員会管理
               </Text>
               <Stack gap="1">
-                <NavLink to="/$slug/committee/organizations" params={{ slug }}>
-                  <Building2Icon />
-                  団体管理
+                <NavLink>
+                  <Link to="/$slug/committee/organizations" params={{ slug }}>
+                    <Building2Icon />
+                    団体管理
+                  </Link>
                 </NavLink>
-                <NavLink to="/$slug/committee/tags" params={{ slug }}>
-                  <TagIcon />
-                  タグ管理
+                <NavLink>
+                  <Link to="/$slug/committee/tags" params={{ slug }}>
+                    <TagIcon />
+                    タグ管理
+                  </Link>
                 </NavLink>
-                <NavLink to="/$slug/committee/places" params={{ slug }}>
-                  <MapPinIcon />
-                  場所管理
+                <NavLink>
+                  <Link to="/$slug/committee/places" params={{ slug }}>
+                    <MapPinIcon />
+                    場所管理
+                  </Link>
                 </NavLink>
-                <NavLink to="/$slug/committee/deadlines" params={{ slug }}>
-                  <CalendarClockIcon />
-                  締切管理
+                <NavLink>
+                  <Link to="/$slug/committee/deadlines" params={{ slug }}>
+                    <CalendarClockIcon />
+                    締切管理
+                  </Link>
                 </NavLink>
-                <NavLink to="/$slug/committee/members" params={{ slug }}>
-                  <UsersIcon />
-                  メンバー管理
+                <NavLink>
+                  <Link to="/$slug/committee/members" params={{ slug }}>
+                    <UsersIcon />
+                    メンバー管理
+                  </Link>
                 </NavLink>
               </Stack>
             </Stack>
@@ -97,32 +107,28 @@ function SlugLayout() {
 }
 
 interface NavLinkProps {
-  to: string;
-  params: Record<string, string>;
   children: React.ReactNode;
 }
 
-function NavLink({ to, params, children }: NavLinkProps) {
+function NavLink({ children }: NavLinkProps) {
   return (
-    <Button variant="plain" size="md" asChild>
-      <Link
-        to={to}
-        params={params}
-        className={css({
-          justifyContent: "flex-start",
-        })}
-        activeProps={{
-          className: css({
-            backgroundColor: "colorPalette.surface.bg",
-            color: "colorPalette.surface.fg",
-            _hover: {
-              backgroundColor: "colorPalette.plain.bg.hover",
-            },
-          }),
-        }}
-      >
-        {children}
-      </Link>
+    <Button
+      variant="plain"
+      size="md"
+      colorPalette="gray"
+      justifyContent="flex-start"
+      css={{
+        _currentPage: {
+          backgroundColor: "colorPalette.plain.bg.hover",
+          color: "colorPalette.surface.fg",
+          _hover: {
+            backgroundColor: "colorPalette.plain.bg.active",
+          },
+        },
+      }}
+      asChild
+    >
+      {children}
     </Button>
   );
 }
@@ -136,8 +142,10 @@ function OrganizationLinks({ slug }: { slug: string }) {
   return (
     <>
       {myOrganizations.map((org) => (
-        <NavLink key={org.id} to="/$slug/org/$orgId" params={{ slug, orgId: org.id }}>
-          {org.name}
+        <NavLink key={org.id}>
+          <Link to="/$slug/org/$orgId" params={{ slug, orgId: org.id }}>
+            {org.name}
+          </Link>
         </NavLink>
       ))}
     </>
