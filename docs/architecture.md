@@ -1,8 +1,8 @@
 # アーキテクチャ設計書
 
 **プロジェクト**: 大学祭企画情報管理システム
-**最終更新**: 2026-02-23
-**バージョン**: 1.1.0
+**最終更新**: 2026-02-24
+**バージョン**: 1.3.0
 
 ---
 
@@ -14,13 +14,15 @@
 4. [CQRS パターン](#cqrs-パターン)
 5. [ディレクトリ構造](#ディレクトリ構造)
 6. [レイヤー設計](#レイヤー設計)
-7. [型システム設計](#型システム設計)
-8. [エラーハンドリング戦略](#エラーハンドリング戦略)
-9. [実装パターン](#実装パターン)
-10. [データフロー](#データフロー)
-11. [権限管理](#権限管理)
-12. [テスト戦略](#テスト戦略)
-13. [参考資料](#参考資料)
+7. [ドメインサービス](#ドメインサービス)
+8. [型システム設計](#型システム設計)
+9. [エラーハンドリング戦略](#エラーハンドリング戦略)
+10. [実装パターン](#実装パターン)
+11. [TanStack Query統合](#tanstack-query統合)
+12. [データフロー](#データフロー)
+13. [権限管理](#権限管理)
+14. [テスト戦略](#テスト戦略)
+15. [参考資料](#参考資料)
 
 ---
 
@@ -175,12 +177,14 @@ export const canSubmit = (project: Project): void => {
 └──────────────────┘        └──────────────────┘
          │                           │
          │ 直接DB                    │ Repository
-         │ (Drizzle)                 ▼
+         │ (Drizzle)                 │ Domain Service
+         │                           ▼
          │                  ┌──────────────────┐
          │                  │  Domain Layer    │
          │                  │  domain/         │
          │                  │  - schema.ts     │
          │                  │  - logic.ts      │
+         │                  │  - service.ts    │
          │                  │  - errors.ts     │
          │                  └──────────────────┘
          │                           │
@@ -190,6 +194,7 @@ export const canSubmit = (project: Project): void => {
          │  Infrastructure Layer   │
          │  infrastructure/        │
          │  - repositories/        │
+         │  - domain-services/     │
          │  - di.ts                │
          └─────────────────────────┘
                      │
@@ -350,33 +355,50 @@ src/
 │           ├── get-submissions.ts
 │           └── get-committee-members.ts
 │
-├── domain/                       # Domain層（純粋関数 + 型）
+├── domain/                       # Domain層（純粋関数 + 型 + サービスIF）
 │   ├── project/
 │   │   ├── schema.ts             # Zodスキーマ + 型定義
 │   │   ├── logic.ts              # ドメインロジック（純粋関数）
-│   │   └── errors.ts             # エラー型定義
+│   │   ├── errors.ts             # エラー型定義
+│   │   └── repository.ts         # Repository インターフェース定義
 │   ├── organization/
 │   │   ├── schema.ts
 │   │   ├── logic.ts
-│   │   └── errors.ts
+│   │   ├── errors.ts
+│   │   └── repository.ts
 │   ├── event/
 │   │   ├── schema.ts
 │   │   ├── logic.ts
-│   │   └── errors.ts
+│   │   ├── service.ts            # ドメインサービスインターフェース
+│   │   ├── errors.ts
+│   │   └── repository.ts
+│   ├── user/
+│   │   ├── schema.ts
+│   │   ├── logic.ts
+│   │   ├── errors.ts
+│   │   └── repository.ts
+│   ├── authorization/
+│   │   ├── schema.ts
+│   │   ├── logic.ts
+│   │   ├── errors.ts
+│   │   └── service.ts            # Authorization サービスインターフェース
 │   └── shared/
 │       ├── ids.ts                # 共通ID型（Brand型）
-│       └── value-objects.ts      # 共通値オブジェクト
+│       ├── errors.ts             # 共通エラー型
+│       ├── repository.ts         # 共通Repository型
+│       └── storage.ts            # Storage サービスインターフェース
 │
 ├── infrastructure/               # Infrastructure層
 │   ├── repositories/
-│   │   ├── interfaces.ts         # Repository インターフェース定義
 │   │   ├── project-repository.ts # Project Repository 実装
-│   │   ├── org-repository.ts     # Organization Repository 実装
-│   │   └── event-repository.ts   # Event Repository 実装
+│   │   ├── event-repository.ts   # Event Repository 実装
+│   │   └── user-repository.ts    # User Repository 実装
+│   ├── domain-services/
+│   │   └── event-domain-service.ts # Event ドメインサービス実装
+│   ├── authorization/
+│   │   └── authorization-service-impl.ts # Authorization サービス実装
 │   ├── storage/
-│   │   └── r2-storage.ts         # R2ストレージクライアント
-│   ├── services/
-│   │   └── export-service.ts     # CSV/JSON出力サービス
+│   │   └── storage-service.ts    # Storage サービス実装（R2）
 │   └── di.ts                     # DIコンテナ
 │
 ├── routes/                       # TanStack Router（既存）
@@ -431,16 +453,18 @@ src/
 
 **原則**:
 
-- 純粋関数のみ
-- 外部依存なし（I/O禁止）
+- `logic.ts`: 純粋関数のみ（I/O禁止）
+- `service.ts`: ドメインサービスの**インターフェース定義**のみ（実装はインフラ層）
 - Zodスキーマで型定義
 - Result型でエラーを返す
 
 **ファイル構成**:
 
 - `schema.ts`: Zodスキーマ定義 + 型派生
-- `logic.ts`: ドメインロジック（純粋関数）
+- `logic.ts`: ドメインロジック（純粋関数、I/O不要なビジネスルール）
+- `service.ts`: ドメインサービスインターフェース（I/Oが必要なビジネスルール）
 - `errors.ts`: エラー型定義
+- `repository.ts`: Repository インターフェース定義（各集約ごと）
 
 **例**: [domain/project/schema.ts](#domainprojectschemats)
 
@@ -453,17 +477,18 @@ src/
 **原則**:
 
 - Repository パターンでドメイン層から隔離
-- インターフェースを定義し、実装を差し替え可能に
+- インターフェースはドメイン層で定義、実装はインフラ層で提供
 - DIコンテナで依存を管理
 
 **ファイル構成**:
 
-- `repositories/interfaces.ts`: Repository インターフェース
 - `repositories/*-repository.ts`: Repository 実装（Drizzle ORM使用）
-- `storage/r2-storage.ts`: R2ストレージクライアント
+- `domain-services/*-domain-service.ts`: ドメインサービス実装（Repositoryを使用）
+- `authorization/authorization-service-impl.ts`: 認可サービス実装
+- `storage/storage-service.ts`: ストレージサービス実装（R2）
 - `di.ts`: DIコンテナ
 
-**例**: [infrastructure/repositories/interfaces.ts](#infrastructurerepositoritiesinterfacests)
+**例**: [infrastructure/repositories/event-repository.ts](#infrastructurerepositoritiesevent-repositoryts)
 
 ---
 
@@ -523,6 +548,147 @@ Application層はCQRSパターンに従い、Command（書き込み）とQuery�
 - 既存の `routes/`, `components/` 構造を維持
 - TanStack Query でサーバー状態管理
 - React State でローカルUI状態管理
+
+---
+
+## ドメインサービス
+
+### logic.ts とドメインサービスの違い
+
+ドメイン層には2種類のビジネスロジックがあります。
+
+| 側面         | `logic.ts`（純粋関数）             | `service.ts`（ドメインサービス）       |
+| ------------ | ---------------------------------- | -------------------------------------- |
+| **I/O**      | なし（純粋関数）                   | あり（Repository経由）                 |
+| **定義場所** | ドメイン層で実装まで完結           | ドメイン層にIF、インフラ層に実装       |
+| **テスト**   | モック不要                         | Repository をモックして注入            |
+| **用途**     | 単一エンティティの不変条件チェック | 集約を超えた一意性検証、整合性チェック |
+| **例**       | `canSubmit(project)`               | `ensureSlugUnique(slug)`               |
+
+**判断基準**: ビジネスルールの検証にI/O（DB問い合わせ等）が必要かどうか。
+
+- I/O不要 → `logic.ts` に純粋関数として実装
+- I/O必要 → `service.ts` にインターフェース定義、インフラ層で実装
+
+### 設計原則
+
+1. **インターフェースはドメイン層で定義**（依存性逆転の原則）
+2. **実装はインフラ層で提供**（Repository等を使用）
+3. **DIコンテナで注入**（AuthorizationService と同じパターン）
+4. **Result型でエラーを返す**（他のドメインロジックと統一）
+5. **ドメインエラーを返す**（RepositoryError ではなく EventError 等）
+
+### ドメイン層: インターフェース定義
+
+```typescript
+// domain/event/service.ts
+import type { Result } from "@praha/byethrow";
+import type { EventError } from "./errors";
+
+/**
+ * Event Domain Service Interface
+ * I/Oが必要なビジネスルールを定義する
+ * 実装はインフラ層で提供（EventDomainServiceImpl）
+ */
+export interface EventDomainService {
+  /** スラッグの一意性を保証する */
+  ensureSlugUnique(slug: string): Promise<Result.Result<true, EventError>>;
+}
+```
+
+### インフラ層: 実装
+
+```typescript
+// infrastructure/domain-services/event-domain-service.ts
+import type { EventDomainService } from "@/domain/event/service";
+import type { EventRepository } from "@/domain/event/repository";
+import { Result } from "@praha/byethrow";
+import { EVENT_ERROR_CODE, eventError } from "@/domain/event/errors";
+
+export class EventDomainServiceImpl implements EventDomainService {
+  constructor(private readonly eventRepo: EventRepository) {}
+
+  async ensureSlugUnique(slug: string): Promise<Result.Result<true, EventError>> {
+    const result = await this.eventRepo.findBySlug(slug);
+    if (Result.isFailure(result)) {
+      return Result.fail(
+        eventError(EVENT_ERROR_CODE.SLUG_NOT_UNIQUE, "スラッグの一意性確認に失敗しました"),
+      );
+    }
+
+    if (result.value !== null) {
+      return Result.fail(
+        eventError(EVENT_ERROR_CODE.SLUG_NOT_UNIQUE, "このスラッグは既に使用されています"),
+      );
+    }
+
+    return Result.succeed(true);
+  }
+}
+```
+
+### DI への登録
+
+```typescript
+// infrastructure/di.ts
+import type { EventDomainService } from "@/domain/event/service";
+import { EventDomainServiceImpl } from "./domain-services/event-domain-service";
+
+export type Dependencies = {
+  // Repositories
+  projectRepo: ProjectRepository;
+  eventRepo: EventRepository;
+  userRepo: UserRepository;
+  // Domain Services
+  eventDomainService: EventDomainService;
+  // Application Services
+  authService: AuthorizationService;
+  storageService: StorageService;
+};
+
+export function createDependencies(): Dependencies {
+  const eventRepo = new EventRepositoryImpl();
+  return {
+    // ...
+    eventRepo,
+    eventDomainService: new EventDomainServiceImpl(eventRepo),
+    // ...
+  };
+}
+```
+
+### Command での使用
+
+```typescript
+// application/command/event/create-event.ts
+export async function createEvent(
+  deps: Pick<Dependencies, "eventRepo" | "authService" | "eventDomainService">,
+  input: CreateEventInput,
+): Result.ResultAsync<CreateEventOutput, CreateEventError> {
+  return gen(async function* ($) {
+    yield* $(deps.authService.enforce(input.actor, placeholderResource, "event:create"));
+
+    const eventId = generateId<EventId>();
+
+    // ドメインサービスに委譲（I/Oが必要なビジネスルール）
+    yield* $(await deps.eventDomainService.ensureSlugUnique(input.slug));
+
+    // 純粋なドメインロジック（I/O不要）
+    const event = createEventEntity({ id: eventId, name: input.name, slug: input.slug });
+
+    yield* $(await deps.eventRepo.saveEvent(event));
+    return { eventId };
+  });
+}
+```
+
+### ドメインサービスを使うべきケース
+
+| ケース                            | 例                                     |
+| --------------------------------- | -------------------------------------- |
+| **一意性制約**                    | スラッグ、メールアドレスの重複チェック |
+| **存在チェック + ビジネスルール** | 参照先の存在確認と整合性検証           |
+| **集約をまたぐ整合性チェック**    | 他集約のデータに依存するバリデーション |
 
 ---
 
@@ -687,7 +853,7 @@ export const projectSchema = z.object({
 
 export const draftSchema = z.object({
   projectId: projectIdSchema,
-  pamphletText: z.string().max(120).nullable(),
+  pamphletText: z.string().max(120),
   webContentJson: z.unknown(), // TipTap JSON
   updatedAt: z.number(),
   updatedBy: userIdSchema,
@@ -697,7 +863,7 @@ export const submissionSchema = z.object({
   id: submissionIdSchema,
   projectId: projectIdSchema,
   status: z.enum(["submitted", "returned", "approved", "withdrawn"]),
-  pamphletText: z.string().max(120).nullable(),
+  pamphletText: z.string().max(120),
   webContentJson: z.unknown(),
   submittedAt: z.number(),
   submittedBy: userIdSchema,
@@ -707,7 +873,7 @@ export const submissionSchema = z.object({
 
 export const publishedSchema = z.object({
   projectId: projectIdSchema,
-  pamphletText: z.string().max(120).nullable(),
+  pamphletText: z.string().max(120),
   webContentJson: z.unknown(),
   publishedAt: z.number(),
   publishedBy: userIdSchema,
@@ -728,22 +894,82 @@ export type Published = z.infer<typeof publishedSchema>;
 ### domain/project/errors.ts
 
 ```typescript
-export type ProjectErrorCode =
-  | "ALREADY_SUBMITTED"
-  | "INVALID_STATUS"
-  | "ALREADY_APPROVED"
-  | "NOT_SUBMITTED";
+import type { BaseError } from "../shared/errors";
+import { createError } from "../shared/errors";
 
-export type ProjectError = {
-  code: ProjectErrorCode;
+/**
+ * Project Error Codes
+ * const objectとして定義し、keyofでUnion型を生成
+ */
+export const PROJECT_ERROR_CODE = {
+  ALREADY_SUBMITTED: "ALREADY_SUBMITTED",
+  NOT_SUBMITTED: "NOT_SUBMITTED",
+  INVALID_STATUS: "INVALID_STATUS",
+  CANNOT_WITHDRAW: "CANNOT_WITHDRAW",
+  CANNOT_APPROVE: "CANNOT_APPROVE",
+  CANNOT_RETURN: "CANNOT_RETURN",
+  PROJECT_NOT_FOUND: "PROJECT_NOT_FOUND",
+  DRAFT_NOT_FOUND: "DRAFT_NOT_FOUND",
+  SUBMISSION_NOT_FOUND: "SUBMISSION_NOT_FOUND",
+  FIELD_NOT_EDITABLE: "FIELD_NOT_EDITABLE",
+} as const;
+
+/**
+ * Project Error Code Type
+ * const objectからUnion型を生成
+ */
+export type ProjectErrorCode = (typeof PROJECT_ERROR_CODE)[keyof typeof PROJECT_ERROR_CODE];
+
+/**
+ * Project Error Type
+ * BaseError型を使用してcode + messageの構造を持つ
+ */
+export type ProjectError = BaseError<ProjectErrorCode>;
+
+/**
+ * Project Error Factory
+ * エラーオブジェクトを生成するヘルパー関数
+ */
+export function projectError(code: ProjectErrorCode, message: string): ProjectError {
+  return createError(code, message);
+}
+```
+
+**特徴**:
+
+- `const object + as const`でエラーコードを定義（型安全かつ補完が効く）
+- `keyof typeof`でUnion型を生成
+- `BaseError<T>`型を使用して共通のエラー構造を持つ
+- `createError()`ヘルパーで一貫したエラーオブジェクト生成
+
+---
+
+### domain/shared/errors.ts
+
+```typescript
+/**
+ * Base error utilities for domain layer
+ * すべてのドメインエラーの基底となる型
+ */
+export type BaseError<TCode extends string = string> = {
+  code: TCode;
   message: string;
 };
 
-export const projectError = (code: ProjectErrorCode, message: string): ProjectError => ({
-  code,
-  message,
-});
+/**
+ * Create error helper
+ * エラーオブジェクトを生成するヘルパー関数
+ */
+export function createError<TCode extends string>(code: TCode, message: string): BaseError<TCode> {
+  return { code, message };
+}
 ```
+
+**特徴**:
+
+- ジェネリック型`BaseError<TCode>`で様々なエラーコードに対応
+- `createError()`で統一されたエラーオブジェクト生成
+- すべてのドメインエラーがこの構造を継承
 
 ---
 
@@ -753,120 +979,175 @@ export const projectError = (code: ProjectErrorCode, message: string): ProjectEr
 import { Result } from "@praha/byethrow";
 import type {
   Project,
-  Draft,
-  Submission,
-  Published,
-  ProjectId,
-  SubmissionId,
-  UserId,
+  DraftWithTags,
+  ProjectSubmission,
+  PublishedWithTags,
+  SubmissionWithTags,
 } from "./schema";
 import type { ProjectError } from "./errors";
 import { projectError } from "./errors";
+import type { SubmissionId, UserId } from "../shared/ids";
+
+/**
+ * =============================================================================
+ * Invariant Checks (Business Rules)
+ * =============================================================================
+ */
 
 /**
  * 提出可能かチェック（不変条件）
+ * Rule: Only one active submission allowed at a time
  */
-export const canSubmit = (project: Project): Result.Result<true, ProjectError> => {
+export function canSubmit(project: Project): Result.Result<true, ProjectError> {
   if (project.activeSubmissionId !== null) {
-    return Result.fail(projectError("ALREADY_SUBMITTED", "既に提出済みです"));
+    return Result.fail(
+      projectError(
+        "ALREADY_SUBMITTED",
+        "既に提出済みです。提出中の企画を取り下げてから再提出してください。",
+      ),
+    );
   }
   return Result.succeed(true);
-};
+}
 
 /**
  * 承認可能かチェック（不変条件）
+ * Rule: Only "submitted" status can be approved
  */
-export const canApprove = (submission: Submission): Result.Result<true, ProjectError> => {
+export function canApprove(submission: ProjectSubmission): Result.Result<true, ProjectError> {
   if (submission.status !== "submitted") {
-    return Result.fail(projectError("INVALID_STATUS", "提出中の企画のみ承認可能です"));
+    return Result.fail(
+      projectError(
+        "CANNOT_APPROVE",
+        `提出中ではない企画は承認できません。現在のステータス: ${submission.status}`,
+      ),
+    );
   }
   return Result.succeed(true);
-};
+}
+
+/**
+ * 差戻し可能かチェック（不変条件）
+ * Rule: Only "submitted" status can be returned
+ */
+export function canReturn(submission: ProjectSubmission): Result.Result<true, ProjectError> {
+  if (submission.status !== "submitted") {
+    return Result.fail(
+      projectError(
+        "CANNOT_RETURN",
+        `提出中ではない企画は差戻しできません。現在のステータス: ${submission.status}`,
+      ),
+    );
+  }
+  return Result.succeed(true);
+}
 
 /**
  * 取り下げ可能かチェック（不変条件）
+ * Rule: Only "submitted" status can be withdrawn (not after approval)
  */
-export const canWithdraw = (submission: Submission): Result.Result<true, ProjectError> => {
-  if (submission.status === "approved") {
-    return Result.fail(projectError("ALREADY_APPROVED", "承認済みの企画は取り下げできません"));
-  }
+export function canWithdraw(submission: ProjectSubmission): Result.Result<true, ProjectError> {
   if (submission.status !== "submitted") {
-    return Result.fail(projectError("INVALID_STATUS", "提出中の企画のみ取り下げ可能です"));
+    return Result.fail(
+      projectError(
+        "CANNOT_WITHDRAW",
+        `提出中の企画のみ取り下げできます。現在のステータス: ${submission.status}`,
+      ),
+    );
   }
   return Result.succeed(true);
-};
+}
+
+/**
+ * =============================================================================
+ * Entity Creation (Pure Functions)
+ * =============================================================================
+ */
 
 /**
  * Draftから新しいSubmissionを生成（純粋関数）
  */
-export const createSubmissionFromDraft = (
-  draft: Draft,
+export function createSubmissionFromDraft(
+  draft: DraftWithTags,
   userId: UserId,
   submissionId: SubmissionId,
-): Submission => {
+): SubmissionWithTags {
   return {
     id: submissionId,
     projectId: draft.projectId,
     status: "submitted",
     pamphletText: draft.pamphletText,
     webContentJson: draft.webContentJson,
-    submittedAt: Date.now(),
+    tags: draft.tags,
+    submittedAt: new Date(),
     submittedBy: userId,
     decidedAt: null,
     decidedBy: null,
   };
-};
+}
 
 /**
  * 提出後のProject状態を生成（純粋関数）
  */
-export const projectAfterSubmit = (project: Project, submissionId: SubmissionId): Project => {
+export function projectAfterSubmit(project: Project, submissionId: SubmissionId): Project {
   return {
     ...project,
     activeSubmissionId: submissionId,
-    updatedAt: Date.now(),
+    updatedAt: new Date(),
   };
-};
+}
 
 /**
  * 承認後のSubmissionを生成（純粋関数）
  */
-export const approveSubmission = (submission: Submission, userId: UserId): Submission => {
+export function approveSubmission(
+  submission: SubmissionWithTags,
+  userId: UserId,
+): SubmissionWithTags {
   return {
     ...submission,
     status: "approved",
-    decidedAt: Date.now(),
+    decidedAt: new Date(),
     decidedBy: userId,
   };
-};
+}
 
 /**
  * SubmissionからPublishedを生成（純粋関数）
  */
-export const createPublishedFromSubmission = (
-  submission: Submission,
+export function createPublishedFromSubmission(
+  submission: SubmissionWithTags,
   userId: UserId,
-): Published => {
+): PublishedWithTags {
   return {
     projectId: submission.projectId,
     pamphletText: submission.pamphletText,
     webContentJson: submission.webContentJson,
-    publishedAt: Date.now(),
+    tags: submission.tags,
+    publishedAt: new Date(),
     publishedBy: userId,
   };
-};
+}
 
 /**
  * 承認後のProject状態を生成（純粋関数）
  */
-export const projectAfterApprove = (project: Project): Project => {
+export function projectAfterApprove(project: Project): Project {
   return {
     ...project,
     activeSubmissionId: null,
-    updatedAt: Date.now(),
+    updatedAt: new Date(),
   };
-};
+}
 ```
+
+**特徴**:
+
+- function宣言を使用（arrow functionではなく）
+- 型名を実装に合わせて更新（`ProjectSubmission`, `DraftWithTags`など）
+- エラーコードを実装に合わせて更新（`CANNOT_APPROVE`, `CANNOT_WITHDRAW`など）
+- タイムスタンプは`new Date()`を使用（`Date.now()`ではなく）
+- `canReturn()`関数を追加
 
 ---
 
@@ -963,71 +1244,168 @@ export async function listEvents(): Promise<Result.Result<EventListItem[], Query
 
 ---
 
-### infrastructure/repositories/interfaces.ts
+### domain/event/repository.ts
 
 ```typescript
-import type {
-  Project,
-  Draft,
-  Submission,
-  Published,
-  ProjectId,
-  SubmissionId,
-} from "@/domain/project/schema";
+import type { Result } from "@praha/byethrow";
+import type { Event, Tag, Place, Deadline } from "./schema";
+import type { EventId, TagId, PlaceId, DeadlineId } from "@/domain/shared/ids";
+import type { RepositoryError } from "@/domain/shared/repository";
 
-export interface ProjectRepository {
-  findById(id: ProjectId): Promise<Project | null>;
-  findDraftByProjectId(projectId: ProjectId): Promise<Draft | null>;
-  findSubmissionById(id: SubmissionId): Promise<Submission | null>;
-
-  save(project: Project): Promise<void>;
-  saveDraft(draft: Draft): Promise<void>;
-  saveSubmission(submission: Submission): Promise<void>;
-  updateSubmission(submission: Submission): Promise<void>;
-  savePublished(published: Published): Promise<void>;
-
-  updateProject(project: Project): Promise<void>;
-}
-
-export interface OrganizationRepository {
-  // TODO: 定義
-}
-
+/**
+ * Event Repository Interface
+ * Repositoryインターフェースはドメイン層で定義し、実装はインフラ層で提供する
+ */
 export interface EventRepository {
-  // TODO: 定義
+  findById(id: EventId): Promise<Result.Result<Event | null, RepositoryError>>;
+  findBySlug(slug: string): Promise<Result.Result<Event | null, RepositoryError>>;
+  listAll(): Promise<Result.Result<Event[], RepositoryError>>;
+
+  findTags(eventId: EventId): Promise<Result.Result<Tag[], RepositoryError>>;
+  findPlaces(eventId: EventId): Promise<Result.Result<Place[], RepositoryError>>;
+  findDeadlines(eventId: EventId): Promise<Result.Result<Deadline[], RepositoryError>>;
+
+  saveEvent(event: Event): Promise<Result.Result<void, RepositoryError>>;
+  saveTag(tag: Tag): Promise<Result.Result<void, RepositoryError>>;
+  updateTag(tag: Tag): Promise<Result.Result<void, RepositoryError>>;
+  deleteTag(tagId: TagId): Promise<Result.Result<void, RepositoryError>>;
+  savePlace(place: Place): Promise<Result.Result<void, RepositoryError>>;
+  updatePlace(place: Place): Promise<Result.Result<void, RepositoryError>>;
+  deletePlace(placeId: PlaceId): Promise<Result.Result<void, RepositoryError>>;
+  saveDeadline(deadline: Deadline): Promise<Result.Result<void, RepositoryError>>;
+  deleteDeadline(deadlineId: DeadlineId): Promise<Result.Result<void, RepositoryError>>;
 }
 ```
+
+**特徴**:
+
+- Repositoryインターフェースはドメイン層で定義（依存性逆転の原則）
+- Result型でエラーハンドリング
+- Brand型IDで型安全性を確保
+
+---
+
+### domain/event/service.ts
+
+```typescript
+import type { Result } from "@praha/byethrow";
+import type { EventError } from "./errors";
+
+/**
+ * Event Domain Service Interface
+ * I/Oが必要なビジネスルールを定義する
+ * 実装はインフラ層で提供（EventDomainServiceImpl）
+ */
+export interface EventDomainService {
+  /** スラッグの一意性を保証する */
+  ensureSlugUnique(slug: string): Promise<Result.Result<true, EventError>>;
+}
+```
+
+**特徴**:
+
+- ドメイン層ではインターフェースのみ定義（実装はインフラ層）
+- メソッドのシグネチャはドメインの言葉で表現（`ensureSlugUnique`）
+- 戻り値はドメインエラー（`EventError`）であり、インフラエラー（`RepositoryError`）ではない
+
+---
+
+### infrastructure/domain-services/event-domain-service.ts
+
+```typescript
+import type { EventDomainService } from "@/domain/event/service";
+import type { EventRepository } from "@/domain/event/repository";
+import { Result } from "@praha/byethrow";
+import { EVENT_ERROR_CODE, eventError } from "@/domain/event/errors";
+
+/**
+ * Event Domain Service Implementation
+ * Repositoryを使用してI/Oが必要なビジネスルールを実装する
+ */
+export class EventDomainServiceImpl implements EventDomainService {
+  constructor(private readonly eventRepo: EventRepository) {}
+
+  async ensureSlugUnique(slug: string): Promise<Result.Result<true, EventError>> {
+    const result = await this.eventRepo.findBySlug(slug);
+    if (Result.isFailure(result)) {
+      return Result.fail(
+        eventError(EVENT_ERROR_CODE.SLUG_NOT_UNIQUE, "スラッグの一意性確認に失敗しました"),
+      );
+    }
+
+    if (result.value !== null) {
+      return Result.fail(
+        eventError(EVENT_ERROR_CODE.SLUG_NOT_UNIQUE, "このスラッグは既に使用されています"),
+      );
+    }
+
+    return Result.succeed(true);
+  }
+}
+```
+
+**特徴**:
+
+- コンストラクタでRepositoryを受け取る（DIで注入）
+- RepositoryError をドメインエラー（EventError）に変換して返す
+- ビジネスルールの判定ロジック（存在チェック → エラー）を実装に含む
 
 ---
 
 ### infrastructure/di.ts
 
 ```typescript
-import type {
-  ProjectRepository,
-  OrganizationRepository,
-  EventRepository,
-} from "./repositories/interfaces";
-import { DrizzleProjectRepository } from "./repositories/project-repository";
+import type { ProjectRepository } from "@/domain/project/repository";
+import type { EventRepository } from "@/domain/event/repository";
+import type { UserRepository } from "@/domain/user/repository";
+import type { AuthorizationService } from "@/domain/authorization/service";
+import type { StorageService } from "@/domain/shared/storage";
+import { EventRepositoryImpl } from "./repositories/event-repository";
+import { ProjectRepositoryImpl } from "./repositories/project-repository";
+import { UserRepositoryImpl } from "./repositories/user-repository";
+import { AuthorizationServiceImpl } from "./authorization/authorization-service-impl";
+import { StorageServiceImpl } from "./storage/storage-service";
 
+/**
+ * Dependencies container for use cases
+ * Provides repository instances and services to application layer
+ */
 export type Dependencies = {
   projectRepo: ProjectRepository;
-  orgRepo: OrganizationRepository;
   eventRepo: EventRepository;
+  userRepo: UserRepository;
+  authService: AuthorizationService;
+  storageService: StorageService;
 };
 
 /**
- * DIコンテナ（シンプル実装）
+ * Create dependencies container
+ * In the future, this could be extended to support different implementations
+ * (e.g., mock repositories for testing)
  */
-export const getDependencies = (): Dependencies => {
+export function createDependencies(): Dependencies {
   return {
-    projectRepo: new DrizzleProjectRepository(),
-    // TODO: 他のリポジトリ実装
-    orgRepo: null as any,
-    eventRepo: null as any,
+    projectRepo: new ProjectRepositoryImpl(),
+    eventRepo: new EventRepositoryImpl(),
+    userRepo: new UserRepositoryImpl(),
+    authService: new AuthorizationServiceImpl(),
+    storageService: new StorageServiceImpl(),
   };
-};
+}
+
+/**
+ * Global dependencies instance
+ * Use this in server-side code (loaders, actions, API routes)
+ */
+export const dependencies = createDependencies();
 ```
+
+**特徴**:
+
+- Repositoryインターフェースをドメイン層からインポート
+- `createDependencies()`でインスタンス生成
+- グローバルインスタンス`dependencies`をエクスポート
+- 認可サービス、ストレージサービスも含む
 
 ---
 
@@ -1035,12 +1413,13 @@ export const getDependencies = (): Dependencies => {
 
 ```typescript
 import { Result } from "@praha/byethrow";
-import { gen } from "@/libs/result";
-import type { Dependencies } from "@/infrastructure/di";
-import type { ProjectId, SubmissionId, UserId } from "@/domain/project/schema";
-import type { ProjectError } from "@/domain/project/errors";
-import { canSubmit, createSubmissionFromDraft, projectAfterSubmit } from "@/domain/project/logic";
+import { gen, suspend } from "@/libs/result";
 import { generateId } from "@/libs/id";
+import type { ProjectId, SubmissionId, UserId } from "@/domain/shared/ids";
+import type { ProjectError } from "@/domain/project/errors";
+import type { RepositoryError } from "@/domain/shared/repository";
+import { canSubmit, createSubmissionFromDraft, projectAfterSubmit } from "@/domain/project/logic";
+import type { Dependencies } from "@/infrastructure/di";
 
 export type SubmitProjectInput = {
   projectId: ProjectId;
@@ -1051,60 +1430,256 @@ export type SubmitProjectOutput = {
   submissionId: SubmissionId;
 };
 
-export type SubmitProjectError =
-  | ProjectError
-  | { code: "PROJECT_NOT_FOUND"; message: string }
-  | { code: "DRAFT_NOT_FOUND"; message: string };
+export type SubmitProjectError = ProjectError | RepositoryError;
 
 /**
  * 企画提出ユースケース
  */
-export const submitProject = (
-  deps: Dependencies,
+export function submitProject(
+  deps: Pick<Dependencies, "projectRepo">,
   input: SubmitProjectInput,
-): Result.ResultAsync<SubmitProjectOutput, SubmitProjectError> => {
+): Result.ResultAsync<SubmitProjectOutput, SubmitProjectError> {
   return gen(async function* ($) {
-    const { projectRepo } = deps;
-    const { projectId, userId } = input;
+      // 1. プロジェクトを取得（RepositoryがResult型を返す）
+      const projectResult = yield* $(await deps.projectRepo.findById(input.projectId));
 
-    // 1. プロジェクトを取得
-    const project = await projectRepo.findById(projectId);
-    if (!project) {
-      return yield* $(
-        Result.fail({
-          code: "PROJECT_NOT_FOUND" as const,
-          message: "プロジェクトが見つかりません",
-        }),
-      );
-    }
+      if (!projectResult) {
+        return yield* $(
+          Result.fail({
+            code: "PROJECT_NOT_FOUND" as const,
+            message: "企画が見つかりません。",
+          }),
+        );
+      }
 
-    // 2. Draftを取得
-    const draft = await projectRepo.findDraftByProjectId(projectId);
-    if (!draft) {
-      return yield* $(
-        Result.fail({
-          code: "DRAFT_NOT_FOUND" as const,
-          message: "Draft が見つかりません",
-        }),
-      );
-    }
+      // 2. Draftを取得
+      const draftResult = yield* $(await deps.projectRepo.findDraftWithTags(input.projectId));
 
-    // 3. 不変条件チェック（ドメインロジック）
-    yield* $(canSubmit(project));
+      if (!draftResult) {
+        return yield* $(
+          Result.fail({
+            code: "DRAFT_NOT_FOUND" as const,
+            message: "下書きが見つかりません。",
+          }),
+        );
+      }
 
-    // 4. ドメインロジック実行（純粋関数）
-    const submissionId = generateId() as SubmissionId;
-    const submission = createSubmissionFromDraft(draft, userId, submissionId);
-    const updatedProject = projectAfterSubmit(project, submissionId);
+      // 3. 不変条件チェック（ドメインロジック - 純粋関数）
+      yield* $(canSubmit(projectResult));
 
-    // 5. 永続化
-    await projectRepo.saveSubmission(submission);
-    await projectRepo.updateProject(updatedProject);
+      // 4. ドメインロジック実行（純粋関数）
+      const submissionId = generateId<SubmissionId>();
+      const submission = createSubmissionFromDraft(draftResult, input.userId, submissionId);
+      const updatedProject = projectAfterSubmit(projectResult, submissionId);
 
-    return { submissionId: submission.id };
+      // 5. 永続化
+      yield* $(await deps.projectRepo.saveSubmission(submission));
+      yield* $(await deps.projectRepo.saveProject(updatedProject, draftResult));
+
+      return { submissionId };
+    }),
+}
+```
+
+**特徴**:
+
+- RepositoryがResult型を返すので、`yield* $(await ...)`でハンドリング
+- エラー型に`RepositoryError`を含める
+- 依存は`Pick<Dependencies, "projectRepo">`で必要なもののみ受け取る
+
+---
+
+## TanStack Query統合
+
+### Server Functions とクエリパターン
+
+TanStack Start の Server Functions と TanStack Query を組み合わせて、型安全なデータフェッチングとキャッシュ管理を実現します。
+
+#### Query パターン（読み取り）
+
+**構成**:
+
+- Server Function: `loadXxxFn`
+- Cache Key Generator: `generateLoadXxxCacheKey()`
+- Query Options Generator: `generateLoadXxxQueryOptions()`
+- Component Hook: `useSuspenseQuery(generateLoadXxxQueryOptions())`
+
+**実装例**:
+
+```typescript
+// features/event/actions/queries.ts
+import { createServerFn } from "@tanstack/react-start";
+import { queryOptions } from "@tanstack/react-query";
+import { listEvents } from "@/application/query/event/list-events";
+
+// Server Function
+export const loadEventsFn = createServerFn({ method: "GET" }).handler(async () => {
+  const result = await listEvents();
+  if (Result.isFailure(result)) {
+    throw new Error(result.error.message);
+  }
+  return result.value;
+});
+
+// Cache Key Generator
+export function generateLoadEventsCacheKey() {
+  return ["events"];
+}
+
+// Query Options Generator
+export function generateLoadEventsQueryOptions() {
+  return queryOptions({
+    queryKey: generateLoadEventsCacheKey(),
+    queryFn: loadEventsFn,
   });
+}
+```
+
+**Route での使用**:
+
+```typescript
+// routes/admin/events.tsx
+import { createFileRoute } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { generateLoadEventsQueryOptions } from "@/features/event/actions";
+
+export const Route = createFileRoute("/admin/events")({
+  loader: async ({ context }) =>
+    context.queryClient.ensureQueryData(generateLoadEventsQueryOptions()),
+  component: EventsPage,
+});
+
+function EventsPage() {
+  const { data: events } = useSuspenseQuery(generateLoadEventsQueryOptions());
+  // ...
+}
+```
+
+**パターンの特徴**:
+
+- loader で `ensureQueryData` を使いプリフェッチ
+- component で `useSuspenseQuery` を使いデータ取得
+- 同じ query options を使うことでキャッシュが共有される
+- SSR 時にサーバーでデータがフェッチされる
+
+---
+
+### Mutation パターン（書き込み）
+
+**構成**:
+
+- Server Function: `xxxFn` (createEventFn, updateEventFn など)
+- Mutation Hook: `useXxxMutation()`
+- Cache Invalidation: `onSuccess` で `Result.inspect` を使用
+
+#### 基本パターン
+
+```typescript
+// features/event/actions/mutations.ts
+import { createServerFn } from "@tanstack/react-start";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Result } from "@praha/byethrow";
+import { generateLoadEventsCacheKey } from "./queries";
+
+// Server Function
+export const createEventFn = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .inputValidator(createEventInputSchema)
+  .handler(async ({ data, context }) => {
+    // ... command実行
+    return result; // Result<Output, Error>を返す
+  });
+
+// Mutation Hook
+export function useCreateEventMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createEventFn,
+    onSuccess: Result.inspect(() => {
+      // 成功時のみキャッシュを無効化
+      queryClient.invalidateQueries({ queryKey: generateLoadEventsCacheKey() });
+    }),
+  });
+}
+```
+
+**`Result.inspect` の使い方**:
+
+`Result.inspect` は、Result が成功の場合のみ副作用を実行する関数です。
+
+```typescript
+// Pattern 1: 引数なしの場合
+onSuccess: Result.inspect(() => {
+  queryClient.invalidateQueries({ queryKey: generateLoadEventsCacheKey() });
+});
+
+// Pattern 2: Result の値を使う場合
+onSuccess: Result.inspect(({ eventId }) => {
+  queryClient.invalidateQueries({ queryKey: generateLoadEventsCacheKey() });
+  queryClient.invalidateQueries({ queryKey: generateLoadEventDetailCacheKey(eventId) });
+});
+
+// Pattern 3: variables から値を取得する場合（Result に含まれない情報）
+onSuccess: (result, variables) => {
+  Result.inspect(() => {
+    queryClient.invalidateQueries({
+      queryKey: generateLoadUsersForEventCacheKey(variables.data.eventId),
+    });
+  })(result);
 };
 ```
+
+**Component での使用**:
+
+```typescript
+// features/event/components/create-event-dialog.tsx
+import { useCreateEventMutation } from "@/features/event/actions";
+
+export function CreateEventDialog() {
+  const { mutateAsync } = useCreateEventMutation();
+
+  const form = useForm({
+    validators: {
+      onSubmitAsync: async ({ value }) => {
+        const result = await mutateAsync({ data: value });
+
+        if (Result.isFailure(result)) {
+          // エラーハンドリング
+          return { fields: { ... } };
+        }
+
+        return undefined; // 成功時
+      },
+    },
+    onSubmit: async ({ value }) => {
+      // onSuccessでキャッシュが無効化されるので、ここでは何もしない
+      toaster.create({ type: "success", title: "作成しました" });
+    },
+  });
+}
+```
+
+**パターンの利点**:
+
+- キャッシュ無効化が mutation hook に集約される
+- component は mutation hook を呼ぶだけでキャッシュが自動更新される
+- `Result.inspect` により、成功時のみ副作用が実行される
+- エラー時の処理は component で行う（ユーザーへのフィードバック）
+
+---
+
+### パターンまとめ
+
+| 側面                   | Query（読み取り）                  | Mutation（書き込み）                |
+| ---------------------- | ---------------------------------- | ----------------------------------- |
+| **Server Function**    | `loadXxxFn`                        | `xxxFn` (createXxx, updateXxx など) |
+| **Hook**               | `useSuspenseQuery`                 | `useXxxMutation`                    |
+| **キャッシュキー**     | `generateLoadXxxCacheKey()`        | -                                   |
+| **Query Options**      | `generateLoadXxxQueryOptions()`    | -                                   |
+| **Route での使用**     | loader で `ensureQueryData`        | action で mutation を呼ぶ           |
+| **Component での使用** | `useSuspenseQuery(queryOptions())` | `useXxxMutation()` からフック取得   |
+| **キャッシュ更新**     | -                                  | `onSuccess` + `Result.inspect`      |
+| **エラーハンドリング** | throw Error                        | Result型を返し、component で処理    |
 
 ---
 
@@ -1202,6 +1777,7 @@ Draft → Submission → Published のライフサイクル
 │ - DTO定義(zod)   │         │ - Use Cases      │
 │ - 直接DB         │         │ - Repository経由 │
 │ - JOIN可能       │         │ - Domain logic   │
+│                  │         │ - Domain service │
 └──────────────────┘         └──────────────────┘
          │                              │
          │                              ▼
@@ -1293,7 +1869,47 @@ describe('canSubmit', () => {
 })
 ```
 
-### 2. Command（Use Case）のテスト
+### 2. ドメインサービスのテスト
+
+Repositoryをモックして注入し、ビジネスルールの検証をテストします。
+
+```typescript
+// infrastructure/domain-services/event-domain-service.test.ts
+import { describe, it, expect, vi } from "vitest";
+import { EventDomainServiceImpl } from "./event-domain-service";
+import { Result } from "@praha/byethrow";
+
+describe("EventDomainService", () => {
+  describe("ensureSlugUnique", () => {
+    it("スラッグが未使用の場合、成功を返す", async () => {
+      const mockRepo = {
+        findBySlug: vi.fn().mockResolvedValue(Result.succeed(null)),
+      };
+
+      const service = new EventDomainServiceImpl(mockRepo as any);
+      const result = await service.ensureSlugUnique("2026");
+
+      expect(Result.isSuccess(result)).toBe(true);
+    });
+
+    it("スラッグが既に使用されている場合、SLUG_NOT_UNIQUEエラーを返す", async () => {
+      const mockRepo = {
+        findBySlug: vi.fn().mockResolvedValue(Result.succeed({ id: "evt_1", slug: "2026" })),
+      };
+
+      const service = new EventDomainServiceImpl(mockRepo as any);
+      const result = await service.ensureSlugUnique("2026");
+
+      expect(Result.isFailure(result)).toBe(true);
+      if (Result.isFailure(result)) {
+        expect(result.error.code).toBe("SLUG_NOT_UNIQUE");
+      }
+    });
+  });
+});
+```
+
+### 3. Command（Use Case）のテスト
 
 依存をモックして注入します。
 
@@ -1338,7 +1954,7 @@ describe('submitProject', () => {
 })
 ```
 
-### 3. Query のテスト
+### 4. Query のテスト
 
 DBをモックしてテストします。
 
@@ -1413,7 +2029,9 @@ describe("listEvents", () => {
 
 ## 改訂履歴
 
-| バージョン | 日付       | 変更内容                              |
-| ---------- | ---------- | ------------------------------------- |
-| 1.1.0      | 2026-02-23 | CQRSパターン導入（Command/Query分離） |
-| 1.0.0      | 2026-02-23 | 初版作成（アーキテクチャ確定）        |
+| バージョン | 日付       | 変更内容                                        |
+| ---------- | ---------- | ----------------------------------------------- |
+| 1.3.0      | 2026-02-24 | ドメインサービス設計追加（IF+実装分離パターン） |
+| 1.2.0      | 2026-02-24 | TanStack Query統合パターン追加（Mutation Hook） |
+| 1.1.0      | 2026-02-23 | CQRSパターン導入（Command/Query分離）           |
+| 1.0.0      | 2026-02-23 | 初版作成（アーキテクチャ確定）                  |
