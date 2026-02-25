@@ -6,13 +6,17 @@ import { Building2Icon, CalendarClockIcon, MapPinIcon, TagIcon, UsersIcon } from
 import { Button, Heading, Text } from "@/components/ui";
 import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions/queries";
 import { generateCheckCommitteeRoleQueryOptions } from "@/features/authorization/actions";
+import { generateLoadMyOrganizationsQueryOptions } from "@/features/organization/actions/queries";
 
 export const Route = createFileRoute("/_authenticated/$slug")({
   loader: async ({ params, context }) => {
     const event = await context.queryClient.ensureQueryData(
       generateLoadEventBySlugQueryOptions(params.slug),
     );
-    await context.queryClient.ensureQueryData(generateCheckCommitteeRoleQueryOptions(event.id));
+    await Promise.all([
+      context.queryClient.ensureQueryData(generateCheckCommitteeRoleQueryOptions(event.id)),
+      context.queryClient.ensureQueryData(generateLoadMyOrganizationsQueryOptions(event.id)),
+    ]);
   },
   component: SlugLayout,
 });
@@ -73,6 +77,15 @@ function SlugLayout() {
               </Stack>
             </Stack>
           )}
+
+          <Stack gap="2">
+            <Text textStyle="xs" fontWeight="semibold" color="fg.muted" pl="3.5">
+              団体管理
+            </Text>
+            <Stack gap="1">
+              <OrganizationLinks slug={slug} />
+            </Stack>
+          </Stack>
         </Stack>
       </nav>
 
@@ -111,5 +124,22 @@ function NavLink({ to, params, children }: NavLinkProps) {
         {children}
       </Link>
     </Button>
+  );
+}
+
+function OrganizationLinks({ slug }: { slug: string }) {
+  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
+  const { data: myOrganizations } = useSuspenseQuery(
+    generateLoadMyOrganizationsQueryOptions(event.id),
+  );
+
+  return (
+    <>
+      {myOrganizations.map((org) => (
+        <NavLink key={org.id} to="/$slug/org/$orgId" params={{ slug, orgId: org.id }}>
+          {org.name}
+        </NavLink>
+      ))}
+    </>
   );
 }
