@@ -23,7 +23,7 @@ export const draftDetailSchema = z.object({
 export type DraftDetail = z.infer<typeof draftDetailSchema>;
 
 export type QueryError = {
-  code: "DATABASE_ERROR" | "NOT_FOUND";
+  code: "DATABASE_ERROR";
   message: string;
 };
 
@@ -35,7 +35,7 @@ export type QueryError = {
  */
 export async function getDraft(
   projectId: ProjectId,
-): Promise<Result.Result<DraftDetail, QueryError>> {
+): Promise<Result.Result<DraftDetail | null, QueryError>> {
   try {
     const draftRow = await db.query.projectDrafts.findFirst({
       where: eq(projectDrafts.projectId, projectId),
@@ -49,10 +49,7 @@ export async function getDraft(
     });
 
     if (!draftRow) {
-      return Result.fail({
-        code: "NOT_FOUND",
-        message: "下書きが見つかりません。",
-      });
+      return Result.succeed(null);
     }
 
     const draft = draftDetailSchema.parse({
