@@ -9,7 +9,7 @@ import {
   projectResource,
 } from "@/domain/authorization/logic";
 import { authMiddleware } from "@/libs/session-server";
-import { cast, eventIdSchema } from "@/domain/shared/ids";
+import { cast, eventIdSchema, orgIdSchema } from "@/domain/shared/ids";
 import type { OrgId, ProjectId, UserId } from "@/domain/shared/ids";
 import type { Action, Resource } from "@/domain/authorization/schema";
 import { queryOptions } from "@tanstack/react-query";
@@ -105,6 +105,47 @@ export function generateCheckCommitteePermissionsQueryOptions(eventId: string) {
   return queryOptions({
     queryKey: ["authorization", "committee-permissions", eventId],
     queryFn: () => checkCommitteePermissionsFn({ data: { eventId } }),
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+/**
+ * Server function to check organization permissions
+ * Returns capability flags for organization operations (member management, update, delete)
+ */
+export const checkOrganizationPermissionsFn = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
+  .inputValidator(z.object({ eventId: eventIdSchema, orgId: orgIdSchema }))
+  .handler(async ({ data, context }) => {
+    const actorResult = await resolveActor({
+      userId: cast<UserId>(context.session.user.id),
+      eventIds: [data.eventId],
+      orgIds: [data.orgId],
+    });
+
+    if (Result.isFailure(actorResult)) {
+      throw new Error(actorResult.error.message);
+    }
+
+    const actor = actorResult.value;
+    const { authService } = dependencies;
+
+    const check = (resource: Resource, action: Action): boolean => {
+      const result = authService.isAllowed(actor, resource, action);
+      return Result.isSuccess(result) && result.value;
+    };
+
+    const orgRes = organizationResource(cast<OrgId>(data.orgId), data.eventId);
+
+    return {
+      canManageMembers: check(orgRes, "organization:manage_members"),
+    };
+  });
+
+export function generateCheckOrganizationPermissionsQueryOptions(eventId: string, orgId: string) {
+  return queryOptions({
+    queryKey: ["authorization", "organization-permissions", eventId, orgId],
+    queryFn: () => checkOrganizationPermissionsFn({ data: { eventId, orgId } }),
     staleTime: 5 * 60 * 1000,
   });
 }
