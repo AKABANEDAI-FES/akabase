@@ -49,9 +49,8 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         eventId: row.eventId,
         orgId: row.orgId,
         name: row.name,
-        placeText: row.placeText,
+        placeId: row.placeId,
         logoKey: row.logoKey,
-        activeSubmissionId: row.activeSubmissionId,
         createdAt: new Date(row.createdAt),
         updatedAt: new Date(row.updatedAt),
       });
@@ -177,9 +176,8 @@ export class ProjectRepositoryImpl implements ProjectRepository {
           eventId: row.eventId,
           orgId: row.orgId,
           name: row.name,
-          placeText: row.placeText,
+          placeId: row.placeId,
           logoKey: row.logoKey,
-          activeSubmissionId: row.activeSubmissionId,
           createdAt: new Date(row.createdAt),
           updatedAt: new Date(row.updatedAt),
         }),
@@ -232,9 +230,8 @@ export class ProjectRepositoryImpl implements ProjectRepository {
           eventId: project.eventId,
           orgId: project.orgId,
           name: project.name,
-          placeText: project.placeText,
+          placeId: project.placeId,
           logoKey: project.logoKey,
-          activeSubmissionId: project.activeSubmissionId,
           createdAt: project.createdAt,
           updatedAt: project.updatedAt,
         })
@@ -243,9 +240,8 @@ export class ProjectRepositoryImpl implements ProjectRepository {
           set: {
             // Immutable fields excluded: id, eventId, orgId, createdAt
             name: project.name,
-            placeText: project.placeText,
+            placeId: project.placeId,
             logoKey: project.logoKey,
-            activeSubmissionId: project.activeSubmissionId,
             updatedAt: project.updatedAt,
           },
           where: eq(projects.eventId, project.eventId),

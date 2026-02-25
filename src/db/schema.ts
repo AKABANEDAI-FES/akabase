@@ -204,9 +204,8 @@ export const projects = sqliteTable(
       .notNull()
       .references(() => organizations.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
-    placeText: text("place_text"), // フリーテキスト形式の場所情報
+    placeId: text("place_id").references(() => places.id),
     logoKey: text("logo_key"), // R2 storage key
-    activeSubmissionId: text("active_submission_id"), // 提出中のSubmissionID（nullable）
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .notNull(),
@@ -484,6 +483,10 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
   organization: one(organizations, {
     fields: [projects.orgId],
     references: [organizations.id],
+  }),
+  place: one(places, {
+    fields: [projects.placeId],
+    references: [places.id],
   }),
   draft: one(projectDrafts, {
     fields: [projects.id],

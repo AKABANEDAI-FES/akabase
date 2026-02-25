@@ -166,13 +166,13 @@ CREATE TABLE `projects` (
 	`event_id` text NOT NULL,
 	`org_id` text NOT NULL,
 	`name` text NOT NULL,
-	`place_text` text,
+	`place_id` text,
 	`logo_key` text,
-	`active_submission_id` text,
 	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	`updated_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	FOREIGN KEY (`event_id`) REFERENCES `events`(`id`) ON UPDATE no action ON DELETE cascade,
-	FOREIGN KEY (`org_id`) REFERENCES `organizations`(`id`) ON UPDATE no action ON DELETE cascade
+	FOREIGN KEY (`org_id`) REFERENCES `organizations`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`place_id`) REFERENCES `places`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE INDEX `projects_event_id_idx` ON `projects` (`event_id`);--> statement-breakpoint

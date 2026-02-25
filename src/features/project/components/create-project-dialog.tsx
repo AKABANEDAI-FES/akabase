@@ -40,14 +40,14 @@ export function CreateProjectDialog({
   const placesCollection = createListCollection({
     items: places.map((place) => ({
       label: place.name,
-      value: place.name, // Store place name as value
+      value: place.id, // Store place ID as value
     })),
   });
 
   const form = useForm({
     defaultValues: {
       name: "",
-      placeText: null as string | null,
+      placeId: null as string | null,
       logoKey: null as string | null,
     },
     validators: {
@@ -147,7 +147,7 @@ export function CreateProjectDialog({
                   </form.Field>
 
                   {/* Place selection field */}
-                  <form.Field name="placeText">
+                  <form.Field name="placeId">
                     {(field) => (
                       <Field.Root invalid={!field.state.meta.isValid}>
                         <Field.Label htmlFor={field.name}>開催場所（任意）</Field.Label>

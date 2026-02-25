@@ -18,7 +18,7 @@ export const createProjectInputSchema = projectSchema.pick({
   eventId: true,
   orgId: true,
   name: true,
-  placeText: true,
+  placeId: true,
   logoKey: true,
 });
 
@@ -43,7 +43,7 @@ export const createProjectFn = createServerFn({ method: "POST" })
           eventId: data.eventId,
           orgId: data.orgId,
           name: data.name,
-          placeText: data.placeText,
+          placeId: data.placeId,
           logoKey: data.logoKey,
           actor,
         }),

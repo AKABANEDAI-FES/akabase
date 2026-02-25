@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   eventIdSchema,
   orgIdSchema,
+  placeIdSchema,
   projectIdSchema,
   submissionIdSchema,
   tagIdSchema,
@@ -13,7 +14,6 @@ import {
  */
 export const PROJECT_NAME_MIN_LENGTH = 1;
 export const PROJECT_NAME_MAX_LENGTH = 100;
-export const PROJECT_PLACE_TEXT_MAX_LENGTH = 100;
 export const PROJECT_PAMPHLET_TEXT_MAX_LENGTH = 120;
 
 /**
@@ -28,12 +28,8 @@ export const projectSchema = z.object({
     .string()
     .min(PROJECT_NAME_MIN_LENGTH, "企画名を入力してください")
     .max(PROJECT_NAME_MAX_LENGTH, "企画名は100文字以内で入力してください"),
-  placeText: z
-    .string()
-    .max(PROJECT_PLACE_TEXT_MAX_LENGTH, "場所は100文字以内で入力してください")
-    .nullable(),
+  placeId: placeIdSchema.nullable(),
   logoKey: z.string().nullable(),
-  activeSubmissionId: submissionIdSchema.nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });

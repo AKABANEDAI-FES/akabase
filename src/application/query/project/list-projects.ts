@@ -3,7 +3,7 @@ import { Result } from "@praha/byethrow";
 import { db } from "@/db";
 import { projects } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
-import { eventIdSchema, orgIdSchema, projectIdSchema } from "@/domain/shared/ids";
+import { eventIdSchema, orgIdSchema, placeIdSchema, projectIdSchema } from "@/domain/shared/ids";
 import type { OrgId } from "@/domain/shared/ids";
 
 /**
@@ -14,9 +14,9 @@ export const projectListItemSchema = z.object({
   eventId: eventIdSchema,
   orgId: orgIdSchema,
   name: z.string(),
-  placeText: z.string().nullable(),
+  placeId: placeIdSchema.nullable(),
+  placeName: z.string().nullable(),
   logoKey: z.string().nullable(),
-  activeSubmissionId: z.string().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
@@ -41,6 +41,7 @@ export async function listProjects(
     const rows = await db.query.projects.findMany({
       where: eq(projects.orgId, orgId),
       orderBy: [desc(projects.createdAt)],
+      with: { place: true },
     });
 
     const items: ProjectListItem[] = rows.map((row) =>
@@ -49,11 +50,11 @@ export async function listProjects(
         eventId: row.eventId,
         orgId: row.orgId,
         name: row.name,
-        placeText: row.placeText,
+        placeId: row.placeId,
+        placeName: row.place?.name ?? null,
         logoKey: row.logoKey,
-        activeSubmissionId: row.activeSubmissionId,
-        createdAt: new Date(row.createdAt),
-        updatedAt: new Date(row.updatedAt),
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt,
       }),
     );
 

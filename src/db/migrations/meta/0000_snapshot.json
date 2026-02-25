@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "7f75c4c5-cda9-4375-a82e-721219126df7",
+  "id": "a08ddfc6-edb3-4818-ba0b-bfb25dcb2836",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "committee_roles": {
@@ -1052,8 +1052,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "place_text": {
-          "name": "place_text",
+        "place_id": {
+          "name": "place_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -1061,13 +1061,6 @@
         },
         "logo_key": {
           "name": "logo_key",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "active_submission_id": {
-          "name": "active_submission_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -1119,6 +1112,15 @@
           "columnsFrom": ["org_id"],
           "columnsTo": ["id"],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "projects_place_id_places_id_fk": {
+          "name": "projects_place_id_places_id_fk",
+          "tableFrom": "projects",
+          "tableTo": "places",
+          "columnsFrom": ["place_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
           "onUpdate": "no action"
         }
       },

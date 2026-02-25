@@ -4,7 +4,7 @@ import { draftWithTagsSchema, projectSchema } from "./schema";
 import type { ProjectError } from "./errors";
 import { projectError } from "./errors";
 import { DOMAIN_ERROR_CODE } from "../shared/errors";
-import type { EventId, OrgId, ProjectId, TagId, UserId } from "../shared/ids";
+import type { EventId, OrgId, PlaceId, ProjectId, TagId, UserId } from "../shared/ids";
 
 /**
  * =============================================================================
@@ -21,7 +21,7 @@ export function createProjectEntity(input: {
   eventId: EventId;
   orgId: OrgId;
   name: string;
-  placeText: string | null;
+  placeId: PlaceId | null;
   logoKey: string | null;
   now?: Date;
 }): Result.Result<Project, ProjectError> {
@@ -31,9 +31,8 @@ export function createProjectEntity(input: {
     eventId: input.eventId,
     orgId: input.orgId,
     name: input.name,
-    placeText: input.placeText,
+    placeId: input.placeId,
     logoKey: input.logoKey,
-    activeSubmissionId: null,
     createdAt: now,
     updatedAt: now,
   };
