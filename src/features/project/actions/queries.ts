@@ -4,9 +4,12 @@ import { Result } from "@praha/byethrow";
 import { listPlaces } from "@/application/query/event/list-places";
 import { listProjects } from "@/application/query/project/list-projects";
 import { getDraft } from "@/application/query/project/get-project-draft";
+import { resolveActor } from "@/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/session-server";
-import { eventIdSchema, orgIdSchema, projectIdSchema } from "@/domain/shared/ids";
+import { cast, eventIdSchema, orgIdSchema, projectIdSchema } from "@/domain/shared/ids";
+import type { UserId } from "@/domain/shared/ids";
 import { queryOptions } from "@tanstack/react-query";
+import { dependencies } from "@/infrastructure/di";
 
 /**
  * Server function to load places for an event
@@ -40,9 +43,21 @@ export function generateLoadPlacesQueryOptions(eventId: string) {
  */
 export const loadProjectsFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
-  .inputValidator(z.object({ orgId: orgIdSchema }))
-  .handler(async ({ data }) => {
-    const result = await listProjects(data.orgId);
+  .inputValidator(z.object({ eventId: eventIdSchema, orgId: orgIdSchema }))
+  .handler(async ({ data, context }) => {
+    // Resolve actor from session
+    const actorResult = await resolveActor({
+      userId: cast<UserId>(context.session.user.id),
+      eventIds: [data.eventId],
+      orgIds: [data.orgId],
+    });
+
+    if (Result.isFailure(actorResult)) {
+      throw new Error(actorResult.error.message);
+    }
+
+    // Query with authorization check
+    const result = await listProjects(dependencies, data.eventId, data.orgId, actorResult.value);
 
     if (Result.isFailure(result)) {
       throw new Error(result.error.message);
@@ -51,14 +66,14 @@ export const loadProjectsFn = createServerFn({ method: "GET" })
     return result.value;
   });
 
-export function generateLoadProjectsCacheKey(orgId: string) {
-  return ["projects", "for-organization", orgId];
+export function generateLoadProjectsCacheKey(eventId: string, orgId: string) {
+  return ["projects", "for-organization", [eventId, orgId]];
 }
 
-export function generateLoadProjectsQueryOptions(orgId: string) {
+export function generateLoadProjectsQueryOptions(eventId: string, orgId: string) {
   return queryOptions({
-    queryKey: generateLoadProjectsCacheKey(orgId),
-    queryFn: () => loadProjectsFn({ data: { orgId } }),
+    queryKey: generateLoadProjectsCacheKey(eventId, orgId),
+    queryFn: () => loadProjectsFn({ data: { eventId, orgId } }),
   });
 }
 
@@ -67,9 +82,29 @@ export function generateLoadProjectsQueryOptions(orgId: string) {
  */
 export const loadDraftFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
-  .inputValidator(z.object({ projectId: projectIdSchema }))
-  .handler(async ({ data }) => {
-    const result = await getDraft(data.projectId);
+  .inputValidator(
+    z.object({ eventId: eventIdSchema, orgId: orgIdSchema, projectId: projectIdSchema }),
+  )
+  .handler(async ({ data, context }) => {
+    // Resolve actor from session
+    const actorResult = await resolveActor({
+      userId: cast<UserId>(context.session.user.id),
+      eventIds: [data.eventId],
+      orgIds: [data.orgId],
+    });
+
+    if (Result.isFailure(actorResult)) {
+      throw new Error(actorResult.error.message);
+    }
+
+    // Query with authorization check
+    const result = await getDraft(
+      dependencies,
+      data.eventId,
+      data.orgId,
+      data.projectId,
+      actorResult.value,
+    );
 
     if (Result.isFailure(result)) {
       throw new Error(result.error.message);
@@ -78,13 +113,13 @@ export const loadDraftFn = createServerFn({ method: "GET" })
     return result.value;
   });
 
-export function generateLoadDraftCacheKey(projectId: string) {
-  return ["project-draft", projectId];
+export function generateLoadDraftCacheKey(eventId: string, orgId: string, projectId: string) {
+  return ["project-draft", [eventId, orgId, projectId]];
 }
 
-export function generateLoadDraftQueryOptions(projectId: string) {
+export function generateLoadDraftQueryOptions(eventId: string, orgId: string, projectId: string) {
   return queryOptions({
-    queryKey: generateLoadDraftCacheKey(projectId),
-    queryFn: () => loadDraftFn({ data: { projectId } }),
+    queryKey: generateLoadDraftCacheKey(eventId, orgId, projectId),
+    queryFn: () => loadDraftFn({ data: { eventId, orgId, projectId } }),
   });
 }

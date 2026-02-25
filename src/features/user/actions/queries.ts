@@ -11,8 +11,18 @@ import { resolveActor } from "@/application/query/authorization/resolve-actor";
 
 export const loadUsersWithRolesFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
-  .handler(async () => {
-    const result = await listUsersWithRoles();
+  .handler(async ({ context }) => {
+    // Resolve actor from session
+    const actorResult = await resolveActor({
+      userId: cast<UserId>(context.session.user.id),
+    });
+
+    if (Result.isFailure(actorResult)) {
+      throw new Error(actorResult.error.message);
+    }
+
+    // Query with authorization check
+    const result = await listUsersWithRoles(actorResult.value);
 
     if (Result.isFailure(result)) {
       throw new Error(result.error.message);

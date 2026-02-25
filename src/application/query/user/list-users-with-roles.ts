@@ -7,6 +7,8 @@ import { z } from "zod";
 import { Result } from "@praha/byethrow";
 import { db } from "@/db";
 import { globalRoleSchema } from "@/domain/authorization/schema";
+import type { Actor } from "@/domain/authorization/schema";
+import { isGlobalAdmin } from "@/domain/authorization/logic";
 import { userIdSchema } from "@/domain/shared/ids";
 
 /**
@@ -23,20 +25,34 @@ export const userListItemSchema = z.object({
 export type UserListItem = z.infer<typeof userListItemSchema>;
 
 export type QueryError = {
-  code: "DATABASE_ERROR";
+  code: "DATABASE_ERROR" | "PERMISSION_DENIED";
   message: string;
 };
 
 /**
  * List all users
  *
+ * Authorization: Only global admins can access
+ *
  * Strategy:
+ * - Check if actor is a global admin
  * - Fetch all users from the user table ordered by creation date
  * - Map to DTO with basic user information and global role
  *
+ * @param actor - Actor (authenticated user with permissions)
  * @returns List of users or query error
  */
-export async function listUsersWithRoles(): Promise<Result.Result<UserListItem[], QueryError>> {
+export async function listUsersWithRoles(
+  actor: Actor,
+): Promise<Result.Result<UserListItem[], QueryError>> {
+  // Authorization check: only global admins can list all users
+  if (!isGlobalAdmin(actor)) {
+    return Result.fail({
+      code: "PERMISSION_DENIED",
+      message: "ユーザー一覧を閲覧する権限がありません。グローバル管理者のみアクセス可能です。",
+    });
+  }
+
   try {
     // Fetch all users
     const users = await db.query.user.findMany({

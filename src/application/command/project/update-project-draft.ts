@@ -1,6 +1,6 @@
 import { Result } from "@praha/byethrow";
 import { gen } from "@/libs/result";
-import type { ProjectId, TagId } from "@/domain/shared/ids";
+import type { EventId, OrgId, ProjectId, TagId } from "@/domain/shared/ids";
 import type { ProjectError } from "@/domain/project/errors";
 import { PROJECT_ERROR_CODE, projectError } from "@/domain/project/errors";
 import type { EventError } from "@/domain/event/errors";
@@ -28,6 +28,8 @@ export type UpdateProjectDraftInput = {
  * Output of draft update
  */
 export type UpdateProjectDraftOutput = {
+  eventId: EventId;
+  orgId: OrgId;
   projectId: ProjectId;
 };
 
@@ -134,6 +136,6 @@ export async function updateProjectDraft(
     // Save updated draft (project remains unchanged)
     yield* $(await deps.projectRepo.saveDraft(updatedDraft));
 
-    return { projectId: project.id };
+    return { projectId: project.id, eventId: project.eventId, orgId: project.orgId };
   });
 }

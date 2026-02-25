@@ -1,10 +1,15 @@
 import { z } from "zod";
 import { Result } from "@praha/byethrow";
+import { gen } from "@/libs/result";
 import { db } from "@/db";
 import { projects } from "@/db/schema";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { eventIdSchema, orgIdSchema, placeIdSchema, projectIdSchema } from "@/domain/shared/ids";
-import type { OrgId } from "@/domain/shared/ids";
+import type { EventId, OrgId } from "@/domain/shared/ids";
+import type { Actor } from "@/domain/authorization/schema";
+import type { AuthorizationError } from "@/domain/authorization/errors";
+import type { Dependencies } from "@/infrastructure/di";
+import { organizationResource } from "@/domain/authorization/logic";
 
 /**
  * DTO schema for project list item
@@ -31,39 +36,56 @@ export type QueryError = {
 /**
  * List projects for an organization
  *
+ * Authorization: Committee members or organization members can read
+ *
+ * @param deps - Dependencies (authService)
+ * @param eventId - Event ID
  * @param orgId - Organization ID
+ * @param actor - Actor (authenticated user with permissions)
  * @returns Result with list of projects or error
  */
 export async function listProjects(
+  deps: Pick<Dependencies, "authService">,
+  eventId: EventId,
   orgId: OrgId,
-): Promise<Result.Result<ProjectListItem[], QueryError>> {
-  try {
-    const rows = await db.query.projects.findMany({
-      where: eq(projects.orgId, orgId),
-      orderBy: [desc(projects.createdAt)],
-      with: { place: true },
-    });
-
-    const items: ProjectListItem[] = rows.map((row) =>
-      projectListItemSchema.parse({
-        id: row.id,
-        eventId: row.eventId,
-        orgId: row.orgId,
-        name: row.name,
-        placeId: row.placeId,
-        placeName: row.place?.name ?? null,
-        logoKey: row.logoKey,
-        createdAt: row.createdAt,
-        updatedAt: row.updatedAt,
-      }),
+  actor: Actor,
+): Result.ResultAsync<ProjectListItem[], QueryError | AuthorizationError> {
+  return gen(async function* ($) {
+    // Authorization check: organization:read permission
+    yield* $(
+      deps.authService.enforce(actor, organizationResource(orgId, eventId), "organization:read"),
     );
 
-    return Result.succeed(items);
-  } catch (error) {
-    console.error("[Query Error] Failed to list projects", error);
-    return Result.fail({
-      code: "DATABASE_ERROR",
-      message: "企画一覧の取得に失敗しました。",
-    });
-  }
+    try {
+      const rows = await db.query.projects.findMany({
+        where: and(eq(projects.orgId, orgId), eq(projects.eventId, eventId)),
+        orderBy: [desc(projects.createdAt)],
+        with: { place: true },
+      });
+
+      const items: ProjectListItem[] = rows.map((row) =>
+        projectListItemSchema.parse({
+          id: row.id,
+          eventId: row.eventId,
+          orgId: row.orgId,
+          name: row.name,
+          placeId: row.placeId,
+          placeName: row.place?.name ?? null,
+          logoKey: row.logoKey,
+          createdAt: row.createdAt,
+          updatedAt: row.updatedAt,
+        }),
+      );
+
+      return items;
+    } catch (error) {
+      console.error("[Query Error] Failed to list projects", error);
+      return yield* $(
+        Result.fail({
+          code: "DATABASE_ERROR",
+          message: "企画一覧の取得に失敗しました。",
+        }),
+      );
+    }
+  });
 }

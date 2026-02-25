@@ -27,6 +27,7 @@ export type CreateProjectInput = {
  * Output of project creation
  */
 export type CreateProjectOutput = {
+  eventId: EventId;
   orgId: OrgId;
   projectId: ProjectId;
 };
@@ -89,6 +90,6 @@ export async function createProject(
     yield* $(await deps.projectRepo.saveProject(project));
     yield* $(await deps.projectRepo.saveDraft(draft));
 
-    return { orgId: project.orgId, projectId: project.id };
+    return { orgId: project.orgId, projectId: project.id, eventId: project.eventId };
   });
 }

@@ -57,9 +57,9 @@ export function useCreateProjectMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createProjectFn,
-    onSuccess: Result.inspect(({ orgId }) => {
+    onSuccess: Result.inspect(({ orgId, eventId }) => {
       queryClient.invalidateQueries({
-        queryKey: generateLoadProjectsCacheKey(orgId),
+        queryKey: generateLoadProjectsCacheKey(eventId, orgId),
       });
     }),
   });
@@ -111,9 +111,9 @@ export function useUpdateProjectDraftMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updateProjectDraftFn,
-    onSuccess: Result.inspect(({ projectId }) => {
+    onSuccess: Result.inspect(({ projectId, eventId, orgId }) => {
       queryClient.invalidateQueries({
-        queryKey: generateLoadDraftCacheKey(projectId),
+        queryKey: generateLoadDraftCacheKey(eventId, orgId, projectId),
       });
     }),
   });
