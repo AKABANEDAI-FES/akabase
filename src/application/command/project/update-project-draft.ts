@@ -9,6 +9,8 @@ import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
 import { projectResource } from "@/domain/authorization/logic";
 import { updateProjectDraftEntity } from "@/domain/project/logic";
+import type { Deadline } from "@/domain/event/schema";
+import type { DraftWithTags } from "@/domain/project/schema";
 import type { Dependencies } from "@/infrastructure/di";
 
 /**
@@ -39,21 +41,54 @@ export type UpdateProjectDraftError =
   | AuthorizationError;
 
 /**
+ * Build a set of past-deadline field keys
+ */
+function getPastDeadlineFieldKeys(deadlines: Deadline[], now: Date): Set<string> {
+  const keys = new Set<string>();
+  for (const deadline of deadlines) {
+    if (deadline.deadlineAt <= now) {
+      keys.add(deadline.fieldKey);
+    }
+  }
+  return keys;
+}
+
+/**
+ * Apply deadline enforcement by keeping existing values for past-deadline fields
+ */
+function applyDeadlineEnforcement(
+  existingDraft: DraftWithTags,
+  input: UpdateProjectDraftInput,
+  pastDeadlineKeys: Set<string>,
+): { pamphletText: string; webContentJson: unknown | null; tags: TagId[] } {
+  return {
+    pamphletText: pastDeadlineKeys.has("pamphlet_text")
+      ? existingDraft.pamphletText
+      : input.pamphletText,
+    webContentJson: pastDeadlineKeys.has("web_content")
+      ? existingDraft.webContentJson
+      : input.webContentJson,
+    tags: pastDeadlineKeys.has("tags") ? existingDraft.tags : input.tags,
+  };
+}
+
+/**
  * Update a project draft
  *
  * Business rules:
  * - Only committee admins can update drafts
  * - Draft must exist (project must exist)
  * - Event must be modifiable (not archived)
+ * - Fields past their deadline are silently kept unchanged
  * - Updates only the draft, not the project itself
  * - Validation: pamphletText max 120 chars (enforced by domain schema)
  *
- * @param deps - Dependencies (projectRepo, authService, eventDomainService)
+ * @param deps - Dependencies (projectRepo, authService, eventDomainService, eventRepo)
  * @param input - Draft update input
  * @returns Result with project ID or error
  */
 export async function updateProjectDraft(
-  deps: Pick<Dependencies, "projectRepo" | "authService" | "eventDomainService">,
+  deps: Pick<Dependencies, "projectRepo" | "authService" | "eventDomainService" | "eventRepo">,
   input: UpdateProjectDraftInput,
 ): Result.ResultAsync<UpdateProjectDraftOutput, UpdateProjectDraftError> {
   return gen(async function* ($) {
@@ -80,13 +115,18 @@ export async function updateProjectDraft(
       );
     }
 
+    // Deadline enforcement: keep existing values for past-deadline fields
+    const deadlines = yield* $(await deps.eventRepo.findDeadlines(project.eventId));
+    const pastDeadlineKeys = getPastDeadlineFieldKeys(deadlines, new Date());
+    const enforced = applyDeadlineEnforcement(existingDraft, input, pastDeadlineKeys);
+
     // Create updated draft entity
     const updatedDraft = yield* $(
       updateProjectDraftEntity({
         projectId: input.projectId,
-        pamphletText: input.pamphletText,
-        webContentJson: input.webContentJson,
-        tags: input.tags,
+        pamphletText: enforced.pamphletText,
+        webContentJson: enforced.webContentJson,
+        tags: enforced.tags,
         updatedBy: input.actor.userId,
       }),
     );
