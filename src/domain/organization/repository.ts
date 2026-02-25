@@ -13,7 +13,10 @@ export interface OrganizationRepository {
   /**
    * Find organization by ID
    */
-  findById(id: OrgId): Promise<Result.Result<Organization | null, RepositoryError>>;
+  findById(
+    eventId: EventId,
+    id: OrgId,
+  ): Promise<Result.Result<Organization | null, RepositoryError>>;
 
   /**
    * Find organization members
@@ -41,7 +44,7 @@ export interface OrganizationRepository {
   removeMember(orgId: OrgId, userId: UserId): Promise<Result.Result<void, RepositoryError>>;
 
   /**
-   * Delete an organization
+   * Delete an organization (scoped by eventId)
    */
-  deleteOrganization(id: OrgId): Promise<Result.Result<void, RepositoryError>>;
+  deleteOrganization(eventId: EventId, id: OrgId): Promise<Result.Result<void, RepositoryError>>;
 }

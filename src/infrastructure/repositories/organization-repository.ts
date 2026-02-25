@@ -13,10 +13,14 @@ import { repositoryError } from "@/domain/shared/repository";
  * Organization Repository Implementation using Drizzle ORM
  */
 export class OrganizationRepositoryImpl implements OrganizationRepository {
-  async findById(id: OrgId): Promise<Result.Result<Organization | null, RepositoryError>> {
+  async findById(
+    eventId: EventId,
+    id: OrgId,
+  ): Promise<Result.Result<Organization | null, RepositoryError>> {
     try {
       const row = await db.query.organizations.findFirst({
-        where: (organizations, { eq }) => eq(organizations.id, id),
+        where: (organizations, { eq, and }) =>
+          and(eq(organizations.id, id), eq(organizations.eventId, eventId)),
       });
 
       if (!row) {
@@ -111,6 +115,7 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
             logoKey: org.logoKey,
             updatedAt: org.updatedAt,
           },
+          where: eq(organizations.eventId, org.eventId),
         });
 
       return Result.succeed(undefined);
@@ -119,9 +124,14 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
     }
   }
 
-  async deleteOrganization(id: OrgId): Promise<Result.Result<void, RepositoryError>> {
+  async deleteOrganization(
+    eventId: EventId,
+    id: OrgId,
+  ): Promise<Result.Result<void, RepositoryError>> {
     try {
-      await db.delete(organizations).where(eq(organizations.id, id));
+      await db
+        .delete(organizations)
+        .where(and(eq(organizations.id, id), eq(organizations.eventId, eventId)));
       return Result.succeed(undefined);
     } catch (error) {
       return Result.fail(repositoryError("DATABASE_ERROR", "Failed to delete organization", error));

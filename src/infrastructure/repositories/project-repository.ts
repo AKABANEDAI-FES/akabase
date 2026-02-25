@@ -248,6 +248,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
             activeSubmissionId: project.activeSubmissionId,
             updatedAt: project.updatedAt,
           },
+          where: eq(projects.eventId, project.eventId),
         });
 
       // Upsert draft

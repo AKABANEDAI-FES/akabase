@@ -51,9 +51,9 @@ export interface EventRepository {
   saveTag(tag: Tag): Promise<Result.Result<void, RepositoryError>>;
 
   /**
-   * Delete tag
+   * Delete tag (scoped by eventId)
    */
-  deleteTag(tagId: TagId): Promise<Result.Result<void, RepositoryError>>;
+  deleteTag(eventId: EventId, tagId: TagId): Promise<Result.Result<void, RepositoryError>>;
 
   /**
    * Save place (insert or update)
@@ -61,9 +61,9 @@ export interface EventRepository {
   savePlace(place: Place): Promise<Result.Result<void, RepositoryError>>;
 
   /**
-   * Delete place
+   * Delete place (scoped by eventId)
    */
-  deletePlace(placeId: PlaceId): Promise<Result.Result<void, RepositoryError>>;
+  deletePlace(eventId: EventId, placeId: PlaceId): Promise<Result.Result<void, RepositoryError>>;
 
   /**
    * Save or update deadline
@@ -71,7 +71,10 @@ export interface EventRepository {
   saveDeadline(deadline: Deadline): Promise<Result.Result<void, RepositoryError>>;
 
   /**
-   * Delete deadline
+   * Delete deadline (scoped by eventId)
    */
-  deleteDeadline(deadlineId: DeadlineId): Promise<Result.Result<void, RepositoryError>>;
+  deleteDeadline(
+    eventId: EventId,
+    deadlineId: DeadlineId,
+  ): Promise<Result.Result<void, RepositoryError>>;
 }

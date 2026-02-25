@@ -1,9 +1,8 @@
-import { Result } from "@praha/byethrow";
+import type { Result } from "@praha/byethrow";
 import { gen } from "@/libs/result";
 import type { EventId } from "@/domain/shared/ids";
 import type { EventError } from "@/domain/event/errors";
-import { EVENT_ERROR_CODE, eventError } from "@/domain/event/errors";
-import { canModifyEvent, updateEventEntity } from "@/domain/event/logic";
+import { updateEventEntity } from "@/domain/event/logic";
 import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
@@ -51,21 +50,12 @@ export async function updateEvent(
   input: UpdateEventInput,
 ): Result.ResultAsync<UpdateEventOutput, UpdateEventError> {
   return gen(async function* ($) {
-    // Fetch the event
-    const event = yield* $(await deps.eventRepo.findById(input.eventId));
-
-    if (!event) {
-      return yield* $(
-        Result.fail(eventError(EVENT_ERROR_CODE.EVENT_NOT_FOUND, "イベントが見つかりません")),
-      );
-    }
+    // Fetch event and check if modifiable
+    const event = yield* $(await deps.eventDomainService.resolveModifiableEvent(input.eventId));
 
     // Authorization check: global admin or event committee admin
     const resource = eventResource(input.eventId, event);
     yield* $(deps.authService.enforce(input.actor, resource, "event:update"));
-
-    // Check if event can be modified (not archived)
-    yield* $(canModifyEvent(event));
 
     // Check if slug is unique (exclude current event, domain service)
     yield* $(await deps.eventDomainService.ensureSlugUnique(input.slug, input.eventId));

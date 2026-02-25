@@ -4,10 +4,11 @@ import { OrgMemberRoleSelect } from "./org-member-role-select";
 import { RemoveMemberDialog } from "./remove-member-dialog";
 import type { OrgMemberRole } from "@/domain/organization/schema";
 import { ORG_ROLE_LABELS } from "@/domain/authorization/schema";
+import type { EventId, OrgId, UserId } from "@/domain/shared/ids";
 
 interface Member {
   id: string;
-  userId: string;
+  userId: UserId;
   name: string;
   email: string;
   role: OrgMemberRole;
@@ -15,11 +16,17 @@ interface Member {
 
 interface OrgMembersTableProps {
   members: Member[];
-  orgId: string;
+  eventId: EventId;
+  orgId: OrgId;
   canManageMembers: boolean;
 }
 
-export function OrgMembersTable({ members, orgId, canManageMembers }: OrgMembersTableProps) {
+export function OrgMembersTable({
+  members,
+  eventId,
+  orgId,
+  canManageMembers,
+}: OrgMembersTableProps) {
   if (members.length === 0) {
     return <p>メンバーがいません。</p>;
   }
@@ -44,6 +51,7 @@ export function OrgMembersTable({ members, orgId, canManageMembers }: OrgMembers
             <Table.Cell>
               {canManageMembers ? (
                 <OrgMemberRoleSelect
+                  eventId={eventId}
                   orgId={orgId}
                   userId={member.userId}
                   currentRole={member.role}
@@ -54,7 +62,12 @@ export function OrgMembersTable({ members, orgId, canManageMembers }: OrgMembers
             </Table.Cell>
             {canManageMembers && (
               <Table.Cell>
-                <RemoveMemberDialog orgId={orgId} userId={member.userId} userName={member.name}>
+                <RemoveMemberDialog
+                  eventId={eventId}
+                  orgId={orgId}
+                  userId={member.userId}
+                  userName={member.name}
+                >
                   <IconButton variant="outline" colorPalette="red" size="sm">
                     <Trash2Icon />
                   </IconButton>

@@ -1,7 +1,7 @@
 import { Result } from "@praha/byethrow";
 import { db } from "@/db";
 import { deadlines, events, places, tags } from "@/db/schema";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { deadlineSchema, eventSchema, placeSchema, tagSchema } from "@/domain/event/schema";
 import type { Deadline, Event, Place, Tag } from "@/domain/event/schema";
 import type { DeadlineId, EventId, PlaceId, TagId } from "@/domain/shared/ids";
@@ -156,6 +156,7 @@ export class EventRepositoryImpl implements EventRepository {
             // Immutable fields excluded: id, eventId, createdAt
             name: tag.name,
           },
+          where: eq(tags.eventId, tag.eventId),
         });
 
       return Result.succeed(undefined);
@@ -164,9 +165,9 @@ export class EventRepositoryImpl implements EventRepository {
     }
   }
 
-  async deleteTag(tagId: TagId): Promise<Result.Result<void, RepositoryError>> {
+  async deleteTag(eventId: EventId, tagId: TagId): Promise<Result.Result<void, RepositoryError>> {
     try {
-      await db.delete(tags).where(eq(tags.id, tagId));
+      await db.delete(tags).where(and(eq(tags.id, tagId), eq(tags.eventId, eventId)));
       return Result.succeed(undefined);
     } catch (error) {
       return Result.fail(repositoryError("DATABASE_ERROR", "Failed to delete tag", error));
@@ -217,6 +218,7 @@ export class EventRepositoryImpl implements EventRepository {
             // Note: parentId cannot be changed after creation to avoid circular reference complexity
             name: place.name,
           },
+          where: eq(places.eventId, place.eventId),
         });
 
       return Result.succeed(undefined);
@@ -225,9 +227,12 @@ export class EventRepositoryImpl implements EventRepository {
     }
   }
 
-  async deletePlace(placeId: PlaceId): Promise<Result.Result<void, RepositoryError>> {
+  async deletePlace(
+    eventId: EventId,
+    placeId: PlaceId,
+  ): Promise<Result.Result<void, RepositoryError>> {
     try {
-      await db.delete(places).where(eq(places.id, placeId));
+      await db.delete(places).where(and(eq(places.id, placeId), eq(places.eventId, eventId)));
       return Result.succeed(undefined);
     } catch (error) {
       return Result.fail(repositoryError("DATABASE_ERROR", "Failed to delete place", error));
@@ -284,9 +289,14 @@ export class EventRepositoryImpl implements EventRepository {
     }
   }
 
-  async deleteDeadline(deadlineId: DeadlineId): Promise<Result.Result<void, RepositoryError>> {
+  async deleteDeadline(
+    eventId: EventId,
+    deadlineId: DeadlineId,
+  ): Promise<Result.Result<void, RepositoryError>> {
     try {
-      await db.delete(deadlines).where(eq(deadlines.id, deadlineId));
+      await db
+        .delete(deadlines)
+        .where(and(eq(deadlines.id, deadlineId), eq(deadlines.eventId, eventId)));
       return Result.succeed(undefined);
     } catch (error) {
       return Result.fail(repositoryError("DATABASE_ERROR", "Failed to delete deadline", error));

@@ -1,9 +1,7 @@
-import { Result } from "@praha/byethrow";
+import type { Result } from "@praha/byethrow";
 import { gen } from "@/libs/result";
 import type { DeadlineId, EventId } from "@/domain/shared/ids";
 import type { EventError } from "@/domain/event/errors";
-import { EVENT_ERROR_CODE, eventError } from "@/domain/event/errors";
-import { canModifyEvent } from "@/domain/event/logic";
 import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
@@ -30,7 +28,7 @@ export type DeleteDeadlineError = EventError | RepositoryError | AuthorizationEr
  * Delete a deadline
  */
 export async function deleteDeadline(
-  deps: Pick<Dependencies, "eventRepo" | "authService">,
+  deps: Pick<Dependencies, "eventRepo" | "authService" | "eventDomainService">,
   input: DeleteDeadlineInput,
 ): Result.ResultAsync<DeleteDeadlineOutput, DeleteDeadlineError> {
   return gen(async function* ($) {
@@ -39,16 +37,10 @@ export async function deleteDeadline(
     yield* $(deps.authService.enforce(input.actor, resource, "event:update"));
 
     // Fetch event and check if modifiable
-    const event = yield* $(await deps.eventRepo.findById(input.eventId));
-    if (!event) {
-      return yield* $(
-        Result.fail(eventError(EVENT_ERROR_CODE.EVENT_NOT_FOUND, "イベントが見つかりません")),
-      );
-    }
-    yield* $(canModifyEvent(event));
+    yield* $(await deps.eventDomainService.resolveModifiableEvent(input.eventId));
 
     // Delete deadline
-    yield* $(await deps.eventRepo.deleteDeadline(input.deadlineId));
+    yield* $(await deps.eventRepo.deleteDeadline(input.eventId, input.deadlineId));
 
     return { success: true as const, eventId: input.eventId };
   });

@@ -10,7 +10,7 @@ import { generateCheckCommitteePermissionsQueryOptions } from "@/features/author
 import { OrgMembersTable } from "@/features/organization/components/org-members-table";
 import { Button, Text } from "@/components/ui";
 import { cast } from "@/domain/shared/ids";
-import type { OrgId } from "@/domain/shared/ids";
+import type { EventId, OrgId } from "@/domain/shared/ids";
 
 export const Route = createFileRoute(
   "/_authenticated/$slug/committee/organizations_/$orgId/members",
@@ -53,7 +53,7 @@ function MemberManagementSection({
 }: {
   slug: string;
   orgId: OrgId;
-  eventId: string;
+  eventId: EventId;
 }) {
   const { data: members } = useSuspenseQuery(generateLoadOrganizationMembersQueryOptions(orgId));
   const { data: permissions } = useSuspenseQuery(
@@ -78,6 +78,7 @@ function MemberManagementSection({
         </HStack>
         <OrgMembersTable
           members={members}
+          eventId={eventId}
           orgId={orgId}
           canManageMembers={permissions.canManageOrgMembers}
         />

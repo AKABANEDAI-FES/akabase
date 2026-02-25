@@ -25,11 +25,12 @@ export function UpdateOrganizationForm({ organization, disabled }: UpdateOrganiz
       description: organization.description,
     },
     validators: {
-      onDynamic: updateOrganizationInputSchema.omit({ id: true }),
+      onDynamic: updateOrganizationInputSchema.omit({ eventId: true, id: true }),
       onSubmitAsync: async ({ value }) => {
         try {
           const result = await mutateAsync({
             data: {
+              eventId: organization.eventId,
               id: organization.id,
               name: value.name,
               description: value.description,

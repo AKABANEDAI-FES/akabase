@@ -2,9 +2,10 @@ import { Result } from "@praha/byethrow";
 import { useActivateEventMutation, useArchiveEventMutation } from "@/features/event/actions";
 import { Button, Fieldset, toaster } from "@/components/ui";
 import { ArchiveIcon, ArchiveRestoreIcon } from "lucide-react";
+import type { EventId } from "@/domain/shared/ids";
 
 interface EventStatusControlsProps {
-  eventId: string;
+  eventId: EventId;
   eventName: string;
   status: "active" | "archived";
 }

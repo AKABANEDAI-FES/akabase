@@ -9,6 +9,7 @@ import type {
 import { projectSchema } from "./schema";
 import type { ProjectError } from "./errors";
 import { PROJECT_ERROR_CODE, projectError } from "./errors";
+import { DOMAIN_ERROR_CODE } from "../shared/errors";
 import type { SubmissionId, UserId } from "../shared/ids";
 
 /**
@@ -254,7 +255,7 @@ export function updateProject(
   const validationResult = projectSchema.safeParse(updated);
 
   if (!validationResult.success) {
-    return Result.fail(projectError(PROJECT_ERROR_CODE.VALIDATION_ERROR, "入力値が不正です"));
+    return Result.fail(projectError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "入力値が不正です"));
   }
 
   return Result.succeed(validationResult.data);

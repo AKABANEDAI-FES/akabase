@@ -1,4 +1,4 @@
-import type { BaseError } from "../shared/errors";
+import type { BaseError, DomainErrorCodeOf } from "../shared/errors";
 import { createError } from "../shared/errors";
 
 export const PROJECT_ERROR_CODE = {
@@ -12,10 +12,9 @@ export const PROJECT_ERROR_CODE = {
   DRAFT_NOT_FOUND: "DRAFT_NOT_FOUND",
   SUBMISSION_NOT_FOUND: "SUBMISSION_NOT_FOUND",
   FIELD_NOT_EDITABLE: "FIELD_NOT_EDITABLE",
-  VALIDATION_ERROR: "VALIDATION_ERROR",
 } as const;
 
-export type ProjectErrorCode = (typeof PROJECT_ERROR_CODE)[keyof typeof PROJECT_ERROR_CODE];
+export type ProjectErrorCode = DomainErrorCodeOf<typeof PROJECT_ERROR_CODE>;
 
 export type ProjectError = BaseError<ProjectErrorCode>;
 

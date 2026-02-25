@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { Result } from "@praha/byethrow";
 import { db } from "@/db";
-import { orgIdSchema } from "@/domain/shared/ids";
+import { eventIdSchema, orgIdSchema } from "@/domain/shared/ids";
 import type { OrgId } from "@/domain/shared/ids";
 
 /**
@@ -9,7 +9,7 @@ import type { OrgId } from "@/domain/shared/ids";
  */
 export const organizationDetailSchema = z.object({
   id: orgIdSchema,
-  eventId: z.string(),
+  eventId: eventIdSchema,
   name: z.string(),
   description: z.string(),
   logoKey: z.string().nullable(),

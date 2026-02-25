@@ -7,7 +7,7 @@ import { generateCheckCommitteePermissionsQueryOptions } from "@/features/author
 import { UpdateOrganizationForm } from "@/features/organization/components/update-organization-form";
 import { DeleteOrganizationDialog } from "@/features/organization/components/delete-organization-dialog";
 import { Button, Fieldset } from "@/components/ui";
-import type { OrgId } from "@/domain/shared/ids";
+import type { EventId, OrgId } from "@/domain/shared/ids";
 
 export const Route = createFileRoute("/_authenticated/$slug/committee/organizations_/$orgId/")({
   loader: async ({ params, context }) => {
@@ -39,6 +39,7 @@ function EditOrganizationPage() {
       />
       {permissions.canDeleteOrganization && (
         <DeleteOrganizationSection
+          eventId={organization.eventId}
           orgId={organization.id as OrgId}
           orgName={organization.name}
           slug={slug}
@@ -49,10 +50,12 @@ function EditOrganizationPage() {
 }
 
 function DeleteOrganizationSection({
+  eventId,
   orgId,
   orgName,
   slug,
 }: {
+  eventId: EventId;
   orgId: OrgId;
   orgName: string;
   slug: string;
@@ -66,7 +69,7 @@ function DeleteOrganizationSection({
         </Fieldset.HelperText>
       </Fieldset.Control>
       <Fieldset.Content>
-        <DeleteOrganizationDialog orgId={orgId} orgName={orgName} slug={slug}>
+        <DeleteOrganizationDialog eventId={eventId} orgId={orgId} orgName={orgName} slug={slug}>
           <Button variant="outline" colorPalette="red" w="fit" ml="auto">
             <Trash2Icon />
             団体を削除

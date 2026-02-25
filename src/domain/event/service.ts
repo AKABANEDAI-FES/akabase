@@ -1,5 +1,6 @@
 import type { Result } from "@praha/byethrow";
 import type { EventId, PlaceId, TagId } from "@/domain/shared/ids";
+import type { Event } from "./schema";
 import type { EventError } from "./errors";
 import type { RepositoryError } from "../shared/repository";
 
@@ -50,4 +51,14 @@ export interface EventDomainService {
     parentId: PlaceId | null,
     excludePlaceId?: PlaceId,
   ): Promise<Result.Result<true, EventError | RepositoryError>>;
+
+  /**
+   * イベントを取得し、変更可能な状態であることを保証する
+   *
+   * @param eventId - 対象イベントID
+   * @returns イベントエンティティ。見つからない場合はEVENT_NOT_FOUND、アーカイブ済みの場合はEVENT_ARCHIVEDエラー
+   */
+  resolveModifiableEvent(
+    eventId: EventId,
+  ): Promise<Result.Result<Event, EventError | RepositoryError>>;
 }

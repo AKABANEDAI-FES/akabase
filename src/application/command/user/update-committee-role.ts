@@ -9,6 +9,7 @@ import type { EventId, UserId } from "@/domain/shared/ids";
 import type { Actor, CommitteeRole } from "@/domain/authorization/schema";
 import type { Dependencies } from "@/infrastructure/di";
 import type { UserError } from "@/domain/user/errors";
+import type { EventError } from "@/domain/event/errors";
 import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import { eventResource } from "@/domain/authorization/logic";
@@ -26,7 +27,11 @@ export type UpdateCommitteeRoleOutput = {
   success: true;
 };
 
-export type UpdateCommitteeRoleError = UserError | RepositoryError | AuthorizationError;
+export type UpdateCommitteeRoleError =
+  | UserError
+  | EventError
+  | RepositoryError
+  | AuthorizationError;
 
 /**
  * Update (or create) a committee role assignment
@@ -41,12 +46,15 @@ export type UpdateCommitteeRoleError = UserError | RepositoryError | Authorizati
  * @returns Success or error
  */
 export async function updateCommitteeRole(
-  deps: Pick<Dependencies, "userRepo" | "authService">,
+  deps: Pick<Dependencies, "userRepo" | "authService" | "eventDomainService">,
   input: UpdateCommitteeRoleInput,
 ): Result.ResultAsync<UpdateCommitteeRoleOutput, UpdateCommitteeRoleError> {
   return gen(async function* ($) {
     const resource = eventResource(input.eventId);
     yield* $(deps.authService.enforce(input.actor, resource, "event:update"));
+
+    // Fetch event and check if modifiable
+    yield* $(await deps.eventDomainService.resolveModifiableEvent(input.eventId));
 
     const existingAssignment = yield* $(
       await deps.userRepo.findCommitteeRoleAssignment(input.userId, input.eventId),

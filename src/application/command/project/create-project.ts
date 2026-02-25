@@ -3,6 +3,7 @@ import { gen } from "@/libs/result";
 import { generateId } from "@/libs/id";
 import type { EventId, OrgId, ProjectId } from "@/domain/shared/ids";
 import type { ProjectError } from "@/domain/project/errors";
+import type { EventError } from "@/domain/event/errors";
 import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
@@ -33,7 +34,7 @@ export type CreateProjectOutput = {
 /**
  * Errors that can occur during project creation
  */
-export type CreateProjectError = ProjectError | RepositoryError | AuthorizationError;
+export type CreateProjectError = ProjectError | EventError | RepositoryError | AuthorizationError;
 
 /**
  * Create a new project
@@ -50,7 +51,7 @@ export type CreateProjectError = ProjectError | RepositoryError | AuthorizationE
  * @returns Result with project ID or error
  */
 export async function createProject(
-  deps: Pick<Dependencies, "projectRepo" | "authService">,
+  deps: Pick<Dependencies, "projectRepo" | "authService" | "eventDomainService">,
   input: CreateProjectInput,
 ): Result.ResultAsync<CreateProjectOutput, CreateProjectError> {
   return gen(async function* ($) {
@@ -60,6 +61,9 @@ export async function createProject(
     // Authorization check: only committee admins can create projects
     const resource = projectResource(projectId, input.eventId, input.orgId);
     yield* $(deps.authService.enforce(input.actor, resource, "project:create"));
+
+    // Fetch event and check if modifiable
+    yield* $(await deps.eventDomainService.resolveModifiableEvent(input.eventId));
 
     // Create project entity
     const project = projectSchema.parse({

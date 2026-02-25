@@ -1,4 +1,4 @@
-import type { BaseError } from "../shared/errors";
+import type { BaseError, DomainErrorCodeOf } from "../shared/errors";
 import { createError } from "../shared/errors";
 
 export const ORGANIZATION_ERROR_CODE = {
@@ -7,11 +7,9 @@ export const ORGANIZATION_ERROR_CODE = {
   NOT_MANAGER: "NOT_MANAGER",
   ORGANIZATION_NOT_FOUND: "ORGANIZATION_NOT_FOUND",
   INVALID_ROLE: "INVALID_ROLE",
-  VALIDATION_ERROR: "VALIDATION_ERROR",
 } as const;
 
-export type OrganizationErrorCode =
-  (typeof ORGANIZATION_ERROR_CODE)[keyof typeof ORGANIZATION_ERROR_CODE];
+export type OrganizationErrorCode = DomainErrorCodeOf<typeof ORGANIZATION_ERROR_CODE>;
 
 export type OrganizationError = BaseError<OrganizationErrorCode>;
 

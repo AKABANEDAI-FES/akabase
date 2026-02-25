@@ -9,7 +9,7 @@ import { removeOrganizationMember } from "@/application/command/organization/rem
 import { updateOrganizationMemberRole } from "@/application/command/organization/update-organization-member-role";
 import { resolveActor } from "@/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/session-server";
-import { cast, orgIdSchema, userIdSchema } from "@/domain/shared/ids";
+import { cast, eventIdSchema, orgIdSchema, userIdSchema } from "@/domain/shared/ids";
 import type { OrgId, UserId } from "@/domain/shared/ids";
 import { z } from "zod";
 import { orgMemberRoleSchema, organizationSchema } from "@/domain/organization/schema";
@@ -20,7 +20,6 @@ import {
   generateLoadOrganizationsCacheKey,
 } from "./queries";
 import { gen } from "@/libs/result";
-import { ORGANIZATION_ERROR_CODE } from "@/domain/organization/errors";
 
 /**
  * Create organization input validation schema
@@ -76,6 +75,7 @@ export function useCreateOrganizationMutation() {
  * Update organization input validation schema
  */
 export const updateOrganizationInputSchema = organizationSchema.pick({
+  eventId: true,
   id: true,
   name: true,
   description: true,
@@ -89,28 +89,17 @@ export const updateOrganizationFn = createServerFn({ method: "POST" })
   .inputValidator(updateOrganizationInputSchema)
   .handler(async ({ data, context }) => {
     return gen(async function* ($) {
-      // Resolve actor with event context
-      // Note: We need to fetch the org first to get eventId for actor resolution
-      const org = yield* $(await dependencies.organizationRepo.findById(data.id));
-
-      if (!org) {
-        return yield* $(
-          Result.fail({
-            code: ORGANIZATION_ERROR_CODE.ORGANIZATION_NOT_FOUND,
-            message: "団体が見つかりません。",
-          }),
-        );
-      }
-
       const actor = yield* $(
         await resolveActor({
           userId: cast<UserId>(context.session.user.id),
-          eventIds: [org.eventId],
+          eventIds: [data.eventId],
+          orgIds: [data.id],
         }),
       );
 
       return yield* $(
         await updateOrganization(dependencies, {
+          eventId: data.eventId,
           orgId: data.id,
           name: data.name,
           description: data.description,
@@ -139,6 +128,7 @@ export function useUpdateOrganizationMutation() {
  * Delete organization input validation schema
  */
 export const deleteOrganizationInputSchema = z.object({
+  eventId: eventIdSchema,
   orgId: orgIdSchema,
 });
 
@@ -150,26 +140,17 @@ export const deleteOrganizationFn = createServerFn({ method: "POST" })
   .inputValidator(deleteOrganizationInputSchema)
   .handler(async ({ data, context }) => {
     return gen(async function* ($) {
-      const org = yield* $(await dependencies.organizationRepo.findById(data.orgId));
-
-      if (!org) {
-        return yield* $(
-          Result.fail({
-            code: ORGANIZATION_ERROR_CODE.ORGANIZATION_NOT_FOUND,
-            message: "団体が見つかりません。",
-          }),
-        );
-      }
-
       const actor = yield* $(
         await resolveActor({
           userId: cast<UserId>(context.session.user.id),
-          eventIds: [org.eventId],
+          eventIds: [data.eventId],
+          orgIds: [data.orgId],
         }),
       );
 
       return yield* $(
         await deleteOrganization(dependencies, {
+          eventId: data.eventId,
           orgId: data.orgId,
           actor,
         }),
@@ -193,6 +174,7 @@ export function useDeleteOrganizationMutation() {
  * Add organization member input validation schema
  */
 export const addOrganizationMemberInputSchema = z.object({
+  eventId: eventIdSchema,
   orgId: orgIdSchema,
   userId: userIdSchema,
   role: orgMemberRoleSchema,
@@ -209,13 +191,15 @@ export const addOrganizationMemberFn = createServerFn({ method: "POST" })
       const actor = yield* $(
         await resolveActor({
           userId: cast<UserId>(context.session.user.id),
-          orgIds: [data.orgId as OrgId],
+          eventIds: [data.eventId],
+          orgIds: [data.orgId],
         }),
       );
 
       return yield* $(
         await addOrganizationMember(dependencies, {
-          orgId: data.orgId as OrgId,
+          eventId: data.eventId,
+          orgId: data.orgId,
           userId: data.userId,
           role: data.role,
           actor,
@@ -240,6 +224,7 @@ export function useAddOrganizationMemberMutation() {
  * Remove organization member input validation schema
  */
 export const removeOrganizationMemberInputSchema = z.object({
+  eventId: eventIdSchema,
   orgId: orgIdSchema,
   userId: userIdSchema,
 });
@@ -255,12 +240,14 @@ export const removeOrganizationMemberFn = createServerFn({ method: "POST" })
       const actor = yield* $(
         await resolveActor({
           userId: cast<UserId>(context.session.user.id),
-          orgIds: [data.orgId as OrgId],
+          eventIds: [data.eventId],
+          orgIds: [data.orgId],
         }),
       );
 
       return yield* $(
         await removeOrganizationMember(dependencies, {
+          eventId: data.eventId,
           orgId: data.orgId as OrgId,
           userId: data.userId,
           actor,
@@ -285,6 +272,7 @@ export function useRemoveOrganizationMemberMutation() {
  * Update organization member role input validation schema
  */
 export const updateOrganizationMemberRoleInputSchema = z.object({
+  eventId: eventIdSchema,
   orgId: orgIdSchema,
   userId: userIdSchema,
   role: orgMemberRoleSchema,
@@ -301,13 +289,15 @@ export const updateOrganizationMemberRoleFn = createServerFn({ method: "POST" })
       const actor = yield* $(
         await resolveActor({
           userId: cast<UserId>(context.session.user.id),
-          orgIds: [data.orgId as OrgId],
+          eventIds: [data.eventId],
+          orgIds: [data.orgId],
         }),
       );
 
       return yield* $(
         await updateOrganizationMemberRole(dependencies, {
-          orgId: data.orgId as OrgId,
+          eventId: data.eventId,
+          orgId: data.orgId,
           userId: data.userId,
           role: data.role,
           actor,

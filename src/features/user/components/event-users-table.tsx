@@ -1,9 +1,10 @@
 import { Code, Table } from "@/components/ui";
 import { CommitteeRoleSelect } from "./committee-role-select";
 import type { CommitteeRole } from "@/domain/authorization/schema";
+import type { EventId, UserId } from "@/domain/shared/ids";
 
 interface User {
-  id: string;
+  id: UserId;
   name: string;
   email: string;
   role: CommitteeRole;
@@ -11,7 +12,7 @@ interface User {
 
 interface EventUsersTableProps {
   users: User[];
-  eventId: string;
+  eventId: EventId;
   disabled?: boolean;
 }
 

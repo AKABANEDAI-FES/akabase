@@ -4,22 +4,35 @@ import { useDialogContext } from "@ark-ui/react/dialog";
 import { Portal } from "@ark-ui/react/portal";
 import { Button, CloseButton, Dialog, toaster } from "@/components/ui";
 import { useRemoveOrganizationMemberMutation } from "@/features/organization/actions/mutations";
+import type { EventId, OrgId, UserId } from "@/domain/shared/ids";
 
 interface RemoveMemberDialogProps {
-  orgId: string;
-  userId: string;
+  eventId: EventId;
+  orgId: OrgId;
+  userId: UserId;
   userName: string;
   children: ReactNode;
 }
 
-export function RemoveMemberDialog({ orgId, userId, userName, children }: RemoveMemberDialogProps) {
+export function RemoveMemberDialog({
+  eventId,
+  orgId,
+  userId,
+  userName,
+  children,
+}: RemoveMemberDialogProps) {
   return (
     <Dialog.Root size="sm" role="alertdialog">
       <Dialog.Trigger asChild>{children}</Dialog.Trigger>
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>
-          <RemoveMemberDialogContent orgId={orgId} userId={userId} userName={userName} />
+          <RemoveMemberDialogContent
+            eventId={eventId}
+            orgId={orgId}
+            userId={userId}
+            userName={userName}
+          />
         </Dialog.Positioner>
       </Portal>
     </Dialog.Root>
@@ -27,12 +40,14 @@ export function RemoveMemberDialog({ orgId, userId, userName, children }: Remove
 }
 
 function RemoveMemberDialogContent({
+  eventId,
   orgId,
   userId,
   userName,
 }: {
-  orgId: string;
-  userId: string;
+  eventId: EventId;
+  orgId: OrgId;
+  userId: UserId;
   userName: string;
 }) {
   const dialog = useDialogContext();
@@ -40,7 +55,7 @@ function RemoveMemberDialogContent({
 
   const handleRemove = async () => {
     try {
-      const result = await mutateAsync({ data: { orgId, userId } });
+      const result = await mutateAsync({ data: { eventId, orgId, userId } });
 
       if (Result.isFailure(result)) {
         toaster.create({

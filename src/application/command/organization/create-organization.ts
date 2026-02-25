@@ -3,6 +3,7 @@ import { gen } from "@/libs/result";
 import { generateId } from "@/libs/id";
 import type { EventId, OrgId } from "@/domain/shared/ids";
 import type { OrganizationError } from "@/domain/organization/errors";
+import type { EventError } from "@/domain/event/errors";
 import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
@@ -32,7 +33,11 @@ export type CreateOrganizationOutput = {
 /**
  * Errors that can occur during organization creation
  */
-export type CreateOrganizationError = OrganizationError | RepositoryError | AuthorizationError;
+export type CreateOrganizationError =
+  | OrganizationError
+  | EventError
+  | RepositoryError
+  | AuthorizationError;
 
 /**
  * Create a new organization
@@ -48,7 +53,7 @@ export type CreateOrganizationError = OrganizationError | RepositoryError | Auth
  * @returns Result with organization ID or error
  */
 export async function createOrganization(
-  deps: Pick<Dependencies, "organizationRepo" | "authService">,
+  deps: Pick<Dependencies, "organizationRepo" | "authService" | "eventDomainService">,
   input: CreateOrganizationInput,
 ): Result.ResultAsync<CreateOrganizationOutput, CreateOrganizationError> {
   return gen(async function* ($) {
@@ -58,6 +63,9 @@ export async function createOrganization(
     // Authorization check: only committee admins can create organizations
     const resource = organizationResource(organizationId, input.eventId);
     yield* $(deps.authService.enforce(input.actor, resource, "organization:create"));
+
+    // Fetch event and check if modifiable
+    yield* $(await deps.eventDomainService.resolveModifiableEvent(input.eventId));
 
     // Create organization entity
     const organization = organizationSchema.parse({

@@ -4,6 +4,7 @@ import { useUpdateCommitteeRoleMutation } from "@/features/user/actions";
 import { Select, toaster } from "@/components/ui";
 import { COMMITTEE_ROLES, COMMITTEE_ROLE_LABELS } from "@/domain/authorization/schema";
 import type { CommitteeRole } from "@/domain/authorization/schema";
+import type { EventId, UserId } from "@/domain/shared/ids";
 
 const roleCollection = createListCollection({
   items: COMMITTEE_ROLES.map((role) => ({
@@ -13,8 +14,8 @@ const roleCollection = createListCollection({
 });
 
 interface CommitteeRoleSelectProps {
-  userId: string;
-  eventId: string;
+  userId: UserId;
+  eventId: EventId;
   currentRole: CommitteeRole;
   disabled?: boolean;
 }

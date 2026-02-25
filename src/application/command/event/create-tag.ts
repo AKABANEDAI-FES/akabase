@@ -1,10 +1,9 @@
-import { Result } from "@praha/byethrow";
+import type { Result } from "@praha/byethrow";
 import { gen } from "@/libs/result";
 import { generateId } from "@/libs/id";
 import type { EventId, TagId } from "@/domain/shared/ids";
 import type { EventError } from "@/domain/event/errors";
-import { EVENT_ERROR_CODE, eventError } from "@/domain/event/errors";
-import { canModifyEvent, createTagEntity } from "@/domain/event/logic";
+import { createTagEntity } from "@/domain/event/logic";
 import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
@@ -45,13 +44,7 @@ export async function createTag(
     yield* $(deps.authService.enforce(input.actor, resource, "event:update"));
 
     // Fetch event and check if modifiable
-    const event = yield* $(await deps.eventRepo.findById(input.eventId));
-    if (!event) {
-      return yield* $(
-        Result.fail(eventError(EVENT_ERROR_CODE.EVENT_NOT_FOUND, "イベントが見つかりません")),
-      );
-    }
-    yield* $(canModifyEvent(event));
+    yield* $(await deps.eventDomainService.resolveModifiableEvent(input.eventId));
 
     // Check tag name uniqueness within event
     yield* $(await deps.eventDomainService.ensureTagNameUnique(input.eventId, input.name));

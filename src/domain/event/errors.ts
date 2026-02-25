@@ -1,4 +1,4 @@
-import type { BaseError } from "../shared/errors";
+import type { BaseError, DomainErrorCodeOf } from "../shared/errors";
 import { createError } from "../shared/errors";
 
 export const EVENT_ERROR_CODE = {
@@ -16,7 +16,7 @@ export const EVENT_ERROR_CODE = {
   SLUG_NOT_UNIQUE: "SLUG_NOT_UNIQUE",
 } as const;
 
-export type EventErrorCode = (typeof EVENT_ERROR_CODE)[keyof typeof EVENT_ERROR_CODE];
+export type EventErrorCode = DomainErrorCodeOf<typeof EVENT_ERROR_CODE>;
 
 export type EventError = BaseError<EventErrorCode>;
 

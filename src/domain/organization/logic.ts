@@ -3,6 +3,7 @@ import type { OrgMember, OrgMemberRole, Organization } from "./schema";
 import { orgMemberSchema, organizationSchema } from "./schema";
 import type { OrganizationError } from "./errors";
 import { ORGANIZATION_ERROR_CODE, organizationError } from "./errors";
+import { DOMAIN_ERROR_CODE } from "../shared/errors";
 import type { OrgId, UserId } from "../shared/ids";
 
 /**
@@ -114,7 +115,7 @@ export function createOrgMemberEntity(input: {
   return Result.try({
     try: () => orgMemberSchema.parse(data),
     catch: () =>
-      organizationError(ORGANIZATION_ERROR_CODE.VALIDATION_ERROR, "メンバーの作成に失敗しました"),
+      organizationError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "メンバーの作成に失敗しました"),
   });
 }
 
@@ -162,7 +163,7 @@ export function updateOrgMemberEntity(
   return Result.try({
     try: () => orgMemberSchema.parse(data),
     catch: () =>
-      organizationError(ORGANIZATION_ERROR_CODE.VALIDATION_ERROR, "メンバーの更新に失敗しました"),
+      organizationError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "メンバーの更新に失敗しました"),
   });
 }
 
@@ -194,9 +195,7 @@ export function updateOrganization(
   const validationResult = organizationSchema.safeParse(updated);
 
   if (!validationResult.success) {
-    return Result.fail(
-      organizationError(ORGANIZATION_ERROR_CODE.VALIDATION_ERROR, "入力値が不正です"),
-    );
+    return Result.fail(organizationError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "入力値が不正です"));
   }
 
   return Result.succeed(validationResult.data);

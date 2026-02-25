@@ -1,8 +1,10 @@
 import { Result } from "@praha/byethrow";
+import { gen } from "@/libs/result";
 import type { EventDomainService } from "@/domain/event/service";
 import type { EventRepository } from "@/domain/event/repository";
 import type { EventId, PlaceId, TagId } from "@/domain/shared/ids";
 import { EVENT_ERROR_CODE, eventError } from "@/domain/event/errors";
+import { canModifyEvent } from "@/domain/event/logic";
 
 export class EventDomainServiceImpl implements EventDomainService {
   constructor(private readonly eventRepo: EventRepository) {}
@@ -61,5 +63,19 @@ export class EventDomainServiceImpl implements EventDomainService {
     }
 
     return Result.succeed(true);
+  }
+
+  async resolveModifiableEvent(eventId: EventId) {
+    const repo = this.eventRepo;
+    return gen(async function* ($) {
+      const event = yield* $(await repo.findById(eventId));
+      if (!event) {
+        return yield* $(
+          Result.fail(eventError(EVENT_ERROR_CODE.EVENT_NOT_FOUND, "イベントが見つかりません")),
+        );
+      }
+      yield* $(canModifyEvent(event));
+      return event;
+    });
   }
 }

@@ -3,6 +3,7 @@ import { gen } from "@/libs/result";
 import type { EventId, OrgId } from "@/domain/shared/ids";
 import type { OrganizationError } from "@/domain/organization/errors";
 import { ORGANIZATION_ERROR_CODE, organizationError } from "@/domain/organization/errors";
+import type { EventError } from "@/domain/event/errors";
 import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
@@ -13,6 +14,7 @@ import type { Dependencies } from "@/infrastructure/di";
  * Delete organization input
  */
 export type DeleteOrganizationInput = {
+  eventId: EventId;
   orgId: OrgId;
   actor: Actor;
 };
@@ -22,7 +24,11 @@ export type DeleteOrganizationOutput = {
   eventId: EventId;
 };
 
-export type DeleteOrganizationError = OrganizationError | RepositoryError | AuthorizationError;
+export type DeleteOrganizationError =
+  | OrganizationError
+  | EventError
+  | RepositoryError
+  | AuthorizationError;
 
 /**
  * Delete an organization
@@ -30,12 +36,12 @@ export type DeleteOrganizationError = OrganizationError | RepositoryError | Auth
  * Note: CASCADE deletion will automatically remove projects and members
  */
 export async function deleteOrganization(
-  deps: Pick<Dependencies, "organizationRepo" | "authService">,
+  deps: Pick<Dependencies, "organizationRepo" | "authService" | "eventDomainService">,
   input: DeleteOrganizationInput,
 ): Result.ResultAsync<DeleteOrganizationOutput, DeleteOrganizationError> {
   return gen(async function* ($) {
-    // Fetch organization to get eventId for authorization
-    const organization = yield* $(await deps.organizationRepo.findById(input.orgId));
+    // Fetch organization (scoped by eventId)
+    const organization = yield* $(await deps.organizationRepo.findById(input.eventId, input.orgId));
     if (!organization) {
       return yield* $(
         Result.fail(
@@ -45,12 +51,15 @@ export async function deleteOrganization(
     }
 
     // Authorization check
-    const resource = organizationResource(input.orgId, organization.eventId, organization);
+    const resource = organizationResource(input.orgId, input.eventId, organization);
     yield* $(deps.authService.enforce(input.actor, resource, "organization:delete"));
 
-    // Delete organization
-    yield* $(await deps.organizationRepo.deleteOrganization(input.orgId));
+    // Fetch event and check if modifiable
+    yield* $(await deps.eventDomainService.resolveModifiableEvent(input.eventId));
 
-    return { success: true as const, eventId: organization.eventId };
+    // Delete organization (scoped by eventId)
+    yield* $(await deps.organizationRepo.deleteOrganization(input.eventId, input.orgId));
+
+    return { success: true as const, eventId: input.eventId };
   });
 }

@@ -4,6 +4,7 @@ import { useUpdateOrganizationMemberRoleMutation } from "@/features/organization
 import { Select, toaster } from "@/components/ui";
 import { ORG_ROLES, ORG_ROLE_LABELS } from "@/domain/authorization/schema";
 import type { OrgMemberRole } from "@/domain/organization/schema";
+import type { EventId, OrgId, UserId } from "@/domain/shared/ids";
 
 const roleCollection = createListCollection({
   items: ORG_ROLES.map((role) => ({
@@ -13,12 +14,18 @@ const roleCollection = createListCollection({
 });
 
 interface OrgMemberRoleSelectProps {
-  orgId: string;
-  userId: string;
+  eventId: EventId;
+  orgId: OrgId;
+  userId: UserId;
   currentRole: OrgMemberRole;
 }
 
-export function OrgMemberRoleSelect({ orgId, userId, currentRole }: OrgMemberRoleSelectProps) {
+export function OrgMemberRoleSelect({
+  eventId,
+  orgId,
+  userId,
+  currentRole,
+}: OrgMemberRoleSelectProps) {
   const { mutateAsync, isPending } = useUpdateOrganizationMemberRoleMutation();
 
   const handleRoleChange = async (newRole: OrgMemberRole) => {
@@ -26,7 +33,7 @@ export function OrgMemberRoleSelect({ orgId, userId, currentRole }: OrgMemberRol
 
     try {
       const result = await mutateAsync({
-        data: { orgId, userId, role: newRole },
+        data: { eventId, orgId, userId, role: newRole },
       });
 
       if (Result.isFailure(result)) {

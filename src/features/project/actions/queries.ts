@@ -69,9 +69,9 @@ export function generateLoadProjectsQueryOptions(orgId: string) {
  */
 export const loadOrganizationDetailFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
-  .inputValidator(z.object({ orgId: orgIdSchema }))
+  .inputValidator(z.object({ eventId: eventIdSchema, orgId: orgIdSchema }))
   .handler(async ({ data }) => {
-    const result = await dependencies.organizationRepo.findById(data.orgId);
+    const result = await dependencies.organizationRepo.findById(data.eventId, data.orgId);
 
     if (Result.isFailure(result)) {
       throw new Error(result.error.message);
@@ -88,9 +88,9 @@ export function generateLoadOrganizationDetailCacheKey(orgId: string) {
   return ["organizations", orgId];
 }
 
-export function generateLoadOrganizationDetailQueryOptions(orgId: string) {
+export function generateLoadOrganizationDetailQueryOptions(eventId: string, orgId: string) {
   return queryOptions({
     queryKey: generateLoadOrganizationDetailCacheKey(orgId),
-    queryFn: () => loadOrganizationDetailFn({ data: { orgId } }),
+    queryFn: () => loadOrganizationDetailFn({ data: { eventId, orgId } }),
   });
 }

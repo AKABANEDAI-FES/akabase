@@ -8,8 +8,11 @@ export const DOMAIN_ERROR_CODE = {
 
 export type DomainErrorCode = (typeof DOMAIN_ERROR_CODE)[keyof typeof DOMAIN_ERROR_CODE];
 
+/** Context-specific error code union with shared domain error codes */
+export type DomainErrorCodeOf<T> = T[keyof T] | DomainErrorCode;
+
 export type BaseError<TCode extends string = string> = {
-  code: TCode | DomainErrorCode;
+  code: TCode;
   message: string;
 };
 

@@ -4,10 +4,11 @@ import { useDialogContext } from "@ark-ui/react/dialog";
 import { Portal } from "@ark-ui/react/portal";
 import { useNavigate } from "@tanstack/react-router";
 import { Button, CloseButton, Dialog, toaster } from "@/components/ui";
-import type { OrgId } from "@/domain/shared/ids";
+import type { EventId, OrgId } from "@/domain/shared/ids";
 import { useDeleteOrganizationMutation } from "@/features/organization/actions/mutations";
 
 interface DeleteOrganizationDialogProps {
+  eventId: EventId;
   orgId: OrgId;
   orgName: string;
   slug: string;
@@ -15,6 +16,7 @@ interface DeleteOrganizationDialogProps {
 }
 
 export function DeleteOrganizationDialog({
+  eventId,
   orgId,
   orgName,
   slug,
@@ -26,7 +28,12 @@ export function DeleteOrganizationDialog({
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>
-          <DeleteOrganizationDialogContent orgId={orgId} orgName={orgName} slug={slug} />
+          <DeleteOrganizationDialogContent
+            eventId={eventId}
+            orgId={orgId}
+            orgName={orgName}
+            slug={slug}
+          />
         </Dialog.Positioner>
       </Portal>
     </Dialog.Root>
@@ -34,10 +41,12 @@ export function DeleteOrganizationDialog({
 }
 
 function DeleteOrganizationDialogContent({
+  eventId,
   orgId,
   orgName,
   slug,
 }: {
+  eventId: EventId;
   orgId: OrgId;
   orgName: string;
   slug: string;
@@ -48,7 +57,7 @@ function DeleteOrganizationDialogContent({
 
   const handleDelete = async () => {
     try {
-      const result = await mutateAsync({ data: { orgId } });
+      const result = await mutateAsync({ data: { eventId, orgId } });
 
       if (Result.isFailure(result)) {
         toaster.create({

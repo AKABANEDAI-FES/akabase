@@ -26,6 +26,7 @@ import type { ComboboxInputValueChangeDetails, ComboboxValueChangeDetails } from
 import type { UserSearchResult } from "@/application/query/user/search-users-by-email";
 import { nl2br } from "@/libs/text";
 import { ORGANIZATION_ERROR_CODE } from "@/domain/organization/errors";
+import type { EventId, OrgId } from "@/domain/shared/ids";
 
 const roleCollection = createListCollection({
   items: ORG_ROLES.map((role) => ({
@@ -35,8 +36,8 @@ const roleCollection = createListCollection({
 });
 
 interface AddMemberDialogProps {
-  orgId: string;
-  eventId: string;
+  orgId: OrgId;
+  eventId: EventId;
   defaultOpen?: boolean;
   onClose?: () => void;
 }
@@ -70,8 +71,8 @@ function AddMemberDialogContent({
   eventId,
   onSuccess,
 }: {
-  orgId: string;
-  eventId: string;
+  orgId: OrgId;
+  eventId: EventId;
   onSuccess: () => void;
 }) {
   const { mutateAsync } = useAddOrganizationMemberMutation();
@@ -98,9 +99,10 @@ function AddMemberDialogContent({
       role: "manager" as OrgMemberRole,
     },
     validators: {
-      onDynamic: addOrganizationMemberInputSchema.omit({ orgId: true }),
+      onDynamic: addOrganizationMemberInputSchema.omit({ eventId: true, orgId: true }),
       onSubmitAsync: async ({ value }) => {
         const data = addOrganizationMemberInputSchema.parse({
+          eventId,
           orgId,
           userId: value.userId,
           role: value.role,
