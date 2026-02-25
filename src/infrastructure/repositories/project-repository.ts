@@ -29,6 +29,7 @@ import type { ProjectRepository } from "@/domain/project/repository";
 import type { RepositoryError } from "@/domain/shared/repository";
 import { repositoryError } from "@/domain/shared/repository";
 import { generateId } from "@/libs/id";
+import type { BatchItem } from "drizzle-orm/batch";
 
 /**
  * Project Repository Implementation using Drizzle ORM
@@ -67,17 +68,18 @@ export class ProjectRepositoryImpl implements ProjectRepository {
     try {
       const draftRow = await db.query.projectDrafts.findFirst({
         where: (projectDrafts, { eq }) => eq(projectDrafts.projectId, projectId),
+        with: {
+          tags: {
+            columns: {
+              tagId: true,
+            },
+          },
+        },
       });
 
       if (!draftRow) {
         return Result.succeed(null);
       }
-
-      // Fetch tags for this draft
-      const tagRows = await db.query.projectDraftTags.findMany({
-        where: (projectDraftTags, { eq }) => eq(projectDraftTags.projectId, projectId),
-        columns: { tagId: true },
-      });
 
       const draft = draftWithTagsSchema.parse({
         projectId: draftRow.projectId,
@@ -85,7 +87,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         webContentJson: draftRow.webContentJson,
         updatedAt: new Date(draftRow.updatedAt),
         updatedBy: draftRow.updatedBy,
-        tags: tagRows.map((r) => r.tagId),
+        tags: draftRow.tags.map((t) => t.tagId),
       });
 
       return Result.succeed(draft);
@@ -100,17 +102,18 @@ export class ProjectRepositoryImpl implements ProjectRepository {
     try {
       const row = await db.query.projectSubmissions.findFirst({
         where: (projectSubmissions, { eq }) => eq(projectSubmissions.id, id),
+        with: {
+          tags: {
+            columns: {
+              tagId: true,
+            },
+          },
+        },
       });
 
       if (!row) {
         return Result.succeed(null);
       }
-
-      // Fetch tags for this submission
-      const tagRows = await db.query.projectSubmissionTags.findMany({
-        where: (projectSubmissionTags, { eq }) => eq(projectSubmissionTags.submissionId, id),
-        columns: { tagId: true },
-      });
 
       const submission = submissionWithTagsSchema.parse({
         id: row.id,
@@ -122,7 +125,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         submittedBy: row.submittedBy,
         decidedAt: row.decidedAt ? new Date(row.decidedAt) : null,
         decidedBy: row.decidedBy,
-        tags: tagRows.map((r) => r.tagId),
+        tags: row.tags.map((t) => t.tagId),
       });
 
       return Result.succeed(submission);
@@ -137,17 +140,18 @@ export class ProjectRepositoryImpl implements ProjectRepository {
     try {
       const row = await db.query.projectPublished.findFirst({
         where: (projectPublished, { eq }) => eq(projectPublished.projectId, projectId),
+        with: {
+          tags: {
+            columns: {
+              tagId: true,
+            },
+          },
+        },
       });
 
       if (!row) {
         return Result.succeed(null);
       }
-
-      // Fetch tags for published data
-      const tagRows = await db.query.projectPublishedTags.findMany({
-        where: (projectPublishedTags, { eq }) => eq(projectPublishedTags.projectId, projectId),
-        columns: { tagId: true },
-      });
 
       const published = publishedWithTagsSchema.parse({
         projectId: row.projectId,
@@ -155,7 +159,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         webContentJson: row.webContentJson,
         publishedAt: new Date(row.publishedAt),
         publishedBy: row.publishedBy,
-        tags: tagRows.map((r) => r.tagId),
+        tags: row.tags.map((t) => t.tagId),
       });
 
       return Result.succeed(published);
@@ -217,10 +221,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
     }
   }
 
-  async saveProject(
-    project: Project,
-    draft: DraftWithTags,
-  ): Promise<Result.Result<void, RepositoryError>> {
+  async saveProject(project: Project): Promise<Result.Result<void, RepositoryError>> {
     try {
       // Upsert project
       await db
@@ -247,8 +248,16 @@ export class ProjectRepositoryImpl implements ProjectRepository {
           where: eq(projects.eventId, project.eventId),
         });
 
+      return Result.succeed(undefined);
+    } catch (error) {
+      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to save project", error));
+    }
+  }
+
+  async saveDraft(draft: DraftWithTags): Promise<Result.Result<void, RepositoryError>> {
+    try {
       // Upsert draft
-      await db
+      const q1 = db
         .insert(projectDrafts)
         .values({
           projectId: draft.projectId,
@@ -269,21 +278,26 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         });
 
       // Replace tags (delete + insert)
-      await db.delete(projectDraftTags).where(eq(projectDraftTags.projectId, draft.projectId));
+      const q2 = db.delete(projectDraftTags).where(eq(projectDraftTags.projectId, draft.projectId));
+
+      const query: [BatchItem<"sqlite">, ...BatchItem<"sqlite">[]] = [q1, q2];
 
       if (draft.tags.length > 0) {
-        await db.insert(projectDraftTags).values(
+        const q3 = db.insert(projectDraftTags).values(
           draft.tags.map((tagId) => ({
             id: generateId(),
             projectId: draft.projectId,
             tagId,
           })),
         );
+        query.push(q3);
       }
+
+      await db.batch(query);
 
       return Result.succeed(undefined);
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to save project", error));
+      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to save draft", error));
     }
   }
 
@@ -292,7 +306,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
   ): Promise<Result.Result<void, RepositoryError>> {
     try {
       // Upsert submission
-      await db
+      const q1 = db
         .insert(projectSubmissions)
         .values({
           id: submission.id,
@@ -317,19 +331,24 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         });
 
       // Replace tags (delete + insert)
-      await db
+      const q2 = db
         .delete(projectSubmissionTags)
         .where(eq(projectSubmissionTags.submissionId, submission.id));
 
+      const query: [BatchItem<"sqlite">, ...BatchItem<"sqlite">[]] = [q1, q2];
+
       if (submission.tags.length > 0) {
-        await db.insert(projectSubmissionTags).values(
+        const q3 = db.insert(projectSubmissionTags).values(
           submission.tags.map((tagId) => ({
             id: generateId(),
             submissionId: submission.id,
             tagId,
           })),
         );
+        query.push(q3);
       }
+
+      await db.batch(query);
 
       return Result.succeed(undefined);
     } catch (error) {
@@ -340,7 +359,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
   async savePublished(published: PublishedWithTags): Promise<Result.Result<void, RepositoryError>> {
     try {
       // Upsert published data
-      await db
+      const q1 = db
         .insert(projectPublished)
         .values({
           projectId: published.projectId,
@@ -359,20 +378,25 @@ export class ProjectRepositoryImpl implements ProjectRepository {
           },
         });
 
-      // Update tags: delete old ones and insert new ones
-      await db
+      // Replace tags (delete + insert)
+      const q2 = db
         .delete(projectPublishedTags)
         .where(eq(projectPublishedTags.projectId, published.projectId));
 
+      const query: [BatchItem<"sqlite">, ...BatchItem<"sqlite">[]] = [q1, q2];
+
       if (published.tags.length > 0) {
-        await db.insert(projectPublishedTags).values(
+        const q3 = db.insert(projectPublishedTags).values(
           published.tags.map((tagId) => ({
             id: generateId(),
             projectId: published.projectId,
             tagId,
           })),
         );
+        query.push(q3);
       }
+
+      await db.batch(query);
 
       return Result.succeed(undefined);
     } catch (error) {

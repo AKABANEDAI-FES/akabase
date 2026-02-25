@@ -55,12 +55,14 @@ export interface ProjectRepository {
   ): Promise<Result.Result<ProjectSubmission[], RepositoryError>>;
 
   /**
-   * Save project (insert or update - atomic operation for project + draft)
+   * Save project (insert or update)
    */
-  saveProject(
-    project: Project,
-    draft: DraftWithTags,
-  ): Promise<Result.Result<void, RepositoryError>>;
+  saveProject(project: Project): Promise<Result.Result<void, RepositoryError>>;
+
+  /**
+   * Save draft (insert or update)
+   */
+  saveDraft(draft: DraftWithTags): Promise<Result.Result<void, RepositoryError>>;
 
   /**
    * Save submission (insert or update)

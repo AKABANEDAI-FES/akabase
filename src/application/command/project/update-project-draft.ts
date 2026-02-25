@@ -92,7 +92,7 @@ export async function updateProjectDraft(
     );
 
     // Save updated draft (project remains unchanged)
-    yield* $(await deps.projectRepo.saveProject(project, updatedDraft));
+    yield* $(await deps.projectRepo.saveDraft(updatedDraft));
 
     return { projectId: project.id };
   });

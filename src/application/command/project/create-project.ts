@@ -85,8 +85,9 @@ export async function createProject(
       }),
     );
 
-    // Save project + draft atomically
-    yield* $(await deps.projectRepo.saveProject(project, draft));
+    // Save project and draft
+    yield* $(await deps.projectRepo.saveProject(project));
+    yield* $(await deps.projectRepo.saveDraft(draft));
 
     return { orgId: project.orgId, projectId: project.id };
   });
