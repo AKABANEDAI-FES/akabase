@@ -4,7 +4,7 @@ import { orgMemberSchema, organizationSchema } from "./schema";
 import type { OrganizationError } from "./errors";
 import { ORGANIZATION_ERROR_CODE, organizationError } from "./errors";
 import { DOMAIN_ERROR_CODE } from "../shared/errors";
-import type { OrgId, UserId } from "../shared/ids";
+import type { EventId, OrgId, UserId } from "../shared/ids";
 
 /**
  * =============================================================================
@@ -57,37 +57,6 @@ export function canRemoveMember(
 }
 
 /**
- * Check if user is a manager
- * Rule: Only managers can perform certain operations
- */
-export function isManager(
-  members: OrgMember[],
-  userId: UserId,
-): Result.Result<true, OrganizationError> {
-  const member = members.find((m) => m.userId === userId);
-
-  if (!member) {
-    return Result.fail(
-      organizationError(
-        ORGANIZATION_ERROR_CODE.USER_NOT_MEMBER,
-        "このユーザーはメンバーではありません。",
-      ),
-    );
-  }
-
-  if (member.role !== "manager") {
-    return Result.fail(
-      organizationError(
-        ORGANIZATION_ERROR_CODE.NOT_MANAGER,
-        "この操作にはマネージャー権限が必要です。",
-      ),
-    );
-  }
-
-  return Result.succeed(true);
-}
-
-/**
  * =============================================================================
  * Member Management Functions (Pure Functions)
  * =============================================================================
@@ -120,34 +89,6 @@ export function createOrgMemberEntity(input: {
 }
 
 /**
- * Add a new member to the organization
- * Returns new members array
- */
-export function addMember(members: OrgMember[], newMember: OrgMember): OrgMember[] {
-  return [...members, newMember];
-}
-
-/**
- * Remove a member from the organization
- * Returns new members array
- */
-export function removeMember(members: OrgMember[], targetUserId: UserId): OrgMember[] {
-  return members.filter((m) => m.userId !== targetUserId);
-}
-
-/**
- * Update a member's role
- * Returns new members array
- */
-export function updateMemberRole(
-  members: OrgMember[],
-  targetUserId: UserId,
-  newRole: OrgMemberRole,
-): OrgMember[] {
-  return members.map((m) => (m.userId === targetUserId ? { ...m, role: newRole } : m));
-}
-
-/**
  * Update a member entity's role
  * Validates the updated member against schema
  */
@@ -169,6 +110,41 @@ export function updateOrgMemberEntity(
 
 /**
  * =============================================================================
+ * Organization Creation
+ * =============================================================================
+ */
+
+/**
+ * Create a new Organization entity
+ * Validates input using zod schema
+ */
+export function createOrganizationEntity(input: {
+  id: OrgId;
+  eventId: EventId;
+  name: string;
+  description: string | null;
+  logoKey: string | null;
+  now?: Date;
+}): Result.Result<Organization, OrganizationError> {
+  const now = input.now ?? new Date();
+  const data = {
+    id: input.id,
+    eventId: input.eventId,
+    name: input.name,
+    description: input.description ?? "",
+    logoKey: input.logoKey,
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  return Result.try({
+    try: () => organizationSchema.parse(data),
+    catch: () => organizationError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "団体の作成に失敗しました"),
+  });
+}
+
+/**
+ * =============================================================================
  * Organization Updates
  * =============================================================================
  */
@@ -178,7 +154,7 @@ export function updateOrgMemberEntity(
  * Validates the updated organization using zod schema
  * Only specified fields will be updated
  */
-export function updateOrganization(
+export function updateOrganizationEntity(
   org: Organization,
   input: { name?: string; description?: string; logoKey?: string | null },
 ): Result.Result<Organization, OrganizationError> {
@@ -191,12 +167,8 @@ export function updateOrganization(
     updatedAt: new Date(),
   };
 
-  // Validate using zod schema
-  const validationResult = organizationSchema.safeParse(updated);
-
-  if (!validationResult.success) {
-    return Result.fail(organizationError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "入力値が不正です"));
-  }
-
-  return Result.succeed(validationResult.data);
+  return Result.try({
+    try: () => organizationSchema.parse(updated),
+    catch: () => organizationError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "団体の更新に失敗しました"),
+  });
 }

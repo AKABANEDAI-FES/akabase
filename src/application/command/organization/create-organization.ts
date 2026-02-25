@@ -8,7 +8,7 @@ import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
 import { organizationResource } from "@/domain/authorization/logic";
-import { organizationSchema } from "@/domain/organization/schema";
+import { createOrganizationEntity } from "@/domain/organization/logic";
 import type { Dependencies } from "@/infrastructure/di";
 
 /**
@@ -68,15 +68,15 @@ export async function createOrganization(
     yield* $(await deps.eventDomainService.resolveModifiableEvent(input.eventId));
 
     // Create organization entity
-    const organization = organizationSchema.parse({
-      id: organizationId,
-      eventId: input.eventId,
-      name: input.name,
-      description: input.description,
-      logoKey: input.logoKey,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
+    const organization = yield* $(
+      createOrganizationEntity({
+        id: organizationId,
+        eventId: input.eventId,
+        name: input.name,
+        description: input.description,
+        logoKey: input.logoKey,
+      }),
+    );
 
     // Save organization to database
     yield* $(await deps.organizationRepo.saveOrganization(organization));

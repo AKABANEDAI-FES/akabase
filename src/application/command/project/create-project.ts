@@ -8,7 +8,7 @@ import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
 import { projectResource } from "@/domain/authorization/logic";
-import { draftWithTagsSchema, projectSchema } from "@/domain/project/schema";
+import { createProjectDraftEntity, createProjectEntity } from "@/domain/project/logic";
 import type { Dependencies } from "@/infrastructure/di";
 
 /**
@@ -66,27 +66,24 @@ export async function createProject(
     yield* $(await deps.eventDomainService.resolveModifiableEvent(input.eventId));
 
     // Create project entity
-    const project = projectSchema.parse({
-      id: projectId,
-      eventId: input.eventId,
-      orgId: input.orgId,
-      name: input.name,
-      placeText: input.placeText,
-      logoKey: input.logoKey,
-      activeSubmissionId: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
+    const project = yield* $(
+      createProjectEntity({
+        id: projectId,
+        eventId: input.eventId,
+        orgId: input.orgId,
+        name: input.name,
+        placeText: input.placeText,
+        logoKey: input.logoKey,
+      }),
+    );
 
     // Create draft entity with initial empty values
-    const draft = draftWithTagsSchema.parse({
-      projectId: projectId,
-      pamphletText: "",
-      webContentJson: null,
-      updatedAt: new Date(),
-      updatedBy: input.actor.userId,
-      tags: [], // Start with empty tags
-    });
+    const draft = yield* $(
+      createProjectDraftEntity({
+        projectId: projectId,
+        updatedBy: input.actor.userId,
+      }),
+    );
 
     // Save project + draft atomically
     yield* $(await deps.projectRepo.saveProject(project, draft));

@@ -76,66 +76,6 @@ export function canModifyEvent(event: Event): Result.Result<true, EventError> {
 }
 
 /**
- * Get all child places of a parent
- */
-export function getChildPlaces(places: Place[], parentId: PlaceId | null): Place[] {
-  return places.filter((p) => p.parentId === parentId);
-}
-
-/**
- * Get all descendant places (recursive)
- * Returns all children, grandchildren, etc.
- */
-export function getAllDescendantPlaces(places: Place[], parentId: PlaceId): Place[] {
-  const children = places.filter((p) => p.parentId === parentId);
-  const descendants = [...children];
-
-  for (const child of children) {
-    descendants.push(...getAllDescendantPlaces(places, child.id));
-  }
-
-  return descendants;
-}
-
-/**
- * Check if a field is editable based on deadline
- * Rule: After deadline, only admins can edit
- */
-export function isFieldEditable(
-  deadlines: Deadline[],
-  fieldKey: string,
-  currentTime: Date,
-  isAdmin: boolean,
-): Result.Result<true, EventError> {
-  const deadline = deadlines.find((d) => d.fieldKey === fieldKey);
-
-  // No deadline means always editable
-  if (!deadline) {
-    return Result.succeed(true);
-  }
-
-  // Check if past deadline
-  const isPastDeadline = currentTime > deadline.deadlineAt;
-
-  // Admins can always edit
-  if (isAdmin) {
-    return Result.succeed(true);
-  }
-
-  // Non-admins cannot edit past deadline
-  if (isPastDeadline) {
-    return Result.fail(
-      eventError(
-        EVENT_ERROR_CODE.FIELD_PAST_DEADLINE,
-        `「${fieldKey}」の締切（${deadline.deadlineAt.toLocaleString("ja-JP")}）を過ぎているため編集できません。`,
-      ),
-    );
-  }
-
-  return Result.succeed(true);
-}
-
-/**
  * =============================================================================
  * Tag Management Functions (Pure Functions)
  * =============================================================================

@@ -4,7 +4,7 @@ import type { EventId, OrgId } from "@/domain/shared/ids";
 import type { OrganizationError } from "@/domain/organization/errors";
 import { ORGANIZATION_ERROR_CODE, organizationError } from "@/domain/organization/errors";
 import type { EventError } from "@/domain/event/errors";
-import { updateOrganization as updateOrganizationLogic } from "@/domain/organization/logic";
+import { updateOrganizationEntity as updateOrganizationLogic } from "@/domain/organization/logic";
 import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";

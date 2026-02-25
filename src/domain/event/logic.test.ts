@@ -1,13 +1,12 @@
 import { Result } from "@praha/byethrow";
 import { describe, expect, it } from "vitest";
-import type { Deadline, Event } from "./schema";
+import type { Event } from "./schema";
 import type { EventId } from "../shared/ids";
 import {
   activateEvent,
   archiveEvent,
   canModifyEvent,
   createEventEntity,
-  isFieldEditable,
   updateEventEntity,
 } from "./logic";
 
@@ -22,14 +21,6 @@ const createMockEvent = (overrides?: Partial<Event>): Event => ({
   createdAt: new Date("2025-01-01"),
   updatedAt: new Date("2025-01-01"),
   ...overrides,
-});
-
-const createMockDeadline = (fieldKey: Deadline["fieldKey"], deadlineAt: Date): Deadline => ({
-  id: `deadline_${fieldKey}` as any,
-  eventId: mockEventId,
-  fieldKey,
-  deadlineAt,
-  createdAt: new Date("2025-01-01"),
 });
 
 describe("Event Domain Logic", () => {
@@ -50,46 +41,6 @@ describe("Event Domain Logic", () => {
         if (Result.isFailure(result)) {
           expect(result.error.code).toBe("EVENT_ARCHIVED");
         }
-      });
-    });
-
-    describe("isFieldEditable", () => {
-      it("succeeds when no deadline exists", () => {
-        const deadlines: Deadline[] = [];
-        const result = isFieldEditable(deadlines, "pamphlet_text", new Date("2025-02-01"), false);
-
-        expect(Result.isSuccess(result)).toBe(true);
-      });
-
-      it("succeeds when before deadline", () => {
-        const deadlines = [createMockDeadline("pamphlet_text", new Date("2025-02-28"))];
-        const result = isFieldEditable(deadlines, "pamphlet_text", new Date("2025-02-01"), false);
-
-        expect(Result.isSuccess(result)).toBe(true);
-      });
-
-      it("fails when past deadline and not admin", () => {
-        const deadlines = [createMockDeadline("pamphlet_text", new Date("2025-02-28"))];
-        const result = isFieldEditable(deadlines, "pamphlet_text", new Date("2025-03-01"), false);
-
-        expect(Result.isFailure(result)).toBe(true);
-        if (Result.isFailure(result)) {
-          expect(result.error.code).toBe("FIELD_PAST_DEADLINE");
-        }
-      });
-
-      it("succeeds when past deadline but user is admin", () => {
-        const deadlines = [createMockDeadline("pamphlet_text", new Date("2025-02-28"))];
-        const result = isFieldEditable(deadlines, "pamphlet_text", new Date("2025-03-01"), true);
-
-        expect(Result.isSuccess(result)).toBe(true);
-      });
-
-      it("succeeds for different field when deadline exists for another field", () => {
-        const deadlines = [createMockDeadline("pamphlet_text", new Date("2025-02-28"))];
-        const result = isFieldEditable(deadlines, "web_content", new Date("2025-03-01"), false);
-
-        expect(Result.isSuccess(result)).toBe(true);
       });
     });
   });
