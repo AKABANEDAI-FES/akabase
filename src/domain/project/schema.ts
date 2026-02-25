@@ -15,6 +15,7 @@ import {
 export const PROJECT_NAME_MIN_LENGTH = 1;
 export const PROJECT_NAME_MAX_LENGTH = 100;
 export const PROJECT_PAMPHLET_TEXT_MAX_LENGTH = 120;
+export const PROJECT_MAX_TAGS = 5;
 
 /**
  * Project (Aggregate Root)
@@ -100,19 +101,19 @@ export type ProjectPublished = z.infer<typeof projectPublishedSchema>;
  */
 
 export const draftWithTagsSchema = projectDraftSchema.extend({
-  tags: z.array(tagIdSchema),
+  tags: z.array(tagIdSchema).max(PROJECT_MAX_TAGS, `タグは${PROJECT_MAX_TAGS}個まで選択できます`),
 });
 
 export type DraftWithTags = z.infer<typeof draftWithTagsSchema>;
 
 export const submissionWithTagsSchema = projectSubmissionSchema.extend({
-  tags: z.array(tagIdSchema),
+  tags: z.array(tagIdSchema).max(PROJECT_MAX_TAGS, `タグは${PROJECT_MAX_TAGS}個まで選択できます`),
 });
 
 export type SubmissionWithTags = z.infer<typeof submissionWithTagsSchema>;
 
 export const publishedWithTagsSchema = projectPublishedSchema.extend({
-  tags: z.array(tagIdSchema),
+  tags: z.array(tagIdSchema).max(PROJECT_MAX_TAGS, `タグは${PROJECT_MAX_TAGS}個まで選択できます`),
 });
 
 export type PublishedWithTags = z.infer<typeof publishedWithTagsSchema>;

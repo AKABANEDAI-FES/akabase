@@ -5,9 +5,9 @@ import { createProject } from "@/application/command/project/create-project";
 import { updateProjectDraft } from "@/application/command/project/update-project-draft";
 import { resolveActor } from "@/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/session-server";
-import { cast, projectIdSchema, tagIdSchema } from "@/domain/shared/ids";
+import { cast, projectIdSchema } from "@/domain/shared/ids";
 import type { UserId } from "@/domain/shared/ids";
-import { projectDraftSchema, projectSchema } from "@/domain/project/schema";
+import { draftWithTagsSchema, projectSchema } from "@/domain/project/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { generateLoadDraftCacheKey, generateLoadProjectsCacheKey } from "./queries";
 import { gen } from "@/libs/result";
@@ -73,8 +73,8 @@ export const updateProjectDraftInputSchema = z.object({
   projectId: projectIdSchema,
   eventId: projectSchema.shape.eventId,
   orgId: projectSchema.shape.orgId,
-  pamphletText: projectDraftSchema.shape.pamphletText,
-  tags: z.array(tagIdSchema),
+  pamphletText: draftWithTagsSchema.shape.pamphletText,
+  tags: draftWithTagsSchema.shape.tags,
 });
 
 /**

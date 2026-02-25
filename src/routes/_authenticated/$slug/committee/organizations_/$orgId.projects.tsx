@@ -50,7 +50,7 @@ function ProjectsPage() {
             {projects.map((project) => (
               <Table.Row key={project.id}>
                 <Table.Cell fontWeight="medium">{project.name}</Table.Cell>
-                <Table.Cell>{project.placeText || "—"}</Table.Cell>
+                <Table.Cell>{project.placeName || "—"}</Table.Cell>
                 <Table.Cell>{new Date(project.createdAt).toLocaleDateString("ja-JP")}</Table.Cell>
               </Table.Row>
             ))}
