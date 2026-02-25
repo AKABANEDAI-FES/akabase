@@ -68,3 +68,36 @@ export function createProjectDraftEntity(input: {
     catch: () => projectError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "下書きの作成に失敗しました"),
   });
 }
+
+/**
+ * Update an existing ProjectDraft entity
+ * Validates input using zod schema
+ *
+ * Business rules:
+ * - Draft must exist before updating
+ * - All fields can be updated except projectId
+ * - Validation is performed by zod schema (e.g., pamphletText max 120 chars)
+ */
+export function updateProjectDraftEntity(input: {
+  projectId: ProjectId;
+  pamphletText: string;
+  webContentJson: unknown | null;
+  tags: TagId[];
+  updatedBy: UserId;
+  now?: Date;
+}): Result.Result<DraftWithTags, ProjectError> {
+  const now = input.now ?? new Date();
+  const data = {
+    projectId: input.projectId,
+    pamphletText: input.pamphletText,
+    webContentJson: input.webContentJson,
+    updatedAt: now,
+    updatedBy: input.updatedBy,
+    tags: input.tags,
+  };
+
+  return Result.try({
+    try: () => draftWithTagsSchema.parse(data),
+    catch: () => projectError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "下書きの更新に失敗しました"),
+  });
+}

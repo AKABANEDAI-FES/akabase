@@ -254,7 +254,7 @@ describe("AuthorizationServiceImpl", () => {
         }
       });
 
-      it("should allow organization manager", () => {
+      it("should deny organization manager", () => {
         const projectId = cast<ProjectId>("project_1");
         const eventId = cast<EventId>("event_1");
         const orgId = cast<OrgId>("org_1");
@@ -262,14 +262,15 @@ describe("AuthorizationServiceImpl", () => {
         const actor = createActor(cast<UserId>("user_1"), "user", new Map(), orgRoles);
         const resource = projectResource(projectId, eventId, orgId);
 
-        const result = authService.isAllowed(actor, resource, "project:update");
+        const result = authService.checkPermission(actor, resource, "project:update");
         expect(Result.isSuccess(result)).toBe(true);
         if (Result.isSuccess(result)) {
-          expect(result.value).toBe(true);
+          expect(result.value.allowed).toBe(false);
+          expect(result.value.reason).toContain("委員会管理者");
         }
       });
 
-      it("should allow organization editor", () => {
+      it("should deny organization editor", () => {
         const projectId = cast<ProjectId>("project_1");
         const eventId = cast<EventId>("event_1");
         const orgId = cast<OrgId>("org_1");
@@ -277,10 +278,11 @@ describe("AuthorizationServiceImpl", () => {
         const actor = createActor(cast<UserId>("user_1"), "user", new Map(), orgRoles);
         const resource = projectResource(projectId, eventId, orgId);
 
-        const result = authService.isAllowed(actor, resource, "project:update");
+        const result = authService.checkPermission(actor, resource, "project:update");
         expect(Result.isSuccess(result)).toBe(true);
         if (Result.isSuccess(result)) {
-          expect(result.value).toBe(true);
+          expect(result.value.allowed).toBe(false);
+          expect(result.value.reason).toContain("委員会管理者");
         }
       });
     });
@@ -397,35 +399,51 @@ describe("AuthorizationServiceImpl", () => {
     });
 
     describe("organization:update", () => {
-      it("should allow organization manager", () => {
+      it("should allow committee admin", () => {
+        const orgId = cast<OrgId>("org_1");
+        const eventId = cast<EventId>("event_1");
+        const committeeRoles = new Map<EventId, CommitteeRole>([[eventId, "admin"]]);
+        const actor = createActor(cast<UserId>("user_1"), "user", committeeRoles);
+        const resource = organizationResource(orgId, eventId);
+
+        const result = authService.isAllowed(actor, resource, "organization:update");
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value).toBe(true);
+        }
+      });
+
+      it("should deny organization manager", () => {
         const orgId = cast<OrgId>("org_1");
         const eventId = cast<EventId>("event_1");
         const orgRoles = new Map<OrgId, OrgRole>([[orgId, "manager"]]);
         const actor = createActor(cast<UserId>("user_1"), "user", new Map(), orgRoles);
         const resource = organizationResource(orgId, eventId);
 
-        const result = authService.isAllowed(actor, resource, "organization:update");
+        const result = authService.checkPermission(actor, resource, "organization:update");
         expect(Result.isSuccess(result)).toBe(true);
         if (Result.isSuccess(result)) {
-          expect(result.value).toBe(true);
+          expect(result.value.allowed).toBe(false);
+          expect(result.value.reason).toContain("委員会管理者");
         }
       });
 
-      it("should allow organization editor", () => {
+      it("should deny organization editor", () => {
         const orgId = cast<OrgId>("org_1");
         const eventId = cast<EventId>("event_1");
         const orgRoles = new Map<OrgId, OrgRole>([[orgId, "editor"]]);
         const actor = createActor(cast<UserId>("user_1"), "user", new Map(), orgRoles);
         const resource = organizationResource(orgId, eventId);
 
-        const result = authService.isAllowed(actor, resource, "organization:update");
+        const result = authService.checkPermission(actor, resource, "organization:update");
         expect(Result.isSuccess(result)).toBe(true);
         if (Result.isSuccess(result)) {
-          expect(result.value).toBe(true);
+          expect(result.value.allowed).toBe(false);
+          expect(result.value.reason).toContain("委員会管理者");
         }
       });
 
-      it("should deny user without organization role", () => {
+      it("should deny user without roles", () => {
         const orgId = cast<OrgId>("org_1");
         const eventId = cast<EventId>("event_1");
         const actor = createActor(cast<UserId>("user_1"), "user");
@@ -435,7 +453,7 @@ describe("AuthorizationServiceImpl", () => {
         expect(Result.isSuccess(updateResult)).toBe(true);
         if (Result.isSuccess(updateResult)) {
           expect(updateResult.value.allowed).toBe(false);
-          expect(updateResult.value.reason).toContain("組織メンバー");
+          expect(updateResult.value.reason).toContain("委員会管理者");
         }
       });
     });

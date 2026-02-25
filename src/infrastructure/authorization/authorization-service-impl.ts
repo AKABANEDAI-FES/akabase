@@ -186,18 +186,14 @@ export class AuthorizationServiceImpl implements AuthorizationService {
       }
 
       case "project:update": {
-        // Committee admins can update any project
+        // Only committee admins can update projects
         const committeeRole = getCommitteeRoleForEvent(actor, resource.eventId);
         if (committeeRole === "admin") {
           return Result.succeed({ allowed: true, reason: "委員会管理者" });
         }
-        // Organization managers and editors can update their projects
-        if (orgRole === "manager" || orgRole === "editor") {
-          return Result.succeed({ allowed: true, reason: "組織メンバー" });
-        }
         return Result.succeed({
           allowed: false,
-          reason: "委員会管理者または組織メンバーのみがプロジェクトを更新できます",
+          reason: "委員会管理者のみがプロジェクトを更新できます",
         });
       }
 
@@ -225,6 +221,19 @@ export class AuthorizationServiceImpl implements AuthorizationService {
       case "project:read":
         // Anyone can read (public data)
         return Result.succeed({ allowed: true });
+
+      case "project_draft:update":
+        // Committee admins and organization managers/editors can update drafts
+        if (committeeRole === "admin") {
+          return Result.succeed({ allowed: true, reason: "委員会管理者" });
+        }
+        if (orgRole === "manager" || orgRole === "editor") {
+          return Result.succeed({ allowed: true, reason: "組織マネージャーまたはエディター" });
+        }
+        return Result.succeed({
+          allowed: false,
+          reason: "委員会管理者または組織のメンバーのみがプロジェクト下書きを更新できます",
+        });
 
       default:
         return Result.succeed({ allowed: false, reason: "不明なアクション" });

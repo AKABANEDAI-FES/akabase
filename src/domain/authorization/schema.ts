@@ -196,6 +196,9 @@ export const actionSchema = z.enum([
   "tag:update",
   "tag:delete",
 
+  // Project draft actions
+  "project_draft:update",
+
   // User actions
   "user:update_role",
 ]);

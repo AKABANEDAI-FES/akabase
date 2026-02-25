@@ -3,8 +3,9 @@ import { z } from "zod";
 import { Result } from "@praha/byethrow";
 import { listPlaces } from "@/application/query/event/list-places";
 import { listProjects } from "@/application/query/project/list-projects";
+import { getDraft } from "@/application/query/project/get-project-draft";
 import { authMiddleware } from "@/libs/session-server";
-import { eventIdSchema, orgIdSchema } from "@/domain/shared/ids";
+import { eventIdSchema, orgIdSchema, projectIdSchema } from "@/domain/shared/ids";
 import { queryOptions } from "@tanstack/react-query";
 
 /**
@@ -58,5 +59,32 @@ export function generateLoadProjectsQueryOptions(orgId: string) {
   return queryOptions({
     queryKey: generateLoadProjectsCacheKey(orgId),
     queryFn: () => loadProjectsFn({ data: { orgId } }),
+  });
+}
+
+/**
+ * Server function to load draft for a project
+ */
+export const loadDraftFn = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
+  .inputValidator(z.object({ projectId: projectIdSchema }))
+  .handler(async ({ data }) => {
+    const result = await getDraft(data.projectId);
+
+    if (Result.isFailure(result)) {
+      throw new Error(result.error.message);
+    }
+
+    return result.value;
+  });
+
+export function generateLoadDraftCacheKey(projectId: string) {
+  return ["project-draft", projectId];
+}
+
+export function generateLoadDraftQueryOptions(projectId: string) {
+  return queryOptions({
+    queryKey: generateLoadDraftCacheKey(projectId),
+    queryFn: () => loadDraftFn({ data: { projectId } }),
   });
 }
