@@ -105,6 +105,17 @@ export interface ProjectRepository {
   }): Promise<void>;
 
   /**
+   * Withdraw submission with transaction safety
+   * Atomically: updates submission status, saves withdrawal action, and optionally saves message
+   * @throws {RepositoryException} on database errors
+   */
+  withdrawWithTransaction(params: {
+    updatedSubmission: SubmissionWithTags;
+    withdrawalAction: SubmissionAction;
+    withdrawalMessage?: SubmissionMessage;
+  }): Promise<void>;
+
+  /**
    * Submit project with transaction safety
    * Atomically: saves submission, saves submission action, and optionally saves message
    * @throws {RepositoryException} on database errors

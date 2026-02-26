@@ -10,10 +10,11 @@ import {
 } from "lucide-react";
 import { Card, Text } from "@/components/ui";
 import type { SubmissionDetail } from "@/application/query/project/get-submission-detail";
+import type { SubmissionDetailForOrg } from "@/application/query/project/get-submission-detail-for-org";
 import { SUBMISSION_ACTION_LABELS } from "@/domain/project/schema";
 
 interface SubmissionHistoryTabProps {
-  submission: SubmissionDetail;
+  submission: SubmissionDetail | SubmissionDetailForOrg;
 }
 
 export function SubmissionHistoryTab({ submission }: SubmissionHistoryTabProps) {

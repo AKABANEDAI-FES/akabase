@@ -122,9 +122,12 @@ export const checkOrganizationPermissionsFn = createServerFn({ method: "GET" })
     };
 
     const orgRes = organizationResource(cast<OrgId>(data.orgId), data.eventId);
+    const projectRes = projectResource(cast<ProjectId>("_"), data.eventId, cast<OrgId>(data.orgId));
 
     return {
       canManageMembers: check(orgRes, "organization:manage_members"),
+      canSubmitProject: check(projectRes, "project:submit"),
+      canWithdrawSubmission: check(projectRes, "project:withdraw"),
     };
   });
 

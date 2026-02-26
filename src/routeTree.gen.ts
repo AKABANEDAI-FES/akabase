@@ -48,6 +48,7 @@ import { Route as AuthenticatedSlugOrgsOrgIdProjectsProjectIdSubmissionsRouteImp
 import { Route as AuthenticatedSlugOrgsOrgIdProjectsProjectIdEditRouteImport } from './routes/_authenticated/$slug/orgs/$orgId_/projects.$projectId.edit'
 import { Route as AuthenticatedSlugCommitteeOrganizationsOrgIdProjectsNewRouteImport } from './routes/_authenticated/$slug/committee/organizations_/$orgId.projects.new'
 import { Route as AuthenticatedSlugCommitteeOrganizationsOrgIdMembersNewRouteImport } from './routes/_authenticated/$slug/committee/organizations_/$orgId.members.new'
+import { Route as AuthenticatedSlugOrgsOrgIdProjectsProjectIdSubmissionsSubmissionIdRouteImport } from './routes/_authenticated/$slug/orgs/$orgId_/projects.$projectId.submissions_.$submissionId'
 
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
@@ -269,6 +270,14 @@ const AuthenticatedSlugCommitteeOrganizationsOrgIdMembersNewRoute =
     getParentRoute: () =>
       AuthenticatedSlugCommitteeOrganizationsOrgIdMembersRoute,
   } as any)
+const AuthenticatedSlugOrgsOrgIdProjectsProjectIdSubmissionsSubmissionIdRoute =
+  AuthenticatedSlugOrgsOrgIdProjectsProjectIdSubmissionsSubmissionIdRouteImport.update(
+    {
+      id: '/orgs/$orgId_/projects/$projectId/submissions_/$submissionId',
+      path: '/orgs/$orgId/projects/$projectId/submissions/$submissionId',
+      getParentRoute: () => AuthenticatedSlugRoute,
+    } as any,
+  )
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -308,6 +317,7 @@ export interface FileRoutesByFullPath {
   '/$slug/orgs/$orgId/projects/$projectId/edit': typeof AuthenticatedSlugOrgsOrgIdProjectsProjectIdEditRoute
   '/$slug/orgs/$orgId/projects/$projectId/submissions': typeof AuthenticatedSlugOrgsOrgIdProjectsProjectIdSubmissionsRoute
   '/$slug/orgs/$orgId/projects/$projectId/': typeof AuthenticatedSlugOrgsOrgIdProjectsProjectIdIndexRoute
+  '/$slug/orgs/$orgId/projects/$projectId/submissions/$submissionId': typeof AuthenticatedSlugOrgsOrgIdProjectsProjectIdSubmissionsSubmissionIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -343,6 +353,7 @@ export interface FileRoutesByTo {
   '/$slug/orgs/$orgId/projects/$projectId/edit': typeof AuthenticatedSlugOrgsOrgIdProjectsProjectIdEditRoute
   '/$slug/orgs/$orgId/projects/$projectId/submissions': typeof AuthenticatedSlugOrgsOrgIdProjectsProjectIdSubmissionsRoute
   '/$slug/orgs/$orgId/projects/$projectId': typeof AuthenticatedSlugOrgsOrgIdProjectsProjectIdIndexRoute
+  '/$slug/orgs/$orgId/projects/$projectId/submissions/$submissionId': typeof AuthenticatedSlugOrgsOrgIdProjectsProjectIdSubmissionsSubmissionIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -385,6 +396,7 @@ export interface FileRoutesById {
   '/_authenticated/$slug/orgs/$orgId_/projects/$projectId/edit': typeof AuthenticatedSlugOrgsOrgIdProjectsProjectIdEditRoute
   '/_authenticated/$slug/orgs/$orgId_/projects/$projectId/submissions': typeof AuthenticatedSlugOrgsOrgIdProjectsProjectIdSubmissionsRoute
   '/_authenticated/$slug/orgs/$orgId_/projects/$projectId/': typeof AuthenticatedSlugOrgsOrgIdProjectsProjectIdIndexRoute
+  '/_authenticated/$slug/orgs/$orgId_/projects/$projectId/submissions_/$submissionId': typeof AuthenticatedSlugOrgsOrgIdProjectsProjectIdSubmissionsSubmissionIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -426,6 +438,7 @@ export interface FileRouteTypes {
     | '/$slug/orgs/$orgId/projects/$projectId/edit'
     | '/$slug/orgs/$orgId/projects/$projectId/submissions'
     | '/$slug/orgs/$orgId/projects/$projectId/'
+    | '/$slug/orgs/$orgId/projects/$projectId/submissions/$submissionId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -461,6 +474,7 @@ export interface FileRouteTypes {
     | '/$slug/orgs/$orgId/projects/$projectId/edit'
     | '/$slug/orgs/$orgId/projects/$projectId/submissions'
     | '/$slug/orgs/$orgId/projects/$projectId'
+    | '/$slug/orgs/$orgId/projects/$projectId/submissions/$submissionId'
   id:
     | '__root__'
     | '/'
@@ -502,6 +516,7 @@ export interface FileRouteTypes {
     | '/_authenticated/$slug/orgs/$orgId_/projects/$projectId/edit'
     | '/_authenticated/$slug/orgs/$orgId_/projects/$projectId/submissions'
     | '/_authenticated/$slug/orgs/$orgId_/projects/$projectId/'
+    | '/_authenticated/$slug/orgs/$orgId_/projects/$projectId/submissions_/$submissionId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -787,6 +802,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSlugCommitteeOrganizationsOrgIdMembersNewRouteImport
       parentRoute: typeof AuthenticatedSlugCommitteeOrganizationsOrgIdMembersRoute
     }
+    '/_authenticated/$slug/orgs/$orgId_/projects/$projectId/submissions_/$submissionId': {
+      id: '/_authenticated/$slug/orgs/$orgId_/projects/$projectId/submissions_/$submissionId'
+      path: '/orgs/$orgId/projects/$projectId/submissions/$submissionId'
+      fullPath: '/$slug/orgs/$orgId/projects/$projectId/submissions/$submissionId'
+      preLoaderRoute: typeof AuthenticatedSlugOrgsOrgIdProjectsProjectIdSubmissionsSubmissionIdRouteImport
+      parentRoute: typeof AuthenticatedSlugRoute
+    }
   }
 }
 
@@ -975,6 +997,7 @@ interface AuthenticatedSlugRouteChildren {
   AuthenticatedSlugOrgsOrgIdProjectsProjectIdEditRoute: typeof AuthenticatedSlugOrgsOrgIdProjectsProjectIdEditRoute
   AuthenticatedSlugOrgsOrgIdProjectsProjectIdSubmissionsRoute: typeof AuthenticatedSlugOrgsOrgIdProjectsProjectIdSubmissionsRoute
   AuthenticatedSlugOrgsOrgIdProjectsProjectIdIndexRoute: typeof AuthenticatedSlugOrgsOrgIdProjectsProjectIdIndexRoute
+  AuthenticatedSlugOrgsOrgIdProjectsProjectIdSubmissionsSubmissionIdRoute: typeof AuthenticatedSlugOrgsOrgIdProjectsProjectIdSubmissionsSubmissionIdRoute
 }
 
 const AuthenticatedSlugRouteChildren: AuthenticatedSlugRouteChildren = {
@@ -986,6 +1009,8 @@ const AuthenticatedSlugRouteChildren: AuthenticatedSlugRouteChildren = {
     AuthenticatedSlugOrgsOrgIdProjectsProjectIdSubmissionsRoute,
   AuthenticatedSlugOrgsOrgIdProjectsProjectIdIndexRoute:
     AuthenticatedSlugOrgsOrgIdProjectsProjectIdIndexRoute,
+  AuthenticatedSlugOrgsOrgIdProjectsProjectIdSubmissionsSubmissionIdRoute:
+    AuthenticatedSlugOrgsOrgIdProjectsProjectIdSubmissionsSubmissionIdRoute,
 }
 
 const AuthenticatedSlugRouteWithChildren =

@@ -2,9 +2,10 @@ import { Flex, Grid, HStack, Stack } from "styled-system/jsx";
 import { TagIcon } from "lucide-react";
 import { Badge, Card, Text } from "@/components/ui";
 import type { SubmissionDetail } from "@/application/query/project/get-submission-detail";
+import type { SubmissionDetailForOrg } from "@/application/query/project/get-submission-detail-for-org";
 
 interface SubmissionOverviewTabProps {
-  submission: SubmissionDetail;
+  submission: SubmissionDetail | SubmissionDetailForOrg;
 }
 
 export function SubmissionOverviewTab({ submission }: SubmissionOverviewTabProps) {
@@ -31,10 +32,9 @@ export function SubmissionOverviewTab({ submission }: SubmissionOverviewTabProps
 function SubmissionInfoCard({
   submission,
 }: {
-  submission: Pick<
-    SubmissionDetail,
-    "submittedBy" | "submittedAt" | "approvalCount" | "requiredApprovals"
-  >;
+  submission: Pick<SubmissionDetail, "submittedBy" | "submittedAt" | "approvalCount"> & {
+    requiredApprovals?: number;
+  };
 }) {
   return (
     <Card.Root>
@@ -60,7 +60,9 @@ function SubmissionInfoCard({
               承認状況
             </Text>
             <Text textStyle="sm">
-              {submission.approvalCount}/{submission.requiredApprovals}
+              {submission.requiredApprovals !== undefined
+                ? `${submission.approvalCount}/${submission.requiredApprovals}`
+                : `${submission.approvalCount}`}
             </Text>
           </Flex>
         </Stack>

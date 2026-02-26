@@ -498,6 +498,56 @@ export class ProjectRepositoryImpl implements ProjectRepository {
     }
   }
 
+  async withdrawWithTransaction(params: {
+    updatedSubmission: SubmissionWithTags;
+    withdrawalAction: SubmissionAction;
+    withdrawalMessage?: SubmissionMessage;
+  }): Promise<void> {
+    try {
+      // Build batch operations
+      const query: [BatchItem<"sqlite">, ...BatchItem<"sqlite">[]] = [
+        // 1. Update submission status
+        db
+          .update(projectSubmissions)
+          .set({ status: params.updatedSubmission.status })
+          .where(eq(projectSubmissions.id, params.updatedSubmission.id)),
+
+        // 2. Update project's updatedAt
+        db
+          .update(projects)
+          .set({ updatedAt: new Date() })
+          .where(eq(projects.id, params.updatedSubmission.projectId)),
+
+        // 3. Save withdrawal action
+        db.insert(submissionActions).values({
+          id: params.withdrawalAction.id,
+          submissionId: params.withdrawalAction.submissionId,
+          actionType: params.withdrawalAction.actionType,
+          userId: params.withdrawalAction.userId,
+          createdAt: params.withdrawalAction.createdAt,
+        }),
+      ];
+
+      // 4. Optionally save withdrawal message
+      if (params.withdrawalMessage) {
+        query.push(
+          db.insert(submissionMessages).values({
+            id: params.withdrawalMessage.id,
+            submissionId: params.withdrawalMessage.submissionId,
+            actionId: params.withdrawalMessage.actionId,
+            userId: params.withdrawalMessage.userId,
+            message: params.withdrawalMessage.message,
+            createdAt: params.withdrawalMessage.createdAt,
+          }),
+        );
+      }
+
+      await db.batch(query);
+    } catch (error) {
+      throw new RepositoryException("DATABASE_ERROR", "Failed to withdraw with transaction", error);
+    }
+  }
+
   async submitWithTransaction(params: {
     submission: SubmissionWithTags;
     submissionAction: SubmissionAction;

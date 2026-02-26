@@ -207,6 +207,16 @@ export class AuthorizationServiceImpl implements AuthorizationService {
           reason: "出展団体マネージャーのみがプロジェクトを提出できます",
         });
 
+      case "project:withdraw":
+        // Organization managers can withdraw submissions
+        if (orgRole === "manager") {
+          return Result.succeed({ allowed: true, reason: "出展団体マネージャー" });
+        }
+        return Result.succeed({
+          allowed: false,
+          reason: "出展団体マネージャーのみが企画提出を取り下げできます",
+        });
+
       case "project:approve":
       case "project:return":
         // Event admins and approvers can approve/return submissions

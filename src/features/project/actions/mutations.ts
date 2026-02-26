@@ -6,6 +6,7 @@ import { updateProjectDraft } from "@/application/command/project/update-project
 import { submitProject } from "@/application/command/project/submit-project";
 import { approveProject } from "@/application/command/project/approve-project";
 import { returnProject } from "@/application/command/project/return-project";
+import { withdrawSubmission } from "@/application/command/project/withdraw-submission";
 import { resolveActor } from "@/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/session-server";
 import { cast, projectIdSchema, submissionIdSchema } from "@/domain/shared/ids";
@@ -21,6 +22,7 @@ import {
   generateLoadEventSubmissionsCacheKey,
   generateLoadProjectsCacheKey,
   generateLoadSubmissionDetailCacheKey,
+  generateLoadSubmissionDetailForOrgCacheKey,
   generateLoadSubmissionsCacheKey,
 } from "./queries";
 import { gen } from "@/libs/result";
@@ -166,7 +168,7 @@ export function useSubmitProjectMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: submitProjectFn,
-    onSuccess: Result.inspect(({ projectId, eventId, orgId }) => {
+    onSuccess: Result.inspect(({ projectId, eventId, orgId, submissionId }) => {
       // Invalidate draft cache
       queryClient.invalidateQueries({
         queryKey: generateLoadDraftCacheKey(eventId, orgId, projectId),
@@ -178,6 +180,15 @@ export function useSubmitProjectMutation() {
       // Invalidate event-wide submissions cache
       queryClient.invalidateQueries({
         queryKey: generateLoadEventSubmissionsCacheKey(eventId),
+      });
+      // Invalidate submission detail cache (org view)
+      queryClient.invalidateQueries({
+        queryKey: generateLoadSubmissionDetailForOrgCacheKey(
+          eventId,
+          orgId,
+          projectId,
+          submissionId,
+        ),
       });
     }),
   });
@@ -289,6 +300,73 @@ export function useReturnProjectMutation() {
       // Invalidate draft cache (returned submissions can be edited again)
       queryClient.invalidateQueries({
         queryKey: generateLoadDraftCacheKey(eventId, orgId, projectId),
+      });
+    }),
+  });
+}
+
+/**
+ * Withdraw submission input validation schema
+ */
+export const withdrawSubmissionInputSchema = z.object({
+  submissionId: submissionIdSchema,
+  eventId: projectSchema.shape.eventId,
+  orgId: projectSchema.shape.orgId,
+  projectId: projectIdSchema,
+  reason: submissionMessageSchema.shape.message.optional(), // 取り下げ理由（任意）
+});
+
+/**
+ * Server function to withdraw a submission
+ */
+export const withdrawSubmissionFn = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .inputValidator(withdrawSubmissionInputSchema)
+  .handler(async ({ data, context }) => {
+    return gen(async function* ($) {
+      const actor = await resolveActor({
+        userId: cast<UserId>(context.session.user.id),
+        eventIds: [data.eventId],
+      });
+
+      return yield* $(
+        await withdrawSubmission(dependencies, {
+          submissionId: data.submissionId,
+          actor,
+          reason: data.reason,
+        }),
+      );
+    });
+  });
+
+/**
+ * React hook for withdraw submission mutation
+ */
+export function useWithdrawSubmissionMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: withdrawSubmissionFn,
+    onSuccess: Result.inspect(({ projectId, eventId, orgId, submissionId }) => {
+      // Invalidate submission detail cache (committee view)
+      queryClient.invalidateQueries({
+        queryKey: generateLoadSubmissionDetailCacheKey(eventId, submissionId),
+      });
+      // Invalidate submission detail cache (org view)
+      queryClient.invalidateQueries({
+        queryKey: generateLoadSubmissionDetailForOrgCacheKey(
+          eventId,
+          orgId,
+          projectId,
+          submissionId,
+        ),
+      });
+      // Invalidate project-specific submissions cache
+      queryClient.invalidateQueries({
+        queryKey: generateLoadSubmissionsCacheKey(eventId, orgId, projectId),
+      });
+      // Invalidate event-wide submissions cache
+      queryClient.invalidateQueries({
+        queryKey: generateLoadEventSubmissionsCacheKey(eventId),
       });
     }),
   });

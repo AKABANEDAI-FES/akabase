@@ -217,6 +217,34 @@ export function createReturnedActionEntity(input: {
 }
 
 /**
+ * Create SubmissionAction entity for "withdrawn" action
+ *
+ * Records the withdrawal action in submission_actions table
+ */
+export function createWithdrawnActionEntity(input: {
+  actionId: SubmissionActionId;
+  submissionId: SubmissionId;
+  userId: UserId;
+  now?: Date;
+}): Result.Result<SubmissionAction, ProjectError> {
+  const now = input.now ?? new Date();
+
+  const data = {
+    id: input.actionId,
+    submissionId: input.submissionId,
+    actionType: "withdrawn" as const,
+    userId: input.userId,
+    createdAt: now,
+  };
+
+  return Result.try({
+    try: () => submissionActionSchema.parse(data),
+    catch: () =>
+      projectError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "取り下げアクションの作成に失敗しました"),
+  });
+}
+
+/**
  * Create SubmissionMessage entity
  *
  * Records a message (note/remark) linked to a submission and optionally to a specific action
@@ -364,6 +392,29 @@ export function canReturn(submission: SubmissionWithTags): Result.Result<true, P
       projectError(
         PROJECT_ERROR_CODE.CANNOT_RETURN,
         `差し戻しは提出中(submitted)の提出のみ可能です。現在のステータス: ${submission.status}`,
+      ),
+    );
+  }
+  return Result.succeed(true);
+}
+
+/**
+ * Check if a submission can be withdrawn
+ *
+ * Business rules:
+ * - Submission status must be 'submitted'
+ * - Cannot withdraw submissions that are: approved, returned, or already withdrawn
+ * - Withdrawal is performed by organization manager (not committee)
+ *
+ * @param submission - The submission to check
+ * @returns Result.succeed if can withdraw, Result.fail with error otherwise
+ */
+export function canWithdraw(submission: SubmissionWithTags): Result.Result<true, ProjectError> {
+  if (submission.status !== "submitted") {
+    return Result.fail(
+      projectError(
+        PROJECT_ERROR_CODE.CANNOT_WITHDRAW,
+        `取り下げは提出中(submitted)の提出のみ可能です。現在のステータス: ${submission.status}`,
       ),
     );
   }

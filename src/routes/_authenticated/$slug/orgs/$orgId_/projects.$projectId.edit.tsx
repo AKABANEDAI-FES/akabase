@@ -13,6 +13,7 @@ import {
 import { SubmitProjectDialog } from "@/features/project/components";
 import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions";
 import { generateLoadTagsQueryOptions } from "@/features/event/actions/queries/tag";
+import { generateCheckOrganizationPermissionsQueryOptions } from "@/features/authorization/actions/queries";
 import { nl2br } from "@/libs/text";
 import { createListCollection } from "@ark-ui/react/collection";
 import { Portal } from "@ark-ui/react/portal";
@@ -33,6 +34,9 @@ export const Route = createFileRoute("/_authenticated/$slug/orgs/$orgId_/project
           generateLoadDraftQueryOptions(event.id, params.orgId, params.projectId),
         ),
         context.queryClient.ensureQueryData(generateLoadTagsQueryOptions(event.id)),
+        context.queryClient.ensureQueryData(
+          generateCheckOrganizationPermissionsQueryOptions(event.id, params.orgId),
+        ),
       ]);
     },
     component: ProjectEditPage,
@@ -48,6 +52,9 @@ function ProjectEditPage() {
     generateLoadDraftQueryOptions(event.id, orgId, projectId),
   );
   const { data: tags } = useSuspenseQuery(generateLoadTagsQueryOptions(event.id));
+  const { data: permissions } = useSuspenseQuery(
+    generateCheckOrganizationPermissionsQueryOptions(event.id, orgId),
+  );
   const { mutateAsync } = useUpdateProjectDraftMutation();
 
   const form = useForm({
@@ -218,20 +225,22 @@ function ProjectEditPage() {
             >
               {([canSubmit, isFormSubmitting, isDefaultValue]) => (
                 <Flex justify="flex-end" gap="2">
-                  <SubmitProjectDialog
-                    eventId={event.id}
-                    orgId={cast<OrgId>(orgId)}
-                    projectId={cast<ProjectId>(projectId)}
-                  >
-                    <Button
-                      type="button"
-                      variant="outline"
-                      disabled={!canSubmit || !isDefaultValue}
+                  {permissions.canSubmitProject && (
+                    <SubmitProjectDialog
+                      eventId={event.id}
+                      orgId={cast<OrgId>(orgId)}
+                      projectId={cast<ProjectId>(projectId)}
                     >
-                      <SendIcon />
-                      提出する
-                    </Button>
-                  </SubmitProjectDialog>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        disabled={!canSubmit || !isDefaultValue}
+                      >
+                        <SendIcon />
+                        提出する
+                      </Button>
+                    </SubmitProjectDialog>
+                  )}
                   <Button
                     type="submit"
                     loading={isFormSubmitting}
