@@ -92,6 +92,7 @@ export const select = defineSlotRecipe({
     },
     trigger: {
       alignItems: "center",
+      backgroundColor: "gray.surface.bg",
       borderRadius: "l2",
       cursor: "pointer",
       display: "grid",

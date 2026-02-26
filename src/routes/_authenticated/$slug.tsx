@@ -156,7 +156,7 @@ function OrganizationLinks({ slug }: { slug: string }) {
     <>
       {myOrganizations.map((org) => (
         <NavLink key={org.id}>
-          <Link to="/$slug/org/$orgId" params={{ slug, orgId: org.id }}>
+          <Link to="/$slug/orgs/$orgId" params={{ slug, orgId: org.id }}>
             {org.name}
           </Link>
         </NavLink>
