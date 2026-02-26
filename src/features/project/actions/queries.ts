@@ -3,6 +3,8 @@ import { z } from "zod";
 import { listPlaces } from "@/application/query/event/list-places";
 import { listProjects } from "@/application/query/project/list-projects";
 import { getDraft } from "@/application/query/project/get-project-draft";
+import { getProjectDetail } from "@/application/query/project/get-project-detail";
+import { getProjectPublished } from "@/application/query/project/get-project-published";
 import { listSubmissions } from "@/application/query/project/list-submissions";
 import { listEventSubmissions } from "@/application/query/project/list-event-submissions";
 import { resolveActor } from "@/application/query/authorization/resolve-actor";
@@ -94,6 +96,57 @@ export function generateLoadDraftQueryOptions(eventId: string, orgId: string, pr
 }
 
 /**
+ * Server function to load project detail
+ */
+export const loadProjectDetailFn = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
+  .inputValidator(
+    z.object({ eventId: eventIdSchema, orgId: orgIdSchema, projectId: projectIdSchema }),
+  )
+  .handler(async ({ data, context }) => {
+    // Resolve actor from session
+    const actor = await resolveActor({
+      userId: cast<UserId>(context.session.user.id),
+      eventIds: [data.eventId],
+      orgIds: [data.orgId],
+    });
+
+    // Query with authorization check
+    const project = await getProjectDetail(
+      dependencies,
+      data.eventId,
+      data.orgId,
+      data.projectId,
+      actor,
+    );
+
+    if (!project) {
+      throw new Error("プロジェクトが見つかりません。");
+    }
+
+    return project;
+  });
+
+export function generateLoadProjectDetailCacheKey(
+  eventId: string,
+  orgId: string,
+  projectId: string,
+) {
+  return ["project-detail", [eventId, orgId, projectId]];
+}
+
+export function generateLoadProjectDetailQueryOptions(
+  eventId: string,
+  orgId: string,
+  projectId: string,
+) {
+  return queryOptions({
+    queryKey: generateLoadProjectDetailCacheKey(eventId, orgId, projectId),
+    queryFn: () => loadProjectDetailFn({ data: { eventId, orgId, projectId } }),
+  });
+}
+
+/**
  * Server function to load submissions for a project
  */
 export const loadSubmissionsFn = createServerFn({ method: "GET" })
@@ -153,5 +206,44 @@ export function generateLoadEventSubmissionsQueryOptions(eventId: string) {
   return queryOptions({
     queryKey: generateLoadEventSubmissionsCacheKey(eventId),
     queryFn: () => loadEventSubmissionsFn({ data: { eventId } }),
+  });
+}
+
+/**
+ * Server function to load published data for a project
+ */
+export const loadProjectPublishedFn = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
+  .inputValidator(
+    z.object({ eventId: eventIdSchema, orgId: orgIdSchema, projectId: projectIdSchema }),
+  )
+  .handler(async ({ data, context }) => {
+    // Resolve actor from session
+    const actor = await resolveActor({
+      userId: cast<UserId>(context.session.user.id),
+      eventIds: [data.eventId],
+      orgIds: [data.orgId],
+    });
+
+    // Query with authorization check
+    return await getProjectPublished(dependencies, data.eventId, data.orgId, data.projectId, actor);
+  });
+
+export function generateLoadProjectPublishedCacheKey(
+  eventId: string,
+  orgId: string,
+  projectId: string,
+) {
+  return ["project-published", [eventId, orgId, projectId]];
+}
+
+export function generateLoadProjectPublishedQueryOptions(
+  eventId: string,
+  orgId: string,
+  projectId: string,
+) {
+  return queryOptions({
+    queryKey: generateLoadProjectPublishedCacheKey(eventId, orgId, projectId),
+    queryFn: () => loadProjectPublishedFn({ data: { eventId, orgId, projectId } }),
   });
 }
