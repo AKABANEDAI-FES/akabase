@@ -7,7 +7,7 @@ import type {
   SubmissionMessage,
   SubmissionWithTags,
 } from "./schema";
-import type { OrgId, ProjectId, SubmissionId } from "@/domain/shared/ids";
+import type { OrgId, ProjectId, SubmissionId, UserId } from "@/domain/shared/ids";
 
 /**
  * =============================================================================
@@ -89,4 +89,17 @@ export interface ProjectRepository {
    * @throws {RepositoryException} on database errors
    */
   saveSubmissionMessage(message: SubmissionMessage): Promise<void>;
+
+  /**
+   * Find approval action by submission and user
+   * Used to check if a user has already approved a submission
+   * @throws {RepositoryException} on database errors
+   */
+  findApprovalAction(submissionId: SubmissionId, userId: UserId): Promise<SubmissionAction | null>;
+
+  /**
+   * Count approval actions for a submission
+   * @throws {RepositoryException} on database errors
+   */
+  countApprovalActions(submissionId: SubmissionId): Promise<number>;
 }

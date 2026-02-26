@@ -80,11 +80,10 @@ const createColumns = (slug: string) => [
       return (
         <Button variant="plain" size="sm" asChild>
           <Link
-            to="/$slug/orgs/$orgId/projects/$projectId"
+            to="/$slug/committee/submissions/$submissionId"
             params={{
               slug,
-              orgId: row.orgId,
-              projectId: row.projectId,
+              submissionId: row.id,
             }}
           >
             詳細

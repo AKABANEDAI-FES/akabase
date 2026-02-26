@@ -142,7 +142,7 @@ export type SubmissionActionType = z.infer<typeof submissionActionTypeSchema>;
 export const SUBMISSION_ACTION_LABELS: Record<SubmissionActionType, string> = {
   submitted: "提出",
   approved: "承認",
-  returned: "差戻",
+  returned: "差し戻し",
   withdrawn: "取り下げ",
 } as const;
 

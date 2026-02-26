@@ -2,6 +2,7 @@ import { Result } from "@praha/byethrow";
 import type {
   DraftWithTags,
   Project,
+  PublishedWithTags,
   SubmissionAction,
   SubmissionMessage,
   SubmissionWithTags,
@@ -9,6 +10,7 @@ import type {
 import {
   draftWithTagsSchema,
   projectSchema,
+  publishedWithTagsSchema,
   submissionActionSchema,
   submissionMessageSchema,
   submissionWithTagsSchema,
@@ -186,6 +188,34 @@ export function createSubmissionActionEntity(input: {
 }
 
 /**
+ * Create SubmissionAction entity for "returned" action
+ *
+ * Records the return action in submission_actions table
+ */
+export function createReturnedActionEntity(input: {
+  actionId: SubmissionActionId;
+  submissionId: SubmissionId;
+  userId: UserId;
+  now?: Date;
+}): Result.Result<SubmissionAction, ProjectError> {
+  const now = input.now ?? new Date();
+
+  const data = {
+    id: input.actionId,
+    submissionId: input.submissionId,
+    actionType: "returned" as const,
+    userId: input.userId,
+    createdAt: now,
+  };
+
+  return Result.try({
+    try: () => submissionActionSchema.parse(data),
+    catch: () =>
+      projectError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "差し戻しアクションの作成に失敗しました"),
+  });
+}
+
+/**
  * Create SubmissionMessage entity
  *
  * Records a message (note/remark) linked to a submission and optionally to a specific action
@@ -212,5 +242,66 @@ export function createSubmissionMessageEntity(input: {
   return Result.try({
     try: () => submissionMessageSchema.parse(data),
     catch: () => projectError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "メッセージの作成に失敗しました"),
+  });
+}
+
+/**
+ * Create SubmissionAction entity for "approved" action
+ *
+ * Records an approval action in submission_actions table
+ * Business rules:
+ * - actionType is always "approved"
+ * - Each approval is independent (same user can't approve twice on same submission)
+ */
+export function createApprovalActionEntity(input: {
+  actionId: SubmissionActionId;
+  submissionId: SubmissionId;
+  userId: UserId;
+  now?: Date;
+}): Result.Result<SubmissionAction, ProjectError> {
+  const now = input.now ?? new Date();
+
+  const data = {
+    id: input.actionId,
+    submissionId: input.submissionId,
+    actionType: "approved" as const,
+    userId: input.userId,
+    createdAt: now,
+  };
+
+  return Result.try({
+    try: () => submissionActionSchema.parse(data),
+    catch: () =>
+      projectError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "承認アクションの作成に失敗しました"),
+  });
+}
+
+/**
+ * Create PublishedWithTags entity from SubmissionWithTags
+ *
+ * Business rules:
+ * - Creates immutable snapshot of approved submission for public display
+ * - Tags are copied from submission
+ * - publishedBy is the user who triggered the approval that met the threshold
+ */
+export function createPublishedEntity(input: {
+  submission: SubmissionWithTags;
+  publishedBy: UserId;
+  now?: Date;
+}): Result.Result<PublishedWithTags, ProjectError> {
+  const now = input.now ?? new Date();
+
+  const data = {
+    projectId: input.submission.projectId,
+    pamphletText: input.submission.pamphletText,
+    webContentJson: input.submission.webContentJson,
+    publishedAt: now,
+    publishedBy: input.publishedBy,
+    tags: input.submission.tags,
+  };
+
+  return Result.try({
+    try: () => publishedWithTagsSchema.parse(data),
+    catch: () => projectError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "公開データの作成に失敗しました"),
   });
 }

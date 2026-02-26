@@ -4,9 +4,11 @@ import { dependencies } from "@/infrastructure/di";
 import { createProject } from "@/application/command/project/create-project";
 import { updateProjectDraft } from "@/application/command/project/update-project-draft";
 import { submitProject } from "@/application/command/project/submit-project";
+import { approveProject } from "@/application/command/project/approve-project";
+import { returnProject } from "@/application/command/project/return-project";
 import { resolveActor } from "@/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/session-server";
-import { cast, projectIdSchema } from "@/domain/shared/ids";
+import { cast, projectIdSchema, submissionIdSchema } from "@/domain/shared/ids";
 import type { UserId } from "@/domain/shared/ids";
 import {
   draftWithTagsSchema,
@@ -18,6 +20,7 @@ import {
   generateLoadDraftCacheKey,
   generateLoadEventSubmissionsCacheKey,
   generateLoadProjectsCacheKey,
+  generateLoadSubmissionDetailCacheKey,
   generateLoadSubmissionsCacheKey,
 } from "./queries";
 import { gen } from "@/libs/result";
@@ -175,6 +178,117 @@ export function useSubmitProjectMutation() {
       // Invalidate event-wide submissions cache
       queryClient.invalidateQueries({
         queryKey: generateLoadEventSubmissionsCacheKey(eventId),
+      });
+    }),
+  });
+}
+
+/**
+ * Approve project input validation schema
+ */
+export const approveProjectInputSchema = z.object({
+  submissionId: submissionIdSchema,
+  eventId: projectSchema.shape.eventId,
+  message: submissionMessageSchema.shape.message.nullable(),
+});
+
+/**
+ * Server function to approve project submission
+ */
+export const approveProjectFn = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .inputValidator(approveProjectInputSchema)
+  .handler(async ({ data, context }) => {
+    return gen(async function* ($) {
+      const actor = await resolveActor({
+        userId: cast<UserId>(context.session.user.id),
+        eventIds: [data.eventId],
+      });
+
+      return yield* $(
+        await approveProject(dependencies, {
+          submissionId: data.submissionId,
+          actor,
+          message: data.message ?? undefined,
+        }),
+      );
+    });
+  });
+
+export function useApproveProjectMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: approveProjectFn,
+    onSuccess: Result.inspect(({ submissionId, eventId }) => {
+      // Invalidate submission detail cache
+      queryClient.invalidateQueries({
+        queryKey: generateLoadSubmissionDetailCacheKey(eventId, submissionId),
+      });
+      // Invalidate event-wide submissions cache
+      queryClient.invalidateQueries({
+        queryKey: generateLoadEventSubmissionsCacheKey(eventId),
+      });
+    }),
+  });
+}
+
+/**
+ * Return project input validation schema
+ */
+export const returnProjectInputSchema = z.object({
+  submissionId: submissionIdSchema,
+  eventId: projectSchema.shape.eventId,
+  orgId: projectSchema.shape.orgId,
+  projectId: projectIdSchema,
+  reason: submissionMessageSchema.shape.message,
+});
+
+/**
+ * Server function to return a submission
+ */
+export const returnProjectFn = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .inputValidator(returnProjectInputSchema)
+  .handler(async ({ data, context }) => {
+    return gen(async function* ($) {
+      const actor = await resolveActor({
+        userId: cast<UserId>(context.session.user.id),
+        eventIds: [data.eventId],
+      });
+
+      return yield* $(
+        await returnProject(dependencies, {
+          submissionId: data.submissionId,
+          actor,
+          reason: data.reason,
+        }),
+      );
+    });
+  });
+
+/**
+ * React hook for return project mutation
+ */
+export function useReturnProjectMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: returnProjectFn,
+    onSuccess: Result.inspect(({ projectId, eventId, orgId, submissionId }) => {
+      // Invalidate submission detail cache
+      queryClient.invalidateQueries({
+        queryKey: generateLoadSubmissionDetailCacheKey(eventId, submissionId),
+      });
+      // Invalidate project-specific submissions cache
+      queryClient.invalidateQueries({
+        queryKey: generateLoadSubmissionsCacheKey(eventId, orgId, projectId),
+      });
+      // Invalidate event-wide submissions cache
+      queryClient.invalidateQueries({
+        queryKey: generateLoadEventSubmissionsCacheKey(eventId),
+      });
+      // Invalidate draft cache (returned submissions can be edited again)
+      queryClient.invalidateQueries({
+        queryKey: generateLoadDraftCacheKey(eventId, orgId, projectId),
       });
     }),
   });

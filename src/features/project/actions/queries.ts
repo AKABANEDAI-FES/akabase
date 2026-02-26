@@ -7,9 +7,16 @@ import { getProjectDetail } from "@/application/query/project/get-project-detail
 import { getProjectPublished } from "@/application/query/project/get-project-published";
 import { listSubmissions } from "@/application/query/project/list-submissions";
 import { listEventSubmissions } from "@/application/query/project/list-event-submissions";
+import { getSubmissionDetail } from "@/application/query/project/get-submission-detail";
 import { resolveActor } from "@/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/session-server";
-import { cast, eventIdSchema, orgIdSchema, projectIdSchema } from "@/domain/shared/ids";
+import {
+  cast,
+  eventIdSchema,
+  orgIdSchema,
+  projectIdSchema,
+  submissionIdSchema,
+} from "@/domain/shared/ids";
 import type { UserId } from "@/domain/shared/ids";
 import { queryOptions } from "@tanstack/react-query";
 import { dependencies } from "@/infrastructure/di";
@@ -245,5 +252,35 @@ export function generateLoadProjectPublishedQueryOptions(
   return queryOptions({
     queryKey: generateLoadProjectPublishedCacheKey(eventId, orgId, projectId),
     queryFn: () => loadProjectPublishedFn({ data: { eventId, orgId, projectId } }),
+  });
+}
+
+/**
+ * Server function to load submission detail (committee view)
+ */
+export const loadSubmissionDetailFn = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
+  .inputValidator(z.object({ eventId: eventIdSchema, submissionId: submissionIdSchema }))
+  .handler(async ({ data, context }) => {
+    const actor = await resolveActor({
+      userId: cast<UserId>(context.session.user.id),
+      eventIds: [data.eventId],
+    });
+
+    const detail = await getSubmissionDetail(data.eventId, data.submissionId, actor);
+    if (!detail) {
+      throw new Error("提出が見つかりません。");
+    }
+    return detail;
+  });
+
+export function generateLoadSubmissionDetailCacheKey(eventId: string, submissionId: string) {
+  return ["submission-detail", [eventId, submissionId]];
+}
+
+export function generateLoadSubmissionDetailQueryOptions(eventId: string, submissionId: string) {
+  return queryOptions({
+    queryKey: generateLoadSubmissionDetailCacheKey(eventId, submissionId),
+    queryFn: () => loadSubmissionDetailFn({ data: { eventId, submissionId } }),
   });
 }
