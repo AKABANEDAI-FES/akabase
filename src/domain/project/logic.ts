@@ -8,6 +8,7 @@ import type {
   SubmissionWithTags,
 } from "./schema";
 import {
+  REQUIRED_APPROVALS,
   draftWithTagsSchema,
   projectSchema,
   publishedWithTagsSchema,
@@ -16,7 +17,7 @@ import {
   submissionWithTagsSchema,
 } from "./schema";
 import type { ProjectError } from "./errors";
-import { projectError } from "./errors";
+import { PROJECT_ERROR_CODE, projectError } from "./errors";
 import { DOMAIN_ERROR_CODE } from "../shared/errors";
 import type {
   EventId,
@@ -304,4 +305,67 @@ export function createPublishedEntity(input: {
     try: () => publishedWithTagsSchema.parse(data),
     catch: () => projectError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "公開データの作成に失敗しました"),
   });
+}
+
+/**
+ * =============================================================================
+ * Business Rule Validations
+ * =============================================================================
+ */
+
+/**
+ * Check if approval count has reached the required threshold for auto-approval
+ *
+ * Business rule:
+ * - When approval count reaches REQUIRED_APPROVALS, submission automatically becomes 'approved'
+ *
+ * @param approvalCount - Current number of approvals
+ * @returns true if threshold reached, false otherwise
+ */
+export function shouldAutoApprove(approvalCount: number): boolean {
+  return approvalCount >= REQUIRED_APPROVALS;
+}
+
+/**
+ * Check if a submission can be approved
+ *
+ * Business rules:
+ * - Submission status must be 'submitted'
+ * - Cannot approve submissions that are: returned, approved, or withdrawn
+ *
+ * @param submission - The submission to check
+ * @returns Result.succeed if can approve, Result.fail with error otherwise
+ */
+export function canApprove(submission: SubmissionWithTags): Result.Result<true, ProjectError> {
+  if (submission.status !== "submitted") {
+    return Result.fail(
+      projectError(
+        PROJECT_ERROR_CODE.CANNOT_APPROVE,
+        `承認は提出中(submitted)の提出のみ可能です。現在のステータス: ${submission.status}`,
+      ),
+    );
+  }
+  return Result.succeed(true);
+}
+
+/**
+ * Check if a submission can be returned
+ *
+ * Business rules:
+ * - Submission status must be 'submitted'
+ * - Cannot return submissions that are: approved, withdrawn, or already returned
+ *
+ * @param submission - The submission to check
+ * @returns Result.succeed if can return, Result.fail with error otherwise
+ */
+export function canReturn(submission: SubmissionWithTags): Result.Result<true, ProjectError> {
+  if (submission.status !== "submitted") {
+    return Result.fail(
+      projectError(
+        PROJECT_ERROR_CODE.CANNOT_RETURN,
+        `差し戻しは提出中(submitted)の提出のみ可能です。現在のステータス: ${submission.status}`,
+      ),
+    );
+  }
+  return Result.succeed(true);
 }

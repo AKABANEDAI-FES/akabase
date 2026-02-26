@@ -102,4 +102,39 @@ export interface ProjectRepository {
    * @throws {RepositoryException} on database errors
    */
   countApprovalActions(submissionId: SubmissionId): Promise<number>;
+
+  /**
+   * Approve submission with transaction safety
+   * Atomically: saves approval action, counts approvals, and if threshold reached,
+   * updates submission status and saves published data
+   * @throws {RepositoryException} on database errors
+   */
+  approveWithTransaction(params: {
+    approvalAction: SubmissionAction;
+    submission: SubmissionWithTags;
+    published?: PublishedWithTags;
+    requiredApprovals: number;
+  }): Promise<{ approvalCount: number; statusChanged: boolean }>;
+
+  /**
+   * Return submission with transaction safety
+   * Atomically: updates submission status, saves return action, and saves message
+   * @throws {RepositoryException} on database errors
+   */
+  returnWithTransaction(params: {
+    updatedSubmission: SubmissionWithTags;
+    returnAction: SubmissionAction;
+    returnMessage: SubmissionMessage;
+  }): Promise<void>;
+
+  /**
+   * Submit project with transaction safety
+   * Atomically: saves submission, saves submission action, and optionally saves message
+   * @throws {RepositoryException} on database errors
+   */
+  submitWithTransaction(params: {
+    submission: SubmissionWithTags;
+    submissionAction: SubmissionAction;
+    submissionMessage?: SubmissionMessage;
+  }): Promise<void>;
 }

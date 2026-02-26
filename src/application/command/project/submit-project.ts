@@ -20,6 +20,7 @@ import {
   createSubmissionEntity,
   createSubmissionMessageEntity,
 } from "@/domain/project/logic";
+import type { SubmissionMessage } from "@/domain/project/schema";
 import type { Dependencies } from "@/infrastructure/di";
 
 /**
@@ -117,15 +118,12 @@ export async function submitProject(
       }),
     );
 
-    // Save submission and action
-    await deps.projectRepo.saveSubmission(submission);
-    await deps.projectRepo.saveSubmissionAction(action);
-
-    // Save optional message (備考)
+    // Create optional message (備考)
     const trimmedMessage = input.message?.trim();
+    let submissionMessage: SubmissionMessage | undefined;
     if (trimmedMessage) {
       const messageId = generateId<SubmissionMessageId>();
-      const submissionMessage = yield* $(
+      submissionMessage = yield* $(
         createSubmissionMessageEntity({
           messageId,
           submissionId,
@@ -134,8 +132,14 @@ export async function submitProject(
           message: trimmedMessage,
         }),
       );
-      await deps.projectRepo.saveSubmissionMessage(submissionMessage);
     }
+
+    // Save submission, action, and message atomically
+    await deps.projectRepo.submitWithTransaction({
+      submission,
+      submissionAction: action,
+      submissionMessage,
+    });
 
     return {
       eventId: project.eventId,

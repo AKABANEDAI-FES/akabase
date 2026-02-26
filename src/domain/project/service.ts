@@ -18,15 +18,13 @@ export interface ProjectDomainService {
   canSubmit(projectId: ProjectId): Promise<Result.Result<true, ProjectError>>;
 
   /**
-   * 承認可能かチェック
-   * - 提出のステータスが 'submitted' であることを確認
-   * - 同じユーザーが既に承認していないことを確認
+   * 同じユーザーが既に承認していないことを確認（重複承認チェック）
    *
    * @param submissionId - チェック対象のsubmissionId
    * @param userId - 承認しようとしているユーザーID
-   * @returns 承認可能ならtrue、不可能ならエラー
+   * @returns 重複していなければtrue、既に承認済みならCANNOT_APPROVEエラー
    */
-  canApprove(
+  ensureUserNotApproved(
     submissionId: SubmissionId,
     userId: UserId,
   ): Promise<Result.Result<true, ProjectError>>;

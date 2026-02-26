@@ -16,6 +16,7 @@ import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
 import { projectResource } from "@/domain/authorization/logic";
 import {
+  canApprove,
   createApprovalActionEntity,
   createPublishedEntity,
   createSubmissionMessageEntity,
@@ -99,13 +100,18 @@ export async function approveProject(
     // 4. Check if event is modifiable
     yield* $(await deps.eventDomainService.resolveModifiableEvent(project.eventId));
 
-    // 5. Domain Service: Check if can approve
-    yield* $(await deps.projectDomainService.canApprove(input.submissionId, input.actor.userId));
+    // 5. Domain Logic: Check submission status
+    yield* $(canApprove(submission));
 
-    // 6. Generate IDs
+    // 6. Domain Service: Ensure user has not already approved
+    yield* $(
+      await deps.projectDomainService.ensureUserNotApproved(input.submissionId, input.actor.userId),
+    );
+
+    // 7. Generate IDs
     const approvalActionId = generateId<SubmissionActionId>();
 
-    // 7. Create approval action entity
+    // 8. Create approval action entity
     const approvalAction = yield* $(
       createApprovalActionEntity({
         actionId: approvalActionId,
@@ -114,32 +120,24 @@ export async function approveProject(
       }),
     );
 
-    // 8. Save approval action
-    await deps.projectRepo.saveSubmissionAction(approvalAction);
+    // 9. Create Published entity (prepare in case threshold is reached)
+    const updatedSubmission = { ...submission, status: "approved" as const };
+    const published = yield* $(
+      createPublishedEntity({
+        submission: updatedSubmission,
+        publishedBy: input.actor.userId,
+      }),
+    );
 
-    // 9. Count approvals
-    const approvalCount = await deps.projectRepo.countApprovalActions(input.submissionId);
-
-    // 10. Check if threshold reached and auto-update status
-    let statusChanged = false;
-    if (approvalCount >= REQUIRED_APPROVALS) {
-      // Update submission status
-      const updatedSubmission = { ...submission, status: "approved" as const };
-
-      // Create Published entity
-      const published = yield* $(
-        createPublishedEntity({
-          submission: updatedSubmission,
-          publishedBy: input.actor.userId,
-        }),
-      );
-
-      // Save both (transaction)
-      await deps.projectRepo.saveSubmission(updatedSubmission);
-      await deps.projectRepo.savePublished(published);
-
-      statusChanged = true;
-    }
+    // 10. Execute approval with transaction safety
+    // This atomically: saves approval, counts approvals, and if threshold reached,
+    // updates status and saves published data
+    const { approvalCount, statusChanged } = await deps.projectRepo.approveWithTransaction({
+      approvalAction,
+      submission,
+      published,
+      requiredApprovals: REQUIRED_APPROVALS,
+    });
 
     // 11. Optional message
     const trimmedMessage = input.message?.trim();

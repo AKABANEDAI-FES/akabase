@@ -15,7 +15,11 @@ import type { EventError } from "@/domain/event/errors";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
 import { projectResource } from "@/domain/authorization/logic";
-import { createReturnedActionEntity, createSubmissionMessageEntity } from "@/domain/project/logic";
+import {
+  canReturn,
+  createReturnedActionEntity,
+  createSubmissionMessageEntity,
+} from "@/domain/project/logic";
 import type { Dependencies } from "@/infrastructure/di";
 
 /**
@@ -71,17 +75,8 @@ export async function returnProject(
       );
     }
 
-    // ビジネスルール: status='submitted' のときのみ差し戻し可能
-    if (submission.status !== "submitted") {
-      return yield* $(
-        Result.fail(
-          projectError(
-            PROJECT_ERROR_CODE.CANNOT_RETURN,
-            "この提出は差し戻しできません。差し戻しは提出済み状態のみ可能です。",
-          ),
-        ),
-      );
-    }
+    // ドメインロジック: 差し戻し可能かチェック
+    yield* $(canReturn(submission));
 
     // 企画を取得して eventId と orgId を取得（認可用）
     const project = await deps.projectRepo.findById(submission.projectId);
@@ -128,10 +123,12 @@ export async function returnProject(
       status: "returned" as const,
     };
 
-    // 変更を永続化
-    await deps.projectRepo.saveSubmission(updatedSubmission);
-    await deps.projectRepo.saveSubmissionAction(returnAction);
-    await deps.projectRepo.saveSubmissionMessage(returnMessage);
+    // 変更を永続化（トランザクション内でアトミックに実行）
+    await deps.projectRepo.returnWithTransaction({
+      updatedSubmission,
+      returnAction,
+      returnMessage,
+    });
 
     return {
       eventId: project.eventId,

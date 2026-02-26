@@ -24,27 +24,8 @@ export class ProjectDomainServiceImpl implements ProjectDomainService {
     return Result.succeed(true);
   }
 
-  async canApprove(submissionId: SubmissionId, userId: UserId) {
-    // 1. Fetch submission to check status
-    const submission = await this.projectRepo.findSubmissionById(submissionId);
-
-    if (!submission) {
-      return Result.fail(
-        projectError(PROJECT_ERROR_CODE.SUBMISSION_NOT_FOUND, "提出データが見つかりません"),
-      );
-    }
-
-    // 2. Check status is 'submitted'
-    if (submission.status !== "submitted") {
-      return Result.fail(
-        projectError(
-          PROJECT_ERROR_CODE.INVALID_STATUS,
-          `この提出は承認できません。現在のステータス: ${submission.status}`,
-        ),
-      );
-    }
-
-    // 3. Check if user already approved
+  async ensureUserNotApproved(submissionId: SubmissionId, userId: UserId) {
+    // Check if user already approved (duplicate check)
     const existingApproval = await this.projectRepo.findApprovalAction(submissionId, userId);
 
     if (existingApproval) {
