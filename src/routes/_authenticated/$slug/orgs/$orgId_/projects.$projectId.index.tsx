@@ -2,7 +2,7 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Container, Flex, Stack } from "styled-system/jsx";
 import { Button, Heading, Text } from "@/components/ui";
-import { EditIcon, HistoryIcon } from "lucide-react";
+import { ArrowLeftIcon, EditIcon, HistoryIcon } from "lucide-react";
 import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions";
 import {
   generateLoadProjectDetailQueryOptions,
@@ -40,16 +40,24 @@ function ProjectDetailPage() {
   return (
     <Container maxW="4xl" py="8">
       <Stack gap="8">
-        <Flex justify="space-between" align="center">
-          <div>
-            <Heading as="h1" textStyle="2xl" fontWeight="bold">
-              {project.name}
-            </Heading>
-            <Text textStyle="sm" color="fg.muted">
-              最終更新: {new Date(project.updatedAt).toLocaleDateString("ja-JP")}
-            </Text>
-          </div>
-        </Flex>
+        <div>
+          <Button variant="plain" size="sm" mb="4" asChild>
+            <Link to="/$slug/orgs/$orgId" params={{ slug, orgId }}>
+              <ArrowLeftIcon />
+              組織に戻る
+            </Link>
+          </Button>
+          <Flex justify="space-between" align="center">
+            <div>
+              <Heading as="h1" textStyle="2xl" fontWeight="bold">
+                {project.name}
+              </Heading>
+              <Text textStyle="sm" color="fg.muted">
+                最終更新: {new Date(project.updatedAt).toLocaleDateString("ja-JP")}
+              </Text>
+            </div>
+          </Flex>
+        </div>
 
         <Flex gap="2">
           <Button asChild>
