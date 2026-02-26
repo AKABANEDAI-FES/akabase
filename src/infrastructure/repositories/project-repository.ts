@@ -265,20 +265,26 @@ export class ProjectRepositoryImpl implements ProjectRepository {
           },
         });
 
-      // Replace tags (delete + insert)
-      const q2 = db.delete(projectDraftTags).where(eq(projectDraftTags.projectId, draft.projectId));
+      // Update project's updatedAt
+      const q2 = db
+        .update(projects)
+        .set({ updatedAt: draft.updatedAt })
+        .where(eq(projects.id, draft.projectId));
 
-      const query: [BatchItem<"sqlite">, ...BatchItem<"sqlite">[]] = [q1, q2];
+      // Replace tags (delete + insert)
+      const q3 = db.delete(projectDraftTags).where(eq(projectDraftTags.projectId, draft.projectId));
+
+      const query: [BatchItem<"sqlite">, ...BatchItem<"sqlite">[]] = [q1, q2, q3];
 
       if (draft.tags.length > 0) {
-        const q3 = db.insert(projectDraftTags).values(
+        const q4 = db.insert(projectDraftTags).values(
           draft.tags.map((tagId) => ({
             id: generateId(),
             projectId: draft.projectId,
             tagId,
           })),
         );
-        query.push(q3);
+        query.push(q4);
       }
 
       await db.batch(query);
@@ -310,22 +316,28 @@ export class ProjectRepositoryImpl implements ProjectRepository {
           },
         });
 
-      // Replace tags (delete + insert)
+      // Update project's updatedAt
       const q2 = db
+        .update(projects)
+        .set({ updatedAt: submission.submittedAt })
+        .where(eq(projects.id, submission.projectId));
+
+      // Replace tags (delete + insert)
+      const q3 = db
         .delete(projectSubmissionTags)
         .where(eq(projectSubmissionTags.submissionId, submission.id));
 
-      const query: [BatchItem<"sqlite">, ...BatchItem<"sqlite">[]] = [q1, q2];
+      const query: [BatchItem<"sqlite">, ...BatchItem<"sqlite">[]] = [q1, q2, q3];
 
       if (submission.tags.length > 0) {
-        const q3 = db.insert(projectSubmissionTags).values(
+        const q4 = db.insert(projectSubmissionTags).values(
           submission.tags.map((tagId) => ({
             id: generateId(),
             submissionId: submission.id,
             tagId,
           })),
         );
-        query.push(q3);
+        query.push(q4);
       }
 
       await db.batch(query);
