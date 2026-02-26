@@ -9,7 +9,7 @@ import { IconButton } from "./icon-button";
 const { withProvider, withContext } = createStyleContext(pagination);
 
 export type RootProps = ComponentProps<typeof Root>;
-export const Root = withProvider(Pagination.Root, "root");
+export const Root = withProvider(Pagination.Root, "root", { forwardProps: ["page"] });
 export const RootProvider = withProvider(Pagination.RootProvider, "root");
 export const Item = withContext(Pagination.Item, "item");
 export const Ellipsis = withContext(Pagination.Ellipsis, "ellipsis");
