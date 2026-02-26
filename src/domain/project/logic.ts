@@ -1,9 +1,16 @@
 import { Result } from "@praha/byethrow";
-import type { DraftWithTags, Project, SubmissionAction, SubmissionWithTags } from "./schema";
+import type {
+  DraftWithTags,
+  Project,
+  SubmissionAction,
+  SubmissionMessage,
+  SubmissionWithTags,
+} from "./schema";
 import {
   draftWithTagsSchema,
   projectSchema,
   submissionActionSchema,
+  submissionMessageSchema,
   submissionWithTagsSchema,
 } from "./schema";
 import type { ProjectError } from "./errors";
@@ -16,6 +23,7 @@ import type {
   ProjectId,
   SubmissionActionId,
   SubmissionId,
+  SubmissionMessageId,
   TagId,
   UserId,
 } from "../shared/ids";
@@ -174,5 +182,35 @@ export function createSubmissionActionEntity(input: {
     try: () => submissionActionSchema.parse(data),
     catch: () =>
       projectError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "提出アクションの作成に失敗しました"),
+  });
+}
+
+/**
+ * Create SubmissionMessage entity
+ *
+ * Records a message (note/remark) linked to a submission and optionally to a specific action
+ */
+export function createSubmissionMessageEntity(input: {
+  messageId: SubmissionMessageId;
+  submissionId: SubmissionId;
+  actionId: SubmissionActionId | null;
+  userId: UserId;
+  message: string;
+  now?: Date;
+}): Result.Result<SubmissionMessage, ProjectError> {
+  const now = input.now ?? new Date();
+
+  const data = {
+    id: input.messageId,
+    submissionId: input.submissionId,
+    actionId: input.actionId,
+    userId: input.userId,
+    message: input.message,
+    createdAt: now,
+  };
+
+  return Result.try({
+    try: () => submissionMessageSchema.parse(data),
+    catch: () => projectError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "メッセージの作成に失敗しました"),
   });
 }

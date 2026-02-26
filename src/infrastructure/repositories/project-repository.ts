@@ -8,6 +8,7 @@ import {
   projectSubmissions,
   projects,
   submissionActions,
+  submissionMessages,
 } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import {
@@ -23,6 +24,7 @@ import type {
   ProjectSubmission,
   PublishedWithTags,
   SubmissionAction,
+  SubmissionMessage,
   SubmissionWithTags,
 } from "@/domain/project/schema";
 import type { OrgId, ProjectId, SubmissionId } from "@/domain/shared/ids";
@@ -389,6 +391,21 @@ export class ProjectRepositoryImpl implements ProjectRepository {
       });
     } catch (error) {
       throw new RepositoryException("DATABASE_ERROR", "Failed to save submission action", error);
+    }
+  }
+
+  async saveSubmissionMessage(message: SubmissionMessage): Promise<void> {
+    try {
+      await db.insert(submissionMessages).values({
+        id: message.id,
+        submissionId: message.submissionId,
+        actionId: message.actionId,
+        userId: message.userId,
+        message: message.message,
+        createdAt: message.createdAt,
+      });
+    } catch (error) {
+      throw new RepositoryException("DATABASE_ERROR", "Failed to save submission message", error);
     }
   }
 }

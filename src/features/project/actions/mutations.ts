@@ -127,6 +127,7 @@ export const submitProjectInputSchema = z.object({
   projectId: projectIdSchema,
   eventId: projectSchema.shape.eventId,
   orgId: projectSchema.shape.orgId,
+  message: z.string().optional(),
 });
 
 /**
@@ -143,7 +144,13 @@ export const submitProjectFn = createServerFn({ method: "POST" })
         orgIds: [data.orgId],
       });
 
-      return yield* $(await submitProject(dependencies, { projectId: data.projectId, actor }));
+      return yield* $(
+        await submitProject(dependencies, {
+          projectId: data.projectId,
+          actor,
+          message: data.message,
+        }),
+      );
     });
   });
 

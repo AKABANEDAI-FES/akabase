@@ -7,6 +7,7 @@ import type {
   ProjectId,
   SubmissionActionId,
   SubmissionId,
+  SubmissionMessageId,
 } from "@/domain/shared/ids";
 import type { ProjectError } from "@/domain/project/errors";
 import { PROJECT_ERROR_CODE, projectError } from "@/domain/project/errors";
@@ -14,7 +15,11 @@ import type { EventError } from "@/domain/event/errors";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
 import { projectResource } from "@/domain/authorization/logic";
-import { createSubmissionActionEntity, createSubmissionEntity } from "@/domain/project/logic";
+import {
+  createSubmissionActionEntity,
+  createSubmissionEntity,
+  createSubmissionMessageEntity,
+} from "@/domain/project/logic";
 import type { Dependencies } from "@/infrastructure/di";
 
 /**
@@ -23,6 +28,7 @@ import type { Dependencies } from "@/infrastructure/di";
 export type SubmitProjectInput = {
   projectId: ProjectId;
   actor: Actor;
+  message?: string;
 };
 
 /**
@@ -111,9 +117,25 @@ export async function submitProject(
       }),
     );
 
-    // Save submission and action (repository handles transaction)
+    // Save submission and action
     await deps.projectRepo.saveSubmission(submission);
     await deps.projectRepo.saveSubmissionAction(action);
+
+    // Save optional message (備考)
+    const trimmedMessage = input.message?.trim();
+    if (trimmedMessage) {
+      const messageId = generateId<SubmissionMessageId>();
+      const submissionMessage = yield* $(
+        createSubmissionMessageEntity({
+          messageId,
+          submissionId,
+          actionId,
+          userId: input.actor.userId,
+          message: trimmedMessage,
+        }),
+      );
+      await deps.projectRepo.saveSubmissionMessage(submissionMessage);
+    }
 
     return {
       eventId: project.eventId,

@@ -4,6 +4,7 @@ import type {
   ProjectSubmission,
   PublishedWithTags,
   SubmissionAction,
+  SubmissionMessage,
   SubmissionWithTags,
 } from "./schema";
 import type { OrgId, ProjectId, SubmissionId } from "@/domain/shared/ids";
@@ -82,4 +83,10 @@ export interface ProjectRepository {
    * @throws {RepositoryException} on database errors
    */
   saveSubmissionAction(action: SubmissionAction): Promise<void>;
+
+  /**
+   * Save submission message (insert only, no update)
+   * @throws {RepositoryException} on database errors
+   */
+  saveSubmissionMessage(message: SubmissionMessage): Promise<void>;
 }
