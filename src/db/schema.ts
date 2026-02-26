@@ -261,8 +261,6 @@ export const projectSubmissions = sqliteTable(
     submittedBy: text("submitted_by")
       .notNull()
       .references(() => user.id),
-    decidedAt: integer("decided_at", { mode: "timestamp_ms" }),
-    decidedBy: text("decided_by").references(() => user.id),
   },
   (table) => [
     index("project_submissions_project_id_idx").on(table.projectId),
@@ -285,6 +283,34 @@ export const projectPublished = sqliteTable("project_published", {
     .notNull()
     .references(() => user.id),
 });
+
+/**
+ * SubmissionAction (提出に対するアクション)
+ * 提出・承認・差し戻し・取り下げを統合管理
+ */
+export const submissionActions = sqliteTable(
+  "submission_actions",
+  {
+    id: text("id").primaryKey(),
+    submissionId: text("submission_id")
+      .notNull()
+      .references(() => projectSubmissions.id, { onDelete: "cascade" }),
+    actionType: text("action_type", {
+      enum: ["submitted", "approved", "returned", "withdrawn"],
+    }).notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+  },
+  (table) => [
+    index("submission_actions_submission_id_idx").on(table.submissionId),
+    index("submission_actions_action_type_idx").on(table.actionType),
+    index("submission_actions_created_at_idx").on(table.createdAt),
+  ],
+);
 
 /**
  * ProjectDraftTag (下書きのタグ)
@@ -353,39 +379,24 @@ export const projectPublishedTags = sqliteTable(
 );
 
 // ============================================================================
-// Feedback Context
+// Submission Feedback Context
 // ============================================================================
 
 /**
- * FeedbackThread (フィードバックスレッド)
- * 企画ごとに1つのスレッド
+ * SubmissionMessage (提出へのフィードバックメッセージ)
+ * 提出ごとにメッセージを記録
+ * actionIdが指定されている場合は特定のアクションに紐付く
  */
-export const feedbackThreads = sqliteTable(
-  "feedback_threads",
+export const submissionMessages = sqliteTable(
+  "submission_messages",
   {
     id: text("id").primaryKey(),
-    projectId: text("project_id")
+    submissionId: text("submission_id")
       .notNull()
-      .unique()
-      .references(() => projects.id, { onDelete: "cascade" }),
-    createdAt: integer("created_at", { mode: "timestamp_ms" })
-      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
-      .notNull(),
-  },
-  (table) => [index("feedback_threads_project_id_idx").on(table.projectId)],
-);
-
-/**
- * FeedbackMessage (フィードバックメッセージ)
- * スレッド内のメッセージ
- */
-export const feedbackMessages = sqliteTable(
-  "feedback_messages",
-  {
-    id: text("id").primaryKey(),
-    threadId: text("thread_id")
-      .notNull()
-      .references(() => feedbackThreads.id, { onDelete: "cascade" }),
+      .references(() => projectSubmissions.id, { onDelete: "cascade" }),
+    actionId: text("action_id").references(() => submissionActions.id, {
+      onDelete: "set null",
+    }), // オプショナル: 特定のアクションに紐付く場合
     userId: text("user_id")
       .notNull()
       .references(() => user.id),
@@ -395,8 +406,9 @@ export const feedbackMessages = sqliteTable(
       .notNull(),
   },
   (table) => [
-    index("feedback_messages_thread_id_idx").on(table.threadId),
-    index("feedback_messages_created_at_idx").on(table.createdAt),
+    index("submission_messages_submission_id_idx").on(table.submissionId),
+    index("submission_messages_action_id_idx").on(table.actionId),
+    index("submission_messages_created_at_idx").on(table.createdAt),
   ],
 );
 
@@ -497,10 +509,6 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
     fields: [projects.id],
     references: [projectPublished.projectId],
   }),
-  feedbackThread: one(feedbackThreads, {
-    fields: [projects.id],
-    references: [feedbackThreads.projectId],
-  }),
 }));
 
 export const projectDraftsRelations = relations(projectDrafts, ({ one, many }) => ({
@@ -524,11 +532,9 @@ export const projectSubmissionsRelations = relations(projectSubmissions, ({ one,
     fields: [projectSubmissions.submittedBy],
     references: [user.id],
   }),
-  decidedByUser: one(user, {
-    fields: [projectSubmissions.decidedBy],
-    references: [user.id],
-  }),
   tags: many(projectSubmissionTags),
+  actions: many(submissionActions),
+  messages: many(submissionMessages),
 }));
 
 export const projectPublishedRelations = relations(projectPublished, ({ one, many }) => ({
@@ -576,23 +582,31 @@ export const projectPublishedTagsRelations = relations(projectPublishedTags, ({ 
   }),
 }));
 
-export const feedbackThreadsRelations = relations(feedbackThreads, ({ one, many }) => ({
-  project: one(projects, {
-    fields: [feedbackThreads.projectId],
-    references: [projects.id],
+export const submissionMessagesRelations = relations(submissionMessages, ({ one }) => ({
+  submission: one(projectSubmissions, {
+    fields: [submissionMessages.submissionId],
+    references: [projectSubmissions.id],
   }),
-  messages: many(feedbackMessages),
-}));
-
-export const feedbackMessagesRelations = relations(feedbackMessages, ({ one }) => ({
-  thread: one(feedbackThreads, {
-    fields: [feedbackMessages.threadId],
-    references: [feedbackThreads.id],
+  action: one(submissionActions, {
+    fields: [submissionMessages.actionId],
+    references: [submissionActions.id],
   }),
   user: one(user, {
-    fields: [feedbackMessages.userId],
+    fields: [submissionMessages.userId],
     references: [user.id],
   }),
+}));
+
+export const submissionActionsRelations = relations(submissionActions, ({ one, many }) => ({
+  submission: one(projectSubmissions, {
+    fields: [submissionActions.submissionId],
+    references: [projectSubmissions.id],
+  }),
+  user: one(user, {
+    fields: [submissionActions.userId],
+    references: [user.id],
+  }),
+  messages: many(submissionMessages),
 }));
 
 // ============================================================================
@@ -644,12 +658,12 @@ export const selectProjectSubmissionTagSchema = createSelectSchema(projectSubmis
 export const insertProjectPublishedTagSchema = createInsertSchema(projectPublishedTags);
 export const selectProjectPublishedTagSchema = createSelectSchema(projectPublishedTags);
 
-// Feedback Context Schemas
-export const insertFeedbackThreadSchema = createInsertSchema(feedbackThreads);
-export const selectFeedbackThreadSchema = createSelectSchema(feedbackThreads);
+// Submission Feedback Schemas
+export const insertSubmissionMessageSchema = createInsertSchema(submissionMessages);
+export const selectSubmissionMessageSchema = createSelectSchema(submissionMessages);
 
-export const insertFeedbackMessageSchema = createInsertSchema(feedbackMessages);
-export const selectFeedbackMessageSchema = createSelectSchema(feedbackMessages);
+export const insertSubmissionActionSchema = createInsertSchema(submissionActions);
+export const selectSubmissionActionSchema = createSelectSchema(submissionActions);
 
 // Type exports for convenience
 export type InsertEvent = z.infer<typeof insertEventSchema>;
@@ -694,8 +708,8 @@ export type SelectProjectSubmissionTag = z.infer<typeof selectProjectSubmissionT
 export type InsertProjectPublishedTag = z.infer<typeof insertProjectPublishedTagSchema>;
 export type SelectProjectPublishedTag = z.infer<typeof selectProjectPublishedTagSchema>;
 
-export type InsertFeedbackThread = z.infer<typeof insertFeedbackThreadSchema>;
-export type SelectFeedbackThread = z.infer<typeof selectFeedbackThreadSchema>;
+export type InsertSubmissionMessage = z.infer<typeof insertSubmissionMessageSchema>;
+export type SelectSubmissionMessage = z.infer<typeof selectSubmissionMessageSchema>;
 
-export type InsertFeedbackMessage = z.infer<typeof insertFeedbackMessageSchema>;
-export type SelectFeedbackMessage = z.infer<typeof selectFeedbackMessageSchema>;
+export type InsertSubmissionAction = z.infer<typeof insertSubmissionActionSchema>;
+export type SelectSubmissionAction = z.infer<typeof selectSubmissionActionSchema>;

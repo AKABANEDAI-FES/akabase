@@ -69,11 +69,19 @@ The codebase follows DDD principles with bounded contexts:
    - **Draft:** Editable working data
    - **Submission:** Immutable snapshot when submitted (states: Submitted/Returned/Approved/Withdrawn)
    - **Published:** Current approved public data
+   - **SubmissionActions:** All actions (submitted, approved, returned, withdrawn) recorded in unified table
+   - **SubmissionMessages:** Feedback messages and comments, optionally linked to specific actions
    - **Invariants:**
      - Only one active submission allowed at a time
-     - Submissions are immutable after creation
+     - Submissions are immutable after creation (content cannot be modified)
      - Draft changes don't affect Published until approved
-     - Withdrawal only allowed before approval
+     - Approvals are recorded as actions (actionType: "approved") in submission_actions table
+     - Same user cannot approve twice on the same submission
+     - Approvals can only be added/removed when status is 'submitted'
+     - When approval count reaches required number (1), status automatically changes to 'approved' and Published is updated
+     - Once status becomes 'approved', approvals cannot be removed and submission cannot be returned or withdrawn
+     - Approval removal is physical deletion (DELETE) from submission_actions table
+     - Withdrawal only allowed before approval (status must be 'submitted')
 
 3. **Organization Context** (`Organization` aggregate)
    - Organization info and member management
@@ -84,19 +92,54 @@ The codebase follows DDD principles with bounded contexts:
 **State Transitions:**
 
 ```
-Draft → [Submit] → Submission (Submitted)
-                → [Return] → Submission (Returned) → back to Draft editing
-                → [Approve] → Submission (Approved) + Published updated
-                → [Withdraw] → Submission (Withdrawn)
+Draft → [Submit] → Submission (status: submitted)
+                → submission_actions += {actionType: "submitted"}
+                ↓
+             [Approval Actions Added] (submission_actions table)
+                → submission_actions += {actionType: "approved", userId: approver}
+                ↓
+             When COUNT(actionType='approved') >= REQUIRED_APPROVALS (1):
+                → status = 'approved' (automatic)
+                → project_published table updated
+
+From 'submitted' state only:
+                → [Return] → status = 'returned'
+                          → submission_actions += {actionType: "returned"}
+                          → back to Draft editing
+
+                → [Withdraw] → status = 'withdrawn'
+                            → submission_actions += {actionType: "withdrawn"}
+
+                → [Remove Approval] → DELETE from submission_actions
+                                   → If count < required: revert to 'submitted'
+
+Note: Return, Withdraw, and Approval removal only allowed when status = 'submitted'
+Once status = 'approved', it becomes immutable (no return, no withdrawal, no approval removal)
 ```
 
 **Database Schema:**
 
 - `projects`: Core project metadata
 - `project_drafts`: Current editable version
-- `project_submissions`: Historical submission snapshots
+- `project_submissions`: Historical submission snapshots (status field only, no decidedAt/decidedBy)
+- `submission_actions`: All actions (submitted, approved, returned, withdrawn) with userId and timestamp
+- `submission_messages`: Feedback messages and comments, optionally linked to specific actions
 - `project_published`: Current public version
 - Auth tables: `user`, `session`, `account`, `verification` (Better Auth schema)
+
+**Approval Flow:**
+
+1. Multiple committee members (role: admin or approver) can add approvals to a submission by creating action records
+2. Required approval count is hardcoded: `REQUIRED_APPROVALS = 1` (defined in `src/domain/project/schema.ts`)
+3. Approval is recorded as: `submission_actions += {actionType: "approved", userId: approver, submissionId: ...}`
+4. When `COUNT(actionType='approved') >= REQUIRED_APPROVALS`, the submission automatically transitions to 'approved' status and Published is updated
+5. Approvals can only be added/removed when `submission.status = 'submitted'`
+6. Approval removal is physical deletion: `DELETE FROM submission_actions WHERE id = ?`
+7. Approval removal permissions:
+   - Committee admin: can remove any approval
+   - Approver who added the approval: can remove their own approval only
+8. If approval is removed and count falls below required threshold, automatically revert: status → 'submitted', delete Published
+9. Once status becomes 'approved', no changes are allowed (immutable)
 
 ### CQRS Pattern (Command Query Responsibility Segregation)
 

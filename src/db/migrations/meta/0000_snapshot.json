@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "a08ddfc6-edb3-4818-ba0b-bfb25dcb2836",
+  "id": "1f54fa0d-f00d-4950-91f5-2b51100d47e4",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "committee_roles": {
@@ -209,135 +209,6 @@
         }
       },
       "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "feedback_messages": {
-      "name": "feedback_messages",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "thread_id": {
-          "name": "thread_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "message": {
-          "name": "message",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(cast(unixepoch('subsecond') * 1000 as integer))"
-        }
-      },
-      "indexes": {
-        "feedback_messages_thread_id_idx": {
-          "name": "feedback_messages_thread_id_idx",
-          "columns": ["thread_id"],
-          "isUnique": false
-        },
-        "feedback_messages_created_at_idx": {
-          "name": "feedback_messages_created_at_idx",
-          "columns": ["created_at"],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {
-        "feedback_messages_thread_id_feedback_threads_id_fk": {
-          "name": "feedback_messages_thread_id_feedback_threads_id_fk",
-          "tableFrom": "feedback_messages",
-          "tableTo": "feedback_threads",
-          "columnsFrom": ["thread_id"],
-          "columnsTo": ["id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "feedback_messages_user_id_user_id_fk": {
-          "name": "feedback_messages_user_id_user_id_fk",
-          "tableFrom": "feedback_messages",
-          "tableTo": "user",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "feedback_threads": {
-      "name": "feedback_threads",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "project_id": {
-          "name": "project_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(cast(unixepoch('subsecond') * 1000 as integer))"
-        }
-      },
-      "indexes": {
-        "feedback_threads_project_id_unique": {
-          "name": "feedback_threads_project_id_unique",
-          "columns": ["project_id"],
-          "isUnique": true
-        },
-        "feedback_threads_project_id_idx": {
-          "name": "feedback_threads_project_id_idx",
-          "columns": ["project_id"],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {
-        "feedback_threads_project_id_projects_id_fk": {
-          "name": "feedback_threads_project_id_projects_id_fk",
-          "tableFrom": "feedback_threads",
-          "tableTo": "projects",
-          "columnsFrom": ["project_id"],
-          "columnsTo": ["id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -960,20 +831,6 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
-        },
-        "decided_at": {
-          "name": "decided_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "decided_by": {
-          "name": "decided_by",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
         }
       },
       "indexes": {
@@ -1003,15 +860,6 @@
           "tableFrom": "project_submissions",
           "tableTo": "user",
           "columnsFrom": ["submitted_by"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "project_submissions_decided_by_user_id_fk": {
-          "name": "project_submissions_decided_by_user_id_fk",
-          "tableFrom": "project_submissions",
-          "tableTo": "user",
-          "columnsFrom": ["decided_by"],
           "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
@@ -1119,6 +967,184 @@
           "tableFrom": "projects",
           "tableTo": "places",
           "columnsFrom": ["place_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "submission_actions": {
+      "name": "submission_actions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "submission_id": {
+          "name": "submission_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "action_type": {
+          "name": "action_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(unixepoch('subsecond') * 1000 as integer))"
+        }
+      },
+      "indexes": {
+        "submission_actions_submission_id_idx": {
+          "name": "submission_actions_submission_id_idx",
+          "columns": ["submission_id"],
+          "isUnique": false
+        },
+        "submission_actions_action_type_idx": {
+          "name": "submission_actions_action_type_idx",
+          "columns": ["action_type"],
+          "isUnique": false
+        },
+        "submission_actions_created_at_idx": {
+          "name": "submission_actions_created_at_idx",
+          "columns": ["created_at"],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "submission_actions_submission_id_project_submissions_id_fk": {
+          "name": "submission_actions_submission_id_project_submissions_id_fk",
+          "tableFrom": "submission_actions",
+          "tableTo": "project_submissions",
+          "columnsFrom": ["submission_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "submission_actions_user_id_user_id_fk": {
+          "name": "submission_actions_user_id_user_id_fk",
+          "tableFrom": "submission_actions",
+          "tableTo": "user",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "submission_messages": {
+      "name": "submission_messages",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "submission_id": {
+          "name": "submission_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "action_id": {
+          "name": "action_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "message": {
+          "name": "message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(unixepoch('subsecond') * 1000 as integer))"
+        }
+      },
+      "indexes": {
+        "submission_messages_submission_id_idx": {
+          "name": "submission_messages_submission_id_idx",
+          "columns": ["submission_id"],
+          "isUnique": false
+        },
+        "submission_messages_action_id_idx": {
+          "name": "submission_messages_action_id_idx",
+          "columns": ["action_id"],
+          "isUnique": false
+        },
+        "submission_messages_created_at_idx": {
+          "name": "submission_messages_created_at_idx",
+          "columns": ["created_at"],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "submission_messages_submission_id_project_submissions_id_fk": {
+          "name": "submission_messages_submission_id_project_submissions_id_fk",
+          "tableFrom": "submission_messages",
+          "tableTo": "project_submissions",
+          "columnsFrom": ["submission_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "submission_messages_action_id_submission_actions_id_fk": {
+          "name": "submission_messages_action_id_submission_actions_id_fk",
+          "tableFrom": "submission_messages",
+          "tableTo": "submission_actions",
+          "columnsFrom": ["action_id"],
+          "columnsTo": ["id"],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "submission_messages_user_id_user_id_fk": {
+          "name": "submission_messages_user_id_user_id_fk",
+          "tableFrom": "submission_messages",
+          "tableTo": "user",
+          "columnsFrom": ["user_id"],
           "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"

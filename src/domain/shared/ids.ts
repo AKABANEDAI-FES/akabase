@@ -32,11 +32,11 @@ export type PlaceId = z.infer<typeof placeIdSchema>;
 export const deadlineIdSchema = z.string().brand<"DeadlineId">();
 export type DeadlineId = z.infer<typeof deadlineIdSchema>;
 
-export const feedbackThreadIdSchema = z.string().brand<"FeedbackThreadId">();
-export type FeedbackThreadId = z.infer<typeof feedbackThreadIdSchema>;
+export const submissionMessageIdSchema = z.string().brand<"SubmissionMessageId">();
+export type SubmissionMessageId = z.infer<typeof submissionMessageIdSchema>;
 
-export const feedbackMessageIdSchema = z.string().brand<"FeedbackMessageId">();
-export type FeedbackMessageId = z.infer<typeof feedbackMessageIdSchema>;
+export const submissionActionIdSchema = z.string().brand<"SubmissionActionId">();
+export type SubmissionActionId = z.infer<typeof submissionActionIdSchema>;
 
 export function cast<T extends string>(id: string): T {
   return z.string().parse(id) as T;

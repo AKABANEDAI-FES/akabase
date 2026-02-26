@@ -4,7 +4,9 @@ import {
   orgIdSchema,
   placeIdSchema,
   projectIdSchema,
+  submissionActionIdSchema,
   submissionIdSchema,
+  submissionMessageIdSchema,
   tagIdSchema,
   userIdSchema,
 } from "../shared/ids";
@@ -16,6 +18,11 @@ export const PROJECT_NAME_MIN_LENGTH = 1;
 export const PROJECT_NAME_MAX_LENGTH = 100;
 export const PROJECT_PAMPHLET_TEXT_MAX_LENGTH = 120;
 export const PROJECT_MAX_TAGS = 5;
+
+/**
+ * Approval constraints
+ */
+export const REQUIRED_APPROVALS = 1; // 必要な承認数
 
 /**
  * Project (Aggregate Root)
@@ -74,8 +81,6 @@ export const projectSubmissionSchema = z.object({
   webContentJson: z.json().nullable(),
   submittedAt: z.date(),
   submittedBy: userIdSchema,
-  decidedAt: z.date().nullable(),
-  decidedBy: userIdSchema.nullable(),
 });
 
 export type ProjectSubmission = z.infer<typeof projectSubmissionSchema>;
@@ -117,3 +122,43 @@ export const publishedWithTagsSchema = projectPublishedSchema.extend({
 });
 
 export type PublishedWithTags = z.infer<typeof publishedWithTagsSchema>;
+
+/**
+ * Submission Action Types
+ */
+export const submissionActionTypeSchema = z.enum([
+  "submitted",
+  "approved",
+  "returned",
+  "withdrawn",
+]);
+export type SubmissionActionType = z.infer<typeof submissionActionTypeSchema>;
+
+/**
+ * SubmissionAction
+ * 提出に対するアクション記録（提出・承認・差し戻し・取り下げ）
+ */
+export const submissionActionSchema = z.object({
+  id: submissionActionIdSchema,
+  submissionId: submissionIdSchema,
+  actionType: submissionActionTypeSchema,
+  userId: userIdSchema,
+  createdAt: z.date(),
+});
+
+export type SubmissionAction = z.infer<typeof submissionActionSchema>;
+
+/**
+ * SubmissionMessage
+ * 提出に対するメッセージ（チャット or アクションへのコメント）
+ */
+export const submissionMessageSchema = z.object({
+  id: submissionMessageIdSchema,
+  submissionId: submissionIdSchema,
+  actionId: submissionActionIdSchema.nullable(), // オプショナル: 特定のアクションに紐付く場合
+  userId: userIdSchema,
+  message: z.string().min(1, "メッセージを入力してください"),
+  createdAt: z.date(),
+});
+
+export type SubmissionMessage = z.infer<typeof submissionMessageSchema>;

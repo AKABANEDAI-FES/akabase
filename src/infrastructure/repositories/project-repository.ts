@@ -117,8 +117,6 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         webContentJson: row.webContentJson,
         submittedAt: new Date(row.submittedAt),
         submittedBy: row.submittedBy,
-        decidedAt: row.decidedAt ? new Date(row.decidedAt) : null,
-        decidedBy: row.decidedBy,
         tags: row.tags.map((t) => t.tagId),
       });
 
@@ -200,8 +198,6 @@ export class ProjectRepositoryImpl implements ProjectRepository {
           webContentJson: row.webContentJson,
           submittedAt: new Date(row.submittedAt),
           submittedBy: row.submittedBy,
-          decidedAt: row.decidedAt ? new Date(row.decidedAt) : null,
-          decidedBy: row.decidedBy,
         }),
       );
 
@@ -300,16 +296,12 @@ export class ProjectRepositoryImpl implements ProjectRepository {
           webContentJson: submission.webContentJson,
           submittedAt: submission.submittedAt,
           submittedBy: submission.submittedBy,
-          decidedAt: submission.decidedAt,
-          decidedBy: submission.decidedBy,
         })
         .onConflictDoUpdate({
           target: projectSubmissions.id,
           set: {
-            // Submission content is immutable, only status/decision can change
+            // Submission content is immutable, only status can change
             status: submission.status,
-            decidedAt: submission.decidedAt,
-            decidedBy: submission.decidedBy,
             // Immutable fields excluded: id, projectId, pamphletText, webContentJson, submittedAt, submittedBy
           },
         });

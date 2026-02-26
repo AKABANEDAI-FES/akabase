@@ -32,27 +32,6 @@ CREATE TABLE `events` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `events_slug_unique` ON `events` (`slug`);--> statement-breakpoint
-CREATE TABLE `feedback_messages` (
-	`id` text PRIMARY KEY NOT NULL,
-	`thread_id` text NOT NULL,
-	`user_id` text NOT NULL,
-	`message` text NOT NULL,
-	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
-	FOREIGN KEY (`thread_id`) REFERENCES `feedback_threads`(`id`) ON UPDATE no action ON DELETE cascade,
-	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE no action
-);
---> statement-breakpoint
-CREATE INDEX `feedback_messages_thread_id_idx` ON `feedback_messages` (`thread_id`);--> statement-breakpoint
-CREATE INDEX `feedback_messages_created_at_idx` ON `feedback_messages` (`created_at`);--> statement-breakpoint
-CREATE TABLE `feedback_threads` (
-	`id` text PRIMARY KEY NOT NULL,
-	`project_id` text NOT NULL,
-	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
-	FOREIGN KEY (`project_id`) REFERENCES `projects`(`id`) ON UPDATE no action ON DELETE cascade
-);
---> statement-breakpoint
-CREATE UNIQUE INDEX `feedback_threads_project_id_unique` ON `feedback_threads` (`project_id`);--> statement-breakpoint
-CREATE INDEX `feedback_threads_project_id_idx` ON `feedback_threads` (`project_id`);--> statement-breakpoint
 CREATE TABLE `org_members` (
 	`id` text PRIMARY KEY NOT NULL,
 	`org_id` text NOT NULL,
@@ -152,11 +131,8 @@ CREATE TABLE `project_submissions` (
 	`web_content_json` text,
 	`submitted_at` integer NOT NULL,
 	`submitted_by` text NOT NULL,
-	`decided_at` integer,
-	`decided_by` text,
 	FOREIGN KEY (`project_id`) REFERENCES `projects`(`id`) ON UPDATE no action ON DELETE cascade,
-	FOREIGN KEY (`submitted_by`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`decided_by`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE no action
+	FOREIGN KEY (`submitted_by`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE INDEX `project_submissions_project_id_idx` ON `project_submissions` (`project_id`);--> statement-breakpoint
@@ -177,6 +153,34 @@ CREATE TABLE `projects` (
 --> statement-breakpoint
 CREATE INDEX `projects_event_id_idx` ON `projects` (`event_id`);--> statement-breakpoint
 CREATE INDEX `projects_org_id_idx` ON `projects` (`org_id`);--> statement-breakpoint
+CREATE TABLE `submission_actions` (
+	`id` text PRIMARY KEY NOT NULL,
+	`submission_id` text NOT NULL,
+	`action_type` text NOT NULL,
+	`user_id` text NOT NULL,
+	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
+	FOREIGN KEY (`submission_id`) REFERENCES `project_submissions`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
+CREATE INDEX `submission_actions_submission_id_idx` ON `submission_actions` (`submission_id`);--> statement-breakpoint
+CREATE INDEX `submission_actions_action_type_idx` ON `submission_actions` (`action_type`);--> statement-breakpoint
+CREATE INDEX `submission_actions_created_at_idx` ON `submission_actions` (`created_at`);--> statement-breakpoint
+CREATE TABLE `submission_messages` (
+	`id` text PRIMARY KEY NOT NULL,
+	`submission_id` text NOT NULL,
+	`action_id` text,
+	`user_id` text NOT NULL,
+	`message` text NOT NULL,
+	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
+	FOREIGN KEY (`submission_id`) REFERENCES `project_submissions`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`action_id`) REFERENCES `submission_actions`(`id`) ON UPDATE no action ON DELETE set null,
+	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
+CREATE INDEX `submission_messages_submission_id_idx` ON `submission_messages` (`submission_id`);--> statement-breakpoint
+CREATE INDEX `submission_messages_action_id_idx` ON `submission_messages` (`action_id`);--> statement-breakpoint
+CREATE INDEX `submission_messages_created_at_idx` ON `submission_messages` (`created_at`);--> statement-breakpoint
 CREATE TABLE `tags` (
 	`id` text PRIMARY KEY NOT NULL,
 	`event_id` text NOT NULL,
