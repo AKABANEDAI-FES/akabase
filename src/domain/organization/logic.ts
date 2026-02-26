@@ -139,7 +139,8 @@ export function createOrganizationEntity(input: {
 
   return Result.try({
     try: () => organizationSchema.parse(data),
-    catch: () => organizationError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "団体の作成に失敗しました"),
+    catch: () =>
+      organizationError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "出展団体の作成に失敗しました"),
   });
 }
 
@@ -169,6 +170,7 @@ export function updateOrganizationEntity(
 
   return Result.try({
     try: () => organizationSchema.parse(updated),
-    catch: () => organizationError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "団体の更新に失敗しました"),
+    catch: () =>
+      organizationError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "出展団体の更新に失敗しました"),
   });
 }

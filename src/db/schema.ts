@@ -134,7 +134,7 @@ export const committeeRoles = sqliteTable(
 // ============================================================================
 
 /**
- * Organization (団体)
+ * Organization (出展団体)
  * イベント単位で管理
  */
 export const organizations = sqliteTable(
@@ -159,7 +159,7 @@ export const organizations = sqliteTable(
 );
 
 /**
- * OrgMember (団体メンバー)
+ * OrgMember (出展団体メンバー)
  * manager: 提出・メンバー管理可能
  * editor: 編集のみ可能
  */

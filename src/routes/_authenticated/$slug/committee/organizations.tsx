@@ -33,25 +33,25 @@ function OrganizationsPage() {
       <Stack gap="6">
         <Flex justify="space-between" align="center">
           <Heading as="h1" textStyle="2xl" fontWeight="bold">
-            団体一覧
+            出展団体一覧
           </Heading>
           {permissions.canCreateOrganization && (
             <Link to="/$slug/committee/organizations/new" params={{ slug }}>
               <Button>
                 <PlusIcon />
-                団体を作成
+                出展団体を作成
               </Button>
             </Link>
           )}
         </Flex>
 
         {organizations.length === 0 ? (
-          <p>団体がまだありません。新しい団体を作成してください。</p>
+          <p>出展団体がまだありません。新しい出展団体を作成してください。</p>
         ) : (
           <Table.Root>
             <Table.Head>
               <Table.Row>
-                <Table.Header>団体名</Table.Header>
+                <Table.Header>出展団体名</Table.Header>
                 <Table.Header>説明</Table.Header>
                 <Table.Header>作成日</Table.Header>
                 <Table.Header />

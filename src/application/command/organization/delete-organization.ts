@@ -40,7 +40,10 @@ export async function deleteOrganization(
     if (!organization) {
       return yield* $(
         Result.fail(
-          organizationError(ORGANIZATION_ERROR_CODE.ORGANIZATION_NOT_FOUND, "団体が見つかりません"),
+          organizationError(
+            ORGANIZATION_ERROR_CODE.ORGANIZATION_NOT_FOUND,
+            "出展団体が見つかりません",
+          ),
         ),
       );
     }

@@ -2,7 +2,14 @@ import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { css } from "styled-system/css";
 import { Stack } from "styled-system/jsx";
-import { Building2Icon, CalendarClockIcon, MapPinIcon, TagIcon, UsersIcon } from "lucide-react";
+import {
+  Building2Icon,
+  CalendarClockIcon,
+  FileClockIcon,
+  MapPinIcon,
+  TagIcon,
+  UsersIcon,
+} from "lucide-react";
 import { Button, Heading, Text } from "@/components/ui";
 import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions/queries";
 import { generateCheckCommitteeRoleQueryOptions } from "@/features/authorization/actions";
@@ -57,7 +64,7 @@ function SlugLayout() {
                 <NavLink>
                   <Link to="/$slug/committee/organizations" params={{ slug }}>
                     <Building2Icon />
-                    団体管理
+                    出展団体管理
                   </Link>
                 </NavLink>
                 <NavLink>
@@ -84,13 +91,19 @@ function SlugLayout() {
                     メンバー管理
                   </Link>
                 </NavLink>
+                <NavLink>
+                  <Link to="/$slug/committee/submissions" params={{ slug }}>
+                    <FileClockIcon />
+                    提出一覧
+                  </Link>
+                </NavLink>
               </Stack>
             </Stack>
           )}
 
           <Stack gap="2">
             <Text textStyle="xs" fontWeight="semibold" color="fg.muted" pl="3.5">
-              団体管理
+              出展団体管理
             </Text>
             <Stack gap="1">
               <OrganizationLinks slug={slug} />

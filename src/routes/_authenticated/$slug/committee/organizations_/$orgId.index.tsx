@@ -69,16 +69,16 @@ function DeleteOrganizationSection({
   return (
     <Fieldset.Root>
       <Fieldset.Control>
-        <Fieldset.Legend>団体の削除</Fieldset.Legend>
+        <Fieldset.Legend>出展団体の削除</Fieldset.Legend>
         <Fieldset.HelperText>
-          この団体を削除すると、所属するすべての企画・メンバーも削除されます。この操作は取り消せません。
+          この出展団体を削除すると、所属するすべての企画・メンバーも削除されます。この操作は取り消せません。
         </Fieldset.HelperText>
       </Fieldset.Control>
       <Fieldset.Content>
         <DeleteOrganizationDialog eventId={eventId} orgId={orgId} orgName={orgName} slug={slug}>
           <Button variant="outline" colorPalette="red" w="fit" ml="auto">
             <Trash2Icon />
-            団体を削除
+            出展団体を削除
           </Button>
         </DeleteOrganizationDialog>
       </Fieldset.Content>

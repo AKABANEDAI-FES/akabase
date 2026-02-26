@@ -10,15 +10,15 @@ export const ORG_DESCRIPTION_MAX_LENGTH = 100;
 
 /**
  * Organization
- * 団体の集約ルート
+ * 出展団体の集約ルート
  */
 export const organizationSchema = z.object({
   id: orgIdSchema,
   eventId: eventIdSchema,
   name: z
     .string()
-    .min(ORG_NAME_MIN_LENGTH, "団体名を入力してください")
-    .max(ORG_NAME_MAX_LENGTH, "団体名は100文字以内で入力してください"),
+    .min(ORG_NAME_MIN_LENGTH, "出展団体名を入力してください")
+    .max(ORG_NAME_MAX_LENGTH, "出展団体名は100文字以内で入力してください"),
   description: z.string().max(ORG_DESCRIPTION_MAX_LENGTH, "説明は100文字以内で入力してください"),
   logoKey: z.string().nullable(),
   createdAt: z.date(),
@@ -36,7 +36,7 @@ export type OrgMemberRole = z.infer<typeof orgMemberRoleSchema>;
 
 /**
  * OrgMember
- * 団体のメンバー
+ * 出展団体のメンバー
  */
 export const orgMemberSchema = z.object({
   id: z.string(),

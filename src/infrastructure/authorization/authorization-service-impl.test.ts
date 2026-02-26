@@ -315,7 +315,7 @@ describe("AuthorizationServiceImpl", () => {
         expect(Result.isSuccess(submitResult)).toBe(true);
         if (Result.isSuccess(submitResult)) {
           expect(submitResult.value.allowed).toBe(false);
-          expect(submitResult.value.reason).toContain("組織マネージャー");
+          expect(submitResult.value.reason).toContain("出展団体マネージャー");
         }
       });
     });
@@ -488,7 +488,7 @@ describe("AuthorizationServiceImpl", () => {
         expect(Result.isSuccess(manageResult)).toBe(true);
         if (Result.isSuccess(manageResult)) {
           expect(manageResult.value.allowed).toBe(false);
-          expect(manageResult.value.reason).toContain("組織マネージャー");
+          expect(manageResult.value.reason).toContain("出展団体マネージャー");
         }
       });
     });

@@ -48,7 +48,7 @@ export const loadOrganizationDetailFn = createServerFn({ method: "GET" })
 
     const organization = await getOrganizationDetail(dependencies, data.eventId, data.orgId, actor);
     if (!organization) {
-      throw new Error("団体が見つかりませんでした");
+      throw new Error("出展団体が見つかりませんでした");
     }
     return organization;
   });

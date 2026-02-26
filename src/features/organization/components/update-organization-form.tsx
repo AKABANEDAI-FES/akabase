@@ -65,7 +65,7 @@ export function UpdateOrganizationForm({ organization, disabled }: UpdateOrganiz
     onSubmit: async ({ value }) => {
       toaster.create({
         type: "success",
-        title: "団体を更新しました",
+        title: "出展団体を更新しました",
         description: `「${value.name}」を更新しました`,
       });
     },
@@ -82,7 +82,7 @@ export function UpdateOrganizationForm({ organization, disabled }: UpdateOrganiz
       <Fieldset.Root disabled={disabled}>
         <Fieldset.Control>
           <Fieldset.Legend>基本情報</Fieldset.Legend>
-          <Fieldset.HelperText>団体の基本情報を編集します</Fieldset.HelperText>
+          <Fieldset.HelperText>出展団体の基本情報を編集します</Fieldset.HelperText>
         </Fieldset.Control>
         <Fieldset.Content>
           {/* Name field */}
@@ -90,7 +90,7 @@ export function UpdateOrganizationForm({ organization, disabled }: UpdateOrganiz
             {(field) => (
               <Field.Root invalid={!field.state.meta.isValid}>
                 <Field.Label htmlFor={field.name}>
-                  団体名 <Field.RequiredIndicator />
+                  出展団体名 <Field.RequiredIndicator />
                 </Field.Label>
                 <Input
                   id={field.name}
@@ -105,7 +105,9 @@ export function UpdateOrganizationForm({ organization, disabled }: UpdateOrganiz
                     {nl2br(field.state.meta.errors.map((error) => error?.message ?? "").join("\n"))}
                   </Field.ErrorText>
                 )}
-                <Field.HelperText>団体の正式名称を入力してください（1-100文字）</Field.HelperText>
+                <Field.HelperText>
+                  出展団体の正式名称を入力してください（1-100文字）
+                </Field.HelperText>
               </Field.Root>
             )}
           </form.Field>
@@ -121,7 +123,7 @@ export function UpdateOrganizationForm({ organization, disabled }: UpdateOrganiz
                   value={field.state.value ?? ""}
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="団体の簡単な説明（任意）"
+                  placeholder="出展団体の簡単な説明（任意）"
                   rows={3}
                 />
                 {!field.state.meta.isValid && (
@@ -129,7 +131,7 @@ export function UpdateOrganizationForm({ organization, disabled }: UpdateOrganiz
                     {nl2br(field.state.meta.errors.map((error) => error?.message ?? "").join("\n"))}
                   </Field.ErrorText>
                 )}
-                <Field.HelperText>団体の説明を入力してください（最大100文字）</Field.HelperText>
+                <Field.HelperText>出展団体の説明を入力してください（最大100文字）</Field.HelperText>
               </Field.Root>
             )}
           </form.Field>

@@ -73,6 +73,6 @@ export async function getOrganizationDetail(
 
     return detail;
   } catch (error) {
-    throw new QueryException("DATABASE_ERROR", "団体詳細の取得に失敗しました。", error);
+    throw new QueryException("DATABASE_ERROR", "出展団体詳細の取得に失敗しました。", error);
   }
 }

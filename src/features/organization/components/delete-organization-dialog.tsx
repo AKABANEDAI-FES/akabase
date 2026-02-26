@@ -70,7 +70,7 @@ function DeleteOrganizationDialogContent({
 
       toaster.create({
         type: "success",
-        title: "団体を削除しました",
+        title: "出展団体を削除しました",
         description: `「${orgName}」を削除しました`,
       });
       dialog.setOpen(false);
@@ -88,10 +88,10 @@ function DeleteOrganizationDialogContent({
   return (
     <Dialog.Content>
       <Dialog.Header>
-        <Dialog.Title>団体を削除</Dialog.Title>
+        <Dialog.Title>出展団体を削除</Dialog.Title>
         <Dialog.Description>
           本当に「{orgName}
-          」を削除しますか？この団体に所属するすべての企画・メンバーも削除されます。この操作は取り消せません。
+          」を削除しますか？この出展団体に所属するすべての企画・メンバーも削除されます。この操作は取り消せません。
         </Dialog.Description>
       </Dialog.Header>
       <Dialog.Footer>

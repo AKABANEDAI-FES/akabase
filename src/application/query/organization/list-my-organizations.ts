@@ -56,6 +56,6 @@ export async function listMyOrganizations(
 
     return list;
   } catch (error) {
-    throw new QueryException("DATABASE_ERROR", "所属団体の取得に失敗しました。", error);
+    throw new QueryException("DATABASE_ERROR", "所属出展団体の取得に失敗しました。", error);
   }
 }

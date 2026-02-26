@@ -18,6 +18,8 @@ export const PROJECT_NAME_MIN_LENGTH = 1;
 export const PROJECT_NAME_MAX_LENGTH = 100;
 export const PROJECT_PAMPHLET_TEXT_MAX_LENGTH = 120;
 export const PROJECT_MAX_TAGS = 5;
+export const SUBMISSION_MESSAGE_MIN_LENGTH = 1;
+export const SUBMISSION_MESSAGE_MAX_LENGTH = 200;
 
 /**
  * Approval constraints
@@ -167,7 +169,13 @@ export const submissionMessageSchema = z.object({
   submissionId: submissionIdSchema,
   actionId: submissionActionIdSchema.nullable(), // オプショナル: 特定のアクションに紐付く場合
   userId: userIdSchema,
-  message: z.string().min(1, "メッセージを入力してください"),
+  message: z
+    .string()
+    .min(SUBMISSION_MESSAGE_MIN_LENGTH, "メッセージを入力してください")
+    .max(
+      SUBMISSION_MESSAGE_MAX_LENGTH,
+      `メッセージは${SUBMISSION_MESSAGE_MAX_LENGTH}文字以内で入力してください`,
+    ),
   createdAt: z.date(),
 });
 

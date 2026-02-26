@@ -39,7 +39,7 @@ function EditOrganizationPage() {
           <Button variant="plain" size="sm" mb="4" asChild>
             <Link to="/$slug/committee/organizations" params={{ slug }}>
               <ArrowLeftIcon />
-              団体一覧に戻る
+              出展団体一覧に戻る
             </Link>
           </Button>
           <Stack gap="2">

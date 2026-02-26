@@ -70,7 +70,7 @@ export function CreateOrganizationDialog({
     onSubmit: async ({ value }) => {
       toaster.create({
         type: "success",
-        title: "団体を作成しました",
+        title: "出展団体を作成しました",
         description: `「${value.name}」を作成しました`,
       });
 
@@ -97,8 +97,8 @@ export function CreateOrganizationDialog({
               }}
             >
               <Dialog.Header>
-                <Dialog.Title>団体を作成</Dialog.Title>
-                <Dialog.Description>新しい団体の情報を入力してください</Dialog.Description>
+                <Dialog.Title>出展団体を作成</Dialog.Title>
+                <Dialog.Description>新しい出展団体の情報を入力してください</Dialog.Description>
               </Dialog.Header>
               <Dialog.Body>
                 <Stack gap="6" w="full">
@@ -106,7 +106,7 @@ export function CreateOrganizationDialog({
                     {(field) => (
                       <Field.Root invalid={!field.state.meta.isValid}>
                         <Field.Label htmlFor={field.name}>
-                          団体名 <Field.RequiredIndicator />
+                          出展団体名 <Field.RequiredIndicator />
                         </Field.Label>
                         <Input
                           id={field.name}
@@ -139,7 +139,7 @@ export function CreateOrganizationDialog({
                           value={field.state.value ?? ""}
                           onBlur={field.handleBlur}
                           onChange={(e) => field.handleChange(e.target.value)}
-                          placeholder="団体の説明を100文字以内で入力"
+                          placeholder="出展団体の説明を100文字以内で入力"
                           rows={3}
                         />
                         {!field.state.meta.isValid && (

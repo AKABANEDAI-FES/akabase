@@ -48,6 +48,6 @@ export async function listOrganizations(eventId: EventId): Promise<OrganizationL
 
     return orgList;
   } catch (error) {
-    throw new QueryException("DATABASE_ERROR", "団体一覧の取得に失敗しました。", error);
+    throw new QueryException("DATABASE_ERROR", "出展団体一覧の取得に失敗しました。", error);
   }
 }

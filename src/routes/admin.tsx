@@ -84,7 +84,7 @@ interface NavLinkProps {
 
 function NavLink({ to, children }: NavLinkProps) {
   return (
-    <Button variant="plain" size="md" asChild>
+    <Button variant="plain" size="md" colorPalette="gray" asChild>
       <Link
         to={to}
         activeOptions={{ exact: to === "/admin" }}

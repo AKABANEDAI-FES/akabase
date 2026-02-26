@@ -69,7 +69,7 @@ function RemoveMemberDialogContent({
       toaster.create({
         type: "success",
         title: "メンバーを削除しました",
-        description: `「${userName}」を団体から削除しました`,
+        description: `「${userName}」を出展団体から削除しました`,
       });
       dialog.setOpen(false);
     } catch (error) {
@@ -86,7 +86,9 @@ function RemoveMemberDialogContent({
     <Dialog.Content>
       <Dialog.Header>
         <Dialog.Title>メンバーを削除</Dialog.Title>
-        <Dialog.Description>本当に「{userName}」をこの団体から削除しますか？</Dialog.Description>
+        <Dialog.Description>
+          本当に「{userName}」をこの出展団体から削除しますか？
+        </Dialog.Description>
       </Dialog.Header>
       <Dialog.Footer>
         <Dialog.ActionTrigger asChild>

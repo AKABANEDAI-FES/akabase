@@ -48,7 +48,7 @@ export async function updateOrganizationMemberRole(
         Result.fail(
           organizationError(
             ORGANIZATION_ERROR_CODE.ORGANIZATION_NOT_FOUND,
-            "団体が見つかりません。",
+            "出展団体が見つかりません。",
           ),
         ),
       );

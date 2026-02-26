@@ -200,11 +200,11 @@ export class AuthorizationServiceImpl implements AuthorizationService {
       case "project:submit":
         // Organization managers can submit projects
         if (orgRole === "manager") {
-          return Result.succeed({ allowed: true, reason: "組織マネージャー" });
+          return Result.succeed({ allowed: true, reason: "出展団体マネージャー" });
         }
         return Result.succeed({
           allowed: false,
-          reason: "組織マネージャーのみがプロジェクトを提出できます",
+          reason: "出展団体マネージャーのみがプロジェクトを提出できます",
         });
 
       case "project:approve":
@@ -224,11 +224,11 @@ export class AuthorizationServiceImpl implements AuthorizationService {
           return Result.succeed({ allowed: true, reason: "委員会管理者" });
         }
         if (orgRole === "manager" || orgRole === "editor") {
-          return Result.succeed({ allowed: true, reason: "組織マネージャーまたはエディター" });
+          return Result.succeed({ allowed: true, reason: "出展団体マネージャーまたはエディター" });
         }
         return Result.succeed({
           allowed: false,
-          reason: "委員会管理者または組織のメンバーのみがプロジェクトを閲覧できます",
+          reason: "委員会管理者または出展団体のメンバーのみがプロジェクトを閲覧できます",
         });
 
       case "project_draft:update":
@@ -237,11 +237,11 @@ export class AuthorizationServiceImpl implements AuthorizationService {
           return Result.succeed({ allowed: true, reason: "委員会管理者" });
         }
         if (orgRole === "manager" || orgRole === "editor") {
-          return Result.succeed({ allowed: true, reason: "組織マネージャーまたはエディター" });
+          return Result.succeed({ allowed: true, reason: "出展団体マネージャーまたはエディター" });
         }
         return Result.succeed({
           allowed: false,
-          reason: "委員会管理者または組織のメンバーのみがプロジェクト下書きを更新できます",
+          reason: "委員会管理者または出展団体のメンバーのみがプロジェクト下書きを更新できます",
         });
 
       default:
@@ -283,11 +283,11 @@ export class AuthorizationServiceImpl implements AuthorizationService {
         }
         // Organization members (any role) can read
         if (orgRole !== null) {
-          return Result.succeed({ allowed: true, reason: "組織メンバー" });
+          return Result.succeed({ allowed: true, reason: "出展団体メンバー" });
         }
         return Result.succeed({
           allowed: false,
-          reason: "委員会メンバーまたは組織メンバーのみが組織情報を閲覧できます",
+          reason: "委員会メンバーまたは出展団体メンバーのみが出展団体情報を閲覧できます",
         });
       }
 
@@ -298,11 +298,11 @@ export class AuthorizationServiceImpl implements AuthorizationService {
           return Result.succeed({ allowed: true, reason: "委員会管理者" });
         }
         if (orgRole === "manager") {
-          return Result.succeed({ allowed: true, reason: "組織マネージャー" });
+          return Result.succeed({ allowed: true, reason: "出展団体マネージャー" });
         }
         return Result.succeed({
           allowed: false,
-          reason: "委員会管理者または組織マネージャーのみがメンバーを管理できます",
+          reason: "委員会管理者または出展団体マネージャーのみがメンバーを管理できます",
         });
       }
 
