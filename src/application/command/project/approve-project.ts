@@ -22,6 +22,7 @@ import {
   createSubmissionMessageEntity,
 } from "@/domain/project/logic";
 import { REQUIRED_APPROVALS } from "@/domain/project/schema";
+import type { SubmissionMessage } from "@/domain/project/schema";
 import type { Dependencies } from "@/infrastructure/di";
 
 /**
@@ -129,21 +130,12 @@ export async function approveProject(
       }),
     );
 
-    // 10. Execute approval with transaction safety
-    // This atomically: saves approval, counts approvals, and if threshold reached,
-    // updates status and saves published data
-    const { approvalCount, statusChanged } = await deps.projectRepo.approveWithTransaction({
-      approvalAction,
-      submission,
-      published,
-      requiredApprovals: REQUIRED_APPROVALS,
-    });
-
-    // 11. Optional message
+    // 10. Create optional approval message
     const trimmedMessage = input.message?.trim();
+    let approvalMessage: SubmissionMessage | undefined;
     if (trimmedMessage) {
       const messageId = generateId<SubmissionMessageId>();
-      const submissionMessage = yield* $(
+      approvalMessage = yield* $(
         createSubmissionMessageEntity({
           messageId,
           submissionId: input.submissionId,
@@ -152,8 +144,18 @@ export async function approveProject(
           message: trimmedMessage,
         }),
       );
-      await deps.projectRepo.saveSubmissionMessage(submissionMessage);
     }
+
+    // 11. Execute approval with transaction safety
+    // This atomically: saves approval action, saves message, counts approvals,
+    // and if threshold reached, updates status and saves published data
+    const { approvalCount, statusChanged } = await deps.projectRepo.approveWithTransaction({
+      approvalAction,
+      approvalMessage,
+      submission,
+      published,
+      requiredApprovals: REQUIRED_APPROVALS,
+    });
 
     // 12. Return output
     return {

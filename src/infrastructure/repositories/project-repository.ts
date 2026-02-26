@@ -295,134 +295,6 @@ export class ProjectRepositoryImpl implements ProjectRepository {
     }
   }
 
-  async saveSubmission(submission: SubmissionWithTags): Promise<void> {
-    try {
-      // Upsert submission
-      const q1 = db
-        .insert(projectSubmissions)
-        .values({
-          id: submission.id,
-          projectId: submission.projectId,
-          status: submission.status,
-          pamphletText: submission.pamphletText,
-          webContentJson: submission.webContentJson,
-          submittedAt: submission.submittedAt,
-          submittedBy: submission.submittedBy,
-        })
-        .onConflictDoUpdate({
-          target: projectSubmissions.id,
-          set: {
-            // Submission content is immutable, only status can change
-            status: submission.status,
-            // Immutable fields excluded: id, projectId, pamphletText, webContentJson, submittedAt, submittedBy
-          },
-        });
-
-      // Update project's updatedAt
-      const q2 = db
-        .update(projects)
-        .set({ updatedAt: submission.submittedAt })
-        .where(eq(projects.id, submission.projectId));
-
-      // Replace tags (delete + insert)
-      const q3 = db
-        .delete(projectSubmissionTags)
-        .where(eq(projectSubmissionTags.submissionId, submission.id));
-
-      const query: [BatchItem<"sqlite">, ...BatchItem<"sqlite">[]] = [q1, q2, q3];
-
-      if (submission.tags.length > 0) {
-        const q4 = db.insert(projectSubmissionTags).values(
-          submission.tags.map((tagId) => ({
-            id: generateId(),
-            submissionId: submission.id,
-            tagId,
-          })),
-        );
-        query.push(q4);
-      }
-
-      await db.batch(query);
-    } catch (error) {
-      throw new RepositoryException("DATABASE_ERROR", "Failed to save submission", error);
-    }
-  }
-
-  async savePublished(published: PublishedWithTags): Promise<void> {
-    try {
-      // Upsert published data
-      const q1 = db
-        .insert(projectPublished)
-        .values({
-          projectId: published.projectId,
-          pamphletText: published.pamphletText,
-          webContentJson: published.webContentJson,
-          publishedAt: published.publishedAt,
-          publishedBy: published.publishedBy,
-        })
-        .onConflictDoUpdate({
-          target: projectPublished.projectId,
-          set: {
-            pamphletText: published.pamphletText,
-            webContentJson: published.webContentJson,
-            publishedAt: published.publishedAt,
-            publishedBy: published.publishedBy,
-          },
-        });
-
-      // Replace tags (delete + insert)
-      const q2 = db
-        .delete(projectPublishedTags)
-        .where(eq(projectPublishedTags.projectId, published.projectId));
-
-      const query: [BatchItem<"sqlite">, ...BatchItem<"sqlite">[]] = [q1, q2];
-
-      if (published.tags.length > 0) {
-        const q3 = db.insert(projectPublishedTags).values(
-          published.tags.map((tagId) => ({
-            id: generateId(),
-            projectId: published.projectId,
-            tagId,
-          })),
-        );
-        query.push(q3);
-      }
-
-      await db.batch(query);
-    } catch (error) {
-      throw new RepositoryException("DATABASE_ERROR", "Failed to save published data", error);
-    }
-  }
-
-  async saveSubmissionAction(action: SubmissionAction): Promise<void> {
-    try {
-      await db.insert(submissionActions).values({
-        id: action.id,
-        submissionId: action.submissionId,
-        actionType: action.actionType,
-        userId: action.userId,
-        createdAt: action.createdAt,
-      });
-    } catch (error) {
-      throw new RepositoryException("DATABASE_ERROR", "Failed to save submission action", error);
-    }
-  }
-
-  async saveSubmissionMessage(message: SubmissionMessage): Promise<void> {
-    try {
-      await db.insert(submissionMessages).values({
-        id: message.id,
-        submissionId: message.submissionId,
-        actionId: message.actionId,
-        userId: message.userId,
-        message: message.message,
-        createdAt: message.createdAt,
-      });
-    } catch (error) {
-      throw new RepositoryException("DATABASE_ERROR", "Failed to save submission message", error);
-    }
-  }
-
   async findApprovalAction(
     submissionId: SubmissionId,
     userId: UserId,
@@ -475,6 +347,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
   async approveWithTransaction(params: {
     approvalAction: SubmissionAction;
+    approvalMessage?: SubmissionMessage;
     submission: SubmissionWithTags;
     published?: PublishedWithTags;
     requiredApprovals: number;
@@ -497,7 +370,21 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         }),
       ];
 
-      // 2. If threshold will be reached, update submission status
+      // 2. Save optional approval message
+      if (params.approvalMessage) {
+        query.push(
+          db.insert(submissionMessages).values({
+            id: params.approvalMessage.id,
+            submissionId: params.approvalMessage.submissionId,
+            actionId: params.approvalMessage.actionId,
+            userId: params.approvalMessage.userId,
+            message: params.approvalMessage.message,
+            createdAt: params.approvalMessage.createdAt,
+          }),
+        );
+      }
+
+      // 3. If threshold will be reached, update submission status
       if (willReachThreshold) {
         query.push(
           db
@@ -513,7 +400,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
             .where(eq(projects.id, params.submission.projectId)),
         );
 
-        // 3. Save published data if provided
+        // 4. Save published data if provided
         if (params.published) {
           const published = params.published;
           query.push(

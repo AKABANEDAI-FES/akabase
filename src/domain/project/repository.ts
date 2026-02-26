@@ -67,30 +67,6 @@ export interface ProjectRepository {
   saveDraft(draft: DraftWithTags): Promise<void>;
 
   /**
-   * Save submission (insert or update)
-   * @throws {RepositoryException} on database errors
-   */
-  saveSubmission(submission: SubmissionWithTags): Promise<void>;
-
-  /**
-   * Save or update published data
-   * @throws {RepositoryException} on database errors
-   */
-  savePublished(published: PublishedWithTags): Promise<void>;
-
-  /**
-   * Save submission action (insert only, no update)
-   * @throws {RepositoryException} on database errors
-   */
-  saveSubmissionAction(action: SubmissionAction): Promise<void>;
-
-  /**
-   * Save submission message (insert only, no update)
-   * @throws {RepositoryException} on database errors
-   */
-  saveSubmissionMessage(message: SubmissionMessage): Promise<void>;
-
-  /**
    * Find approval action by submission and user
    * Used to check if a user has already approved a submission
    * @throws {RepositoryException} on database errors
@@ -105,12 +81,13 @@ export interface ProjectRepository {
 
   /**
    * Approve submission with transaction safety
-   * Atomically: saves approval action, counts approvals, and if threshold reached,
-   * updates submission status and saves published data
+   * Atomically: saves approval action, optionally saves approval message, counts approvals,
+   * and if threshold reached, updates submission status and saves published data
    * @throws {RepositoryException} on database errors
    */
   approveWithTransaction(params: {
     approvalAction: SubmissionAction;
+    approvalMessage?: SubmissionMessage;
     submission: SubmissionWithTags;
     published?: PublishedWithTags;
     requiredApprovals: number;
