@@ -3,6 +3,7 @@ import { Result } from "@praha/byethrow";
 import { dependencies } from "@/infrastructure/di";
 import { createProject } from "@/application/command/project/create-project";
 import { updateProjectDraft } from "@/application/command/project/update-project-draft";
+import { submitProject } from "@/application/command/project/submit-project";
 import { resolveActor } from "@/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/session-server";
 import { cast, projectIdSchema } from "@/domain/shared/ids";
@@ -107,6 +108,45 @@ export function useUpdateProjectDraftMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updateProjectDraftFn,
+    onSuccess: Result.inspect(({ projectId, eventId, orgId }) => {
+      queryClient.invalidateQueries({
+        queryKey: generateLoadDraftCacheKey(eventId, orgId, projectId),
+      });
+    }),
+  });
+}
+
+/**
+ * Submit project input validation schema
+ */
+export const submitProjectInputSchema = z.object({
+  projectId: projectIdSchema,
+  eventId: projectSchema.shape.eventId,
+  orgId: projectSchema.shape.orgId,
+});
+
+/**
+ * Server function to submit project
+ */
+export const submitProjectFn = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .inputValidator(submitProjectInputSchema)
+  .handler(async ({ data, context }) => {
+    return gen(async function* ($) {
+      const actor = await resolveActor({
+        userId: cast<UserId>(context.session.user.id),
+        eventIds: [data.eventId],
+        orgIds: [data.orgId],
+      });
+
+      return yield* $(await submitProject(dependencies, { projectId: data.projectId, actor }));
+    });
+  });
+
+export function useSubmitProjectMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: submitProjectFn,
     onSuccess: Result.inspect(({ projectId, eventId, orgId }) => {
       queryClient.invalidateQueries({
         queryKey: generateLoadDraftCacheKey(eventId, orgId, projectId),

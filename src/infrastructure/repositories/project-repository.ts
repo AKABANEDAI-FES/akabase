@@ -7,6 +7,7 @@ import {
   projectSubmissionTags,
   projectSubmissions,
   projects,
+  submissionActions,
 } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import {
@@ -21,6 +22,7 @@ import type {
   Project,
   ProjectSubmission,
   PublishedWithTags,
+  SubmissionAction,
   SubmissionWithTags,
 } from "@/domain/project/schema";
 import type { OrgId, ProjectId, SubmissionId } from "@/domain/shared/ids";
@@ -373,6 +375,20 @@ export class ProjectRepositoryImpl implements ProjectRepository {
       await db.batch(query);
     } catch (error) {
       throw new RepositoryException("DATABASE_ERROR", "Failed to save published data", error);
+    }
+  }
+
+  async saveSubmissionAction(action: SubmissionAction): Promise<void> {
+    try {
+      await db.insert(submissionActions).values({
+        id: action.id,
+        submissionId: action.submissionId,
+        actionType: action.actionType,
+        userId: action.userId,
+        createdAt: action.createdAt,
+      });
+    } catch (error) {
+      throw new RepositoryException("DATABASE_ERROR", "Failed to save submission action", error);
     }
   }
 }

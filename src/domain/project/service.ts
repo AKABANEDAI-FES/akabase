@@ -1,0 +1,19 @@
+import type { Result } from "@praha/byethrow";
+import type { ProjectId } from "@/domain/shared/ids";
+import type { ProjectError } from "./errors";
+
+/**
+ * Project Domain Service Interface
+ * I/Oが必要なビジネスルールを定義する
+ * 実装はインフラ層で提供（ProjectDomainServiceImpl）
+ */
+export interface ProjectDomainService {
+  /**
+   * 提出可能かチェック
+   * - 既に有効な提出（status='submitted'）が存在しないことを確認
+   *
+   * @param projectId - チェック対象のプロジェクトID
+   * @returns 提出可能ならtrue、既に提出済みならALREADY_SUBMITTEDエラー
+   */
+  canSubmit(projectId: ProjectId): Promise<Result.Result<true, ProjectError>>;
+}

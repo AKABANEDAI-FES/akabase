@@ -5,6 +5,7 @@ import type { OrganizationRepository } from "@/domain/organization/repository";
 import type { AuthorizationService } from "@/domain/authorization/service";
 import type { EventDomainService } from "@/domain/event/service";
 import type { OrganizationDomainService } from "@/domain/organization/service";
+import type { ProjectDomainService } from "@/domain/project/service";
 import type { StorageService } from "@/domain/shared/storage";
 import { EventRepositoryImpl } from "./repositories/event-repository";
 import { ProjectRepositoryImpl } from "./repositories/project-repository";
@@ -12,6 +13,7 @@ import { UserRepositoryImpl } from "./repositories/user-repository";
 import { OrganizationRepositoryImpl } from "./repositories/organization-repository";
 import { EventDomainServiceImpl } from "./domain-services/event-domain-service";
 import { OrganizationDomainServiceImpl } from "./domain-services/organization-domain-service";
+import { ProjectDomainServiceImpl } from "./domain-services/project-domain-service";
 import { AuthorizationServiceImpl } from "./authorization/authorization-service-impl";
 import { StorageServiceImpl } from "./storage/storage-service";
 
@@ -26,6 +28,7 @@ export type Dependencies = {
   organizationRepo: OrganizationRepository;
   eventDomainService: EventDomainService;
   organizationDomainService: OrganizationDomainService;
+  projectDomainService: ProjectDomainService;
   authService: AuthorizationService;
   storageService: StorageService;
 };
@@ -38,13 +41,15 @@ export type Dependencies = {
 export function createDependencies(): Dependencies {
   const eventRepo = new EventRepositoryImpl();
   const organizationRepo = new OrganizationRepositoryImpl();
+  const projectRepo = new ProjectRepositoryImpl();
   return {
-    projectRepo: new ProjectRepositoryImpl(),
+    projectRepo,
     eventRepo,
     userRepo: new UserRepositoryImpl(),
     organizationRepo: organizationRepo,
     eventDomainService: new EventDomainServiceImpl(eventRepo),
     organizationDomainService: new OrganizationDomainServiceImpl(organizationRepo),
+    projectDomainService: new ProjectDomainServiceImpl(projectRepo),
     authService: new AuthorizationServiceImpl(),
     storageService: new StorageServiceImpl(),
   };

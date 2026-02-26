@@ -1,10 +1,24 @@
 import { Result } from "@praha/byethrow";
-import type { DraftWithTags, Project } from "./schema";
-import { draftWithTagsSchema, projectSchema } from "./schema";
+import type { DraftWithTags, Project, SubmissionAction, SubmissionWithTags } from "./schema";
+import {
+  draftWithTagsSchema,
+  projectSchema,
+  submissionActionSchema,
+  submissionWithTagsSchema,
+} from "./schema";
 import type { ProjectError } from "./errors";
 import { projectError } from "./errors";
 import { DOMAIN_ERROR_CODE } from "../shared/errors";
-import type { EventId, OrgId, PlaceId, ProjectId, TagId, UserId } from "../shared/ids";
+import type {
+  EventId,
+  OrgId,
+  PlaceId,
+  ProjectId,
+  SubmissionActionId,
+  SubmissionId,
+  TagId,
+  UserId,
+} from "../shared/ids";
 
 /**
  * =============================================================================
@@ -99,5 +113,66 @@ export function updateProjectDraftEntity(input: {
   return Result.try({
     try: () => draftWithTagsSchema.parse(data),
     catch: () => projectError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "下書きの更新に失敗しました"),
+  });
+}
+
+/**
+ * Create SubmissionWithTags entity from DraftWithTags
+ *
+ * Business rules:
+ * - Creates immutable snapshot of draft at submission time
+ * - Status is always "submitted" at creation
+ * - Tags are copied from draft
+ */
+export function createSubmissionEntity(input: {
+  draft: DraftWithTags;
+  submissionId: SubmissionId;
+  submittedBy: UserId;
+  now?: Date;
+}): Result.Result<SubmissionWithTags, ProjectError> {
+  const now = input.now ?? new Date();
+
+  const data = {
+    id: input.submissionId,
+    projectId: input.draft.projectId,
+    status: "submitted" as const,
+    pamphletText: input.draft.pamphletText,
+    webContentJson: input.draft.webContentJson,
+    submittedAt: now,
+    submittedBy: input.submittedBy,
+    tags: input.draft.tags,
+  };
+
+  return Result.try({
+    try: () => submissionWithTagsSchema.parse(data),
+    catch: () => projectError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "提出データの作成に失敗しました"),
+  });
+}
+
+/**
+ * Create SubmissionAction entity for "submitted" action
+ *
+ * Records the submission action in submission_actions table
+ */
+export function createSubmissionActionEntity(input: {
+  actionId: SubmissionActionId;
+  submissionId: SubmissionId;
+  userId: UserId;
+  now?: Date;
+}): Result.Result<SubmissionAction, ProjectError> {
+  const now = input.now ?? new Date();
+
+  const data = {
+    id: input.actionId,
+    submissionId: input.submissionId,
+    actionType: "submitted" as const,
+    userId: input.userId,
+    createdAt: now,
+  };
+
+  return Result.try({
+    try: () => submissionActionSchema.parse(data),
+    catch: () =>
+      projectError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "提出アクションの作成に失敗しました"),
   });
 }
