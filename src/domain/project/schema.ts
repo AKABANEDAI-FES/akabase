@@ -135,6 +135,16 @@ export const submissionActionTypeSchema = z.enum([
 export type SubmissionActionType = z.infer<typeof submissionActionTypeSchema>;
 
 /**
+ * Submission action type display labels (Japanese)
+ */
+export const SUBMISSION_ACTION_LABELS: Record<SubmissionActionType, string> = {
+  submitted: "提出",
+  approved: "承認",
+  returned: "差戻",
+  withdrawn: "取り下げ",
+} as const;
+
+/**
  * SubmissionAction
  * 提出に対するアクション記録（提出・承認・差し戻し・取り下げ）
  */

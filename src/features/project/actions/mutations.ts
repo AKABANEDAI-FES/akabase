@@ -10,7 +10,11 @@ import { cast, projectIdSchema } from "@/domain/shared/ids";
 import type { UserId } from "@/domain/shared/ids";
 import { draftWithTagsSchema, projectSchema } from "@/domain/project/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { generateLoadDraftCacheKey, generateLoadProjectsCacheKey } from "./queries";
+import {
+  generateLoadDraftCacheKey,
+  generateLoadProjectsCacheKey,
+  generateLoadSubmissionsCacheKey,
+} from "./queries";
 import { gen } from "@/libs/result";
 import { z } from "zod";
 
@@ -150,6 +154,9 @@ export function useSubmitProjectMutation() {
     onSuccess: Result.inspect(({ projectId, eventId, orgId }) => {
       queryClient.invalidateQueries({
         queryKey: generateLoadDraftCacheKey(eventId, orgId, projectId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: generateLoadSubmissionsCacheKey(eventId, orgId, projectId),
       });
     }),
   });

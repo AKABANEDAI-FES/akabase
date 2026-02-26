@@ -3,6 +3,7 @@ import { z } from "zod";
 import { listPlaces } from "@/application/query/event/list-places";
 import { listProjects } from "@/application/query/project/list-projects";
 import { getDraft } from "@/application/query/project/get-project-draft";
+import { listSubmissions } from "@/application/query/project/list-submissions";
 import { resolveActor } from "@/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/session-server";
 import { cast, eventIdSchema, orgIdSchema, projectIdSchema } from "@/domain/shared/ids";
@@ -88,5 +89,40 @@ export function generateLoadDraftQueryOptions(eventId: string, orgId: string, pr
   return queryOptions({
     queryKey: generateLoadDraftCacheKey(eventId, orgId, projectId),
     queryFn: () => loadDraftFn({ data: { eventId, orgId, projectId } }),
+  });
+}
+
+/**
+ * Server function to load submissions for a project
+ */
+export const loadSubmissionsFn = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
+  .inputValidator(
+    z.object({ eventId: eventIdSchema, orgId: orgIdSchema, projectId: projectIdSchema }),
+  )
+  .handler(async ({ data, context }) => {
+    // Resolve actor from session
+    const actor = await resolveActor({
+      userId: cast<UserId>(context.session.user.id),
+      eventIds: [data.eventId],
+      orgIds: [data.orgId],
+    });
+
+    // Query with authorization check
+    return await listSubmissions(dependencies, data.eventId, data.orgId, data.projectId, actor);
+  });
+
+export function generateLoadSubmissionsCacheKey(eventId: string, orgId: string, projectId: string) {
+  return ["submissions", "for-project", [eventId, orgId, projectId]];
+}
+
+export function generateLoadSubmissionsQueryOptions(
+  eventId: string,
+  orgId: string,
+  projectId: string,
+) {
+  return queryOptions({
+    queryKey: generateLoadSubmissionsCacheKey(eventId, orgId, projectId),
+    queryFn: () => loadSubmissionsFn({ data: { eventId, orgId, projectId } }),
   });
 }
