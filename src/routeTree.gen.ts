@@ -34,6 +34,7 @@ import { Route as AuthenticatedSlugCommitteeDeadlinesRouteImport } from './route
 import { Route as AuthenticatedSlugOrgsOrgIdIndexRouteImport } from './routes/_authenticated/$slug/orgs/$orgId.index'
 import { Route as AuthenticatedSlugOrgsOrgIdMembersRouteImport } from './routes/_authenticated/$slug/orgs/$orgId.members'
 import { Route as AuthenticatedSlugCommitteeTagsNewRouteImport } from './routes/_authenticated/$slug/committee/tags.new'
+import { Route as AuthenticatedSlugCommitteeSubmissionsSubmissionIdRouteImport } from './routes/_authenticated/$slug/committee/submissions_/$submissionId'
 import { Route as AuthenticatedSlugCommitteePlacesNewRouteImport } from './routes/_authenticated/$slug/committee/places.new'
 import { Route as AuthenticatedSlugCommitteeOrganizationsOrgIdRouteImport } from './routes/_authenticated/$slug/committee/organizations_/$orgId'
 import { Route as AuthenticatedSlugCommitteeOrganizationsNewRouteImport } from './routes/_authenticated/$slug/committee/organizations.new'
@@ -182,6 +183,12 @@ const AuthenticatedSlugCommitteeTagsNewRoute =
     path: '/new',
     getParentRoute: () => AuthenticatedSlugCommitteeTagsRoute,
   } as any)
+const AuthenticatedSlugCommitteeSubmissionsSubmissionIdRoute =
+  AuthenticatedSlugCommitteeSubmissionsSubmissionIdRouteImport.update({
+    id: '/submissions_/$submissionId',
+    path: '/submissions/$submissionId',
+    getParentRoute: () => AuthenticatedSlugCommitteeRoute,
+  } as any)
 const AuthenticatedSlugCommitteePlacesNewRoute =
   AuthenticatedSlugCommitteePlacesNewRouteImport.update({
     id: '/new',
@@ -288,6 +295,7 @@ export interface FileRoutesByFullPath {
   '/$slug/committee/organizations/new': typeof AuthenticatedSlugCommitteeOrganizationsNewRoute
   '/$slug/committee/organizations/$orgId': typeof AuthenticatedSlugCommitteeOrganizationsOrgIdRouteWithChildren
   '/$slug/committee/places/new': typeof AuthenticatedSlugCommitteePlacesNewRoute
+  '/$slug/committee/submissions/$submissionId': typeof AuthenticatedSlugCommitteeSubmissionsSubmissionIdRoute
   '/$slug/committee/tags/new': typeof AuthenticatedSlugCommitteeTagsNewRoute
   '/$slug/orgs/$orgId/members': typeof AuthenticatedSlugOrgsOrgIdMembersRouteWithChildren
   '/$slug/orgs/$orgId/': typeof AuthenticatedSlugOrgsOrgIdIndexRoute
@@ -322,6 +330,7 @@ export interface FileRoutesByTo {
   '/$slug/committee/deadlines/new': typeof AuthenticatedSlugCommitteeDeadlinesNewRoute
   '/$slug/committee/organizations/new': typeof AuthenticatedSlugCommitteeOrganizationsNewRoute
   '/$slug/committee/places/new': typeof AuthenticatedSlugCommitteePlacesNewRoute
+  '/$slug/committee/submissions/$submissionId': typeof AuthenticatedSlugCommitteeSubmissionsSubmissionIdRoute
   '/$slug/committee/tags/new': typeof AuthenticatedSlugCommitteeTagsNewRoute
   '/$slug/orgs/$orgId/members': typeof AuthenticatedSlugOrgsOrgIdMembersRouteWithChildren
   '/$slug/orgs/$orgId': typeof AuthenticatedSlugOrgsOrgIdIndexRoute
@@ -363,6 +372,7 @@ export interface FileRoutesById {
   '/_authenticated/$slug/committee/organizations/new': typeof AuthenticatedSlugCommitteeOrganizationsNewRoute
   '/_authenticated/$slug/committee/organizations_/$orgId': typeof AuthenticatedSlugCommitteeOrganizationsOrgIdRouteWithChildren
   '/_authenticated/$slug/committee/places/new': typeof AuthenticatedSlugCommitteePlacesNewRoute
+  '/_authenticated/$slug/committee/submissions_/$submissionId': typeof AuthenticatedSlugCommitteeSubmissionsSubmissionIdRoute
   '/_authenticated/$slug/committee/tags/new': typeof AuthenticatedSlugCommitteeTagsNewRoute
   '/_authenticated/$slug/orgs/$orgId/members': typeof AuthenticatedSlugOrgsOrgIdMembersRouteWithChildren
   '/_authenticated/$slug/orgs/$orgId/': typeof AuthenticatedSlugOrgsOrgIdIndexRoute
@@ -403,6 +413,7 @@ export interface FileRouteTypes {
     | '/$slug/committee/organizations/new'
     | '/$slug/committee/organizations/$orgId'
     | '/$slug/committee/places/new'
+    | '/$slug/committee/submissions/$submissionId'
     | '/$slug/committee/tags/new'
     | '/$slug/orgs/$orgId/members'
     | '/$slug/orgs/$orgId/'
@@ -437,6 +448,7 @@ export interface FileRouteTypes {
     | '/$slug/committee/deadlines/new'
     | '/$slug/committee/organizations/new'
     | '/$slug/committee/places/new'
+    | '/$slug/committee/submissions/$submissionId'
     | '/$slug/committee/tags/new'
     | '/$slug/orgs/$orgId/members'
     | '/$slug/orgs/$orgId'
@@ -477,6 +489,7 @@ export interface FileRouteTypes {
     | '/_authenticated/$slug/committee/organizations/new'
     | '/_authenticated/$slug/committee/organizations_/$orgId'
     | '/_authenticated/$slug/committee/places/new'
+    | '/_authenticated/$slug/committee/submissions_/$submissionId'
     | '/_authenticated/$slug/committee/tags/new'
     | '/_authenticated/$slug/orgs/$orgId/members'
     | '/_authenticated/$slug/orgs/$orgId/'
@@ -675,6 +688,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$slug/committee/tags/new'
       preLoaderRoute: typeof AuthenticatedSlugCommitteeTagsNewRouteImport
       parentRoute: typeof AuthenticatedSlugCommitteeTagsRoute
+    }
+    '/_authenticated/$slug/committee/submissions_/$submissionId': {
+      id: '/_authenticated/$slug/committee/submissions_/$submissionId'
+      path: '/submissions/$submissionId'
+      fullPath: '/$slug/committee/submissions/$submissionId'
+      preLoaderRoute: typeof AuthenticatedSlugCommitteeSubmissionsSubmissionIdRouteImport
+      parentRoute: typeof AuthenticatedSlugCommitteeRoute
     }
     '/_authenticated/$slug/committee/places/new': {
       id: '/_authenticated/$slug/committee/places/new'
@@ -889,6 +909,7 @@ interface AuthenticatedSlugCommitteeRouteChildren {
   AuthenticatedSlugCommitteeSubmissionsRoute: typeof AuthenticatedSlugCommitteeSubmissionsRoute
   AuthenticatedSlugCommitteeTagsRoute: typeof AuthenticatedSlugCommitteeTagsRouteWithChildren
   AuthenticatedSlugCommitteeOrganizationsOrgIdRoute: typeof AuthenticatedSlugCommitteeOrganizationsOrgIdRouteWithChildren
+  AuthenticatedSlugCommitteeSubmissionsSubmissionIdRoute: typeof AuthenticatedSlugCommitteeSubmissionsSubmissionIdRoute
 }
 
 const AuthenticatedSlugCommitteeRouteChildren: AuthenticatedSlugCommitteeRouteChildren =
@@ -907,6 +928,8 @@ const AuthenticatedSlugCommitteeRouteChildren: AuthenticatedSlugCommitteeRouteCh
       AuthenticatedSlugCommitteeTagsRouteWithChildren,
     AuthenticatedSlugCommitteeOrganizationsOrgIdRoute:
       AuthenticatedSlugCommitteeOrganizationsOrgIdRouteWithChildren,
+    AuthenticatedSlugCommitteeSubmissionsSubmissionIdRoute:
+      AuthenticatedSlugCommitteeSubmissionsSubmissionIdRoute,
   }
 
 const AuthenticatedSlugCommitteeRouteWithChildren =
