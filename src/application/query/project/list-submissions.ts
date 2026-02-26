@@ -21,7 +21,7 @@ export const submissionListItemSchema = z.object({
   submittedBy: z.string(), // 提出者名
   currentAction: z
     .object({
-      actionType: z.enum(["submitted", "approved", "returned", "withdrawn"]),
+      actionType: submissionStatusSchema,
       performedBy: z.string(), // アクション実行者名
       performedAt: z.date(), // アクション実行日時
       message: z.string().nullable(), // このアクションに紐づくメッセージ

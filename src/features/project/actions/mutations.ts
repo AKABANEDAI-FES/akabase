@@ -8,10 +8,15 @@ import { resolveActor } from "@/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/session-server";
 import { cast, projectIdSchema } from "@/domain/shared/ids";
 import type { UserId } from "@/domain/shared/ids";
-import { draftWithTagsSchema, projectSchema } from "@/domain/project/schema";
+import {
+  draftWithTagsSchema,
+  projectSchema,
+  submissionMessageSchema,
+} from "@/domain/project/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   generateLoadDraftCacheKey,
+  generateLoadEventSubmissionsCacheKey,
   generateLoadProjectsCacheKey,
   generateLoadSubmissionsCacheKey,
 } from "./queries";
@@ -127,7 +132,7 @@ export const submitProjectInputSchema = z.object({
   projectId: projectIdSchema,
   eventId: projectSchema.shape.eventId,
   orgId: projectSchema.shape.orgId,
-  message: z.string().optional(),
+  message: submissionMessageSchema.shape.message.nullable(),
 });
 
 /**
@@ -148,7 +153,7 @@ export const submitProjectFn = createServerFn({ method: "POST" })
         await submitProject(dependencies, {
           projectId: data.projectId,
           actor,
-          message: data.message,
+          message: data.message ?? undefined,
         }),
       );
     });
@@ -159,11 +164,17 @@ export function useSubmitProjectMutation() {
   return useMutation({
     mutationFn: submitProjectFn,
     onSuccess: Result.inspect(({ projectId, eventId, orgId }) => {
+      // Invalidate draft cache
       queryClient.invalidateQueries({
         queryKey: generateLoadDraftCacheKey(eventId, orgId, projectId),
       });
+      // Invalidate project-specific submissions cache
       queryClient.invalidateQueries({
         queryKey: generateLoadSubmissionsCacheKey(eventId, orgId, projectId),
+      });
+      // Invalidate event-wide submissions cache
+      queryClient.invalidateQueries({
+        queryKey: generateLoadEventSubmissionsCacheKey(eventId),
       });
     }),
   });

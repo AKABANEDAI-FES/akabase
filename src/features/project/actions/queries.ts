@@ -4,6 +4,7 @@ import { listPlaces } from "@/application/query/event/list-places";
 import { listProjects } from "@/application/query/project/list-projects";
 import { getDraft } from "@/application/query/project/get-project-draft";
 import { listSubmissions } from "@/application/query/project/list-submissions";
+import { listEventSubmissions } from "@/application/query/project/list-event-submissions";
 import { resolveActor } from "@/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/session-server";
 import { cast, eventIdSchema, orgIdSchema, projectIdSchema } from "@/domain/shared/ids";
@@ -124,5 +125,33 @@ export function generateLoadSubmissionsQueryOptions(
   return queryOptions({
     queryKey: generateLoadSubmissionsCacheKey(eventId, orgId, projectId),
     queryFn: () => loadSubmissionsFn({ data: { eventId, orgId, projectId } }),
+  });
+}
+
+/**
+ * Server function to load all submissions for an event
+ */
+export const loadEventSubmissionsFn = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
+  .inputValidator(z.object({ eventId: eventIdSchema }))
+  .handler(async ({ data, context }) => {
+    // Resolve actor from session
+    const actor = await resolveActor({
+      userId: cast<UserId>(context.session.user.id),
+      eventIds: [data.eventId],
+    });
+
+    // Query with authorization check
+    return await listEventSubmissions(data.eventId, actor);
+  });
+
+export function generateLoadEventSubmissionsCacheKey(eventId: string) {
+  return ["submissions", "for-event", eventId];
+}
+
+export function generateLoadEventSubmissionsQueryOptions(eventId: string) {
+  return queryOptions({
+    queryKey: generateLoadEventSubmissionsCacheKey(eventId),
+    queryFn: () => loadEventSubmissionsFn({ data: { eventId } }),
   });
 }
