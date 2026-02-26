@@ -989,7 +989,7 @@ async function main() {
     }
   }
 
-  console.log("公開データを挿入中...");
+  console.log("公開用データを挿入中...");
   if (publishedInserts.length > 0) {
     for (let i = 0; i < publishedInserts.length; i += BATCH) {
       await db.insert(schema.projectPublished).values(publishedInserts.slice(i, i + BATCH));

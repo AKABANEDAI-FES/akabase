@@ -269,7 +269,7 @@ export const projectSubmissions = sqliteTable(
 );
 
 /**
- * ProjectPublished (企画の公開データ)
+ * ProjectPublished (企画の公開用データ)
  * 承認済みデータのスナップショット
  */
 export const projectPublished = sqliteTable("project_published", {
@@ -357,7 +357,7 @@ export const projectSubmissionTags = sqliteTable(
 );
 
 /**
- * ProjectPublishedTag (公開データのタグ)
+ * ProjectPublishedTag (公開用データのタグ)
  * 中間テーブル
  */
 export const projectPublishedTags = sqliteTable(

@@ -87,6 +87,6 @@ export async function getProjectPublished(
 
     return published;
   } catch (error) {
-    throw new QueryException("DATABASE_ERROR", "公開データの取得に失敗しました。", error);
+    throw new QueryException("DATABASE_ERROR", "公開用データの取得に失敗しました。", error);
   }
 }

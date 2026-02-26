@@ -23,7 +23,7 @@ export function ProjectPublishedDataCard({
     return (
       <Card.Root>
         <Card.Header>
-          <Card.Title>公開データ</Card.Title>
+          <Card.Title>公開用データ</Card.Title>
         </Card.Header>
         <Card.Body>
           <Text color="fg.muted">まだ公開されていません。</Text>
@@ -35,7 +35,7 @@ export function ProjectPublishedDataCard({
   return (
     <Card.Root>
       <Card.Header>
-        <Card.Title>公開データ</Card.Title>
+        <Card.Title>公開用データ</Card.Title>
         <Card.Description>現在公開されている企画情報</Card.Description>
       </Card.Header>
       <Card.Body>
