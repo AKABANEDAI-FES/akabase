@@ -15,7 +15,8 @@
     "cf-typegen": "wrangler types",
     "migration": "drizzle-kit generate",
     "migrate": "wrangler d1 migrations apply archive --local",
-    "seed": "wrangler d1 execute archive --local --file=./scripts/seed.sql"
+    "seed": "wrangler d1 execute archive --local --file=./scripts/seed.sql",
+    "seed:large": "npx tsx scripts/seed-large.ts"
   },
   "dependencies": {
     "@ark-ui/react": "^5.32.0",
