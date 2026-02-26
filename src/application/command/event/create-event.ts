@@ -5,7 +5,6 @@ import { cast } from "@/domain/shared/ids";
 import type { EventId } from "@/domain/shared/ids";
 import type { EventError } from "@/domain/event/errors";
 import { createEventEntity } from "@/domain/event/logic";
-import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
 import { eventResource } from "@/domain/authorization/logic";
@@ -30,7 +29,7 @@ export type CreateEventOutput = {
 /**
  * Errors that can occur during event creation
  */
-export type CreateEventError = EventError | RepositoryError | AuthorizationError;
+export type CreateEventError = EventError | AuthorizationError;
 
 /**
  * Create a new event
@@ -71,7 +70,7 @@ export async function createEvent(
     );
 
     // Save event to database
-    yield* $(await deps.eventRepo.saveEvent(event));
+    await deps.eventRepo.saveEvent(event);
 
     return { eventId };
   });

@@ -2,7 +2,6 @@ import type { Result } from "@praha/byethrow";
 import type { EventId, PlaceId, TagId } from "@/domain/shared/ids";
 import type { Event } from "./schema";
 import type { EventError } from "./errors";
-import type { RepositoryError } from "../shared/repository";
 
 /**
  * Event Domain Service Interface
@@ -20,7 +19,7 @@ export interface EventDomainService {
   ensureSlugUnique(
     slug: string,
     excludeEventId?: EventId,
-  ): Promise<Result.Result<true, EventError | RepositoryError>>;
+  ): Promise<Result.Result<true, EventError>>;
 
   /**
    * タグ名の一意性を保証する（イベント内）
@@ -34,7 +33,7 @@ export interface EventDomainService {
     eventId: EventId,
     name: string,
     excludeTagId?: TagId,
-  ): Promise<Result.Result<true, EventError | RepositoryError>>;
+  ): Promise<Result.Result<true, EventError>>;
 
   /**
    * 場所名の一意性を保証する（同一イベント・同一階層内）
@@ -50,7 +49,7 @@ export interface EventDomainService {
     name: string,
     parentId: PlaceId | null,
     excludePlaceId?: PlaceId,
-  ): Promise<Result.Result<true, EventError | RepositoryError>>;
+  ): Promise<Result.Result<true, EventError>>;
 
   /**
    * イベントを取得し、変更可能な状態であることを保証する
@@ -58,7 +57,5 @@ export interface EventDomainService {
    * @param eventId - 対象イベントID
    * @returns イベントエンティティ。見つからない場合はEVENT_NOT_FOUND、アーカイブ済みの場合はEVENT_ARCHIVEDエラー
    */
-  resolveModifiableEvent(
-    eventId: EventId,
-  ): Promise<Result.Result<Event, EventError | RepositoryError>>;
+  resolveModifiableEvent(eventId: EventId): Promise<Result.Result<Event, EventError>>;
 }

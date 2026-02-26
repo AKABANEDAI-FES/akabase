@@ -4,7 +4,6 @@ import type { EventId, OrgId, ProjectId, TagId } from "@/domain/shared/ids";
 import type { ProjectError } from "@/domain/project/errors";
 import { PROJECT_ERROR_CODE, projectError } from "@/domain/project/errors";
 import type { EventError } from "@/domain/event/errors";
-import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
 import { projectResource } from "@/domain/authorization/logic";
@@ -36,11 +35,7 @@ export type UpdateProjectDraftOutput = {
 /**
  * Errors that can occur during draft update
  */
-export type UpdateProjectDraftError =
-  | ProjectError
-  | EventError
-  | RepositoryError
-  | AuthorizationError;
+export type UpdateProjectDraftError = ProjectError | EventError | AuthorizationError;
 
 /**
  * Build a set of past-deadline field keys
@@ -95,7 +90,7 @@ export async function updateProjectDraft(
 ): Result.ResultAsync<UpdateProjectDraftOutput, UpdateProjectDraftError> {
   return gen(async function* ($) {
     // Fetch existing project to get eventId and orgId
-    const project = yield* $(await deps.projectRepo.findById(input.projectId));
+    const project = await deps.projectRepo.findById(input.projectId);
     if (!project) {
       return yield* $(
         Result.fail(projectError(PROJECT_ERROR_CODE.PROJECT_NOT_FOUND, "企画が見つかりません")),
@@ -110,7 +105,7 @@ export async function updateProjectDraft(
     yield* $(await deps.eventDomainService.resolveModifiableEvent(project.eventId));
 
     // Verify draft exists
-    const existingDraft = yield* $(await deps.projectRepo.findDraftWithTags(input.projectId));
+    const existingDraft = await deps.projectRepo.findDraftWithTags(input.projectId);
     if (!existingDraft) {
       return yield* $(
         Result.fail(projectError(PROJECT_ERROR_CODE.DRAFT_NOT_FOUND, "下書きが見つかりません")),
@@ -118,7 +113,7 @@ export async function updateProjectDraft(
     }
 
     // Deadline enforcement: keep existing values for past-deadline fields
-    const deadlines = yield* $(await deps.eventRepo.findDeadlines(project.eventId));
+    const deadlines = await deps.eventRepo.findDeadlines(project.eventId);
     const pastDeadlineKeys = getPastDeadlineFieldKeys(deadlines, new Date());
     const enforced = applyDeadlineEnforcement(existingDraft, input, pastDeadlineKeys);
 
@@ -134,7 +129,7 @@ export async function updateProjectDraft(
     );
 
     // Save updated draft (project remains unchanged)
-    yield* $(await deps.projectRepo.saveDraft(updatedDraft));
+    await deps.projectRepo.saveDraft(updatedDraft);
 
     return { projectId: project.id, eventId: project.eventId, orgId: project.orgId };
   });

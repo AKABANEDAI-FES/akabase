@@ -4,7 +4,6 @@ import { generateId } from "@/libs/id";
 import type { EventId, TagId } from "@/domain/shared/ids";
 import type { EventError } from "@/domain/event/errors";
 import { createTagEntity } from "@/domain/event/logic";
-import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
 import { eventResource } from "@/domain/authorization/logic";
@@ -24,7 +23,7 @@ export type CreateTagOutput = {
   eventId: EventId;
 };
 
-export type CreateTagError = EventError | RepositoryError | AuthorizationError;
+export type CreateTagError = EventError | AuthorizationError;
 
 /**
  * Create a new tag for an event
@@ -60,7 +59,7 @@ export async function createTag(
     );
 
     // Save tag
-    yield* $(await deps.eventRepo.saveTag(tag));
+    await deps.eventRepo.saveTag(tag);
 
     return { tagId, eventId: input.eventId };
   });

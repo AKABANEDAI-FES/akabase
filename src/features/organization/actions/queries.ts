@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { Result } from "@praha/byethrow";
 import { listOrganizations } from "@/application/query/organization/list-organizations";
 import { getOrganizationDetail } from "@/application/query/organization/get-organization-detail";
 import { listOrganizationMembers } from "@/application/query/organization/list-organization-members";
@@ -20,13 +19,7 @@ export const loadOrganizationsFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
   .handler(async ({ data }) => {
-    const result = await listOrganizations(data.eventId);
-
-    if (Result.isFailure(result)) {
-      throw new Error(result.error.message);
-    }
-
-    return result.value;
+    return await listOrganizations(data.eventId);
   });
 
 export function generateLoadOrganizationsCacheKey(eventId: string) {
@@ -53,17 +46,11 @@ export const loadOrganizationDetailFn = createServerFn({ method: "GET" })
       orgIds: [data.orgId],
     });
 
-    if (Result.isFailure(actor)) {
-      throw new Error(actor.error.message);
+    const organization = await getOrganizationDetail(dependencies, data.eventId, data.orgId, actor);
+    if (!organization) {
+      throw new Error("団体が見つかりませんでした");
     }
-
-    const result = await getOrganizationDetail(dependencies, data.eventId, data.orgId, actor.value);
-
-    if (Result.isFailure(result)) {
-      throw new Error(result.error.message);
-    }
-
-    return result.value;
+    return organization;
   });
 
 export function generateLoadOrganizationDetailCacheKey(eventId: string, orgId: string) {
@@ -90,22 +77,7 @@ export const loadOrganizationMembersFn = createServerFn({ method: "GET" })
       orgIds: [data.orgId],
     });
 
-    if (Result.isFailure(actor)) {
-      throw new Error(actor.error.message);
-    }
-
-    const result = await listOrganizationMembers(
-      dependencies,
-      data.eventId,
-      data.orgId,
-      actor.value,
-    );
-
-    if (Result.isFailure(result)) {
-      throw new Error(result.error.message);
-    }
-
-    return result.value;
+    return await listOrganizationMembers(dependencies, data.eventId, data.orgId, actor);
   });
 
 export function generateLoadOrganizationMembersCacheKey(eventId: string, orgId: string) {
@@ -126,22 +98,12 @@ export const searchUsersByEmailFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ query: z.string().min(1).max(256), eventId: eventIdSchema }))
   .handler(async ({ data, context }) => {
-    const actorResult = await resolveActor({
+    const actor = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
     });
 
-    if (Result.isFailure(actorResult)) {
-      throw new Error(actorResult.error.message);
-    }
-
-    const result = await searchUsersByEmail(data.query, actorResult.value, data.eventId);
-
-    if (Result.isFailure(result)) {
-      throw new Error(result.error.message);
-    }
-
-    return result.value;
+    return await searchUsersByEmail(data.query, actor, data.eventId);
   });
 
 /**
@@ -151,21 +113,11 @@ export const loadMyOrganizationsFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
   .handler(async ({ data, context }) => {
-    const actorResult = await resolveActor({
+    const actor = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
     });
 
-    if (Result.isFailure(actorResult)) {
-      throw new Error(actorResult.error.message);
-    }
-
-    const result = await listMyOrganizations(data.eventId, actorResult.value);
-
-    if (Result.isFailure(result)) {
-      throw new Error(result.error.message);
-    }
-
-    return result.value;
+    return await listMyOrganizations(data.eventId, actor);
   });
 
 export function generateLoadMyOrganizationsCacheKey(eventId: string) {

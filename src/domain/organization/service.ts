@@ -2,7 +2,6 @@ import type { Result } from "@praha/byethrow";
 import type { OrgId, UserId } from "@/domain/shared/ids";
 import type { OrgMember } from "./schema";
 import type { OrganizationError } from "./errors";
-import type { RepositoryError } from "../shared/repository";
 
 /**
  * Organization Domain Service Interface
@@ -14,10 +13,7 @@ export interface OrganizationDomainService {
    * メンバー追加可能であることを保証する
    * Rule: 既にメンバーでないこと
    */
-  ensureCanAddMember(
-    orgId: OrgId,
-    userId: UserId,
-  ): Promise<Result.Result<true, OrganizationError | RepositoryError>>;
+  ensureCanAddMember(orgId: OrgId, userId: UserId): Promise<Result.Result<true, OrganizationError>>;
 
   /**
    * メンバー削除可能であることを保証する
@@ -26,7 +22,7 @@ export interface OrganizationDomainService {
   ensureCanRemoveMember(
     orgId: OrgId,
     userId: UserId,
-  ): Promise<Result.Result<true, OrganizationError | RepositoryError>>;
+  ): Promise<Result.Result<true, OrganizationError>>;
 
   /**
    * メンバーが存在することを保証し、メンバーを返す
@@ -34,5 +30,5 @@ export interface OrganizationDomainService {
   ensureMemberExists(
     orgId: OrgId,
     userId: UserId,
-  ): Promise<Result.Result<OrgMember, OrganizationError | RepositoryError>>;
+  ): Promise<Result.Result<OrgMember, OrganizationError>>;
 }

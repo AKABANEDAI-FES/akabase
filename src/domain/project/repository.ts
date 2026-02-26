@@ -1,4 +1,3 @@
-import type { Result } from "@praha/byethrow";
 import type {
   DraftWithTags,
   Project,
@@ -7,70 +6,73 @@ import type {
   SubmissionWithTags,
 } from "./schema";
 import type { OrgId, ProjectId, SubmissionId } from "@/domain/shared/ids";
-import type { RepositoryError } from "@/domain/shared/repository";
 
 /**
  * =============================================================================
  * Project Repository
  * =============================================================================
+ * Repository methods throw RepositoryException on infrastructure failures.
+ * Returns null for "not found" scenarios (valid state, not an error).
  */
 
 export interface ProjectRepository {
   /**
    * Find project by ID
+   * @throws {RepositoryException} on database errors
    */
-  findById(id: ProjectId): Promise<Result.Result<Project | null, RepositoryError>>;
+  findById(id: ProjectId): Promise<Project | null>;
 
   /**
    * Find draft with tags by project ID
+   * @throws {RepositoryException} on database errors
    */
-  findDraftWithTags(
-    projectId: ProjectId,
-  ): Promise<Result.Result<DraftWithTags | null, RepositoryError>>;
+  findDraftWithTags(projectId: ProjectId): Promise<DraftWithTags | null>;
 
   /**
    * Find submission by ID
+   * @throws {RepositoryException} on database errors
    */
-  findSubmissionById(
-    id: SubmissionId,
-  ): Promise<Result.Result<SubmissionWithTags | null, RepositoryError>>;
+  findSubmissionById(id: SubmissionId): Promise<SubmissionWithTags | null>;
 
   /**
    * Find published data by project ID
+   * @throws {RepositoryException} on database errors
    */
-  findPublishedByProjectId(
-    projectId: ProjectId,
-  ): Promise<Result.Result<PublishedWithTags | null, RepositoryError>>;
+  findPublishedByProjectId(projectId: ProjectId): Promise<PublishedWithTags | null>;
 
   /**
    * List all projects for an organization
+   * @throws {RepositoryException} on database errors
    */
-  listByOrganization(orgId: OrgId): Promise<Result.Result<Project[], RepositoryError>>;
+  listByOrganization(orgId: OrgId): Promise<Project[]>;
 
   /**
    * List all submissions for a project
+   * @throws {RepositoryException} on database errors
    */
-  listSubmissionsByProject(
-    projectId: ProjectId,
-  ): Promise<Result.Result<ProjectSubmission[], RepositoryError>>;
+  listSubmissionsByProject(projectId: ProjectId): Promise<ProjectSubmission[]>;
 
   /**
    * Save project (insert or update)
+   * @throws {RepositoryException} on database errors
    */
-  saveProject(project: Project): Promise<Result.Result<void, RepositoryError>>;
+  saveProject(project: Project): Promise<void>;
 
   /**
    * Save draft (insert or update)
+   * @throws {RepositoryException} on database errors
    */
-  saveDraft(draft: DraftWithTags): Promise<Result.Result<void, RepositoryError>>;
+  saveDraft(draft: DraftWithTags): Promise<void>;
 
   /**
    * Save submission (insert or update)
+   * @throws {RepositoryException} on database errors
    */
-  saveSubmission(submission: SubmissionWithTags): Promise<Result.Result<void, RepositoryError>>;
+  saveSubmission(submission: SubmissionWithTags): Promise<void>;
 
   /**
    * Save or update published data
+   * @throws {RepositoryException} on database errors
    */
-  savePublished(published: PublishedWithTags): Promise<Result.Result<void, RepositoryError>>;
+  savePublished(published: PublishedWithTags): Promise<void>;
 }

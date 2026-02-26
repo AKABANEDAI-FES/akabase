@@ -4,12 +4,12 @@
  */
 
 import { z } from "zod";
-import { Result } from "@praha/byethrow";
 import { db } from "@/db";
 import { globalRoleSchema } from "@/domain/authorization/schema";
 import type { Actor } from "@/domain/authorization/schema";
 import { isGlobalAdmin } from "@/domain/authorization/logic";
 import { userIdSchema } from "@/domain/shared/ids";
+import { QueryException } from "../shared";
 
 /**
  * User list item DTO
@@ -24,11 +24,6 @@ export const userListItemSchema = z.object({
 
 export type UserListItem = z.infer<typeof userListItemSchema>;
 
-export type QueryError = {
-  code: "DATABASE_ERROR" | "PERMISSION_DENIED";
-  message: string;
-};
-
 /**
  * List all users
  *
@@ -41,16 +36,15 @@ export type QueryError = {
  *
  * @param actor - Actor (authenticated user with permissions)
  * @returns List of users or query error
+ * @throws {QueryException} When database operation fails or permission denied
  */
-export async function listUsersWithRoles(
-  actor: Actor,
-): Promise<Result.Result<UserListItem[], QueryError>> {
+export async function listUsersWithRoles(actor: Actor): Promise<UserListItem[]> {
   // Authorization check: only global admins can list all users
   if (!isGlobalAdmin(actor)) {
-    return Result.fail({
-      code: "PERMISSION_DENIED",
-      message: "ユーザー一覧を閲覧する権限がありません。グローバル管理者のみアクセス可能です。",
-    });
+    throw new QueryException(
+      "VALIDATION_ERROR",
+      "ユーザー一覧を閲覧する権限がありません。グローバル管理者のみアクセス可能です。",
+    );
   }
 
   try {
@@ -77,12 +71,8 @@ export async function listUsersWithRoles(
       }),
     );
 
-    return Result.succeed(userList);
+    return userList;
   } catch (error) {
-    console.error("[Query Error] Failed to list users", error);
-    return Result.fail({
-      code: "DATABASE_ERROR",
-      message: "ユーザー一覧の取得に失敗しました。",
-    });
+    throw new QueryException("DATABASE_ERROR", "ユーザー一覧の取得に失敗しました。", error);
   }
 }

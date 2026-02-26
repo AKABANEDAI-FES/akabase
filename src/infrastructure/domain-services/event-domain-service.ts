@@ -10,12 +10,9 @@ export class EventDomainServiceImpl implements EventDomainService {
   constructor(private readonly eventRepo: EventRepository) {}
 
   async ensureSlugUnique(slug: string, excludeEventId?: EventId) {
-    const result = await this.eventRepo.findBySlug(slug);
-    if (Result.isFailure(result)) {
-      return result;
-    }
+    const event = await this.eventRepo.findBySlug(slug);
 
-    if (result.value !== null && result.value.id !== excludeEventId) {
+    if (event !== null && event.id !== excludeEventId) {
       return Result.fail(
         eventError(EVENT_ERROR_CODE.SLUG_NOT_UNIQUE, "このスラッグは既に使用されています"),
       );
@@ -25,12 +22,9 @@ export class EventDomainServiceImpl implements EventDomainService {
   }
 
   async ensureTagNameUnique(eventId: EventId, name: string, excludeTagId?: TagId) {
-    const result = await this.eventRepo.findTags(eventId);
-    if (Result.isFailure(result)) {
-      return result;
-    }
+    const tags = await this.eventRepo.findTags(eventId);
 
-    const duplicate = result.value.find((tag) => tag.name === name && tag.id !== excludeTagId);
+    const duplicate = tags.find((tag) => tag.name === name && tag.id !== excludeTagId);
 
     if (duplicate) {
       return Result.fail(
@@ -47,12 +41,9 @@ export class EventDomainServiceImpl implements EventDomainService {
     parentId: PlaceId | null,
     excludePlaceId?: PlaceId,
   ) {
-    const result = await this.eventRepo.findPlaces(eventId);
-    if (Result.isFailure(result)) {
-      return result;
-    }
+    const places = await this.eventRepo.findPlaces(eventId);
 
-    const duplicate = result.value.find(
+    const duplicate = places.find(
       (place) => place.name === name && place.parentId === parentId && place.id !== excludePlaceId,
     );
 
@@ -66,9 +57,9 @@ export class EventDomainServiceImpl implements EventDomainService {
   }
 
   async resolveModifiableEvent(eventId: EventId) {
-    const repo = this.eventRepo;
+    const eventRepo = this.eventRepo;
     return gen(async function* ($) {
-      const event = yield* $(await repo.findById(eventId));
+      const event = await eventRepo.findById(eventId);
       if (!event) {
         return yield* $(
           Result.fail(eventError(EVENT_ERROR_CODE.EVENT_NOT_FOUND, "イベントが見つかりません")),

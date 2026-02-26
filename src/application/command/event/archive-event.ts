@@ -4,7 +4,6 @@ import type { EventId } from "@/domain/shared/ids";
 import type { EventError } from "@/domain/event/errors";
 import { EVENT_ERROR_CODE, eventError } from "@/domain/event/errors";
 import { archiveEvent as archiveEventLogic } from "@/domain/event/logic";
-import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
 import { eventResource } from "@/domain/authorization/logic";
@@ -28,7 +27,7 @@ export type ArchiveEventOutput = {
 /**
  * Errors that can occur during event archival
  */
-export type ArchiveEventError = EventError | RepositoryError | AuthorizationError;
+export type ArchiveEventError = EventError | AuthorizationError;
 
 /**
  * Archive an event
@@ -50,7 +49,7 @@ export async function archiveEvent(
 ): Result.ResultAsync<ArchiveEventOutput, ArchiveEventError> {
   return gen(async function* ($) {
     // Fetch the event
-    const event = yield* $(await deps.eventRepo.findById(input.eventId));
+    const event = await deps.eventRepo.findById(input.eventId);
 
     if (!event) {
       return yield* $(
@@ -75,7 +74,7 @@ export async function archiveEvent(
     const archivedEvent = yield* $(archiveEventLogic(event));
 
     // Save archived event to database
-    yield* $(await deps.eventRepo.saveEvent(archivedEvent));
+    await deps.eventRepo.saveEvent(archivedEvent);
 
     return { eventId: input.eventId };
   });

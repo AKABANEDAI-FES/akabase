@@ -2,7 +2,6 @@
  * Resolve an Actor from userId with permission context
  */
 
-import { Result } from "@praha/byethrow";
 import { db } from "@/db";
 import { committeeRoles, orgMembers, user } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -10,15 +9,7 @@ import type { EventId, OrgId, UserId } from "@/domain/shared/ids";
 import type { Actor, CommitteeRole, GlobalRole, OrgRole } from "@/domain/authorization/schema";
 import { createActor } from "@/domain/authorization/logic";
 import { globalRoleSchema } from "@/domain/authorization/schema";
-import { AUTHORIZATION_ERROR_CODE } from "@/domain/authorization/errors";
-
-/**
- * Query error type
- */
-export type QueryError = {
-  code: "ACTOR_RESOLUTION_FAILED";
-  message: string;
-};
+import { QueryException } from "../shared";
 
 /**
  * Options for actor resolution
@@ -47,10 +38,9 @@ export type ResolveActorOptions = {
  *
  * @param options - Actor resolution options
  * @returns Actor instance with loaded permissions
+ * @throws {QueryException} When actor resolution fails
  */
-export async function resolveActor(
-  options: ResolveActorOptions,
-): Promise<Result.Result<Actor, QueryError>> {
+export async function resolveActor(options: ResolveActorOptions): Promise<Actor> {
   try {
     // Fetch user's global role from database
     const userRow = await db.query.user.findFirst({
@@ -61,10 +51,10 @@ export async function resolveActor(
     });
 
     if (!userRow) {
-      return Result.fail({
-        code: AUTHORIZATION_ERROR_CODE.ACTOR_RESOLUTION_FAILED,
-        message: `ユーザー ${options.userId} が見つかりません`,
-      });
+      throw new QueryException(
+        "ACTOR_RESOLUTION_FAILED",
+        `ユーザー ${options.userId} が見つかりません`,
+      );
     }
 
     // Parse and validate global role with default fallback
@@ -111,12 +101,16 @@ export async function resolveActor(
 
     const actor = createActor(options.userId, globalRole, committeeRolesMap, orgRolesMap);
 
-    return Result.succeed(actor);
+    return actor;
   } catch (error) {
-    return Result.fail({
-      code: AUTHORIZATION_ERROR_CODE.ACTOR_RESOLUTION_FAILED,
-      message: `Actor の解決に失敗しました: ${error}`,
-    });
+    if (error instanceof QueryException) {
+      throw error;
+    }
+    throw new QueryException(
+      "ACTOR_RESOLUTION_FAILED",
+      `Actor の解決に失敗しました: ${error}`,
+      error,
+    );
   }
 }
 

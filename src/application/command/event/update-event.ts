@@ -3,7 +3,6 @@ import { gen } from "@/libs/result";
 import type { EventId } from "@/domain/shared/ids";
 import type { EventError } from "@/domain/event/errors";
 import { updateEventEntity } from "@/domain/event/logic";
-import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
 import { eventResource } from "@/domain/authorization/logic";
@@ -29,7 +28,7 @@ export type UpdateEventOutput = {
 /**
  * Errors that can occur during event update
  */
-export type UpdateEventError = EventError | RepositoryError | AuthorizationError;
+export type UpdateEventError = EventError | AuthorizationError;
 
 /**
  * Update an existing event
@@ -69,7 +68,7 @@ export async function updateEvent(
     );
 
     // Save updated event to database
-    yield* $(await deps.eventRepo.saveEvent(updatedEvent));
+    await deps.eventRepo.saveEvent(updatedEvent);
 
     return { eventId: input.eventId };
   });

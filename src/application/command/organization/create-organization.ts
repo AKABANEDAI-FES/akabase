@@ -4,7 +4,6 @@ import { generateId } from "@/libs/id";
 import type { EventId, OrgId } from "@/domain/shared/ids";
 import type { OrganizationError } from "@/domain/organization/errors";
 import type { EventError } from "@/domain/event/errors";
-import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
 import { organizationResource } from "@/domain/authorization/logic";
@@ -33,11 +32,7 @@ export type CreateOrganizationOutput = {
 /**
  * Errors that can occur during organization creation
  */
-export type CreateOrganizationError =
-  | OrganizationError
-  | EventError
-  | RepositoryError
-  | AuthorizationError;
+export type CreateOrganizationError = OrganizationError | EventError | AuthorizationError;
 
 /**
  * Create a new organization
@@ -79,7 +74,7 @@ export async function createOrganization(
     );
 
     // Save organization to database
-    yield* $(await deps.organizationRepo.saveOrganization(organization));
+    await deps.organizationRepo.saveOrganization(organization);
 
     return { organizationId: organization.id, eventId: organization.eventId };
   });

@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { Result } from "@praha/byethrow";
 import { authMiddleware } from "@/libs/session-server";
 import { listUsersWithRoles } from "@/application/query/user/list-users-with-roles";
 import { listUsersForEvent } from "@/application/query/user/list-users-for-event";
@@ -13,22 +12,12 @@ export const loadUsersWithRolesFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .handler(async ({ context }) => {
     // Resolve actor from session
-    const actorResult = await resolveActor({
+    const actor = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
     });
 
-    if (Result.isFailure(actorResult)) {
-      throw new Error(actorResult.error.message);
-    }
-
     // Query with authorization check
-    const result = await listUsersWithRoles(actorResult.value);
-
-    if (Result.isFailure(result)) {
-      throw new Error(result.error.message);
-    }
-
-    return result.value;
+    return await listUsersWithRoles(actor);
   });
 
 export function generateLoadUsersWithRolesCacheKey() {
@@ -46,22 +35,12 @@ export const loadUsersForEventFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
   .handler(async ({ data, context }) => {
-    const actorResult = await resolveActor({
+    const actor = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
     });
 
-    if (Result.isFailure(actorResult)) {
-      throw new Error(actorResult.error.message);
-    }
-
-    const result = await listUsersForEvent(data.eventId, actorResult.value);
-
-    if (Result.isFailure(result)) {
-      throw new Error(result.error.message);
-    }
-
-    return result.value;
+    return await listUsersForEvent(data.eventId, actor);
   });
 
 export function generateLoadUsersForEventCacheKey(eventId: string) {

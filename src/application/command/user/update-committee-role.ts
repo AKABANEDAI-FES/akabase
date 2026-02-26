@@ -10,7 +10,6 @@ import type { Actor, CommitteeRole } from "@/domain/authorization/schema";
 import type { Dependencies } from "@/infrastructure/di";
 import type { UserError } from "@/domain/user/errors";
 import type { EventError } from "@/domain/event/errors";
-import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import { eventResource } from "@/domain/authorization/logic";
 import { generateId } from "@/libs/id";
@@ -27,11 +26,7 @@ export type UpdateCommitteeRoleOutput = {
   success: true;
 };
 
-export type UpdateCommitteeRoleError =
-  | UserError
-  | EventError
-  | RepositoryError
-  | AuthorizationError;
+export type UpdateCommitteeRoleError = UserError | EventError | AuthorizationError;
 
 /**
  * Update (or create) a committee role assignment
@@ -56,15 +51,16 @@ export async function updateCommitteeRole(
     // Fetch event and check if modifiable
     yield* $(await deps.eventDomainService.resolveModifiableEvent(input.eventId));
 
-    const existingAssignment = yield* $(
-      await deps.userRepo.findCommitteeRoleAssignment(input.userId, input.eventId),
+    const existingAssignment = await deps.userRepo.findCommitteeRoleAssignment(
+      input.userId,
+      input.eventId,
     );
 
     const assignment = existingAssignment
       ? updateCommitteeRoleAssignment(existingAssignment, input.role)
       : createCommitteeRoleAssignment(generateId(), input.eventId, input.userId, input.role);
 
-    yield* $(await deps.userRepo.saveCommitteeRoleAssignment(assignment));
+    await deps.userRepo.saveCommitteeRoleAssignment(assignment);
 
     return { success: true as const };
   });

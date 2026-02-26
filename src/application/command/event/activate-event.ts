@@ -4,7 +4,6 @@ import type { EventId } from "@/domain/shared/ids";
 import type { EventError } from "@/domain/event/errors";
 import { EVENT_ERROR_CODE, eventError } from "@/domain/event/errors";
 import { activateEvent as activateEventLogic } from "@/domain/event/logic";
-import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
 import { eventResource } from "@/domain/authorization/logic";
@@ -28,7 +27,7 @@ export type ActivateEventOutput = {
 /**
  * Errors that can occur during event activation
  */
-export type ActivateEventError = EventError | RepositoryError | AuthorizationError;
+export type ActivateEventError = EventError | AuthorizationError;
 
 /**
  * Activate an archived event
@@ -50,7 +49,7 @@ export async function activateEvent(
 ): Result.ResultAsync<ActivateEventOutput, ActivateEventError> {
   return gen(async function* ($) {
     // Fetch the event
-    const event = yield* $(await deps.eventRepo.findById(input.eventId));
+    const event = await deps.eventRepo.findById(input.eventId);
 
     if (!event) {
       return yield* $(
@@ -75,7 +74,7 @@ export async function activateEvent(
     const activatedEvent = yield* $(activateEventLogic(event));
 
     // Save activated event to database
-    yield* $(await deps.eventRepo.saveEvent(activatedEvent));
+    await deps.eventRepo.saveEvent(activatedEvent);
 
     return { eventId: input.eventId };
   });

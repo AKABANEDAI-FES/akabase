@@ -1,80 +1,90 @@
-import type { Result } from "@praha/byethrow";
 import type { Deadline, Event, Place, Tag } from "./schema";
 import type { DeadlineId, EventId, PlaceId, TagId } from "@/domain/shared/ids";
-import type { RepositoryError } from "@/domain/shared/repository";
 
 /**
  * =============================================================================
  * Event Repository
  * =============================================================================
+ * Repository methods throw RepositoryException on infrastructure failures.
+ * Returns null for "not found" scenarios (valid state, not an error).
  */
 
 export interface EventRepository {
   /**
    * Find event by ID
+   * @throws {RepositoryException} on database errors
    */
-  findById(id: EventId): Promise<Result.Result<Event | null, RepositoryError>>;
+  findById(id: EventId): Promise<Event | null>;
 
   /**
    * Find event by slug
+   * @throws {RepositoryException} on database errors
    */
-  findBySlug(slug: string): Promise<Result.Result<Event | null, RepositoryError>>;
+  findBySlug(slug: string): Promise<Event | null>;
 
   /**
    * List all events
+   * @throws {RepositoryException} on database errors
    */
-  listAll(): Promise<Result.Result<Event[], RepositoryError>>;
+  listAll(): Promise<Event[]>;
 
   /**
    * Find all tags for an event
+   * @throws {RepositoryException} on database errors
    */
-  findTags(eventId: EventId): Promise<Result.Result<Tag[], RepositoryError>>;
+  findTags(eventId: EventId): Promise<Tag[]>;
 
   /**
    * Find all places for an event
+   * @throws {RepositoryException} on database errors
    */
-  findPlaces(eventId: EventId): Promise<Result.Result<Place[], RepositoryError>>;
+  findPlaces(eventId: EventId): Promise<Place[]>;
 
   /**
    * Find all deadlines for an event
+   * @throws {RepositoryException} on database errors
    */
-  findDeadlines(eventId: EventId): Promise<Result.Result<Deadline[], RepositoryError>>;
+  findDeadlines(eventId: EventId): Promise<Deadline[]>;
 
   /**
    * Save event (insert or update)
+   * @throws {RepositoryException} on database errors
    */
-  saveEvent(event: Event): Promise<Result.Result<void, RepositoryError>>;
+  saveEvent(event: Event): Promise<void>;
 
   /**
    * Save tag (insert or update)
+   * @throws {RepositoryException} on database errors
    */
-  saveTag(tag: Tag): Promise<Result.Result<void, RepositoryError>>;
+  saveTag(tag: Tag): Promise<void>;
 
   /**
    * Delete tag (scoped by eventId)
+   * @throws {RepositoryException} on database errors
    */
-  deleteTag(eventId: EventId, tagId: TagId): Promise<Result.Result<void, RepositoryError>>;
+  deleteTag(eventId: EventId, tagId: TagId): Promise<void>;
 
   /**
    * Save place (insert or update)
+   * @throws {RepositoryException} on database errors
    */
-  savePlace(place: Place): Promise<Result.Result<void, RepositoryError>>;
+  savePlace(place: Place): Promise<void>;
 
   /**
    * Delete place (scoped by eventId)
+   * @throws {RepositoryException} on database errors
    */
-  deletePlace(eventId: EventId, placeId: PlaceId): Promise<Result.Result<void, RepositoryError>>;
+  deletePlace(eventId: EventId, placeId: PlaceId): Promise<void>;
 
   /**
    * Save or update deadline
+   * @throws {RepositoryException} on database errors
    */
-  saveDeadline(deadline: Deadline): Promise<Result.Result<void, RepositoryError>>;
+  saveDeadline(deadline: Deadline): Promise<void>;
 
   /**
    * Delete deadline (scoped by eventId)
+   * @throws {RepositoryException} on database errors
    */
-  deleteDeadline(
-    eventId: EventId,
-    deadlineId: DeadlineId,
-  ): Promise<Result.Result<void, RepositoryError>>;
+  deleteDeadline(eventId: EventId, deadlineId: DeadlineId): Promise<void>;
 }

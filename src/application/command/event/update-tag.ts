@@ -4,7 +4,6 @@ import type { EventId, TagId } from "@/domain/shared/ids";
 import type { EventError } from "@/domain/event/errors";
 import { EVENT_ERROR_CODE, eventError } from "@/domain/event/errors";
 import { updateTagEntity } from "@/domain/event/logic";
-import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
 import { eventResource } from "@/domain/authorization/logic";
@@ -25,7 +24,7 @@ export type UpdateTagOutput = {
   eventId: EventId;
 };
 
-export type UpdateTagError = EventError | RepositoryError | AuthorizationError;
+export type UpdateTagError = EventError | AuthorizationError;
 
 /**
  * Update an existing tag
@@ -43,7 +42,7 @@ export async function updateTag(
     yield* $(await deps.eventDomainService.resolveModifiableEvent(input.eventId));
 
     // Find existing tag
-    const existingTags = yield* $(await deps.eventRepo.findTags(input.eventId));
+    const existingTags = await deps.eventRepo.findTags(input.eventId);
     const existingTag = existingTags.find((t) => t.id === input.tagId);
 
     if (!existingTag) {
@@ -61,7 +60,7 @@ export async function updateTag(
     const updatedTag = yield* $(updateTagEntity(existingTag, { name: input.name }));
 
     // Save tag
-    yield* $(await deps.eventRepo.saveTag(updatedTag));
+    await deps.eventRepo.saveTag(updatedTag);
 
     return { success: true as const, eventId: input.eventId };
   });

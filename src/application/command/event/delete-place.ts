@@ -2,7 +2,6 @@ import type { Result } from "@praha/byethrow";
 import { gen } from "@/libs/result";
 import type { EventId, PlaceId } from "@/domain/shared/ids";
 import type { EventError } from "@/domain/event/errors";
-import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
 import { eventResource } from "@/domain/authorization/logic";
@@ -22,7 +21,7 @@ export type DeletePlaceOutput = {
   eventId: EventId;
 };
 
-export type DeletePlaceError = EventError | RepositoryError | AuthorizationError;
+export type DeletePlaceError = EventError | AuthorizationError;
 
 /**
  * Delete a place
@@ -40,7 +39,7 @@ export async function deletePlace(
     yield* $(await deps.eventDomainService.resolveModifiableEvent(input.eventId));
 
     // Delete place
-    yield* $(await deps.eventRepo.deletePlace(input.eventId, input.placeId));
+    await deps.eventRepo.deletePlace(input.eventId, input.placeId);
 
     return { success: true as const, eventId: input.eventId };
   });

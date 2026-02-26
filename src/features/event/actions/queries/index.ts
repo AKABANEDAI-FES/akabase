@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { Result } from "@praha/byethrow";
 import { getEventDetail } from "@/application/query/event/get-event-detail";
 import { authMiddleware } from "@/libs/session-server";
 import { eventIdSchema } from "@/domain/shared/ids";
@@ -10,13 +9,7 @@ import { getEventBySlug } from "@/application/query/event/get-event-by-slug";
 import { queryOptions } from "@tanstack/react-query";
 
 export const loadEventsFn = createServerFn({ method: "GET" }).handler(async () => {
-  const result = await listEvents();
-
-  if (Result.isFailure(result)) {
-    throw new Error(result.error.message);
-  }
-
-  return result.value;
+  return await listEvents();
 });
 
 export function generateLoadEventsCacheKey() {
@@ -34,13 +27,11 @@ export const loadEventDetailFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
   .handler(async ({ data }) => {
-    const result = await getEventDetail(data.eventId);
-
-    if (Result.isFailure(result)) {
-      throw new Error(result.error.message);
+    const event = await getEventDetail(data.eventId);
+    if (!event) {
+      throw new Error("イベントが見つかりませんでした");
     }
-
-    return result.value;
+    return event;
   });
 
 export function generateLoadEventDetailCacheKey(eventId: string) {
@@ -55,13 +46,7 @@ export function generateLoadEventDetailQueryOptions(eventId: string) {
 }
 
 export const loadRecentActiveEventFn = createServerFn({ method: "GET" }).handler(async () => {
-  const result = await getRecentActiveEvent();
-
-  if (Result.isFailure(result)) {
-    throw new Error(result.error.message);
-  }
-
-  return result.value;
+  return await getRecentActiveEvent();
 });
 
 export function generateLoadRecentActiveEventCacheKey() {
@@ -78,17 +63,13 @@ export function generateLoadRecentActiveEventQueryOptions() {
 export const loadEventBySlugFn = createServerFn({ method: "GET" })
   .inputValidator(z.object({ slug: z.string().min(1) }))
   .handler(async ({ data }) => {
-    const result = await getEventBySlug(data.slug);
+    const event = await getEventBySlug(data.slug);
 
-    if (Result.isFailure(result)) {
-      throw new Error(result.error.message);
-    }
-
-    if (!result.value) {
+    if (!event) {
       throw new Error("イベントが見つかりませんでした。");
     }
 
-    return result.value;
+    return event;
   });
 
 export function generateLoadEventBySlugCacheKey(slug: string) {

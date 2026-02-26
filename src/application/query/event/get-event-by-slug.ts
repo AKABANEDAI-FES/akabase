@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { Result } from "@praha/byethrow";
 import { db } from "@/db";
 import { events } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { eventIdSchema } from "@/domain/shared/ids";
+import { QueryException } from "../shared";
 
 /**
  * DTO schema for event retrieved by slug
@@ -19,25 +19,20 @@ export const eventBySlugSchema = z.object({
 
 export type EventBySlug = z.infer<typeof eventBySlugSchema>;
 
-export type QueryError = {
-  code: "DATABASE_ERROR";
-  message: string;
-};
-
 /**
  * Get event by slug
  * Returns null if not found
+ *
+ * @throws {QueryException} When database operation fails
  */
-export async function getEventBySlug(
-  slug: string,
-): Promise<Result.Result<EventBySlug | null, QueryError>> {
+export async function getEventBySlug(slug: string): Promise<EventBySlug | null> {
   try {
     const row = await db.query.events.findFirst({
       where: eq(events.slug, slug),
     });
 
     if (!row) {
-      return Result.succeed(null);
+      return null;
     }
 
     const event = eventBySlugSchema.parse({
@@ -49,12 +44,8 @@ export async function getEventBySlug(
       updatedAt: new Date(row.updatedAt),
     });
 
-    return Result.succeed(event);
+    return event;
   } catch (error) {
-    console.error("[Query Error] Failed to get event by slug", error);
-    return Result.fail({
-      code: "DATABASE_ERROR",
-      message: "イベントの取得に失敗しました。",
-    });
+    throw new QueryException("DATABASE_ERROR", "イベントの取得に失敗しました。", error);
   }
 }

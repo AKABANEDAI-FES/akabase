@@ -1,4 +1,3 @@
-import { Result } from "@praha/byethrow";
 import { db } from "@/db";
 import { deadlines, events, places, tags } from "@/db/schema";
 import { and, desc, eq } from "drizzle-orm";
@@ -6,21 +5,20 @@ import { deadlineSchema, eventSchema, placeSchema, tagSchema } from "@/domain/ev
 import type { Deadline, Event, Place, Tag } from "@/domain/event/schema";
 import type { DeadlineId, EventId, PlaceId, TagId } from "@/domain/shared/ids";
 import type { EventRepository } from "@/domain/event/repository";
-import type { RepositoryError } from "@/domain/shared/repository";
-import { repositoryError } from "@/domain/shared/repository";
+import { RepositoryException } from "@/domain/shared/repository";
 
 /**
  * Event Repository Implementation using Drizzle ORM
  */
 export class EventRepositoryImpl implements EventRepository {
-  async findById(id: EventId): Promise<Result.Result<Event | null, RepositoryError>> {
+  async findById(id: EventId): Promise<Event | null> {
     try {
       const row = await db.query.events.findFirst({
         where: (events, { eq }) => eq(events.id, id),
       });
 
       if (!row) {
-        return Result.succeed(null);
+        return null;
       }
 
       const event = eventSchema.parse({
@@ -32,20 +30,20 @@ export class EventRepositoryImpl implements EventRepository {
         updatedAt: new Date(row.updatedAt),
       });
 
-      return Result.succeed(event);
+      return event;
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to find event", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to find event", error);
     }
   }
 
-  async findBySlug(slug: string): Promise<Result.Result<Event | null, RepositoryError>> {
+  async findBySlug(slug: string): Promise<Event | null> {
     try {
       const row = await db.query.events.findFirst({
         where: (events, { eq }) => eq(events.slug, slug),
       });
 
       if (!row) {
-        return Result.succeed(null);
+        return null;
       }
 
       const event = eventSchema.parse({
@@ -57,13 +55,13 @@ export class EventRepositoryImpl implements EventRepository {
         updatedAt: new Date(row.updatedAt),
       });
 
-      return Result.succeed(event);
+      return event;
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to find event by slug", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to find event by slug", error);
     }
   }
 
-  async listAll(): Promise<Result.Result<Event[], RepositoryError>> {
+  async listAll(): Promise<Event[]> {
     try {
       const rows = await db.query.events.findMany({
         orderBy: [desc(events.createdAt)],
@@ -80,13 +78,13 @@ export class EventRepositoryImpl implements EventRepository {
         }),
       );
 
-      return Result.succeed(eventList);
+      return eventList;
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to list events", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to list events", error);
     }
   }
 
-  async saveEvent(event: Event): Promise<Result.Result<void, RepositoryError>> {
+  async saveEvent(event: Event): Promise<void> {
     try {
       await db
         .insert(events)
@@ -108,10 +106,8 @@ export class EventRepositoryImpl implements EventRepository {
             updatedAt: event.updatedAt,
           },
         });
-
-      return Result.succeed(undefined);
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to save event", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to save event", error);
     }
   }
 
@@ -119,7 +115,7 @@ export class EventRepositoryImpl implements EventRepository {
   // Tag operations
   // =============================================================================
 
-  async findTags(eventId: EventId): Promise<Result.Result<Tag[], RepositoryError>> {
+  async findTags(eventId: EventId): Promise<Tag[]> {
     try {
       const rows = await db.query.tags.findMany({
         where: (tags, { eq }) => eq(tags.eventId, eventId),
@@ -134,13 +130,13 @@ export class EventRepositoryImpl implements EventRepository {
         }),
       );
 
-      return Result.succeed(tagList);
+      return tagList;
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to find tags", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to find tags", error);
     }
   }
 
-  async saveTag(tag: Tag): Promise<Result.Result<void, RepositoryError>> {
+  async saveTag(tag: Tag): Promise<void> {
     try {
       await db
         .insert(tags)
@@ -158,19 +154,16 @@ export class EventRepositoryImpl implements EventRepository {
           },
           where: eq(tags.eventId, tag.eventId),
         });
-
-      return Result.succeed(undefined);
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to save tag", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to save tag", error);
     }
   }
 
-  async deleteTag(eventId: EventId, tagId: TagId): Promise<Result.Result<void, RepositoryError>> {
+  async deleteTag(eventId: EventId, tagId: TagId): Promise<void> {
     try {
       await db.delete(tags).where(and(eq(tags.id, tagId), eq(tags.eventId, eventId)));
-      return Result.succeed(undefined);
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to delete tag", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to delete tag", error);
     }
   }
 
@@ -178,7 +171,7 @@ export class EventRepositoryImpl implements EventRepository {
   // Place operations
   // =============================================================================
 
-  async findPlaces(eventId: EventId): Promise<Result.Result<Place[], RepositoryError>> {
+  async findPlaces(eventId: EventId): Promise<Place[]> {
     try {
       const rows = await db.query.places.findMany({
         where: (places, { eq }) => eq(places.eventId, eventId),
@@ -194,13 +187,13 @@ export class EventRepositoryImpl implements EventRepository {
         }),
       );
 
-      return Result.succeed(placeList);
+      return placeList;
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to find places", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to find places", error);
     }
   }
 
-  async savePlace(place: Place): Promise<Result.Result<void, RepositoryError>> {
+  async savePlace(place: Place): Promise<void> {
     try {
       await db
         .insert(places)
@@ -220,22 +213,16 @@ export class EventRepositoryImpl implements EventRepository {
           },
           where: eq(places.eventId, place.eventId),
         });
-
-      return Result.succeed(undefined);
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to save place", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to save place", error);
     }
   }
 
-  async deletePlace(
-    eventId: EventId,
-    placeId: PlaceId,
-  ): Promise<Result.Result<void, RepositoryError>> {
+  async deletePlace(eventId: EventId, placeId: PlaceId): Promise<void> {
     try {
       await db.delete(places).where(and(eq(places.id, placeId), eq(places.eventId, eventId)));
-      return Result.succeed(undefined);
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to delete place", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to delete place", error);
     }
   }
 
@@ -243,7 +230,7 @@ export class EventRepositoryImpl implements EventRepository {
   // Deadline operations
   // =============================================================================
 
-  async findDeadlines(eventId: EventId): Promise<Result.Result<Deadline[], RepositoryError>> {
+  async findDeadlines(eventId: EventId): Promise<Deadline[]> {
     try {
       const rows = await db.query.deadlines.findMany({
         where: (deadlines, { eq }) => eq(deadlines.eventId, eventId),
@@ -259,13 +246,13 @@ export class EventRepositoryImpl implements EventRepository {
         }),
       );
 
-      return Result.succeed(deadlineList);
+      return deadlineList;
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to find deadlines", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to find deadlines", error);
     }
   }
 
-  async saveDeadline(deadline: Deadline): Promise<Result.Result<void, RepositoryError>> {
+  async saveDeadline(deadline: Deadline): Promise<void> {
     try {
       await db
         .insert(deadlines)
@@ -282,24 +269,18 @@ export class EventRepositoryImpl implements EventRepository {
             deadlineAt: deadline.deadlineAt,
           },
         });
-
-      return Result.succeed(undefined);
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to save deadline", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to save deadline", error);
     }
   }
 
-  async deleteDeadline(
-    eventId: EventId,
-    deadlineId: DeadlineId,
-  ): Promise<Result.Result<void, RepositoryError>> {
+  async deleteDeadline(eventId: EventId, deadlineId: DeadlineId): Promise<void> {
     try {
       await db
         .delete(deadlines)
         .where(and(eq(deadlines.id, deadlineId), eq(deadlines.eventId, eventId)));
-      return Result.succeed(undefined);
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to delete deadline", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to delete deadline", error);
     }
   }
 }

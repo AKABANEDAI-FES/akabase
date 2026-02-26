@@ -6,7 +6,6 @@ import type { DeadlineFieldKey } from "@/domain/event/schema";
 import type { EventError } from "@/domain/event/errors";
 import { EVENT_ERROR_CODE, eventError } from "@/domain/event/errors";
 import { createDeadlineEntity } from "@/domain/event/logic";
-import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
 import { eventResource } from "@/domain/authorization/logic";
@@ -27,7 +26,7 @@ export type CreateDeadlineOutput = {
   eventId: EventId;
 };
 
-export type CreateDeadlineError = EventError | RepositoryError | AuthorizationError;
+export type CreateDeadlineError = EventError | AuthorizationError;
 
 /**
  * Create a new deadline for a field
@@ -50,7 +49,7 @@ export async function createDeadline(
     yield* $(await deps.eventDomainService.resolveModifiableEvent(input.eventId));
 
     // Check if deadline already exists for this fieldKey
-    const existingDeadlines = yield* $(await deps.eventRepo.findDeadlines(input.eventId));
+    const existingDeadlines = await deps.eventRepo.findDeadlines(input.eventId);
     const existingDeadline = existingDeadlines.find((d) => d.fieldKey === input.fieldKey);
 
     if (existingDeadline) {
@@ -76,7 +75,7 @@ export async function createDeadline(
     );
 
     // Save deadline (UPSERT in repository layer)
-    yield* $(await deps.eventRepo.saveDeadline(deadline));
+    await deps.eventRepo.saveDeadline(deadline);
 
     return { deadlineId, eventId: input.eventId };
   });

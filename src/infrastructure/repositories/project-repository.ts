@@ -1,4 +1,3 @@
-import { Result } from "@praha/byethrow";
 import { db } from "@/db";
 import {
   projectDraftTags,
@@ -26,8 +25,7 @@ import type {
 } from "@/domain/project/schema";
 import type { OrgId, ProjectId, SubmissionId } from "@/domain/shared/ids";
 import type { ProjectRepository } from "@/domain/project/repository";
-import type { RepositoryError } from "@/domain/shared/repository";
-import { repositoryError } from "@/domain/shared/repository";
+import { RepositoryException } from "@/domain/shared/repository";
 import { generateId } from "@/libs/id";
 import type { BatchItem } from "drizzle-orm/batch";
 
@@ -35,14 +33,14 @@ import type { BatchItem } from "drizzle-orm/batch";
  * Project Repository Implementation using Drizzle ORM
  */
 export class ProjectRepositoryImpl implements ProjectRepository {
-  async findById(id: ProjectId): Promise<Result.Result<Project | null, RepositoryError>> {
+  async findById(id: ProjectId): Promise<Project | null> {
     try {
       const row = await db.query.projects.findFirst({
         where: (projects, { eq }) => eq(projects.id, id),
       });
 
       if (!row) {
-        return Result.succeed(null);
+        return null;
       }
 
       const project = projectSchema.parse({
@@ -56,15 +54,13 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         updatedAt: new Date(row.updatedAt),
       });
 
-      return Result.succeed(project);
+      return project;
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to find project", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to find project", error);
     }
   }
 
-  async findDraftWithTags(
-    projectId: ProjectId,
-  ): Promise<Result.Result<DraftWithTags | null, RepositoryError>> {
+  async findDraftWithTags(projectId: ProjectId): Promise<DraftWithTags | null> {
     try {
       const draftRow = await db.query.projectDrafts.findFirst({
         where: (projectDrafts, { eq }) => eq(projectDrafts.projectId, projectId),
@@ -78,7 +74,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
       });
 
       if (!draftRow) {
-        return Result.succeed(null);
+        return null;
       }
 
       const draft = draftWithTagsSchema.parse({
@@ -90,15 +86,13 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         tags: draftRow.tags.map((t) => t.tagId),
       });
 
-      return Result.succeed(draft);
+      return draft;
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to find draft", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to find draft", error);
     }
   }
 
-  async findSubmissionById(
-    id: SubmissionId,
-  ): Promise<Result.Result<SubmissionWithTags | null, RepositoryError>> {
+  async findSubmissionById(id: SubmissionId): Promise<SubmissionWithTags | null> {
     try {
       const row = await db.query.projectSubmissions.findFirst({
         where: (projectSubmissions, { eq }) => eq(projectSubmissions.id, id),
@@ -112,7 +106,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
       });
 
       if (!row) {
-        return Result.succeed(null);
+        return null;
       }
 
       const submission = submissionWithTagsSchema.parse({
@@ -128,15 +122,13 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         tags: row.tags.map((t) => t.tagId),
       });
 
-      return Result.succeed(submission);
+      return submission;
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to find submission", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to find submission", error);
     }
   }
 
-  async findPublishedByProjectId(
-    projectId: ProjectId,
-  ): Promise<Result.Result<PublishedWithTags | null, RepositoryError>> {
+  async findPublishedByProjectId(projectId: ProjectId): Promise<PublishedWithTags | null> {
     try {
       const row = await db.query.projectPublished.findFirst({
         where: (projectPublished, { eq }) => eq(projectPublished.projectId, projectId),
@@ -150,7 +142,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
       });
 
       if (!row) {
-        return Result.succeed(null);
+        return null;
       }
 
       const published = publishedWithTagsSchema.parse({
@@ -162,13 +154,13 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         tags: row.tags.map((t) => t.tagId),
       });
 
-      return Result.succeed(published);
+      return published;
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to find published data", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to find published data", error);
     }
   }
 
-  async listByOrganization(orgId: OrgId): Promise<Result.Result<Project[], RepositoryError>> {
+  async listByOrganization(orgId: OrgId): Promise<Project[]> {
     try {
       const rows = await db.query.projects.findMany({
         where: (projects, { eq }) => eq(projects.orgId, orgId),
@@ -187,15 +179,13 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         }),
       );
 
-      return Result.succeed(projectList);
+      return projectList;
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to list projects", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to list projects", error);
     }
   }
 
-  async listSubmissionsByProject(
-    projectId: ProjectId,
-  ): Promise<Result.Result<ProjectSubmission[], RepositoryError>> {
+  async listSubmissionsByProject(projectId: ProjectId): Promise<ProjectSubmission[]> {
     try {
       const rows = await db.query.projectSubmissions.findMany({
         where: (projectSubmissions, { eq }) => eq(projectSubmissions.projectId, projectId),
@@ -215,13 +205,13 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         }),
       );
 
-      return Result.succeed(submissions);
+      return submissions;
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to list submissions", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to list submissions", error);
     }
   }
 
-  async saveProject(project: Project): Promise<Result.Result<void, RepositoryError>> {
+  async saveProject(project: Project): Promise<void> {
     try {
       // Upsert project
       await db
@@ -247,14 +237,12 @@ export class ProjectRepositoryImpl implements ProjectRepository {
           },
           where: eq(projects.eventId, project.eventId),
         });
-
-      return Result.succeed(undefined);
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to save project", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to save project", error);
     }
   }
 
-  async saveDraft(draft: DraftWithTags): Promise<Result.Result<void, RepositoryError>> {
+  async saveDraft(draft: DraftWithTags): Promise<void> {
     try {
       // Upsert draft
       const q1 = db
@@ -294,16 +282,12 @@ export class ProjectRepositoryImpl implements ProjectRepository {
       }
 
       await db.batch(query);
-
-      return Result.succeed(undefined);
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to save draft", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to save draft", error);
     }
   }
 
-  async saveSubmission(
-    submission: SubmissionWithTags,
-  ): Promise<Result.Result<void, RepositoryError>> {
+  async saveSubmission(submission: SubmissionWithTags): Promise<void> {
     try {
       // Upsert submission
       const q1 = db
@@ -349,14 +333,12 @@ export class ProjectRepositoryImpl implements ProjectRepository {
       }
 
       await db.batch(query);
-
-      return Result.succeed(undefined);
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to save submission", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to save submission", error);
     }
   }
 
-  async savePublished(published: PublishedWithTags): Promise<Result.Result<void, RepositoryError>> {
+  async savePublished(published: PublishedWithTags): Promise<void> {
     try {
       // Upsert published data
       const q1 = db
@@ -397,10 +379,8 @@ export class ProjectRepositoryImpl implements ProjectRepository {
       }
 
       await db.batch(query);
-
-      return Result.succeed(undefined);
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to save published data", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to save published data", error);
     }
   }
 }

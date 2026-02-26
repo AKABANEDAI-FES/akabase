@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { Result } from "@praha/byethrow";
 import { db } from "@/db";
 import { events } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { eventIdSchema } from "@/domain/shared/ids";
+import { QueryException } from "../shared";
 
 export const recentActiveEventSchema = z.object({
   id: eventIdSchema,
@@ -15,19 +15,14 @@ export const recentActiveEventSchema = z.object({
 
 export type RecentActiveEvent = z.infer<typeof recentActiveEventSchema>;
 
-export type QueryError = {
-  code: "DATABASE_ERROR";
-  message: string;
-};
-
 /**
  * 最近且つアクティブなイベントを1つ取得
  * アクティブなイベントの中から作成日時が最新のものを返す
  * 見つからない場合はnullを返す
+ *
+ * @throws {QueryException} When database operation fails
  */
-export async function getRecentActiveEvent(): Promise<
-  Result.Result<RecentActiveEvent | null, QueryError>
-> {
+export async function getRecentActiveEvent(): Promise<RecentActiveEvent | null> {
   try {
     const row = await db.query.events.findFirst({
       where: eq(events.status, "active"),
@@ -35,7 +30,7 @@ export async function getRecentActiveEvent(): Promise<
     });
 
     if (!row) {
-      return Result.succeed(null);
+      return null;
     }
 
     const event = recentActiveEventSchema.parse({
@@ -46,12 +41,12 @@ export async function getRecentActiveEvent(): Promise<
       updatedAt: new Date(row.updatedAt),
     });
 
-    return Result.succeed(event);
+    return event;
   } catch (error) {
-    console.error("[Query Error] Failed to get recent active event", error);
-    return Result.fail({
-      code: "DATABASE_ERROR",
-      message: "最新のアクティブイベントの取得に失敗しました。",
-    });
+    throw new QueryException(
+      "DATABASE_ERROR",
+      "最新のアクティブイベントの取得に失敗しました。",
+      error,
+    );
   }
 }

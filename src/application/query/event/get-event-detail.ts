@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { Result } from "@praha/byethrow";
 import { db } from "@/db";
 import { eventIdSchema } from "@/domain/shared/ids";
 import type { EventId } from "@/domain/shared/ids";
+import { QueryException } from "../shared";
 
 export const eventDetailSchema = z.object({
   id: eventIdSchema,
@@ -15,24 +15,20 @@ export const eventDetailSchema = z.object({
 
 export type EventDetail = z.infer<typeof eventDetailSchema>;
 
-export type QueryError = {
-  code: "DATABASE_ERROR" | "NOT_FOUND";
-  message: string;
-};
-
-export async function getEventDetail(
-  eventId: EventId,
-): Promise<Result.Result<EventDetail, QueryError>> {
+/**
+ * Get event detail by ID
+ * Returns null if not found
+ *
+ * @throws {QueryException} When database operation fails
+ */
+export async function getEventDetail(eventId: EventId): Promise<EventDetail | null> {
   try {
     const row = await db.query.events.findFirst({
       where: (events, { eq }) => eq(events.id, eventId),
     });
 
     if (!row) {
-      return Result.fail({
-        code: "NOT_FOUND",
-        message: "イベントが見つかりません。",
-      });
+      return null;
     }
 
     const eventDetail: EventDetail = eventDetailSchema.parse({
@@ -44,12 +40,8 @@ export async function getEventDetail(
       updatedAt: new Date(row.updatedAt),
     });
 
-    return Result.succeed(eventDetail);
+    return eventDetail;
   } catch (error) {
-    console.error("[Query Error] Failed to get event detail", error);
-    return Result.fail({
-      code: "DATABASE_ERROR",
-      message: "イベント詳細の取得に失敗しました。",
-    });
+    throw new QueryException("DATABASE_ERROR", "イベント詳細の取得に失敗しました。", error);
   }
 }

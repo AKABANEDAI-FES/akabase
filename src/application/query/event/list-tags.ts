@@ -1,10 +1,10 @@
 import { z } from "zod";
-import { Result } from "@praha/byethrow";
 import { db } from "@/db";
 import { tags } from "@/db/schema";
 import { asc, eq } from "drizzle-orm";
 import type { EventId } from "@/domain/shared/ids";
 import { eventIdSchema, tagIdSchema } from "@/domain/shared/ids";
+import { QueryException } from "../shared";
 
 /**
  * DTO schema for tag list item
@@ -18,18 +18,13 @@ export const tagListItemSchema = z.object({
 
 export type TagListItem = z.infer<typeof tagListItemSchema>;
 
-export type QueryError = {
-  code: "DATABASE_ERROR";
-  message: string;
-};
-
 /**
  * Get all tags for a specific event
  * Returns empty array if no tags found
+ *
+ * @throws {QueryException} When database operation fails
  */
-export async function listTags(
-  eventId: EventId,
-): Promise<Result.Result<TagListItem[], QueryError>> {
+export async function listTags(eventId: EventId): Promise<TagListItem[]> {
   try {
     const rows = await db.query.tags.findMany({
       where: eq(tags.eventId, eventId),
@@ -45,12 +40,8 @@ export async function listTags(
       }),
     );
 
-    return Result.succeed(tagList);
+    return tagList;
   } catch (error) {
-    console.error("[Query Error] Failed to list tags", error);
-    return Result.fail({
-      code: "DATABASE_ERROR",
-      message: "タグ一覧の取得に失敗しました。",
-    });
+    throw new QueryException("DATABASE_ERROR", "タグ一覧の取得に失敗しました。", error);
   }
 }

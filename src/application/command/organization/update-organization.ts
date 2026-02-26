@@ -5,7 +5,6 @@ import type { OrganizationError } from "@/domain/organization/errors";
 import { ORGANIZATION_ERROR_CODE, organizationError } from "@/domain/organization/errors";
 import type { EventError } from "@/domain/event/errors";
 import { updateOrganizationEntity as updateOrganizationLogic } from "@/domain/organization/logic";
-import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
 import { organizationResource } from "@/domain/authorization/logic";
@@ -33,11 +32,7 @@ export type UpdateOrganizationOutput = {
 /**
  * Errors that can occur during organization update
  */
-export type UpdateOrganizationError =
-  | OrganizationError
-  | EventError
-  | RepositoryError
-  | AuthorizationError;
+export type UpdateOrganizationError = OrganizationError | EventError | AuthorizationError;
 
 /**
  * Update an existing organization
@@ -59,7 +54,7 @@ export async function updateOrganization(
 ): Result.ResultAsync<UpdateOrganizationOutput, UpdateOrganizationError> {
   return gen(async function* ($) {
     // Fetch the organization (scoped by eventId)
-    const organization = yield* $(await deps.organizationRepo.findById(input.eventId, input.orgId));
+    const organization = await deps.organizationRepo.findById(input.eventId, input.orgId);
 
     if (!organization) {
       return yield* $(
@@ -85,7 +80,7 @@ export async function updateOrganization(
     );
 
     // Save updated organization to database
-    yield* $(await deps.organizationRepo.saveOrganization(updatedOrg));
+    await deps.organizationRepo.saveOrganization(updatedOrg);
 
     return { organizationId: input.orgId, eventId: input.eventId };
   });

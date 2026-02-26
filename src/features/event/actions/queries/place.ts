@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { Result } from "@praha/byethrow";
 import { listPlaces } from "@/application/query/event/list-places";
 import { authMiddleware } from "@/libs/session-server";
 import { eventIdSchema } from "@/domain/shared/ids";
@@ -13,13 +12,7 @@ export const loadPlacesFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
   .handler(async ({ data }) => {
-    const result = await listPlaces(data.eventId);
-
-    if (Result.isFailure(result)) {
-      throw new Error(result.error.message);
-    }
-
-    return result.value;
+    return await listPlaces(data.eventId);
   });
 
 /**

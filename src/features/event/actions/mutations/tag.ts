@@ -31,12 +31,10 @@ export const createTagFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     return await gen(async function* ($) {
       // Resolve actor with event context
-      const actor = yield* $(
-        await resolveActor({
-          userId: cast<UserId>(context.session.user.id),
-          eventIds: [data.eventId],
-        }),
-      );
+      const actor = await resolveActor({
+        userId: cast<UserId>(context.session.user.id),
+        eventIds: [data.eventId],
+      });
 
       return yield* $(
         await createTag(dependencies, {
@@ -81,12 +79,10 @@ export const updateTagFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     return await gen(async function* ($) {
       // Resolve actor with event context
-      const actor = yield* $(
-        await resolveActor({
-          userId: cast<UserId>(context.session.user.id),
-          eventIds: [data.eventId],
-        }),
-      );
+      const actor = await resolveActor({
+        userId: cast<UserId>(context.session.user.id),
+        eventIds: [data.eventId],
+      });
 
       return yield* $(
         await updateTag(dependencies, {
@@ -131,12 +127,10 @@ export const deleteTagFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     return await gen(async function* ($) {
       // Resolve actor with event context
-      const actor = yield* $(
-        await resolveActor({
-          userId: cast<UserId>(context.session.user.id),
-          eventIds: [data.eventId],
-        }),
-      );
+      const actor = await resolveActor({
+        userId: cast<UserId>(context.session.user.id),
+        eventIds: [data.eventId],
+      });
 
       return yield* $(
         await deleteTag(dependencies, {

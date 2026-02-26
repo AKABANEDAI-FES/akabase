@@ -1,10 +1,10 @@
 import { z } from "zod";
-import { Result } from "@praha/byethrow";
 import { db } from "@/db";
 import { deadlines } from "@/db/schema";
 import { asc, eq } from "drizzle-orm";
 import type { EventId } from "@/domain/shared/ids";
 import { deadlineIdSchema, eventIdSchema } from "@/domain/shared/ids";
+import { QueryException } from "../shared";
 
 /**
  * DTO schema for deadline list item
@@ -19,18 +19,13 @@ export const deadlineListItemSchema = z.object({
 
 export type DeadlineListItem = z.infer<typeof deadlineListItemSchema>;
 
-export type QueryError = {
-  code: "DATABASE_ERROR";
-  message: string;
-};
-
 /**
  * Get all deadlines for a specific event
  * Returns empty array if no deadlines found
+ *
+ * @throws {QueryException} When database operation fails
  */
-export async function listDeadlines(
-  eventId: EventId,
-): Promise<Result.Result<DeadlineListItem[], QueryError>> {
+export async function listDeadlines(eventId: EventId): Promise<DeadlineListItem[]> {
   try {
     const rows = await db.query.deadlines.findMany({
       where: eq(deadlines.eventId, eventId),
@@ -47,12 +42,8 @@ export async function listDeadlines(
       }),
     );
 
-    return Result.succeed(deadlineList);
+    return deadlineList;
   } catch (error) {
-    console.error("[Query Error] Failed to list deadlines", error);
-    return Result.fail({
-      code: "DATABASE_ERROR",
-      message: "締切一覧の取得に失敗しました。",
-    });
+    throw new QueryException("DATABASE_ERROR", "締切一覧の取得に失敗しました。", error);
   }
 }

@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { Result } from "@praha/byethrow";
 import { db } from "@/db";
 import { user } from "@/db/schema";
 import { eq, like } from "drizzle-orm";
@@ -7,6 +6,7 @@ import { userIdSchema } from "@/domain/shared/ids";
 import type { EventId } from "@/domain/shared/ids";
 import type { Actor } from "@/domain/authorization/schema";
 import { getCommitteeRoleForEvent } from "@/domain/authorization/logic";
+import { QueryException } from "../shared";
 
 /**
  * User search result DTO
@@ -19,11 +19,6 @@ export const userSearchResultSchema = z.object({
 
 export type UserSearchResult = z.infer<typeof userSearchResultSchema>;
 
-export type QueryError = {
-  code: "DATABASE_ERROR";
-  message: string;
-};
-
 /**
  * Search users by email
  *
@@ -35,12 +30,13 @@ export type QueryError = {
  * @param actor - The actor performing the search
  * @param eventId - Event ID to determine committee role
  * @returns List of matching users (max 10)
+ * @throws {QueryException} When database operation fails
  */
 export async function searchUsersByEmail(
   query: string,
   actor: Actor,
   eventId: EventId,
-): Promise<Result.Result<UserSearchResult[], QueryError>> {
+): Promise<UserSearchResult[]> {
   const committeeRole = getCommitteeRoleForEvent(actor, eventId);
   const condition =
     committeeRole === "default" ? eq(user.email, query) : like(user.email, `${query}%`);
@@ -64,12 +60,8 @@ export async function searchUsersByEmail(
       }),
     );
 
-    return Result.succeed(users);
+    return users;
   } catch (error) {
-    console.error("[Query Error] Failed to search users", error);
-    return Result.fail({
-      code: "DATABASE_ERROR",
-      message: "ユーザーの検索に失敗しました。",
-    });
+    throw new QueryException("DATABASE_ERROR", "ユーザーの検索に失敗しました。", error);
   }
 }

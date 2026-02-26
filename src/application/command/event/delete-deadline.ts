@@ -2,7 +2,6 @@ import type { Result } from "@praha/byethrow";
 import { gen } from "@/libs/result";
 import type { DeadlineId, EventId } from "@/domain/shared/ids";
 import type { EventError } from "@/domain/event/errors";
-import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
 import { eventResource } from "@/domain/authorization/logic";
@@ -22,7 +21,7 @@ export type DeleteDeadlineOutput = {
   eventId: EventId;
 };
 
-export type DeleteDeadlineError = EventError | RepositoryError | AuthorizationError;
+export type DeleteDeadlineError = EventError | AuthorizationError;
 
 /**
  * Delete a deadline
@@ -40,7 +39,7 @@ export async function deleteDeadline(
     yield* $(await deps.eventDomainService.resolveModifiableEvent(input.eventId));
 
     // Delete deadline
-    yield* $(await deps.eventRepo.deleteDeadline(input.eventId, input.deadlineId));
+    await deps.eventRepo.deleteDeadline(input.eventId, input.deadlineId);
 
     return { success: true as const, eventId: input.eventId };
   });

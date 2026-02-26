@@ -1,10 +1,10 @@
 import { z } from "zod";
-import { Result } from "@praha/byethrow";
 import { db } from "@/db";
 import { places } from "@/db/schema";
 import { asc, eq } from "drizzle-orm";
 import type { EventId } from "@/domain/shared/ids";
 import { eventIdSchema, placeIdSchema } from "@/domain/shared/ids";
+import { QueryException } from "../shared";
 
 /**
  * DTO schema for place list item
@@ -19,18 +19,13 @@ export const placeListItemSchema = z.object({
 
 export type PlaceListItem = z.infer<typeof placeListItemSchema>;
 
-export type QueryError = {
-  code: "DATABASE_ERROR";
-  message: string;
-};
-
 /**
  * Get all places for a specific event
  * Returns empty array if no places found
+ *
+ * @throws {QueryException} When database operation fails
  */
-export async function listPlaces(
-  eventId: EventId,
-): Promise<Result.Result<PlaceListItem[], QueryError>> {
+export async function listPlaces(eventId: EventId): Promise<PlaceListItem[]> {
   try {
     const rows = await db.query.places.findMany({
       where: eq(places.eventId, eventId),
@@ -47,12 +42,8 @@ export async function listPlaces(
       }),
     );
 
-    return Result.succeed(placeList);
+    return placeList;
   } catch (error) {
-    console.error("[Query Error] Failed to list places", error);
-    return Result.fail({
-      code: "DATABASE_ERROR",
-      message: "開催場所の一覧取得に失敗しました。",
-    });
+    throw new QueryException("DATABASE_ERROR", "開催場所の一覧取得に失敗しました。", error);
   }
 }

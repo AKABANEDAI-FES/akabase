@@ -3,26 +3,25 @@
  * Handles user data persistence using Drizzle ORM
  */
 
-import { Result } from "@praha/byethrow";
 import { db } from "@/db";
 import { committeeRoles, user as userTable } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import type { UserRepository } from "@/domain/user/repository";
 import type { CommitteeRoleAssignment, User } from "@/domain/user/schema";
 import type { EventId, UserId } from "@/domain/shared/ids";
-import type { RepositoryError } from "@/domain/shared/repository";
+import { RepositoryException } from "@/domain/shared/repository";
 import { cast } from "@/domain/shared/ids";
 import type { CommitteeRole } from "@/domain/authorization/schema";
 
 export class UserRepositoryImpl implements UserRepository {
-  async findById(userId: UserId): Promise<Result.Result<User | null, RepositoryError>> {
+  async findById(userId: UserId): Promise<User | null> {
     try {
       const row = await db.query.user.findFirst({
         where: eq(userTable.id, userId),
       });
 
       if (!row) {
-        return Result.succeed(null);
+        return null;
       }
 
       const user: User = {
@@ -36,17 +35,13 @@ export class UserRepositoryImpl implements UserRepository {
         updatedAt: new Date(row.updatedAt),
       };
 
-      return Result.succeed(user);
+      return user;
     } catch (error) {
-      console.error("[UserRepository] findById error:", error);
-      return Result.fail({
-        code: "DATABASE_ERROR",
-        message: "ユーザーの取得に失敗しました",
-      });
+      throw new RepositoryException("DATABASE_ERROR", "ユーザーの取得に失敗しました", error);
     }
   }
 
-  async listAll(): Promise<Result.Result<User[], RepositoryError>> {
+  async listAll(): Promise<User[]> {
     try {
       const rows = await db.query.user.findMany({
         orderBy: (user, { desc }) => [desc(user.createdAt)],
@@ -63,17 +58,13 @@ export class UserRepositoryImpl implements UserRepository {
         updatedAt: new Date(row.updatedAt),
       }));
 
-      return Result.succeed(users);
+      return users;
     } catch (error) {
-      console.error("[UserRepository] listAll error:", error);
-      return Result.fail({
-        code: "DATABASE_ERROR",
-        message: "ユーザー一覧の取得に失敗しました",
-      });
+      throw new RepositoryException("DATABASE_ERROR", "ユーザー一覧の取得に失敗しました", error);
     }
   }
 
-  async saveUser(user: User): Promise<Result.Result<void, RepositoryError>> {
+  async saveUser(user: User): Promise<void> {
     try {
       await db
         .insert(userTable)
@@ -100,21 +91,15 @@ export class UserRepositoryImpl implements UserRepository {
           },
         })
         .run();
-
-      return Result.succeed(undefined);
     } catch (error) {
-      console.error("[UserRepository] saveUser error:", error);
-      return Result.fail({
-        code: "DATABASE_ERROR",
-        message: "ユーザーの保存に失敗しました",
-      });
+      throw new RepositoryException("DATABASE_ERROR", "ユーザーの保存に失敗しました", error);
     }
   }
 
   async findCommitteeRoleAssignment(
     userId: UserId,
     eventId: EventId,
-  ): Promise<Result.Result<CommitteeRoleAssignment | null, RepositoryError>> {
+  ): Promise<CommitteeRoleAssignment | null> {
     try {
       const row = await db
         .select()
@@ -123,7 +108,7 @@ export class UserRepositoryImpl implements UserRepository {
         .get();
 
       if (!row) {
-        return Result.succeed(null);
+        return null;
       }
 
       const assignment: CommitteeRoleAssignment = {
@@ -134,19 +119,17 @@ export class UserRepositoryImpl implements UserRepository {
         createdAt: new Date(row.createdAt),
       };
 
-      return Result.succeed(assignment);
+      return assignment;
     } catch (error) {
-      console.error("[UserRepository] findCommitteeRoleAssignment error:", error);
-      return Result.fail({
-        code: "DATABASE_ERROR",
-        message: "委員会ロール割り当ての取得に失敗しました",
-      });
+      throw new RepositoryException(
+        "DATABASE_ERROR",
+        "委員会ロール割り当ての取得に失敗しました",
+        error,
+      );
     }
   }
 
-  async saveCommitteeRoleAssignment(
-    assignment: CommitteeRoleAssignment,
-  ): Promise<Result.Result<void, RepositoryError>> {
+  async saveCommitteeRoleAssignment(assignment: CommitteeRoleAssignment): Promise<void> {
     try {
       // UPSERT using onConflictDoUpdate
       await db
@@ -163,14 +146,12 @@ export class UserRepositoryImpl implements UserRepository {
           set: { role: assignment.role },
         })
         .run();
-
-      return Result.succeed(undefined);
     } catch (error) {
-      console.error("[UserRepository] saveCommitteeRoleAssignment error:", error);
-      return Result.fail({
-        code: "DATABASE_ERROR",
-        message: "委員会ロール割り当ての保存に失敗しました",
-      });
+      throw new RepositoryException(
+        "DATABASE_ERROR",
+        "委員会ロール割り当ての保存に失敗しました",
+        error,
+      );
     }
   }
 }

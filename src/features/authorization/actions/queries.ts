@@ -22,16 +22,12 @@ export const checkCommitteeRoleFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
   .handler(async ({ data, context }) => {
-    const actorResult = await resolveActor({
+    const actor = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
     });
 
-    if (Result.isFailure(actorResult)) {
-      throw new Error(actorResult.error.message);
-    }
-
-    const committeeRole = getCommitteeRoleForEvent(actorResult.value, data.eventId);
+    const committeeRole = getCommitteeRoleForEvent(actor, data.eventId);
 
     return {
       committeeRole,
@@ -57,16 +53,11 @@ export const checkCommitteePermissionsFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
   .handler(async ({ data, context }) => {
-    const actorResult = await resolveActor({
+    const actor = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
     });
 
-    if (Result.isFailure(actorResult)) {
-      throw new Error(actorResult.error.message);
-    }
-
-    const actor = actorResult.value;
     const { authService } = dependencies;
 
     const check = (resource: Resource, action: Action): boolean => {
@@ -117,17 +108,12 @@ export const checkOrganizationPermissionsFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema, orgId: orgIdSchema }))
   .handler(async ({ data, context }) => {
-    const actorResult = await resolveActor({
+    const actor = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
       orgIds: [data.orgId],
     });
 
-    if (Result.isFailure(actorResult)) {
-      throw new Error(actorResult.error.message);
-    }
-
-    const actor = actorResult.value;
     const { authService } = dependencies;
 
     const check = (resource: Resource, action: Action): boolean => {

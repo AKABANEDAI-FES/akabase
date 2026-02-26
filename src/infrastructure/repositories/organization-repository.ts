@@ -1,4 +1,3 @@
-import { Result } from "@praha/byethrow";
 import { db } from "@/db";
 import { orgMembers, organizations } from "@/db/schema";
 import { and, desc, eq } from "drizzle-orm";
@@ -6,17 +5,13 @@ import { orgMemberSchema, organizationSchema } from "@/domain/organization/schem
 import type { OrgMember, Organization } from "@/domain/organization/schema";
 import type { EventId, OrgId, UserId } from "@/domain/shared/ids";
 import type { OrganizationRepository } from "@/domain/organization/repository";
-import type { RepositoryError } from "@/domain/shared/repository";
-import { repositoryError } from "@/domain/shared/repository";
+import { RepositoryException } from "@/domain/shared/repository";
 
 /**
  * Organization Repository Implementation using Drizzle ORM
  */
 export class OrganizationRepositoryImpl implements OrganizationRepository {
-  async findById(
-    eventId: EventId,
-    id: OrgId,
-  ): Promise<Result.Result<Organization | null, RepositoryError>> {
+  async findById(eventId: EventId, id: OrgId): Promise<Organization | null> {
     try {
       const row = await db.query.organizations.findFirst({
         where: (organizations, { eq, and }) =>
@@ -24,7 +19,7 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
       });
 
       if (!row) {
-        return Result.succeed(null);
+        return null;
       }
 
       const organization = organizationSchema.parse({
@@ -37,13 +32,13 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
         updatedAt: new Date(row.updatedAt),
       });
 
-      return Result.succeed(organization);
+      return organization;
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to find organization", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to find organization", error);
     }
   }
 
-  async findMembers(orgId: OrgId): Promise<Result.Result<OrgMember[], RepositoryError>> {
+  async findMembers(orgId: OrgId): Promise<OrgMember[]> {
     try {
       const rows = await db.query.orgMembers.findMany({
         where: (orgMembers, { eq }) => eq(orgMembers.orgId, orgId),
@@ -60,15 +55,13 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
         }),
       );
 
-      return Result.succeed(members);
+      return members;
     } catch (error) {
-      return Result.fail(
-        repositoryError("DATABASE_ERROR", "Failed to find organization members", error),
-      );
+      throw new RepositoryException("DATABASE_ERROR", "Failed to find organization members", error);
     }
   }
 
-  async listByEvent(eventId: EventId): Promise<Result.Result<Organization[], RepositoryError>> {
+  async listByEvent(eventId: EventId): Promise<Organization[]> {
     try {
       const rows = await db.query.organizations.findMany({
         where: (organizations, { eq }) => eq(organizations.eventId, eventId),
@@ -87,13 +80,13 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
         }),
       );
 
-      return Result.succeed(orgList);
+      return orgList;
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to list organizations", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to list organizations", error);
     }
   }
 
-  async saveOrganization(org: Organization): Promise<Result.Result<void, RepositoryError>> {
+  async saveOrganization(org: Organization): Promise<void> {
     try {
       await db
         .insert(organizations)
@@ -117,28 +110,22 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
           },
           where: eq(organizations.eventId, org.eventId),
         });
-
-      return Result.succeed(undefined);
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to save organization", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to save organization", error);
     }
   }
 
-  async deleteOrganization(
-    eventId: EventId,
-    id: OrgId,
-  ): Promise<Result.Result<void, RepositoryError>> {
+  async deleteOrganization(eventId: EventId, id: OrgId): Promise<void> {
     try {
       await db
         .delete(organizations)
         .where(and(eq(organizations.id, id), eq(organizations.eventId, eventId)));
-      return Result.succeed(undefined);
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to delete organization", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to delete organization", error);
     }
   }
 
-  async saveMember(member: OrgMember): Promise<Result.Result<void, RepositoryError>> {
+  async saveMember(member: OrgMember): Promise<void> {
     try {
       await db
         .insert(orgMembers)
@@ -156,22 +143,18 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
             role: member.role,
           },
         });
-
-      return Result.succeed(undefined);
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to save member", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to save member", error);
     }
   }
 
-  async removeMember(orgId: OrgId, userId: UserId): Promise<Result.Result<void, RepositoryError>> {
+  async removeMember(orgId: OrgId, userId: UserId): Promise<void> {
     try {
       await db
         .delete(orgMembers)
         .where(and(eq(orgMembers.orgId, orgId), eq(orgMembers.userId, userId)));
-
-      return Result.succeed(undefined);
     } catch (error) {
-      return Result.fail(repositoryError("DATABASE_ERROR", "Failed to remove member", error));
+      throw new RepositoryException("DATABASE_ERROR", "Failed to remove member", error);
     }
   }
 }

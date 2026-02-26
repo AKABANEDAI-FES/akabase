@@ -29,11 +29,9 @@ export const createEventFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     return gen(async function* ($) {
       // Resolve actor from session (no event context needed for creation)
-      const actor = yield* $(
-        await resolveActor({
-          userId: cast<UserId>(context.session.user.id),
-        }),
-      );
+      const actor = await resolveActor({
+        userId: cast<UserId>(context.session.user.id),
+      });
 
       return yield* $(
         await createEvent(dependencies, {
@@ -69,12 +67,10 @@ export const updateEventFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     return await gen(async function* ($) {
       // Resolve actor with event context
-      const actor = yield* $(
-        await resolveActor({
-          userId: cast<UserId>(context.session.user.id),
-          eventIds: [data.id],
-        }),
-      );
+      const actor = await resolveActor({
+        userId: cast<UserId>(context.session.user.id),
+        eventIds: [data.id],
+      });
 
       return yield* $(
         await updateEvent(dependencies, {
@@ -107,12 +103,10 @@ export const archiveEventFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     return await gen(async function* ($) {
       // Resolve actor with event context
-      const actor = yield* $(
-        await resolveActor({
-          userId: cast<UserId>(context.session.user.id),
-          eventIds: [data.eventId],
-        }),
-      );
+      const actor = await resolveActor({
+        userId: cast<UserId>(context.session.user.id),
+        eventIds: [data.eventId],
+      });
 
       return yield* $(
         await archiveEvent(dependencies, {
@@ -142,12 +136,10 @@ export const activateEventFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     return await gen(async function* ($) {
       // Resolve actor with event context
-      const actor = yield* $(
-        await resolveActor({
-          userId: cast<UserId>(context.session.user.id),
-          eventIds: [data.eventId],
-        }),
-      );
+      const actor = await resolveActor({
+        userId: cast<UserId>(context.session.user.id),
+        eventIds: [data.eventId],
+      });
 
       return yield* $(
         await activateEvent(dependencies, {

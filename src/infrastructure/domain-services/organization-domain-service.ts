@@ -9,30 +9,19 @@ export class OrganizationDomainServiceImpl implements OrganizationDomainService 
   constructor(private readonly organizationRepo: OrganizationRepository) {}
 
   async ensureCanAddMember(orgId: OrgId, userId: UserId) {
-    const result = await this.organizationRepo.findMembers(orgId);
-    if (Result.isFailure(result)) {
-      return result;
-    }
-
-    return canAddMember(result.value, userId);
+    const members = await this.organizationRepo.findMembers(orgId);
+    return canAddMember(members, userId);
   }
 
   async ensureCanRemoveMember(orgId: OrgId, userId: UserId) {
-    const result = await this.organizationRepo.findMembers(orgId);
-    if (Result.isFailure(result)) {
-      return result;
-    }
-
-    return canRemoveMember(result.value, userId);
+    const members = await this.organizationRepo.findMembers(orgId);
+    return canRemoveMember(members, userId);
   }
 
   async ensureMemberExists(orgId: OrgId, userId: UserId) {
-    const result = await this.organizationRepo.findMembers(orgId);
-    if (Result.isFailure(result)) {
-      return result;
-    }
+    const members = await this.organizationRepo.findMembers(orgId);
 
-    const member = result.value.find((m) => m.userId === userId);
+    const member = members.find((m) => m.userId === userId);
     if (!member) {
       return Result.fail(
         organizationError(

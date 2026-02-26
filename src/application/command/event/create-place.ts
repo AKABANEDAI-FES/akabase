@@ -5,7 +5,6 @@ import type { EventId, PlaceId } from "@/domain/shared/ids";
 import type { EventError } from "@/domain/event/errors";
 import { EVENT_ERROR_CODE, eventError } from "@/domain/event/errors";
 import { createPlaceEntity } from "@/domain/event/logic";
-import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
 import { eventResource } from "@/domain/authorization/logic";
@@ -26,7 +25,7 @@ export type CreatePlaceOutput = {
   eventId: EventId;
 };
 
-export type CreatePlaceError = EventError | RepositoryError | AuthorizationError;
+export type CreatePlaceError = EventError | AuthorizationError;
 
 /**
  * Create a new place for an event
@@ -45,7 +44,7 @@ export async function createPlace(
 
     // Verify parent exists if parentId is provided
     if (input.parentId) {
-      const existingPlaces = yield* $(await deps.eventRepo.findPlaces(input.eventId));
+      const existingPlaces = await deps.eventRepo.findPlaces(input.eventId);
       const parentPlace = existingPlaces.find((p) => p.id === input.parentId);
       if (!parentPlace) {
         return yield* $(
@@ -75,7 +74,7 @@ export async function createPlace(
     );
 
     // Save place
-    yield* $(await deps.eventRepo.savePlace(place));
+    await deps.eventRepo.savePlace(place);
 
     return { placeId, eventId: input.eventId };
   });

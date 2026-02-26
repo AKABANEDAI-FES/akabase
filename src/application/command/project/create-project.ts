@@ -4,7 +4,6 @@ import { generateId } from "@/libs/id";
 import type { EventId, OrgId, PlaceId, ProjectId } from "@/domain/shared/ids";
 import type { ProjectError } from "@/domain/project/errors";
 import type { EventError } from "@/domain/event/errors";
-import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
 import { projectResource } from "@/domain/authorization/logic";
@@ -35,7 +34,7 @@ export type CreateProjectOutput = {
 /**
  * Errors that can occur during project creation
  */
-export type CreateProjectError = ProjectError | EventError | RepositoryError | AuthorizationError;
+export type CreateProjectError = ProjectError | EventError | AuthorizationError;
 
 /**
  * Create a new project
@@ -87,8 +86,8 @@ export async function createProject(
     );
 
     // Save project and draft
-    yield* $(await deps.projectRepo.saveProject(project));
-    yield* $(await deps.projectRepo.saveDraft(draft));
+    await deps.projectRepo.saveProject(project);
+    await deps.projectRepo.saveDraft(draft);
 
     return { orgId: project.orgId, projectId: project.id, eventId: project.eventId };
   });

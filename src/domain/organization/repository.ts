@@ -1,50 +1,54 @@
-import type { Result } from "@praha/byethrow";
 import type { OrgMember, Organization } from "./schema";
 import type { EventId, OrgId, UserId } from "@/domain/shared/ids";
-import type { RepositoryError } from "@/domain/shared/repository";
 
 /**
  * =============================================================================
  * Organization Repository
  * =============================================================================
+ * Repository methods throw RepositoryException on infrastructure failures.
+ * Returns null for "not found" scenarios (valid state, not an error).
  */
 
 export interface OrganizationRepository {
   /**
    * Find organization by ID
+   * @throws {RepositoryException} on database errors
    */
-  findById(
-    eventId: EventId,
-    id: OrgId,
-  ): Promise<Result.Result<Organization | null, RepositoryError>>;
+  findById(eventId: EventId, id: OrgId): Promise<Organization | null>;
 
   /**
    * Find organization members
+   * @throws {RepositoryException} on database errors
    */
-  findMembers(orgId: OrgId): Promise<Result.Result<OrgMember[], RepositoryError>>;
+  findMembers(orgId: OrgId): Promise<OrgMember[]>;
 
   /**
    * List all organizations for an event
+   * @throws {RepositoryException} on database errors
    */
-  listByEvent(eventId: EventId): Promise<Result.Result<Organization[], RepositoryError>>;
+  listByEvent(eventId: EventId): Promise<Organization[]>;
 
   /**
    * Save a new organization (upsert)
+   * @throws {RepositoryException} on database errors
    */
-  saveOrganization(org: Organization): Promise<Result.Result<void, RepositoryError>>;
+  saveOrganization(org: Organization): Promise<void>;
 
   /**
    * Save member (insert or update)
+   * @throws {RepositoryException} on database errors
    */
-  saveMember(member: OrgMember): Promise<Result.Result<void, RepositoryError>>;
+  saveMember(member: OrgMember): Promise<void>;
 
   /**
    * Remove a member
+   * @throws {RepositoryException} on database errors
    */
-  removeMember(orgId: OrgId, userId: UserId): Promise<Result.Result<void, RepositoryError>>;
+  removeMember(orgId: OrgId, userId: UserId): Promise<void>;
 
   /**
    * Delete an organization (scoped by eventId)
+   * @throws {RepositoryException} on database errors
    */
-  deleteOrganization(eventId: EventId, id: OrgId): Promise<Result.Result<void, RepositoryError>>;
+  deleteOrganization(eventId: EventId, id: OrgId): Promise<void>;
 }

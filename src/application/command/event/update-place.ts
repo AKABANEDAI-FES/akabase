@@ -4,7 +4,6 @@ import type { EventId, PlaceId } from "@/domain/shared/ids";
 import type { EventError } from "@/domain/event/errors";
 import { EVENT_ERROR_CODE, eventError } from "@/domain/event/errors";
 import { updatePlaceEntity } from "@/domain/event/logic";
-import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
 import { eventResource } from "@/domain/authorization/logic";
@@ -26,7 +25,7 @@ export type UpdatePlaceOutput = {
   eventId: EventId;
 };
 
-export type UpdatePlaceError = EventError | RepositoryError | AuthorizationError;
+export type UpdatePlaceError = EventError | AuthorizationError;
 
 /**
  * Update an existing place
@@ -44,7 +43,7 @@ export async function updatePlace(
     yield* $(await deps.eventDomainService.resolveModifiableEvent(input.eventId));
 
     // Find existing place
-    const existingPlaces = yield* $(await deps.eventRepo.findPlaces(input.eventId));
+    const existingPlaces = await deps.eventRepo.findPlaces(input.eventId);
     const existingPlace = existingPlaces.find((p) => p.id === input.placeId);
 
     if (!existingPlace) {
@@ -66,7 +65,7 @@ export async function updatePlace(
     // Update place (name only, parent cannot be changed)
     const updatedPlace = yield* $(updatePlaceEntity(existingPlace, { name: input.name }));
 
-    yield* $(await deps.eventRepo.savePlace(updatedPlace));
+    await deps.eventRepo.savePlace(updatedPlace);
 
     return { success: true as const, eventId: input.eventId };
   });

@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { Result } from "@praha/byethrow";
 import { db } from "@/db";
 import { organizations } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 import type { EventId } from "@/domain/shared/ids";
+import { QueryException } from "../shared";
 
 /**
  * DTO schema for organization list item
@@ -20,20 +20,14 @@ export const organizationListItemSchema = z.object({
 
 export type OrganizationListItem = z.infer<typeof organizationListItemSchema>;
 
-export type QueryError = {
-  code: "DATABASE_ERROR";
-  message: string;
-};
-
 /**
  * List all organizations for a specific event
  *
  * @param eventId - Event ID to filter organizations
  * @returns List of organizations sorted by creation date (newest first)
+ * @throws {QueryException} When database operation fails
  */
-export async function listOrganizations(
-  eventId: EventId,
-): Promise<Result.Result<OrganizationListItem[], QueryError>> {
+export async function listOrganizations(eventId: EventId): Promise<OrganizationListItem[]> {
   try {
     const rows = await db.query.organizations.findMany({
       where: eq(organizations.eventId, eventId),
@@ -52,12 +46,8 @@ export async function listOrganizations(
       }),
     );
 
-    return Result.succeed(orgList);
+    return orgList;
   } catch (error) {
-    console.error("[Query Error] Failed to list organizations", error);
-    return Result.fail({
-      code: "DATABASE_ERROR",
-      message: "団体一覧の取得に失敗しました。",
-    });
+    throw new QueryException("DATABASE_ERROR", "団体一覧の取得に失敗しました。", error);
   }
 }

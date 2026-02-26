@@ -1,15 +1,14 @@
 import { z } from "zod";
-import { Result } from "@praha/byethrow";
-import { gen } from "@/libs/result";
 import { db } from "@/db";
 import { projectIdSchema, userIdSchema } from "@/domain/shared/ids";
 import type { EventId, OrgId, ProjectId } from "@/domain/shared/ids";
 import { projectDraftSchema } from "@/domain/project/schema";
 import { tagSchema } from "@/domain/event/schema";
 import type { Actor } from "@/domain/authorization/schema";
-import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Dependencies } from "@/infrastructure/di";
 import { projectResource } from "@/domain/authorization/logic";
+import { QueryException } from "../shared";
+import { Result } from "@praha/byethrow";
 
 /**
  * DTO schema for project draft
@@ -25,11 +24,6 @@ export const draftDetailSchema = z.object({
 
 export type DraftDetail = z.infer<typeof draftDetailSchema>;
 
-export type QueryError = {
-  code: "DATABASE_ERROR" | "NOT_FOUND";
-  message: string;
-};
-
 /**
  * Get draft by project ID
  *
@@ -38,7 +32,8 @@ export type QueryError = {
  * @param deps - Dependencies (authService)
  * @param projectId - Project ID
  * @param actor - Actor (authenticated user with permissions)
- * @returns Result with draft detail or error
+ * @returns Draft detail or null if not found
+ * @throws {QueryException} When database operation fails or authorization is denied
  */
 export async function getDraft(
   deps: Pick<Dependencies, "authService">,
@@ -46,54 +41,51 @@ export async function getDraft(
   orgId: OrgId,
   projectId: ProjectId,
   actor: Actor,
-): Result.ResultAsync<DraftDetail | null, QueryError | AuthorizationError> {
-  return gen(async function* ($) {
-    try {
-      // Authorization check: project:read permission
-      yield* $(
-        deps.authService.enforce(actor, projectResource(projectId, eventId, orgId), "project:read"),
-      );
+): Promise<DraftDetail | null> {
+  // Authorization check: project:read permission
+  const authResult = deps.authService.enforce(
+    actor,
+    projectResource(projectId, eventId, orgId),
+    "project:read",
+  );
+  if (Result.isFailure(authResult)) {
+    throw new QueryException("VALIDATION_ERROR", authResult.error.message, authResult.error);
+  }
 
-      const project = await db.query.projects.findFirst({
-        where: (projects, { eq, and }) =>
-          and(eq(projects.id, projectId), eq(projects.eventId, eventId), eq(projects.orgId, orgId)),
-        with: {
-          draft: {
-            with: {
-              tags: {
-                with: {
-                  tag: true,
-                },
+  try {
+    const project = await db.query.projects.findFirst({
+      where: (projects, { eq, and }) =>
+        and(eq(projects.id, projectId), eq(projects.eventId, eventId), eq(projects.orgId, orgId)),
+      with: {
+        draft: {
+          with: {
+            tags: {
+              with: {
+                tag: true,
               },
             },
           },
         },
-      });
+      },
+    });
 
-      if (!project?.draft) {
-        return null;
-      }
-
-      const draftRow = project.draft;
-
-      const draft = draftDetailSchema.parse({
-        projectId: draftRow.projectId,
-        pamphletText: draftRow.pamphletText,
-        webContentJson: draftRow.webContentJson,
-        updatedAt: draftRow.updatedAt,
-        updatedBy: draftRow.updatedBy,
-        tags: draftRow.tags.map((t) => ({ id: t.tag.id, name: t.tag.name })),
-      });
-
-      return draft;
-    } catch (error) {
-      console.error("[Query Error] Failed to get draft", error);
-      return yield* $(
-        Result.fail({
-          code: "DATABASE_ERROR",
-          message: "下書きの取得に失敗しました。",
-        }),
-      );
+    if (!project?.draft) {
+      return null;
     }
-  });
+
+    const draftRow = project.draft;
+
+    const draft = draftDetailSchema.parse({
+      projectId: draftRow.projectId,
+      pamphletText: draftRow.pamphletText,
+      webContentJson: draftRow.webContentJson,
+      updatedAt: draftRow.updatedAt,
+      updatedBy: draftRow.updatedBy,
+      tags: draftRow.tags.map((t) => ({ id: t.tag.id, name: t.tag.name })),
+    });
+
+    return draft;
+  } catch (error) {
+    throw new QueryException("DATABASE_ERROR", "下書きの取得に失敗しました。", error);
+  }
 }

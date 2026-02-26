@@ -2,7 +2,6 @@ import type { Result } from "@praha/byethrow";
 import { gen } from "@/libs/result";
 import type { EventId, TagId } from "@/domain/shared/ids";
 import type { EventError } from "@/domain/event/errors";
-import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
 import { eventResource } from "@/domain/authorization/logic";
@@ -22,7 +21,7 @@ export type DeleteTagOutput = {
   eventId: EventId;
 };
 
-export type DeleteTagError = EventError | RepositoryError | AuthorizationError;
+export type DeleteTagError = EventError | AuthorizationError;
 
 /**
  * Delete a tag
@@ -42,7 +41,7 @@ export async function deleteTag(
     yield* $(await deps.eventDomainService.resolveModifiableEvent(input.eventId));
 
     // Delete tag
-    yield* $(await deps.eventRepo.deleteTag(input.eventId, input.tagId));
+    await deps.eventRepo.deleteTag(input.eventId, input.tagId);
 
     return { success: true as const, eventId: input.eventId };
   });

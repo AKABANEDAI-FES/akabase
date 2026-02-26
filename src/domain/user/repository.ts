@@ -1,12 +1,13 @@
 /**
  * User repository interface
  * Contract for user data persistence
+ *
+ * Repository methods throw RepositoryException on infrastructure failures.
+ * Returns null for "not found" scenarios (valid state, not an error).
  */
 
-import type { Result } from "@praha/byethrow";
 import type { CommitteeRoleAssignment, User } from "./schema";
 import type { EventId, UserId } from "@/domain/shared/ids";
-import type { RepositoryError } from "@/domain/shared/repository";
 
 export interface UserRepository {
   /**
@@ -14,25 +15,27 @@ export interface UserRepository {
    *
    * @param userId - User ID to search for
    * @returns User if found, null otherwise
+   * @throws {RepositoryException} on database errors
    */
-  findById(userId: UserId): Promise<Result.Result<User | null, RepositoryError>>;
+  findById(userId: UserId): Promise<User | null>;
 
   /**
    * List all users
    * Used for admin user management
    *
    * @returns List of all users
+   * @throws {RepositoryException} on database errors
    */
-  listAll(): Promise<Result.Result<User[], RepositoryError>>;
+  listAll(): Promise<User[]>;
 
   /**
    * Save user (insert or update)
    * Use domain logic functions to compute the user before calling this
    *
    * @param user - User entity to save
-   * @returns Success or repository error
+   * @throws {RepositoryException} on database errors
    */
-  saveUser(user: User): Promise<Result.Result<void, RepositoryError>>;
+  saveUser(user: User): Promise<void>;
 
   /**
    * Find committee role assignment
@@ -40,20 +43,19 @@ export interface UserRepository {
    * @param userId - User ID
    * @param eventId - Event ID
    * @returns CommitteeRoleAssignment if found, null otherwise
+   * @throws {RepositoryException} on database errors
    */
   findCommitteeRoleAssignment(
     userId: UserId,
     eventId: EventId,
-  ): Promise<Result.Result<CommitteeRoleAssignment | null, RepositoryError>>;
+  ): Promise<CommitteeRoleAssignment | null>;
 
   /**
    * Save committee role assignment (handles INSERT or UPDATE)
    * Use domain logic functions to create or update the assignment before calling this
    *
    * @param assignment - CommitteeRoleAssignment entity to save
-   * @returns Success or repository error
+   * @throws {RepositoryException} on database errors
    */
-  saveCommitteeRoleAssignment(
-    assignment: CommitteeRoleAssignment,
-  ): Promise<Result.Result<void, RepositoryError>>;
+  saveCommitteeRoleAssignment(assignment: CommitteeRoleAssignment): Promise<void>;
 }

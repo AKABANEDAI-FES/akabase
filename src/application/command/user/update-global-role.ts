@@ -10,7 +10,6 @@ import type { Actor, GlobalRole } from "@/domain/authorization/schema";
 import type { Dependencies } from "@/infrastructure/di";
 import type { UserError } from "@/domain/user/errors";
 import { userError } from "@/domain/user/errors";
-import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import { userResource } from "@/domain/authorization/logic";
 import { updateUserGlobalRole } from "@/domain/user/logic";
@@ -25,7 +24,7 @@ export type UpdateGlobalRoleOutput = {
   success: true;
 };
 
-export type UpdateGlobalRoleError = UserError | RepositoryError | AuthorizationError;
+export type UpdateGlobalRoleError = UserError | AuthorizationError;
 
 /**
  * Update a user's global role
@@ -46,14 +45,14 @@ export async function updateGlobalRole(
     const resource = userResource(input.userId);
     yield* $(deps.authService.enforce(input.actor, resource, "user:update_role"));
 
-    const user = yield* $(await deps.userRepo.findById(input.userId));
+    const user = await deps.userRepo.findById(input.userId);
     if (!user) {
       return yield* $(Result.fail(userError("USER_NOT_FOUND", "ユーザーが見つかりません")));
     }
 
     const updatedUser = updateUserGlobalRole(user, input.role);
 
-    yield* $(await deps.userRepo.saveUser(updatedUser));
+    await deps.userRepo.saveUser(updatedUser);
 
     return { success: true as const };
   });

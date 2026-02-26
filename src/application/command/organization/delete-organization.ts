@@ -4,7 +4,6 @@ import type { EventId, OrgId } from "@/domain/shared/ids";
 import type { OrganizationError } from "@/domain/organization/errors";
 import { ORGANIZATION_ERROR_CODE, organizationError } from "@/domain/organization/errors";
 import type { EventError } from "@/domain/event/errors";
-import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
 import { organizationResource } from "@/domain/authorization/logic";
@@ -24,11 +23,7 @@ export type DeleteOrganizationOutput = {
   eventId: EventId;
 };
 
-export type DeleteOrganizationError =
-  | OrganizationError
-  | EventError
-  | RepositoryError
-  | AuthorizationError;
+export type DeleteOrganizationError = OrganizationError | EventError | AuthorizationError;
 
 /**
  * Delete an organization
@@ -41,7 +36,7 @@ export async function deleteOrganization(
 ): Result.ResultAsync<DeleteOrganizationOutput, DeleteOrganizationError> {
   return gen(async function* ($) {
     // Fetch organization (scoped by eventId)
-    const organization = yield* $(await deps.organizationRepo.findById(input.eventId, input.orgId));
+    const organization = await deps.organizationRepo.findById(input.eventId, input.orgId);
     if (!organization) {
       return yield* $(
         Result.fail(
@@ -58,7 +53,7 @@ export async function deleteOrganization(
     yield* $(await deps.eventDomainService.resolveModifiableEvent(input.eventId));
 
     // Delete organization (scoped by eventId)
-    yield* $(await deps.organizationRepo.deleteOrganization(input.eventId, input.orgId));
+    await deps.organizationRepo.deleteOrganization(input.eventId, input.orgId);
 
     return { success: true as const, eventId: input.eventId };
   });

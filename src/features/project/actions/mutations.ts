@@ -33,12 +33,10 @@ export const createProjectFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     return gen(async function* ($) {
       // Resolve actor with event context
-      const actor = yield* $(
-        await resolveActor({
-          userId: cast<UserId>(context.session.user.id),
-          eventIds: [data.eventId],
-        }),
-      );
+      const actor = await resolveActor({
+        userId: cast<UserId>(context.session.user.id),
+        eventIds: [data.eventId],
+      });
 
       return yield* $(
         await createProject(dependencies, {
@@ -86,13 +84,11 @@ export const updateProjectDraftFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     return gen(async function* ($) {
       // Resolve actor with event and organization context
-      const actor = yield* $(
-        await resolveActor({
-          userId: cast<UserId>(context.session.user.id),
-          eventIds: [data.eventId],
-          orgIds: [data.orgId],
-        }),
-      );
+      const actor = await resolveActor({
+        userId: cast<UserId>(context.session.user.id),
+        eventIds: [data.eventId],
+        orgIds: [data.orgId],
+      });
 
       // Update draft (webContentJson set to null since rich editor is not implemented yet)
       return yield* $(

@@ -4,7 +4,6 @@ import type { DeadlineId, EventId } from "@/domain/shared/ids";
 import type { EventError } from "@/domain/event/errors";
 import { EVENT_ERROR_CODE, eventError } from "@/domain/event/errors";
 import { updateDeadlineEntity } from "@/domain/event/logic";
-import type { RepositoryError } from "@/domain/shared/repository";
 import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
 import { eventResource } from "@/domain/authorization/logic";
@@ -26,7 +25,7 @@ export type UpdateDeadlineOutput = {
   eventId: EventId;
 };
 
-export type UpdateDeadlineError = EventError | RepositoryError | AuthorizationError;
+export type UpdateDeadlineError = EventError | AuthorizationError;
 
 /**
  * Update an existing deadline
@@ -44,7 +43,7 @@ export async function updateDeadline(
     yield* $(await deps.eventDomainService.resolveModifiableEvent(input.eventId));
 
     // Find existing deadline
-    const existingDeadlines = yield* $(await deps.eventRepo.findDeadlines(input.eventId));
+    const existingDeadlines = await deps.eventRepo.findDeadlines(input.eventId);
     const existingDeadline = existingDeadlines.find((d) => d.id === input.deadlineId);
 
     if (!existingDeadline) {
@@ -58,7 +57,7 @@ export async function updateDeadline(
       updateDeadlineEntity(existingDeadline, { deadlineAt: input.deadlineAt }),
     );
 
-    yield* $(await deps.eventRepo.saveDeadline(updatedDeadline));
+    await deps.eventRepo.saveDeadline(updatedDeadline);
 
     return { success: true as const, eventId: input.eventId };
   });
