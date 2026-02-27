@@ -32,10 +32,15 @@ export type UploadImageInput = {
  * @param input - Upload input
  * @returns Result with image ID or error
  */
+export type UploadImageOutput = {
+  imageId: string;
+  objectKey: string;
+};
+
 export async function uploadImage(
   deps: Pick<Dependencies, "storageService">,
   input: UploadImageInput,
-): Promise<Result.Result<string, StorageError>> {
+): Promise<Result.Result<UploadImageOutput, StorageError>> {
   // Validate file size
   const size = input.file.byteLength;
   if (size > MAX_FILE_SIZE) {
@@ -78,5 +83,5 @@ export async function uploadImage(
     );
   }
 
-  return Result.succeed(id);
+  return Result.succeed({ imageId: id, objectKey });
 }

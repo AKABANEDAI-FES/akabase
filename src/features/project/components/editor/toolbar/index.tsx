@@ -5,6 +5,7 @@ import { HeadingSelect } from "./heading-select";
 import { MarkButton } from "./mark-button";
 import { ListButton } from "./list-button";
 import { TextAlignButton } from "./text-align-button";
+import { ImageUploadButton } from "./image-upload-button";
 import { ToolbarSeparator } from "./toolbar-separator";
 import { Maximize2Icon, Minimize2Icon } from "lucide-react";
 
@@ -50,6 +51,12 @@ export function Toolbar({ className, maximized, toggleMaximize }: Props) {
               <ToolbarGroup>
                 <ListButton type="bulletList" />
                 <ListButton type="orderedList" />
+              </ToolbarGroup>
+
+              <ToolbarSeparator />
+
+              <ToolbarGroup>
+                <ImageUploadButton />
               </ToolbarGroup>
 
               <ToolbarSeparator />

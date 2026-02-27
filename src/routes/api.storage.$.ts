@@ -38,6 +38,12 @@ export const Route = createFileRoute("/api/storage/$")({
       }) => {
         const formData = await request.formData();
         const file = formData.get("file") as File;
+        if (file instanceof File === false) {
+          return new Response(JSON.stringify({ message: "No file uploaded" }), {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
 
         const arrayBuffer = await file.arrayBuffer();
 
@@ -52,7 +58,9 @@ export const Route = createFileRoute("/api/storage/$")({
             headers: { "Content-Type": "application/json" },
           });
         }
-        return new Response(JSON.stringify({ imageId: result.value }), {
+        const { imageId, objectKey } = result.value;
+        const imageUrl = dependencies.storageService.getPublicUrl(objectKey);
+        return new Response(JSON.stringify({ imageId, url: imageUrl }), {
           status: 200,
           headers: { "Content-Type": "application/json" },
         });

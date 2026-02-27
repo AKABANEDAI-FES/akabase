@@ -50,8 +50,8 @@ export function ImageUpload({ currentImageUrl, onImageChange, disabled }: ImageU
       setPreviewUrl(objectUrl);
 
       uploadMutation.mutate(file, {
-        onSuccess: (imageId) => {
-          onImageChange(imageId);
+        onSuccess: (result) => {
+          onImageChange(result.imageId);
           toaster.create({
             type: "success",
             title: "アップロード完了",

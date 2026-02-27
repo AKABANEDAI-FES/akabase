@@ -34,6 +34,7 @@ export const richTextEditor = defineSlotRecipe({
       display: "grid",
       overflowY: "auto",
       bg: "gray.surface.bg",
+      textStyle: "md",
 
       // ProseMirror base styles
       "& .ProseMirror": {
@@ -124,6 +125,21 @@ export const richTextEditor = defineSlotRecipe({
         color: "colorPalette.solid.bg",
         textDecoration: "underline",
         cursor: "pointer",
+      },
+
+      // Image styles
+      "& .ProseMirror img": {
+        maxWidth: "100%",
+        height: "auto",
+        borderRadius: "l2",
+        display: "block",
+        marginX: "auto",
+        marginY: "1em",
+      },
+      "& .ProseMirror img.ProseMirror-selectednode": {
+        outline: "2px solid",
+        outlineColor: "colorPalette.solid.bg",
+        outlineOffset: "2px",
       },
 
       // Placeholder styles

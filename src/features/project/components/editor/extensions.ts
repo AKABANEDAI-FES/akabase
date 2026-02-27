@@ -1,5 +1,6 @@
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
+import Image from "@tiptap/extension-image";
 import type { Extensions } from "@tiptap/react";
 import TextAlign from "@tiptap/extension-text-align";
 
@@ -30,5 +31,11 @@ export const editorExtensions: Extensions = [
   }),
   TextAlign.configure({
     types: ["paragraph", "heading"], // Allow text alignment for paragraphs and headings
+  }),
+
+  // Image extension for inline image uploads
+  Image.configure({
+    inline: false,
+    allowBase64: false,
   }),
 ];

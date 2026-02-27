@@ -26,8 +26,8 @@ export async function uploadImage(file: File) {
     const errorData = await response.json<{ message?: string }>();
     throw new Error(errorData.message || STORAGE_ERROR_MESSAGES.UPLOAD_FAILED);
   }
-  const resultData = await response.json<{ imageId: string }>();
-  return resultData.imageId;
+  const resultData = await response.json<{ imageId: string; url: string }>();
+  return resultData;
 }
 
 export function useUploadImageMutation() {

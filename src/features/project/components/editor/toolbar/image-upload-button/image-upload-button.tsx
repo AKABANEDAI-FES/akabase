@@ -1,0 +1,106 @@
+import { memo, useCallback, useRef } from "react";
+import { ImageIcon, LoaderCircleIcon } from "lucide-react";
+import { useTiptapEditor } from "../../hooks/use-tiptap-editor";
+import { ToolbarButton } from "../toolbar-button";
+import { useUploadImageMutation } from "@/features/shared/actions/mutations";
+import { toaster } from "@/components/ui";
+import type { AllowedImageType } from "@/domain/shared/storage";
+import {
+  ALLOWED_IMAGE_TYPES,
+  MAX_FILE_SIZE,
+  STORAGE_ERROR_MESSAGES,
+} from "@/domain/shared/storage";
+import type { Editor } from "@tiptap/react";
+import { css } from "styled-system/css";
+
+const ACCEPT = ALLOWED_IMAGE_TYPES.join(",");
+
+export interface ImageUploadButtonProps {
+  editor?: Editor | null;
+}
+
+export const ImageUploadButton = memo<ImageUploadButtonProps>(({ editor: providedEditor }) => {
+  const { editor } = useTiptapEditor(providedEditor);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const uploadMutation = useUploadImageMutation();
+
+  const handleUpload = useCallback(
+    (file: File) => {
+      if (!editor) return;
+
+      if (file.size > MAX_FILE_SIZE) {
+        toaster.create({
+          type: "error",
+          title: "ファイルサイズエラー",
+          description: STORAGE_ERROR_MESSAGES.FILE_TOO_LARGE,
+        });
+        return;
+      }
+
+      if (!ALLOWED_IMAGE_TYPES.includes(file.type as AllowedImageType)) {
+        toaster.create({
+          type: "error",
+          title: "ファイル形式エラー",
+          description: STORAGE_ERROR_MESSAGES.INVALID_FILE_TYPE,
+        });
+        return;
+      }
+
+      uploadMutation.mutate(file, {
+        onSuccess: (result) => {
+          editor.chain().focus().setImage({ src: result.url }).run();
+        },
+        onError: (error) => {
+          toaster.create({
+            type: "error",
+            title: "アップロードエラー",
+            description: error.message,
+          });
+        },
+      });
+    },
+    [editor, uploadMutation],
+  );
+
+  const handleClick = useCallback(() => {
+    inputRef.current?.click();
+  }, []);
+
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) handleUpload(file);
+      if (inputRef.current) inputRef.current.value = "";
+    },
+    [handleUpload],
+  );
+
+  const isDisabled = !editor || !editor.isEditable || uploadMutation.isPending;
+
+  return (
+    <>
+      <ToolbarButton label="画像を挿入" disabled={isDisabled} onClick={handleClick}>
+        {uploadMutation.isPending ? <LoaderCircleIcon className={spinnerStyle} /> : <ImageIcon />}
+      </ToolbarButton>
+      <input
+        ref={inputRef}
+        type="file"
+        accept={ACCEPT}
+        onChange={handleInputChange}
+        className={hiddenInputStyle}
+        tabIndex={-1}
+        aria-hidden="true"
+      />
+    </>
+  );
+});
+
+ImageUploadButton.displayName = "ImageUploadButton";
+
+const hiddenInputStyle = css({
+  srOnly: true,
+});
+
+const spinnerStyle = css({
+  animation: "spin",
+});
