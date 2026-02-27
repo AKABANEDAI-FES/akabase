@@ -6,6 +6,7 @@ import { MarkButton } from "./mark-button";
 import { ListButton } from "./list-button";
 import { TextAlignButton } from "./text-align-button";
 import { ImageUploadButton } from "./image-upload-button";
+import { LinkButton } from "./link-button";
 import { ToolbarSeparator } from "./toolbar-separator";
 import { Maximize2Icon, Minimize2Icon } from "lucide-react";
 
@@ -57,6 +58,7 @@ export function Toolbar({ className, maximized, toggleMaximize }: Props) {
 
               <ToolbarGroup>
                 <ImageUploadButton />
+                <LinkButton />
               </ToolbarGroup>
 
               <ToolbarSeparator />
