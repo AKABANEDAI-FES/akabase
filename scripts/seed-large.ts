@@ -571,12 +571,11 @@ async function main() {
   }
   await db.insert(schema.places).values(roomInserts);
 
-  // ------ 締切 (4つ) ------
+  // ------ 締切 (3つ) ------
   console.log("締切を生成中...");
   const deadlineFields = [
     { key: "pamphlet_text", date: new Date("2025-09-30T23:59:59Z") },
     { key: "web_content", date: new Date("2025-10-15T23:59:59Z") },
-    { key: "logo", date: new Date("2025-09-15T23:59:59Z") },
     { key: "tags", date: new Date("2025-09-30T23:59:59Z") },
   ];
   await db.insert(schema.deadlines).values(
@@ -630,7 +629,7 @@ async function main() {
     eventId: string;
     name: string;
     description: string;
-    logoKey: string | null;
+    logoImageId: string | null;
     createdAt: Date;
     updatedAt: Date;
   }> = [];
@@ -653,7 +652,7 @@ async function main() {
       eventId,
       name: ORG_TEMPLATES[i % ORG_TEMPLATES.length],
       description: `${ORG_TEMPLATES[i % ORG_TEMPLATES.length]}の活動紹介`,
-      logoKey: null,
+      logoImageId: null,
       createdAt: baseTime,
       updatedAt: baseTime,
     });
@@ -723,7 +722,7 @@ async function main() {
     orgId: string;
     name: string;
     placeId: string | null;
-    logoKey: string | null;
+    logoImageId: string | null;
     createdAt: Date;
     updatedAt: Date;
   }> = [];
@@ -803,7 +802,7 @@ async function main() {
       orgId,
       name: template.name,
       placeId,
-      logoKey: null,
+      logoImageId: null,
       createdAt,
       updatedAt: createdAt,
     });
