@@ -16,6 +16,7 @@ import { Portal } from "@ark-ui/react/portal";
 import type { OrgId, ProjectId } from "@/domain/shared/ids";
 import { cast } from "@/domain/shared/ids";
 import z from "zod";
+import { LogoUploadField } from "./logo-upload-field";
 
 type ProjectBasicInfoFormProps = {
   projectId: string;
@@ -43,11 +44,13 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
     defaultValues: {
       name: project.name,
       placeId: project.placeId,
+      logoImageId: project.logoImageId,
     },
     validators: {
       onDynamic: z.object({
         name: updateProjectInputSchema.shape.name,
         placeId: updateProjectInputSchema.shape.placeId,
+        logoImageId: updateProjectInputSchema.shape.logoImageId,
       }),
       onSubmitAsync: async ({ value }) => {
         try {
@@ -57,6 +60,7 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
             orgId: cast<OrgId>(orgId),
             name: value.name,
             placeId: value.placeId,
+            logoImageId: value.logoImageId,
           });
 
           const result = await updateProjectMutate({ data: projectData });
@@ -93,6 +97,7 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
       form.reset({
         name: updatedProject.name,
         placeId: updatedProject.placeId,
+        logoImageId: updatedProject.logoImageId,
       });
 
       toaster.create({
@@ -170,6 +175,15 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
                 </Field.ErrorText>
               )}
             </Field.Root>
+          )}
+        </form.Field>
+
+        <form.Field name="logoImageId">
+          {(field) => (
+            <LogoUploadField
+              currentLogoUrl={project.logoUrl}
+              onLogoChange={(logoImageId) => field.handleChange(logoImageId)}
+            />
           )}
         </form.Field>
 

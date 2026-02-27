@@ -13,6 +13,7 @@ import { Stack } from "styled-system/jsx";
 import { useState } from "react";
 import { nl2br } from "@/libs/text";
 import type { EventId, OrgId } from "@/domain/shared/ids";
+import { LogoUploadField } from "./logo-upload-field";
 
 interface CreateProjectDialogProps {
   eventId: EventId;
@@ -48,7 +49,7 @@ export function CreateProjectDialog({
     defaultValues: {
       name: "",
       placeId: null as string | null,
-      logoKey: null as string | null,
+      logoImageId: null as string | null,
     },
     validators: {
       onDynamic: createProjectInputSchema.omit({ eventId: true, orgId: true }),
@@ -190,7 +191,14 @@ export function CreateProjectDialog({
                     )}
                   </form.Field>
 
-                  {/* TODO: ロゴアップロード機能は将来実装 */}
+                  {/* Logo upload field */}
+                  <form.Field name="logoImageId">
+                    {(field) => (
+                      <LogoUploadField
+                        onLogoChange={(logoImageId) => field.handleChange(logoImageId)}
+                      />
+                    )}
+                  </form.Field>
                 </Stack>
               </Dialog.Body>
               <Dialog.Footer>
