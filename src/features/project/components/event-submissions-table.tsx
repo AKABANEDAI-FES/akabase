@@ -65,14 +65,6 @@ const createColumns = (slug: string) => [
     filterFn: "arrIncludesSome",
   }),
   columnHelper.display({
-    id: "approvalCount",
-    header: "承認数",
-    cell: (info) => {
-      const row = info.row.original;
-      return `${row.approvalCount}/${row.requiredApprovals}`;
-    },
-  }),
-  columnHelper.display({
     id: "actions",
     header: "",
     cell: (info) => {

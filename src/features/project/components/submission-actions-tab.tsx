@@ -3,7 +3,6 @@ import { CheckCircleIcon, UndoIcon } from "lucide-react";
 import { Button, Card } from "@/components/ui";
 import type { SubmissionDetail } from "@/application/query/project/get-submission-detail";
 import type { EventId } from "@/domain/shared/ids";
-import { authClient } from "@/libs/auth-client";
 import { ApproveProjectDialog, ReturnProjectDialog } from "@/features/project/components";
 
 interface SubmissionActionsTabProps {
@@ -45,17 +44,11 @@ function ApproveSubmissionButton({
   submission: SubmissionDetail;
   eventId: EventId;
 }) {
-  const session = authClient.useSession();
-  const currentUserId = session.data?.user?.id;
-
   const alreadyApproved = submission.status === "approved";
-  const alreadyApprovedByMe = submission.actions.some(
-    (action) => action.actionType === "approved" && action.userId === currentUserId,
-  );
 
   return (
     <ApproveProjectDialog eventId={eventId} submissionId={submission.id}>
-      <Button colorPalette="green" disabled={alreadyApproved || alreadyApprovedByMe}>
+      <Button colorPalette="green" disabled={alreadyApproved}>
         <CheckCircleIcon />
         承認する
       </Button>

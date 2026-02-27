@@ -1,11 +1,7 @@
 import { z } from "zod";
 import { db, schema } from "@/db";
 import { eq } from "drizzle-orm";
-import {
-  REQUIRED_APPROVALS,
-  submissionActionTypeSchema,
-  submissionStatusSchema,
-} from "@/domain/project/schema";
+import { submissionActionTypeSchema, submissionStatusSchema } from "@/domain/project/schema";
 import {
   orgIdSchema,
   projectIdSchema,
@@ -14,13 +10,13 @@ import {
   submissionMessageIdSchema,
   userIdSchema,
 } from "@/domain/shared/ids";
-import type { EventId, SubmissionId } from "@/domain/shared/ids";
+import type { EventId, OrgId, SubmissionId } from "@/domain/shared/ids";
 import type { Actor } from "@/domain/authorization/schema";
-import { getCommitteeRoleForEvent } from "@/domain/authorization/logic";
+import { getCommitteeRoleForEvent, getOrgRoleForOrg } from "@/domain/authorization/logic";
 import { QueryException } from "../shared";
 
 /**
- * DTO schema for submission detail (committee view)
+ * DTO schema for submission detail
  */
 export const submissionDetailSchema = z.object({
   id: submissionIdSchema,
@@ -37,9 +33,6 @@ export const submissionDetailSchema = z.object({
   orgName: z.string(),
 
   tags: z.array(z.object({ id: z.string(), name: z.string() })),
-
-  approvalCount: z.number(),
-  requiredApprovals: z.number(),
 
   actions: z.array(
     z.object({
@@ -66,16 +59,35 @@ export const submissionDetailSchema = z.object({
 export type SubmissionDetail = z.infer<typeof submissionDetailSchema>;
 
 /**
- * Get submission detail for committee view
+ * Get submission detail
+ *
+ * Authorization:
+ * - If orgId is provided: Committee members OR organization members can view
+ * - If orgId is not provided: Committee members only can view
  */
 export async function getSubmissionDetail(
   eventId: EventId,
   submissionId: SubmissionId,
   actor: Actor,
+  orgId?: OrgId,
 ): Promise<SubmissionDetail | null> {
-  const committeeRole = getCommitteeRoleForEvent(actor, eventId);
-  if (committeeRole === "default") {
-    throw new QueryException("VALIDATION_ERROR", "委員会メンバーのみアクセス可能です。");
+  // Authorization: check if actor is committee member OR org member
+  const checkCommittee = () => {
+    const committeeRole = getCommitteeRoleForEvent(actor, eventId);
+    return committeeRole !== "default";
+  };
+  const checkOrg = () => {
+    if (orgId === undefined) return false;
+    const orgRole = getOrgRoleForOrg(actor, orgId);
+    return orgRole !== null;
+  };
+
+  // Must be either committee member or org member
+  if (!checkCommittee() && !checkOrg()) {
+    throw new QueryException(
+      "VALIDATION_ERROR",
+      "委員会メンバーまたはこの団体のメンバーのみアクセス可能です。",
+    );
   }
 
   try {
@@ -94,11 +106,14 @@ export async function getSubmissionDetail(
       },
     });
 
-    if (!submission || submission.project.eventId !== eventId) {
+    // Verify submission exists and belongs to the correct event (and optionally org)
+    if (
+      !submission ||
+      submission.project.eventId !== eventId ||
+      (orgId !== undefined && submission.project.orgId !== orgId)
+    ) {
       return null;
     }
-
-    const approvalCount = submission.actions.filter((a) => a.actionType === "approved").length;
 
     return submissionDetailSchema.parse({
       id: submission.id,
@@ -112,8 +127,6 @@ export async function getSubmissionDetail(
       orgId: submission.project.organization.id,
       orgName: submission.project.organization.name,
       tags: submission.tags.map((t) => ({ id: t.tag.id, name: t.tag.name })),
-      approvalCount,
-      requiredApprovals: REQUIRED_APPROVALS,
       actions: submission.actions.map((a) => ({
         id: a.id,
         actionType: a.actionType,

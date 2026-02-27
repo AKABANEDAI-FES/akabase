@@ -8,7 +8,6 @@ import { getProjectPublished } from "@/application/query/project/get-project-pub
 import { listSubmissions } from "@/application/query/project/list-submissions";
 import { listEventSubmissions } from "@/application/query/project/list-event-submissions";
 import { getSubmissionDetail } from "@/application/query/project/get-submission-detail";
-import { getSubmissionDetailForOrg } from "@/application/query/project/get-submission-detail-for-org";
 import { resolveActor } from "@/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/session-server";
 import {
@@ -261,14 +260,21 @@ export function generateLoadProjectPublishedQueryOptions(
  */
 export const loadSubmissionDetailFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
-  .inputValidator(z.object({ eventId: eventIdSchema, submissionId: submissionIdSchema }))
+  .inputValidator(
+    z.object({
+      eventId: eventIdSchema,
+      submissionId: submissionIdSchema,
+      orgId: orgIdSchema.optional(),
+    }),
+  )
   .handler(async ({ data, context }) => {
     const actor = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
+      orgIds: data.orgId ? [data.orgId] : undefined,
     });
 
-    const detail = await getSubmissionDetail(data.eventId, data.submissionId, actor);
+    const detail = await getSubmissionDetail(data.eventId, data.submissionId, actor, data.orgId);
     if (!detail) {
       throw new Error("提出が見つかりません。");
     }
@@ -279,65 +285,13 @@ export function generateLoadSubmissionDetailCacheKey(eventId: string, submission
   return ["submission-detail", [eventId, submissionId]];
 }
 
-export function generateLoadSubmissionDetailQueryOptions(eventId: string, submissionId: string) {
+export function generateLoadSubmissionDetailQueryOptions(
+  eventId: string,
+  submissionId: string,
+  orgId?: string,
+) {
   return queryOptions({
     queryKey: generateLoadSubmissionDetailCacheKey(eventId, submissionId),
-    queryFn: () => loadSubmissionDetailFn({ data: { eventId, submissionId } }),
-  });
-}
-
-/**
- * Server function to load submission detail for organization members
- */
-export const loadSubmissionDetailForOrgFn = createServerFn({ method: "GET" })
-  .middleware([authMiddleware])
-  .inputValidator(
-    z.object({
-      eventId: eventIdSchema,
-      orgId: orgIdSchema,
-      projectId: projectIdSchema,
-      submissionId: submissionIdSchema,
-    }),
-  )
-  .handler(async ({ data, context }) => {
-    const actor = await resolveActor({
-      userId: cast<UserId>(context.session.user.id),
-      eventIds: [data.eventId],
-      orgIds: [data.orgId],
-    });
-
-    const detail = await getSubmissionDetailForOrg(
-      data.eventId,
-      data.orgId,
-      data.projectId,
-      data.submissionId,
-      actor,
-    );
-
-    if (!detail) {
-      throw new Error("提出が見つかりません。");
-    }
-    return detail;
-  });
-
-export function generateLoadSubmissionDetailForOrgCacheKey(
-  eventId: string,
-  orgId: string,
-  projectId: string,
-  submissionId: string,
-) {
-  return ["submission-detail-for-org", [eventId, orgId, projectId, submissionId]];
-}
-
-export function generateLoadSubmissionDetailForOrgQueryOptions(
-  eventId: string,
-  orgId: string,
-  projectId: string,
-  submissionId: string,
-) {
-  return queryOptions({
-    queryKey: generateLoadSubmissionDetailForOrgCacheKey(eventId, orgId, projectId, submissionId),
-    queryFn: () =>
-      loadSubmissionDetailForOrgFn({ data: { eventId, orgId, projectId, submissionId } }),
+    queryFn: () => loadSubmissionDetailFn({ data: { eventId, submissionId, orgId } }),
   });
 }

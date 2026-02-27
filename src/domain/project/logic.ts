@@ -8,7 +8,6 @@ import type {
   SubmissionWithTags,
 } from "./schema";
 import {
-  REQUIRED_APPROVALS,
   draftWithTagsSchema,
   projectSchema,
   publishedWithTagsSchema,
@@ -340,19 +339,6 @@ export function createPublishedEntity(input: {
  * Business Rule Validations
  * =============================================================================
  */
-
-/**
- * Check if approval count has reached the required threshold for auto-approval
- *
- * Business rule:
- * - When approval count reaches REQUIRED_APPROVALS, submission automatically becomes 'approved'
- *
- * @param approvalCount - Current number of approvals
- * @returns true if threshold reached, false otherwise
- */
-export function shouldAutoApprove(approvalCount: number): boolean {
-  return approvalCount >= REQUIRED_APPROVALS;
-}
 
 /**
  * Check if a submission can be approved

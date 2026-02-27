@@ -81,17 +81,16 @@ export interface ProjectRepository {
 
   /**
    * Approve submission with transaction safety
-   * Atomically: saves approval action, optionally saves approval message, counts approvals,
-   * and if threshold reached, updates submission status and saves published data
+   * Atomically: saves approval action, optionally saves approval message,
+   * updates submission status to 'approved', and saves published data
    * @throws {RepositoryException} on database errors
    */
   approveWithTransaction(params: {
     approvalAction: SubmissionAction;
     approvalMessage?: SubmissionMessage;
     submission: SubmissionWithTags;
-    published?: PublishedWithTags;
-    requiredApprovals: number;
-  }): Promise<{ approvalCount: number; statusChanged: boolean }>;
+    published: PublishedWithTags;
+  }): Promise<void>;
 
   /**
    * Return submission with transaction safety

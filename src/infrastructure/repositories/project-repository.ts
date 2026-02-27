@@ -19,7 +19,6 @@ import {
   submissionActionSchema,
   submissionWithTagsSchema,
 } from "@/domain/project/schema";
-import { shouldAutoApprove } from "@/domain/project/logic";
 import type {
   DraftWithTags,
   Project,
@@ -349,15 +348,9 @@ export class ProjectRepositoryImpl implements ProjectRepository {
     approvalAction: SubmissionAction;
     approvalMessage?: SubmissionMessage;
     submission: SubmissionWithTags;
-    published?: PublishedWithTags;
-    requiredApprovals: number;
-  }): Promise<{ approvalCount: number; statusChanged: boolean }> {
+    published: PublishedWithTags;
+  }): Promise<void> {
     try {
-      // Pre-check: count current approvals BEFORE adding the new one
-      const currentCount = await this.countApprovalActions(params.submission.id);
-      const newCount = currentCount + 1; // After adding this approval
-      const willReachThreshold = shouldAutoApprove(newCount);
-
       // Build batch operations
       const query: [BatchItem<"sqlite">, ...BatchItem<"sqlite">[]] = [
         // 1. Save approval action
@@ -384,71 +377,66 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         );
       }
 
-      // 3. If threshold will be reached, update submission status
-      if (willReachThreshold) {
+      // 3. Always update submission status to 'approved'
+      query.push(
+        db
+          .update(projectSubmissions)
+          .set({ status: "approved" })
+          .where(eq(projectSubmissions.id, params.submission.id)),
+      );
+
+      // 4. Update project updatedAt
+      query.push(
+        db
+          .update(projects)
+          .set({ updatedAt: new Date() })
+          .where(eq(projects.id, params.submission.projectId)),
+      );
+
+      // 5. Always save published data (UPSERT)
+      const published = params.published;
+      query.push(
+        db
+          .insert(projectPublished)
+          .values({
+            projectId: published.projectId,
+            pamphletText: published.pamphletText,
+            webContentJson: published.webContentJson,
+            publishedAt: published.publishedAt,
+            publishedBy: published.publishedBy,
+          })
+          .onConflictDoUpdate({
+            target: projectPublished.projectId,
+            set: {
+              pamphletText: published.pamphletText,
+              webContentJson: published.webContentJson,
+              publishedAt: published.publishedAt,
+              publishedBy: published.publishedBy,
+            },
+          }),
+      );
+
+      // 6. Delete and re-insert published tags
+      query.push(
+        db
+          .delete(projectPublishedTags)
+          .where(eq(projectPublishedTags.projectId, published.projectId)),
+      );
+
+      if (published.tags.length > 0) {
         query.push(
-          db
-            .update(projectSubmissions)
-            .set({ status: "approved" })
-            .where(eq(projectSubmissions.id, params.submission.id)),
+          db.insert(projectPublishedTags).values(
+            published.tags.map((tagId) => ({
+              id: generateId(),
+              projectId: published.projectId,
+              tagId,
+            })),
+          ),
         );
-
-        query.push(
-          db
-            .update(projects)
-            .set({ updatedAt: new Date() })
-            .where(eq(projects.id, params.submission.projectId)),
-        );
-
-        // 4. Save published data if provided
-        if (params.published) {
-          const published = params.published;
-          query.push(
-            db
-              .insert(projectPublished)
-              .values({
-                projectId: published.projectId,
-                pamphletText: published.pamphletText,
-                webContentJson: published.webContentJson,
-                publishedAt: published.publishedAt,
-                publishedBy: published.publishedBy,
-              })
-              .onConflictDoUpdate({
-                target: projectPublished.projectId,
-                set: {
-                  pamphletText: published.pamphletText,
-                  webContentJson: published.webContentJson,
-                  publishedAt: published.publishedAt,
-                  publishedBy: published.publishedBy,
-                },
-              }),
-          );
-
-          // Delete and re-insert published tags
-          query.push(
-            db
-              .delete(projectPublishedTags)
-              .where(eq(projectPublishedTags.projectId, published.projectId)),
-          );
-
-          if (published.tags.length > 0) {
-            query.push(
-              db.insert(projectPublishedTags).values(
-                published.tags.map((tagId) => ({
-                  id: generateId(),
-                  projectId: published.projectId,
-                  tagId,
-                })),
-              ),
-            );
-          }
-        }
       }
 
       // Execute all operations atomically
       await db.batch(query);
-
-      return { approvalCount: newCount, statusChanged: willReachThreshold };
     } catch (error) {
       throw new RepositoryException("DATABASE_ERROR", "Failed to approve with transaction", error);
     }

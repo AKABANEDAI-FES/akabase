@@ -11,10 +11,10 @@ import {
   SubmissionStatusBadge,
 } from "@/features/project/components";
 import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions/queries";
-import { generateLoadSubmissionDetailForOrgQueryOptions } from "@/features/project/actions/queries";
 import { generateCheckOrganizationPermissionsQueryOptions } from "@/features/authorization/actions/queries";
 import { cast } from "@/domain/shared/ids";
-import type { OrgId, ProjectId } from "@/domain/shared/ids";
+import type { OrgId } from "@/domain/shared/ids";
+import { generateLoadSubmissionDetailQueryOptions } from "@/features/project/actions";
 
 export const Route = createFileRoute(
   "/_authenticated/$slug/orgs/$orgId_/projects/$projectId/submissions_/$submissionId",
@@ -25,11 +25,10 @@ export const Route = createFileRoute(
     );
     await Promise.all([
       context.queryClient.ensureQueryData(
-        generateLoadSubmissionDetailForOrgQueryOptions(
+        generateLoadSubmissionDetailQueryOptions(
           event.id,
-          cast<OrgId>(params.orgId),
-          cast<ProjectId>(params.projectId),
           params.submissionId,
+          cast<OrgId>(params.orgId),
         ),
       ),
       context.queryClient.ensureQueryData(
@@ -44,12 +43,7 @@ function OrgSubmissionDetailPage() {
   const { slug, orgId, projectId, submissionId } = Route.useParams();
   const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
   const { data: submission } = useSuspenseQuery(
-    generateLoadSubmissionDetailForOrgQueryOptions(
-      event.id,
-      cast<OrgId>(orgId),
-      cast<ProjectId>(projectId),
-      submissionId,
-    ),
+    generateLoadSubmissionDetailQueryOptions(event.id, submissionId, cast<OrgId>(orgId)),
   );
   const { data: permissions } = useSuspenseQuery(
     generateCheckOrganizationPermissionsQueryOptions(event.id, orgId),
@@ -114,7 +108,6 @@ function OrgSubmissionDetailPage() {
                 submission={submission}
                 eventId={event.id}
                 orgId={cast<OrgId>(orgId)}
-                projectId={cast<ProjectId>(projectId)}
               />
             </Tabs.Content>
           )}

@@ -22,11 +22,6 @@ export const SUBMISSION_MESSAGE_MIN_LENGTH = 1;
 export const SUBMISSION_MESSAGE_MAX_LENGTH = 200;
 
 /**
- * Approval constraints
- */
-export const REQUIRED_APPROVALS = 1; // 必要な承認数
-
-/**
  * Project (Aggregate Root)
  * 企画の集約ルート
  */

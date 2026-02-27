@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { db, schema } from "@/db";
-import { desc, eq, sql } from "drizzle-orm";
-import { REQUIRED_APPROVALS, submissionStatusSchema } from "@/domain/project/schema";
+import { desc, eq } from "drizzle-orm";
+import { submissionStatusSchema } from "@/domain/project/schema";
 import { orgIdSchema, projectIdSchema, submissionIdSchema } from "@/domain/shared/ids";
 import type { EventId } from "@/domain/shared/ids";
 import type { Actor } from "@/domain/authorization/schema";
@@ -25,10 +25,6 @@ export const eventSubmissionListItemSchema = z.object({
   // Organization info
   orgId: orgIdSchema,
   orgName: z.string(),
-
-  // Approval info
-  approvalCount: z.number(),
-  requiredApprovals: z.number(), // REQUIRED_APPROVALS constant
 });
 
 export type EventSubmissionListItem = z.infer<typeof eventSubmissionListItemSchema>;
@@ -54,18 +50,6 @@ export async function listEventSubmissions(
   }
 
   try {
-    const approvalCountExpr = sql<number>`
-      coalesce(
-        (
-          select count(distinct ${schema.submissionActions.userId})
-          from ${schema.submissionActions}
-          where ${schema.submissionActions.submissionId} = ${schema.projectSubmissions.id}
-            and ${schema.submissionActions.actionType} = 'approved'
-        ),
-        0
-      )
-    `;
-
     const rows = await db
       .select({
         // Submission info
@@ -81,9 +65,6 @@ export async function listEventSubmissions(
         // Organization info
         orgId: schema.organizations.id,
         orgName: schema.organizations.name,
-
-        // Approval info
-        approvalCount: approvalCountExpr,
       })
       .from(schema.projectSubmissions)
       .innerJoin(schema.projects, eq(schema.projectSubmissions.projectId, schema.projects.id))
@@ -102,8 +83,6 @@ export async function listEventSubmissions(
         projectName: row.projectName,
         orgId: row.orgId,
         orgName: row.orgName,
-        approvalCount: row.approvalCount,
-        requiredApprovals: REQUIRED_APPROVALS,
       }),
     );
   } catch (error) {

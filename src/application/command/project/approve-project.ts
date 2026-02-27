@@ -21,7 +21,6 @@ import {
   createPublishedEntity,
   createSubmissionMessageEntity,
 } from "@/domain/project/logic";
-import { REQUIRED_APPROVALS } from "@/domain/project/schema";
 import type { SubmissionMessage } from "@/domain/project/schema";
 import type { Dependencies } from "@/infrastructure/di";
 
@@ -42,8 +41,6 @@ export type ApproveProjectOutput = {
   orgId: OrgId;
   projectId: ProjectId;
   submissionId: SubmissionId;
-  approvalCount: number;
-  statusChanged: boolean;
 };
 
 /**
@@ -104,12 +101,7 @@ export async function approveProject(
     // 5. Domain Logic: Check submission status
     yield* $(canApprove(submission));
 
-    // 6. Domain Service: Ensure user has not already approved
-    yield* $(
-      await deps.projectDomainService.ensureUserNotApproved(input.submissionId, input.actor.userId),
-    );
-
-    // 7. Generate IDs
+    // 6. Generate IDs
     const approvalActionId = generateId<SubmissionActionId>();
 
     // 8. Create approval action entity
@@ -121,7 +113,7 @@ export async function approveProject(
       }),
     );
 
-    // 9. Create Published entity (prepare in case threshold is reached)
+    // 9. Create Published entity (will be saved immediately)
     const updatedSubmission = { ...submission, status: "approved" as const };
     const published = yield* $(
       createPublishedEntity({
@@ -147,14 +139,13 @@ export async function approveProject(
     }
 
     // 11. Execute approval with transaction safety
-    // This atomically: saves approval action, saves message, counts approvals,
-    // and if threshold reached, updates status and saves published data
-    const { approvalCount, statusChanged } = await deps.projectRepo.approveWithTransaction({
+    // This atomically: saves approval action, saves message,
+    // updates submission status to 'approved', and saves published data
+    await deps.projectRepo.approveWithTransaction({
       approvalAction,
       approvalMessage,
       submission,
       published,
-      requiredApprovals: REQUIRED_APPROVALS,
     });
 
     // 12. Return output
@@ -163,8 +154,6 @@ export async function approveProject(
       orgId: project.orgId,
       projectId: project.id,
       submissionId: input.submissionId,
-      approvalCount,
-      statusChanged,
     };
   });
 }

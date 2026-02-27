@@ -22,7 +22,6 @@ import {
   generateLoadEventSubmissionsCacheKey,
   generateLoadProjectsCacheKey,
   generateLoadSubmissionDetailCacheKey,
-  generateLoadSubmissionDetailForOrgCacheKey,
   generateLoadSubmissionsCacheKey,
 } from "./queries";
 import { gen } from "@/libs/result";
@@ -183,12 +182,7 @@ export function useSubmitProjectMutation() {
       });
       // Invalidate submission detail cache (org view)
       queryClient.invalidateQueries({
-        queryKey: generateLoadSubmissionDetailForOrgCacheKey(
-          eventId,
-          orgId,
-          projectId,
-          submissionId,
-        ),
+        queryKey: generateLoadSubmissionDetailCacheKey(eventId, submissionId),
       });
     }),
   });
@@ -350,15 +344,6 @@ export function useWithdrawSubmissionMutation() {
       // Invalidate submission detail cache (committee view)
       queryClient.invalidateQueries({
         queryKey: generateLoadSubmissionDetailCacheKey(eventId, submissionId),
-      });
-      // Invalidate submission detail cache (org view)
-      queryClient.invalidateQueries({
-        queryKey: generateLoadSubmissionDetailForOrgCacheKey(
-          eventId,
-          orgId,
-          projectId,
-          submissionId,
-        ),
       });
       // Invalidate project-specific submissions cache
       queryClient.invalidateQueries({
