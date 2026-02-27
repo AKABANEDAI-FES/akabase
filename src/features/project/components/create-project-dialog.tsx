@@ -165,18 +165,16 @@ export function CreateProjectDialog({
                               <Select.Indicator />
                             </Select.Trigger>
                           </Select.Control>
-                          <Portal>
-                            <Select.Positioner>
-                              <Select.Content>
-                                {placesCollection.items.map((option) => (
-                                  <Select.Item key={option.value} item={option}>
-                                    <Select.ItemText>{option.label}</Select.ItemText>
-                                    <Select.ItemIndicator />
-                                  </Select.Item>
-                                ))}
-                              </Select.Content>
-                            </Select.Positioner>
-                          </Portal>
+                          <Select.Positioner>
+                            <Select.Content>
+                              {placesCollection.items.map((option) => (
+                                <Select.Item key={option.value} item={option}>
+                                  <Select.ItemText>{option.label}</Select.ItemText>
+                                  <Select.ItemIndicator />
+                                </Select.Item>
+                              ))}
+                            </Select.Content>
+                          </Select.Positioner>
                         </Select.Root>
                         {!field.state.meta.isValid && (
                           <Field.ErrorText>
