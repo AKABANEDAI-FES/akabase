@@ -4,7 +4,7 @@ import { orgMemberSchema, organizationSchema } from "./schema";
 import type { OrganizationError } from "./errors";
 import { ORGANIZATION_ERROR_CODE, organizationError } from "./errors";
 import { DOMAIN_ERROR_CODE } from "../shared/errors";
-import type { EventId, OrgId, UserId } from "../shared/ids";
+import type { EventId, ImageId, OrgId, UserId } from "../shared/ids";
 
 /**
  * =============================================================================
@@ -123,7 +123,7 @@ export function createOrganizationEntity(input: {
   eventId: EventId;
   name: string;
   description: string | null;
-  logoKey: string | null;
+  logoImageId: ImageId | null;
   now?: Date;
 }): Result.Result<Organization, OrganizationError> {
   const now = input.now ?? new Date();
@@ -132,7 +132,7 @@ export function createOrganizationEntity(input: {
     eventId: input.eventId,
     name: input.name,
     description: input.description ?? "",
-    logoKey: input.logoKey,
+    logoImageId: input.logoImageId,
     createdAt: now,
     updatedAt: now,
   };
@@ -157,14 +157,14 @@ export function createOrganizationEntity(input: {
  */
 export function updateOrganizationEntity(
   org: Organization,
-  input: { name?: string; description?: string; logoKey?: string | null },
+  input: { name?: string; description?: string; logoImageId?: ImageId | null },
 ): Result.Result<Organization, OrganizationError> {
   // Build updated organization
   const updated = {
     ...org,
     name: input.name ?? org.name,
     description: input.description ?? org.description,
-    logoKey: input.logoKey !== undefined ? input.logoKey : org.logoKey,
+    logoImageId: input.logoImageId !== undefined ? input.logoImageId : org.logoImageId,
     updatedAt: new Date(),
   };
 

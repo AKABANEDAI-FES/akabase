@@ -131,6 +131,27 @@ export const committeeRoles = sqliteTable(
 );
 
 // ============================================================================
+// Storage Context (Shared)
+// ============================================================================
+
+/**
+ * Image (アップロード画像)
+ * R2にアップロードされた画像のメタデータ
+ */
+export const images = sqliteTable("images", {
+  id: text("id").primaryKey(),
+  objectKey: text("object_key").notNull().unique(),
+  contentType: text("content_type").notNull(),
+  size: integer("size").notNull(),
+  uploadedBy: text("uploaded_by")
+    .notNull()
+    .references(() => user.id),
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
+    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+    .notNull(),
+});
+
+// ============================================================================
 // Organization Context
 // ============================================================================
 
@@ -147,7 +168,9 @@ export const organizations = sqliteTable(
       .references(() => events.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     description: text("description").notNull(),
-    logoKey: text("logo_key"), // R2 storage key
+    logoImageId: text("logo_image_id").references(() => images.id, {
+      onDelete: "set null",
+    }),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .notNull(),
@@ -206,7 +229,9 @@ export const projects = sqliteTable(
       .references(() => organizations.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     placeId: text("place_id").references(() => places.id),
-    logoKey: text("logo_key"), // R2 storage key
+    logoImageId: text("logo_image_id").references(() => images.id, {
+      onDelete: "set null",
+    }),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .notNull(),
@@ -468,10 +493,21 @@ export const committeeRolesRelations = relations(committeeRoles, ({ one }) => ({
   }),
 }));
 
+export const imagesRelations = relations(images, ({ one }) => ({
+  uploadedByUser: one(user, {
+    fields: [images.uploadedBy],
+    references: [user.id],
+  }),
+}));
+
 export const organizationsRelations = relations(organizations, ({ one, many }) => ({
   event: one(events, {
     fields: [organizations.eventId],
     references: [events.id],
+  }),
+  logoImage: one(images, {
+    fields: [organizations.logoImageId],
+    references: [images.id],
   }),
   members: many(orgMembers),
   projects: many(projects),
@@ -500,6 +536,10 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
   place: one(places, {
     fields: [projects.placeId],
     references: [places.id],
+  }),
+  logoImage: one(images, {
+    fields: [projects.logoImageId],
+    references: [images.id],
   }),
   draft: one(projectDrafts, {
     fields: [projects.id],
@@ -630,6 +670,10 @@ export const selectDeadlineSchema = createSelectSchema(deadlines);
 export const insertCommitteeRoleSchema = createInsertSchema(committeeRoles);
 export const selectCommitteeRoleSchema = createSelectSchema(committeeRoles);
 
+// Storage Context Schemas
+export const insertImageSchema = createInsertSchema(images);
+export const selectImageSchema = createSelectSchema(images);
+
 // Organization Context Schemas
 export const insertOrganizationSchema = createInsertSchema(organizations);
 export const selectOrganizationSchema = createSelectSchema(organizations);
@@ -667,6 +711,9 @@ export const insertSubmissionActionSchema = createInsertSchema(submissionActions
 export const selectSubmissionActionSchema = createSelectSchema(submissionActions);
 
 // Type exports for convenience
+export type InsertImage = z.infer<typeof insertImageSchema>;
+export type SelectImage = z.infer<typeof selectImageSchema>;
+
 export type InsertEvent = z.infer<typeof insertEventSchema>;
 export type SelectEvent = z.infer<typeof selectEventSchema>;
 

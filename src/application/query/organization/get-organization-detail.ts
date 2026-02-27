@@ -16,7 +16,7 @@ export const organizationDetailSchema = z.object({
   eventId: eventIdSchema,
   name: z.string(),
   description: z.string(),
-  logoKey: z.string().nullable(),
+  logoImageId: z.string().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
@@ -66,7 +66,7 @@ export async function getOrganizationDetail(
       eventId: row.eventId,
       name: row.name,
       description: row.description,
-      logoKey: row.logoKey,
+      logoImageId: row.logoImageId,
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
     });

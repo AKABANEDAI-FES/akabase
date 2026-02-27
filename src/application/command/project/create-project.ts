@@ -1,7 +1,7 @@
 import type { Result } from "@praha/byethrow";
 import { gen } from "@/libs/result";
 import { generateId } from "@/libs/id";
-import type { EventId, OrgId, PlaceId, ProjectId } from "@/domain/shared/ids";
+import type { EventId, ImageId, OrgId, PlaceId, ProjectId } from "@/domain/shared/ids";
 import type { ProjectError } from "@/domain/project/errors";
 import type { EventError } from "@/domain/event/errors";
 import type { AuthorizationError } from "@/domain/authorization/errors";
@@ -18,7 +18,7 @@ export type CreateProjectInput = {
   orgId: OrgId;
   name: string;
   placeId: PlaceId | null;
-  logoKey: string | null;
+  logoImageId: ImageId | null;
   actor: Actor;
 };
 
@@ -73,7 +73,7 @@ export async function createProject(
         orgId: input.orgId,
         name: input.name,
         placeId: input.placeId,
-        logoKey: input.logoKey,
+        logoImageId: input.logoImageId,
       }),
     );
 

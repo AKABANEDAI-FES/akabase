@@ -29,7 +29,7 @@ export const createOrganizationInputSchema = organizationSchema.pick({
   eventId: true,
   name: true,
   description: true,
-  logoKey: true,
+  logoImageId: true,
 });
 
 /**
@@ -51,7 +51,7 @@ export const createOrganizationFn = createServerFn({ method: "POST" })
           eventId: data.eventId,
           name: data.name,
           description: data.description,
-          logoKey: data.logoKey,
+          logoImageId: data.logoImageId,
           actor,
         }),
       );

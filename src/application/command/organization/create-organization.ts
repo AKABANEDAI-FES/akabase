@@ -1,7 +1,7 @@
 import type { Result } from "@praha/byethrow";
 import { gen } from "@/libs/result";
 import { generateId } from "@/libs/id";
-import type { EventId, OrgId } from "@/domain/shared/ids";
+import type { EventId, ImageId, OrgId } from "@/domain/shared/ids";
 import type { OrganizationError } from "@/domain/organization/errors";
 import type { EventError } from "@/domain/event/errors";
 import type { AuthorizationError } from "@/domain/authorization/errors";
@@ -17,7 +17,7 @@ export type CreateOrganizationInput = {
   eventId: EventId;
   name: string;
   description: string | null;
-  logoKey: string | null;
+  logoImageId: ImageId | null;
   actor: Actor;
 };
 
@@ -69,7 +69,7 @@ export async function createOrganization(
         eventId: input.eventId,
         name: input.name,
         description: input.description,
-        logoKey: input.logoKey,
+        logoImageId: input.logoImageId,
       }),
     );
 

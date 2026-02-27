@@ -20,7 +20,7 @@ export const projectListItemSchema = z.object({
   name: z.string(),
   placeId: placeIdSchema.nullable(),
   placeName: z.string().nullable(),
-  logoKey: z.string().nullable(),
+  logoImageId: z.string().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
@@ -70,7 +70,7 @@ export async function listProjects(
         name: row.name,
         placeId: row.placeId,
         placeName: row.place?.name ?? null,
-        logoKey: row.logoKey,
+        logoImageId: row.logoImageId,
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
       }),

@@ -18,7 +18,8 @@ export const projectDetailSchema = z.object({
   name: z.string(),
   placeId: z.string().nullable(),
   placeName: z.string().nullable(),
-  logoKey: z.string().nullable(),
+  logoImageId: z.string().nullable(),
+  logoUrl: z.string().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
@@ -39,7 +40,7 @@ export type ProjectDetail = z.infer<typeof projectDetailSchema>;
  * @throws {QueryException} When database operation fails or authorization is denied
  */
 export async function getProjectDetail(
-  deps: Pick<Dependencies, "authService">,
+  deps: Pick<Dependencies, "authService" | "storageService">,
   eventId: EventId,
   orgId: OrgId,
   projectId: ProjectId,
@@ -61,6 +62,7 @@ export async function getProjectDetail(
         and(eq(projects.id, projectId), eq(projects.eventId, eventId), eq(projects.orgId, orgId)),
       with: {
         place: true,
+        logoImage: true,
       },
     });
 
@@ -75,7 +77,10 @@ export async function getProjectDetail(
       name: project.name,
       placeId: project.placeId,
       placeName: project.place?.name ?? null,
-      logoKey: project.logoKey,
+      logoImageId: project.logoImageId,
+      logoUrl: project.logoImage
+        ? deps.storageService.getPublicUrl(project.logoImage.objectKey)
+        : null,
       createdAt: project.createdAt,
       updatedAt: project.updatedAt,
     });

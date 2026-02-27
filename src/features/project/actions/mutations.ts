@@ -39,7 +39,7 @@ export const createProjectInputSchema = projectSchema.pick({
   orgId: true,
   name: true,
   placeId: true,
-  logoKey: true,
+  logoImageId: true,
 });
 
 /**
@@ -62,7 +62,7 @@ export const createProjectFn = createServerFn({ method: "POST" })
           orgId: data.orgId,
           name: data.name,
           placeId: data.placeId,
-          logoKey: data.logoKey,
+          logoImageId: data.logoImageId,
           actor,
         }),
       );
@@ -373,6 +373,7 @@ export const updateProjectInputSchema = z.object({
   orgId: projectSchema.shape.orgId,
   name: projectSchema.shape.name,
   placeId: projectSchema.shape.placeId,
+  logoImageId: projectSchema.shape.logoImageId,
 });
 
 export const updateProjectFn = createServerFn({ method: "POST" })

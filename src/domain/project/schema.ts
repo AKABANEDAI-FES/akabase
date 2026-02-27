@@ -1,6 +1,7 @@
 import { z } from "zod";
 import {
   eventIdSchema,
+  imageIdSchema,
   orgIdSchema,
   placeIdSchema,
   projectIdSchema,
@@ -34,7 +35,7 @@ export const projectSchema = z.object({
     .min(PROJECT_NAME_MIN_LENGTH, "企画名を入力してください")
     .max(PROJECT_NAME_MAX_LENGTH, "企画名は100文字以内で入力してください"),
   placeId: placeIdSchema.nullable(),
-  logoKey: z.string().nullable(),
+  logoImageId: imageIdSchema.nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });

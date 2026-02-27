@@ -20,6 +20,7 @@ import { PROJECT_ERROR_CODE, projectError } from "./errors";
 import { DOMAIN_ERROR_CODE } from "../shared/errors";
 import type {
   EventId,
+  ImageId,
   OrgId,
   PlaceId,
   ProjectId,
@@ -46,7 +47,7 @@ export function createProjectEntity(input: {
   orgId: OrgId;
   name: string;
   placeId: PlaceId | null;
-  logoKey: string | null;
+  logoImageId: ImageId | null;
   now?: Date;
 }): Result.Result<Project, ProjectError> {
   const now = input.now ?? new Date();
@@ -56,7 +57,7 @@ export function createProjectEntity(input: {
     orgId: input.orgId,
     name: input.name.trim(),
     placeId: input.placeId,
-    logoKey: input.logoKey,
+    logoImageId: input.logoImageId,
     createdAt: now,
     updatedAt: now,
   };
@@ -80,6 +81,7 @@ export function updateProjectEntity(input: {
   project: Project;
   name: string;
   placeId: PlaceId | null;
+  logoImageId: ImageId | null;
   now?: Date;
 }): Result.Result<Project, ProjectError> {
   const now = input.now ?? new Date();
@@ -90,6 +92,7 @@ export function updateProjectEntity(input: {
         ...input.project,
         name: input.name.trim(),
         placeId: input.placeId,
+        logoImageId: input.logoImageId,
         updatedAt: now,
       }),
     catch: () => projectError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "企画の更新に失敗しました"),

@@ -32,17 +32,25 @@ export function storageError(
 /**
  * Storage Service Interface
  */
+/**
+ * Result of uploading an image to R2
+ */
+export type UploadImageResult = {
+  id: string;
+  objectKey: string;
+};
+
 export interface StorageService {
   /**
    * Upload image to R2
    * @param file - File buffer or ArrayBuffer
-   * @param options - Upload options (contentType, metadata)
-   * @returns R2 object key
+   * @param options - Upload options (contentType)
+   * @returns Upload result with id and objectKey
    */
   uploadImage(
     file: ArrayBuffer,
     options: UploadOptions,
-  ): Promise<Result.Result<string, StorageError>>;
+  ): Promise<Result.Result<UploadImageResult, StorageError>>;
 
   /**
    * Delete image from R2
@@ -60,7 +68,6 @@ export interface StorageService {
 
 export type UploadOptions = {
   contentType: string;
-  prefix?: string; // e.g., "organizations", "projects"
 };
 
 /**
@@ -83,5 +90,4 @@ export const STORAGE_ERROR_MESSAGES = {
   FILE_TOO_LARGE: "ファイルサイズが大きすぎます。最大2MBまで対応しています。",
   UPLOAD_FAILED: "画像のアップロードに失敗しました。",
   DELETE_FAILED: "画像の削除に失敗しました。",
-  STORAGE_URL_NOT_CONFIGURED: "ストレージのURLが設定されていません。",
 } as const;

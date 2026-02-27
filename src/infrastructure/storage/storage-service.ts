@@ -1,7 +1,12 @@
 import { Result } from "@praha/byethrow";
 import { env } from "cloudflare:workers";
 import { generateId } from "@/libs/id";
-import type { StorageError, StorageService, UploadOptions } from "@/domain/shared/storage";
+import type {
+  StorageError,
+  StorageService,
+  UploadImageResult,
+  UploadOptions,
+} from "@/domain/shared/storage";
 import { STORAGE_ERROR_CODE, STORAGE_ERROR_MESSAGES, storageError } from "@/domain/shared/storage";
 
 /**
@@ -14,22 +19,19 @@ export class StorageServiceImpl implements StorageService {
   async uploadImage(
     file: ArrayBuffer,
     options: UploadOptions,
-  ): Promise<Result.Result<string, StorageError>> {
+  ): Promise<Result.Result<UploadImageResult, StorageError>> {
     try {
-      // Generate unique object key
       const uniqueId = generateId();
       const extension = this.getExtensionFromContentType(options.contentType);
-      const prefix = options.prefix ? `${options.prefix}/` : "";
-      const objectKey = `${prefix}${uniqueId}${extension}`;
+      const objectKey = `${uniqueId}${extension}`;
 
-      // Upload to R2
       await env.STORAGE.put(objectKey, file, {
         httpMetadata: {
           contentType: options.contentType,
         },
       });
 
-      return Result.succeed(objectKey);
+      return Result.succeed({ id: uniqueId, objectKey });
     } catch (error) {
       return Result.fail(
         storageError(STORAGE_ERROR_CODE.UPLOAD_FAILED, STORAGE_ERROR_MESSAGES.UPLOAD_FAILED, error),
@@ -55,11 +57,7 @@ export class StorageServiceImpl implements StorageService {
    * Get public URL for an image
    */
   getPublicUrl(key: string): string {
-    const bucketUrl = env.STORAGE_PUBLIC_URL;
-    if (!bucketUrl) {
-      throw new Error(STORAGE_ERROR_MESSAGES.STORAGE_URL_NOT_CONFIGURED);
-    }
-    return `${bucketUrl}/${key}`;
+    return `/api/storage/${key}`;
   }
 
   /**

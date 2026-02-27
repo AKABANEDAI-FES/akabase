@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "3ba97f54-423d-4edc-a670-453626e1716b",
+  "id": "fc408b51-ce7e-47ca-b8c0-c88256cc7b1f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "committee_roles": {
@@ -220,6 +220,75 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
+    "images": {
+      "name": "images",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "object_key": {
+          "name": "object_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "content_type": {
+          "name": "content_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "size": {
+          "name": "size",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "uploaded_by": {
+          "name": "uploaded_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(cast(unixepoch('subsecond') * 1000 as integer))"
+        }
+      },
+      "indexes": {
+        "images_object_key_unique": {
+          "name": "images_object_key_unique",
+          "columns": ["object_key"],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "images_uploaded_by_user_id_fk": {
+          "name": "images_uploaded_by_user_id_fk",
+          "tableFrom": "images",
+          "tableTo": "user",
+          "columnsFrom": ["uploaded_by"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
     "org_members": {
       "name": "org_members",
       "columns": {
@@ -332,8 +401,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "logo_key": {
-          "name": "logo_key",
+        "logo_image_id": {
+          "name": "logo_image_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -371,6 +440,15 @@
           "columnsFrom": ["event_id"],
           "columnsTo": ["id"],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "organizations_logo_image_id_images_id_fk": {
+          "name": "organizations_logo_image_id_images_id_fk",
+          "tableFrom": "organizations",
+          "tableTo": "images",
+          "columnsFrom": ["logo_image_id"],
+          "columnsTo": ["id"],
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },
@@ -914,8 +992,8 @@
           "notNull": false,
           "autoincrement": false
         },
-        "logo_key": {
-          "name": "logo_key",
+        "logo_image_id": {
+          "name": "logo_image_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -976,6 +1054,15 @@
           "columnsFrom": ["place_id"],
           "columnsTo": ["id"],
           "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "projects_logo_image_id_images_id_fk": {
+          "name": "projects_logo_image_id_images_id_fk",
+          "tableFrom": "projects",
+          "tableTo": "images",
+          "columnsFrom": ["logo_image_id"],
+          "columnsTo": ["id"],
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },

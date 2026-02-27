@@ -27,7 +27,7 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
         eventId: row.eventId,
         name: row.name,
         description: row.description,
-        logoKey: row.logoKey,
+        logoImageId: row.logoImageId,
         createdAt: new Date(row.createdAt),
         updatedAt: new Date(row.updatedAt),
       });
@@ -74,7 +74,7 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
           eventId: row.eventId,
           name: row.name,
           description: row.description,
-          logoKey: row.logoKey,
+          logoImageId: row.logoImageId,
           createdAt: new Date(row.createdAt),
           updatedAt: new Date(row.updatedAt),
         }),
@@ -95,7 +95,7 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
           eventId: org.eventId,
           name: org.name,
           description: org.description,
-          logoKey: org.logoKey,
+          logoImageId: org.logoImageId,
           createdAt: org.createdAt,
           updatedAt: org.updatedAt,
         })
@@ -105,7 +105,7 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
             // Immutable fields excluded: id, eventId, createdAt
             name: org.name,
             description: org.description,
-            logoKey: org.logoKey,
+            logoImageId: org.logoImageId,
             updatedAt: org.updatedAt,
           },
           where: eq(organizations.eventId, org.eventId),

@@ -38,6 +38,9 @@ export type SubmissionMessageId = z.infer<typeof submissionMessageIdSchema>;
 export const submissionActionIdSchema = z.string().brand<"SubmissionActionId">();
 export type SubmissionActionId = z.infer<typeof submissionActionIdSchema>;
 
+export const imageIdSchema = z.string().brand<"ImageId">();
+export type ImageId = z.infer<typeof imageIdSchema>;
+
 export function cast<T extends string>(id: string): T {
   return z.string().parse(id) as T;
 }

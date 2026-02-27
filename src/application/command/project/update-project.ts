@@ -1,6 +1,6 @@
 import { Result } from "@praha/byethrow";
 import { gen } from "@/libs/result";
-import type { EventId, OrgId, PlaceId, ProjectId } from "@/domain/shared/ids";
+import type { EventId, ImageId, OrgId, PlaceId, ProjectId } from "@/domain/shared/ids";
 import type { ProjectError } from "@/domain/project/errors";
 import { PROJECT_ERROR_CODE, projectError } from "@/domain/project/errors";
 import type { EventError } from "@/domain/event/errors";
@@ -19,6 +19,7 @@ export type UpdateProjectInput = {
   orgId: OrgId;
   name: string;
   placeId: PlaceId | null;
+  logoImageId: ImageId | null;
   actor: Actor;
 };
 
@@ -75,6 +76,7 @@ export async function updateProject(
         project,
         name: input.name,
         placeId: input.placeId,
+        logoImageId: input.logoImageId,
       }),
     );
 

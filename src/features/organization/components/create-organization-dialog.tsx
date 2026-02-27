@@ -32,7 +32,7 @@ export function CreateOrganizationDialog({
     defaultValues: {
       name: "",
       description: "",
-      logoKey: null as string | null,
+      logoImageId: null as string | null,
     },
     validators: {
       onDynamic: createOrganizationInputSchema.omit({ eventId: true }),

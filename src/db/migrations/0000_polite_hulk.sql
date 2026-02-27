@@ -33,6 +33,17 @@ CREATE TABLE `events` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `events_slug_unique` ON `events` (`slug`);--> statement-breakpoint
+CREATE TABLE `images` (
+	`id` text PRIMARY KEY NOT NULL,
+	`object_key` text NOT NULL,
+	`content_type` text NOT NULL,
+	`size` integer NOT NULL,
+	`uploaded_by` text NOT NULL,
+	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
+	FOREIGN KEY (`uploaded_by`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE no action
+);
+--> statement-breakpoint
+CREATE UNIQUE INDEX `images_object_key_unique` ON `images` (`object_key`);--> statement-breakpoint
 CREATE TABLE `org_members` (
 	`id` text PRIMARY KEY NOT NULL,
 	`org_id` text NOT NULL,
@@ -51,10 +62,11 @@ CREATE TABLE `organizations` (
 	`event_id` text NOT NULL,
 	`name` text NOT NULL,
 	`description` text NOT NULL,
-	`logo_key` text,
+	`logo_image_id` text,
 	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	`updated_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
-	FOREIGN KEY (`event_id`) REFERENCES `events`(`id`) ON UPDATE no action ON DELETE cascade
+	FOREIGN KEY (`event_id`) REFERENCES `events`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`logo_image_id`) REFERENCES `images`(`id`) ON UPDATE no action ON DELETE set null
 );
 --> statement-breakpoint
 CREATE INDEX `organizations_event_id_idx` ON `organizations` (`event_id`);--> statement-breakpoint
@@ -144,12 +156,13 @@ CREATE TABLE `projects` (
 	`org_id` text NOT NULL,
 	`name` text NOT NULL,
 	`place_id` text,
-	`logo_key` text,
+	`logo_image_id` text,
 	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	`updated_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	FOREIGN KEY (`event_id`) REFERENCES `events`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`org_id`) REFERENCES `organizations`(`id`) ON UPDATE no action ON DELETE cascade,
-	FOREIGN KEY (`place_id`) REFERENCES `places`(`id`) ON UPDATE no action ON DELETE no action
+	FOREIGN KEY (`place_id`) REFERENCES `places`(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`logo_image_id`) REFERENCES `images`(`id`) ON UPDATE no action ON DELETE set null
 );
 --> statement-breakpoint
 CREATE INDEX `projects_event_id_idx` ON `projects` (`event_id`);--> statement-breakpoint

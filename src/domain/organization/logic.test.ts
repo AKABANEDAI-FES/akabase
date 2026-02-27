@@ -1,7 +1,7 @@
 import { Result } from "@praha/byethrow";
 import { describe, expect, it } from "vitest";
 import type { OrgMember, Organization } from "./schema";
-import type { OrgId, UserId } from "../shared/ids";
+import type { ImageId, OrgId, UserId } from "../shared/ids";
 import { canAddMember, canRemoveMember, updateOrganizationEntity } from "./logic";
 
 // Test fixtures
@@ -15,7 +15,7 @@ const createMockOrganization = (overrides?: Partial<Organization>): Organization
   eventId: mockEventId,
   name: "Test Organization",
   description: "",
-  logoKey: null,
+  logoImageId: null,
   createdAt: new Date("2025-01-01"),
   updatedAt: new Date("2025-01-01"),
   ...overrides,
@@ -136,12 +136,12 @@ describe("Organization Domain Logic", () => {
       });
 
       it("updates organization logo key", () => {
-        const org = createMockOrganization({ logoKey: null });
-        const result = updateOrganizationEntity(org, { logoKey: "logos/test.png" });
+        const org = createMockOrganization({ logoImageId: null });
+        const result = updateOrganizationEntity(org, { logoImageId: "logos/test.png" as ImageId });
 
         expect(Result.isSuccess(result)).toBe(true);
         if (Result.isSuccess(result)) {
-          expect(result.value.logoKey).toBe("logos/test.png");
+          expect(result.value.logoImageId).toBe("logos/test.png");
         }
       });
 
@@ -150,14 +150,14 @@ describe("Organization Domain Logic", () => {
         const result = updateOrganizationEntity(org, {
           name: "New Name",
           description: "New description",
-          logoKey: "logos/new.png",
+          logoImageId: "logos/new.png" as ImageId,
         });
 
         expect(Result.isSuccess(result)).toBe(true);
         if (Result.isSuccess(result)) {
           expect(result.value.name).toBe("New Name");
           expect(result.value.description).toBe("New description");
-          expect(result.value.logoKey).toBe("logos/new.png");
+          expect(result.value.logoImageId).toBe("logos/new.png");
         }
       });
 
