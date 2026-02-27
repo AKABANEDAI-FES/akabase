@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "1f54fa0d-f00d-4950-91f5-2b51100d47e4",
+  "id": "3ba97f54-423d-4edc-a670-453626e1716b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "committee_roles": {
@@ -107,6 +107,13 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false
+        },
+        "start_at": {
+          "name": "start_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         },
         "deadline_at": {

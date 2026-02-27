@@ -35,7 +35,8 @@ export function DeadlineManagementTable({
           <Table.Head>
             <Table.Row>
               <Table.Header>フィールド</Table.Header>
-              <Table.Header>締切日時</Table.Header>
+              <Table.Header>開始日時</Table.Header>
+              <Table.Header>終了日時</Table.Header>
               <Table.Header>作成日</Table.Header>
               {showActions && <Table.Header>操作</Table.Header>}
             </Table.Row>
@@ -46,6 +47,19 @@ export function DeadlineManagementTable({
                 <Table.Cell fontWeight="medium">
                   {DEADLINE_FIELD_LABELS[deadline.fieldKey as DeadlineFieldKey] ||
                     deadline.fieldKey}
+                </Table.Cell>
+                <Table.Cell>
+                  {deadline.startAt ? (
+                    new Date(deadline.startAt).toLocaleString("ja-JP", {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })
+                  ) : (
+                    <span style={{ color: "gray" }}>制限なし</span>
+                  )}
                 </Table.Cell>
                 <Table.Cell>
                   {new Date(deadline.deadlineAt).toLocaleString("ja-JP", {

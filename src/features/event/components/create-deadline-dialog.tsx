@@ -7,7 +7,11 @@ import { Button, CloseButton, Dialog, Field, Input, Select, toaster } from "@/co
 import { Portal } from "@ark-ui/react/portal";
 import { Stack } from "styled-system/jsx";
 import type { EventId } from "@/domain/shared/ids";
-import { DEADLINE_FIELD_KEYS, DEADLINE_FIELD_LABELS } from "@/domain/event/schema";
+import {
+  DEADLINE_FIELD_KEYS,
+  DEADLINE_FIELD_LABELS,
+  deadlineRefinement,
+} from "@/domain/event/schema";
 import type { DeadlineFieldKey } from "@/domain/event/schema";
 import {
   createDeadlineInputSchema,
@@ -41,10 +45,17 @@ export function CreateDeadlineDialog({ eventId, defaultOpen, onClose }: CreateDe
   const form = useForm({
     defaultValues: {
       fieldKey: "",
+      startAt: null as Date | null,
       deadlineAt: new Date(),
     },
     validators: {
-      onDynamic: createDeadlineInputSchema.omit({ eventId: true }),
+      onDynamic: createDeadlineInputSchema
+        .pick({
+          fieldKey: true,
+          startAt: true,
+          deadlineAt: true,
+        })
+        .check(deadlineRefinement),
       onSubmitAsync: async ({ value }) => {
         const data = createDeadlineInputSchema.parse({
           ...value,
@@ -157,11 +168,43 @@ export function CreateDeadlineDialog({ eventId, defaultOpen, onClose }: CreateDe
                     )}
                   </form.Field>
 
+                  <form.Field name="startAt">
+                    {(field) => (
+                      <Field.Root invalid={!field.state.meta.isValid}>
+                        <Field.Label htmlFor={field.name}>開始日時</Field.Label>
+                        <Input
+                          type="datetime-local"
+                          id={field.name}
+                          name={field.name}
+                          value={field.state.value ? toDatetimeLocalValue(field.state.value) : ""}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            field.handleChange(value ? new Date(value) : null);
+                          }}
+                        />
+                        <Field.HelperText>
+                          開始日時を指定しない場合、締切日時まで常に編集可能です
+                        </Field.HelperText>
+                        {!field.state.meta.isValid && field.state.meta.errors.length > 0 && (
+                          <Field.ErrorText>
+                            {nl2br(
+                              field.state.meta.errors
+                                .map((error) => error?.message)
+                                .filter((msg) => msg != null)
+                                .join("\n"),
+                            )}
+                          </Field.ErrorText>
+                        )}
+                      </Field.Root>
+                    )}
+                  </form.Field>
+
                   <form.Field name="deadlineAt">
                     {(field) => (
                       <Field.Root invalid={!field.state.meta.isValid}>
                         <Field.Label htmlFor={field.name}>
-                          締切日時 <Field.RequiredIndicator />
+                          終了日時 <Field.RequiredIndicator />
                         </Field.Label>
                         <Input
                           type="datetime-local"

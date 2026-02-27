@@ -241,6 +241,7 @@ export class EventRepositoryImpl implements EventRepository {
           id: row.id,
           eventId: row.eventId,
           fieldKey: row.fieldKey,
+          startAt: row.startAt ? new Date(row.startAt) : undefined,
           deadlineAt: new Date(row.deadlineAt),
           createdAt: new Date(row.createdAt),
         }),
@@ -260,12 +261,14 @@ export class EventRepositoryImpl implements EventRepository {
           id: deadline.id,
           eventId: deadline.eventId,
           fieldKey: deadline.fieldKey,
+          startAt: deadline.startAt ?? null,
           deadlineAt: deadline.deadlineAt,
           createdAt: deadline.createdAt,
         })
         .onConflictDoUpdate({
           target: [deadlines.eventId, deadlines.fieldKey],
           set: {
+            startAt: deadline.startAt ?? null,
             deadlineAt: deadline.deadlineAt,
           },
         });

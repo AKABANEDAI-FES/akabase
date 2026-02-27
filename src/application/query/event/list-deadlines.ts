@@ -13,6 +13,7 @@ export const deadlineListItemSchema = z.object({
   id: deadlineIdSchema,
   eventId: eventIdSchema,
   fieldKey: z.string(),
+  startAt: z.date().optional(),
   deadlineAt: z.date(),
   createdAt: z.date(),
 });
@@ -37,6 +38,7 @@ export async function listDeadlines(eventId: EventId): Promise<DeadlineListItem[
         id: row.id,
         eventId: row.eventId,
         fieldKey: row.fieldKey,
+        startAt: row.startAt ? new Date(row.startAt) : undefined,
         deadlineAt: new Date(row.deadlineAt),
         createdAt: new Date(row.createdAt),
       }),

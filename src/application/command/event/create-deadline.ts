@@ -17,6 +17,7 @@ import type { Dependencies } from "@/infrastructure/di";
 export type CreateDeadlineInput = {
   eventId: EventId;
   fieldKey: DeadlineFieldKey;
+  startAt?: Date;
   deadlineAt: Date;
   actor: Actor;
 };
@@ -70,6 +71,7 @@ export async function createDeadline(
         id: deadlineId,
         eventId: input.eventId,
         fieldKey: input.fieldKey,
+        startAt: input.startAt,
         deadlineAt: input.deadlineAt,
       }),
     );

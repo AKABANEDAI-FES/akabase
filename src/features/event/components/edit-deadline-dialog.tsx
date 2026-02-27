@@ -7,7 +7,7 @@ import { Portal } from "@ark-ui/react/portal";
 import { Stack } from "styled-system/jsx";
 import type { EventId } from "@/domain/shared/ids";
 import type { DeadlineListItem } from "@/application/query/event/list-deadlines";
-import { DEADLINE_FIELD_LABELS } from "@/domain/event/schema";
+import { DEADLINE_FIELD_LABELS, deadlineRefinement } from "@/domain/event/schema";
 import type { DeadlineFieldKey } from "@/domain/event/schema";
 import {
   updateDeadlineInputSchema,
@@ -48,10 +48,13 @@ function EditDeadlineDialogContent({
 
   const form = useForm({
     defaultValues: {
+      startAt: deadline.startAt ?? null,
       deadlineAt: deadline.deadlineAt,
     },
     validators: {
-      onDynamic: updateDeadlineInputSchema.omit({ eventId: true, deadlineId: true }),
+      onDynamic: updateDeadlineInputSchema
+        .pick({ startAt: true, deadlineAt: true })
+        .check(deadlineRefinement),
       onSubmitAsync: async ({ value }) => {
         try {
           const data = updateDeadlineInputSchema.parse({
@@ -124,11 +127,41 @@ function EditDeadlineDialogContent({
               <Field.HelperText>フィールドは作成後に変更できません</Field.HelperText>
             </Field.Root>
 
+            <form.Field name="startAt">
+              {(field) => (
+                <Field.Root invalid={!field.state.meta.isValid}>
+                  <Field.Label htmlFor={field.name}>開始日時</Field.Label>
+                  <Input
+                    type="datetime-local"
+                    id={field.name}
+                    name={field.name}
+                    value={field.state.value ? toDatetimeLocalValue(field.state.value) : ""}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.handleChange(value ? new Date(value) : null);
+                    }}
+                  />
+                  <Field.HelperText>開始日時を削除する場合は空欄にしてください</Field.HelperText>
+                  {!field.state.meta.isValid && field.state.meta.errors.length > 0 && (
+                    <Field.ErrorText>
+                      {nl2br(
+                        field.state.meta.errors
+                          .map((error) => error?.message)
+                          .filter((msg) => msg != null)
+                          .join("\n"),
+                      )}
+                    </Field.ErrorText>
+                  )}
+                </Field.Root>
+              )}
+            </form.Field>
+
             <form.Field name="deadlineAt">
               {(field) => (
                 <Field.Root invalid={!field.state.meta.isValid}>
                   <Field.Label htmlFor={field.name}>
-                    締切日時 <Field.RequiredIndicator />
+                    終了日時 <Field.RequiredIndicator />
                   </Field.Label>
                   <Input
                     type="datetime-local"

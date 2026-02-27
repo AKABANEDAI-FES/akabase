@@ -230,6 +230,7 @@ export function createDeadlineEntity(input: {
   id: DeadlineId;
   eventId: EventId;
   fieldKey: DeadlineFieldKey;
+  startAt?: Date;
   deadlineAt: Date;
   now?: Date;
 }): Result.Result<Deadline, EventError> {
@@ -237,6 +238,7 @@ export function createDeadlineEntity(input: {
     id: input.id,
     eventId: input.eventId,
     fieldKey: input.fieldKey,
+    startAt: input.startAt,
     deadlineAt: input.deadlineAt,
     createdAt: input.now ?? new Date(),
   };
@@ -249,16 +251,18 @@ export function createDeadlineEntity(input: {
 
 /**
  * Update deadline entity
- * Only deadlineAt can be updated (fieldKey is immutable)
+ * Both startAt and deadlineAt can be updated (fieldKey is immutable)
  */
 export function updateDeadlineEntity(
   deadline: Deadline,
   input: {
+    startAt?: Date;
     deadlineAt: Date;
   },
 ): Result.Result<Deadline, EventError> {
   const data = {
     ...deadline,
+    startAt: input.startAt,
     deadlineAt: input.deadlineAt,
   };
 

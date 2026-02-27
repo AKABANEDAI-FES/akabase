@@ -12,7 +12,7 @@ import type { UserId } from "@/domain/shared/ids";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { generateLoadDeadlinesCacheKey } from "../queries/deadline";
 import { gen } from "@/libs/result";
-import { deadlineSchema } from "@/domain/event/schema";
+import { deadlineRefinement, deadlineSchema } from "@/domain/event/schema";
 
 /**
  * Create deadline input validation schema
@@ -20,7 +20,8 @@ import { deadlineSchema } from "@/domain/event/schema";
 export const createDeadlineInputSchema = z.object({
   eventId: eventIdSchema,
   fieldKey: deadlineSchema.shape.fieldKey, // Use the same enum validation as the domain schema
-  deadlineAt: deadlineSchema.shape.deadlineAt, // Use the same date validation as the domain schema
+  startAt: z.date().nullable(), // Use the same optional date validation as the domain schema
+  deadlineAt: z.date(), // Use the same date validation as the domain schema
 });
 
 /**
@@ -28,7 +29,7 @@ export const createDeadlineInputSchema = z.object({
  */
 export const createDeadlineFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .inputValidator(createDeadlineInputSchema)
+  .inputValidator(createDeadlineInputSchema.check(deadlineRefinement))
   .handler(async ({ data, context }) => {
     return await gen(async function* ($) {
       // Resolve actor with event context
@@ -41,6 +42,7 @@ export const createDeadlineFn = createServerFn({ method: "POST" })
         await createDeadline(dependencies, {
           eventId: data.eventId,
           fieldKey: data.fieldKey,
+          startAt: data.startAt ?? undefined,
           deadlineAt: data.deadlineAt,
           actor,
         }),
@@ -70,6 +72,7 @@ export function useCreateDeadlineMutation() {
 export const updateDeadlineInputSchema = z.object({
   deadlineId: deadlineIdSchema,
   eventId: eventIdSchema,
+  startAt: z.date().nullable(),
   deadlineAt: z.date(),
 });
 
@@ -78,7 +81,7 @@ export const updateDeadlineInputSchema = z.object({
  */
 export const updateDeadlineFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .inputValidator(updateDeadlineInputSchema)
+  .inputValidator(updateDeadlineInputSchema.check(deadlineRefinement))
   .handler(async ({ data, context }) => {
     return await gen(async function* ($) {
       // Resolve actor with event context
@@ -91,6 +94,7 @@ export const updateDeadlineFn = createServerFn({ method: "POST" })
         await updateDeadline(dependencies, {
           deadlineId: data.deadlineId,
           eventId: data.eventId,
+          startAt: data.startAt ?? undefined,
           deadlineAt: data.deadlineAt,
           actor,
         }),

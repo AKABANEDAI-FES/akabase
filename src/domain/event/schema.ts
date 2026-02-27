@@ -93,18 +93,34 @@ export const DEADLINE_FIELD_LABELS: Record<DeadlineFieldKey, string> = {
   tags: "タグ",
 } as const;
 
+export const deadlineRefinement = z.refine<{ startAt?: Date | null; deadlineAt: Date }>(
+  (data) => {
+    if (data.startAt) {
+      return data.startAt < data.deadlineAt;
+    }
+    return true;
+  },
+  {
+    message: "開始日時は終了日時より前に設定してください",
+    path: ["startAt"],
+  },
+);
+
 /**
  * Deadline
  * 締切設定（フィールド単位）
  */
-export const deadlineSchema = z.object({
-  id: deadlineIdSchema,
-  eventId: eventIdSchema,
-  fieldKey: z.enum(DEADLINE_FIELD_KEYS, {
-    message: "フィールドを選択してください",
-  }),
-  deadlineAt: z.date(),
-  createdAt: z.date(),
-});
+export const deadlineSchema = z
+  .object({
+    id: deadlineIdSchema,
+    eventId: eventIdSchema,
+    fieldKey: z.enum(DEADLINE_FIELD_KEYS, {
+      message: "フィールドを選択してください",
+    }),
+    startAt: z.date().optional(), // optional: start time for editing window
+    deadlineAt: z.date(),
+    createdAt: z.date(),
+  })
+  .check(deadlineRefinement);
 
 export type Deadline = z.infer<typeof deadlineSchema>;

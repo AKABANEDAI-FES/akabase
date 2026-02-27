@@ -92,6 +92,7 @@ export const deadlines = sqliteTable(
       .notNull()
       .references(() => events.id, { onDelete: "cascade" }),
     fieldKey: text("field_key").notNull(), // e.g., "pamphlet_text", "web_content"
+    startAt: integer("start_at", { mode: "timestamp_ms" }), // nullable: optional start time
     deadlineAt: integer("deadline_at", { mode: "timestamp_ms" }).notNull(),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)

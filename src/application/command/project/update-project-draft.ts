@@ -38,12 +38,18 @@ export type UpdateProjectDraftOutput = {
 export type UpdateProjectDraftError = ProjectError | EventError | AuthorizationError;
 
 /**
- * Build a set of past-deadline field keys
+ * Build a set of blocked field keys based on deadline window
+ * Field is blocked if:
+ * - now < startAt (not yet open) OR
+ * - deadlineAt <= now (deadline passed)
  */
-function getPastDeadlineFieldKeys(deadlines: Deadline[], now: Date): Set<string> {
+function getBlockedFieldKeys(deadlines: Deadline[], now: Date): Set<string> {
   const keys = new Set<string>();
   for (const deadline of deadlines) {
-    if (deadline.deadlineAt <= now) {
+    const beforeStart = deadline.startAt && now < deadline.startAt;
+    const afterDeadline = deadline.deadlineAt <= now;
+
+    if (beforeStart || afterDeadline) {
       keys.add(deadline.fieldKey);
     }
   }
@@ -51,21 +57,21 @@ function getPastDeadlineFieldKeys(deadlines: Deadline[], now: Date): Set<string>
 }
 
 /**
- * Apply deadline enforcement by keeping existing values for past-deadline fields
+ * Apply deadline enforcement by keeping existing values for blocked fields
  */
 function applyDeadlineEnforcement(
   existingDraft: DraftWithTags,
   input: UpdateProjectDraftInput,
-  pastDeadlineKeys: Set<string>,
+  blockedFieldKeys: Set<string>,
 ): { pamphletText: string; webContentJson: unknown | null; tags: TagId[] } {
   return {
-    pamphletText: pastDeadlineKeys.has("pamphlet_text")
+    pamphletText: blockedFieldKeys.has("pamphlet_text")
       ? existingDraft.pamphletText
       : input.pamphletText,
-    webContentJson: pastDeadlineKeys.has("web_content")
+    webContentJson: blockedFieldKeys.has("web_content")
       ? existingDraft.webContentJson
       : input.webContentJson,
-    tags: pastDeadlineKeys.has("tags") ? existingDraft.tags : input.tags,
+    tags: blockedFieldKeys.has("tags") ? existingDraft.tags : input.tags,
   };
 }
 
@@ -112,10 +118,10 @@ export async function updateProjectDraft(
       );
     }
 
-    // Deadline enforcement: keep existing values for past-deadline fields
+    // Deadline enforcement: keep existing values for blocked fields
     const deadlines = await deps.eventRepo.findDeadlines(project.eventId);
-    const pastDeadlineKeys = getPastDeadlineFieldKeys(deadlines, new Date());
-    const enforced = applyDeadlineEnforcement(existingDraft, input, pastDeadlineKeys);
+    const blockedFieldKeys = getBlockedFieldKeys(deadlines, new Date());
+    const enforced = applyDeadlineEnforcement(existingDraft, input, blockedFieldKeys);
 
     // Create updated draft entity
     const updatedDraft = yield* $(

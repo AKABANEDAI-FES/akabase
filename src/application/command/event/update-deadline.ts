@@ -16,6 +16,7 @@ import type { Dependencies } from "@/infrastructure/di";
 export type UpdateDeadlineInput = {
   deadlineId: DeadlineId;
   eventId: EventId;
+  startAt?: Date;
   deadlineAt: Date;
   actor: Actor;
 };
@@ -54,7 +55,10 @@ export async function updateDeadline(
 
     // Update deadline (fieldKey is immutable)
     const updatedDeadline = yield* $(
-      updateDeadlineEntity(existingDeadline, { deadlineAt: input.deadlineAt }),
+      updateDeadlineEntity(existingDeadline, {
+        startAt: input.startAt,
+        deadlineAt: input.deadlineAt,
+      }),
     );
 
     await deps.eventRepo.saveDeadline(updatedDeadline);
