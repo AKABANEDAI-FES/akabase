@@ -2,6 +2,7 @@ import { Flex, Grid, HStack, Stack } from "styled-system/jsx";
 import { TagIcon } from "lucide-react";
 import { Badge, Card, Text } from "@/components/ui";
 import type { SubmissionDetail } from "@/application/query/project/get-submission-detail";
+import { TipTapContentRenderer } from "./tiptap-content-renderer";
 
 interface SubmissionOverviewTabProps {
   submission: SubmissionDetail;
@@ -22,6 +23,14 @@ export function SubmissionOverviewTab({ submission }: SubmissionOverviewTabProps
           <Text whiteSpace="pre-wrap">
             {submission.pamphletText || <Text color="fg.muted">(未入力)</Text>}
           </Text>
+        </Card.Body>
+      </Card.Root>
+      <Card.Root>
+        <Card.Header>
+          <Card.Title>Web用コンテンツ</Card.Title>
+        </Card.Header>
+        <Card.Body>
+          <TipTapContentRenderer content={submission.webContentJson} />
         </Card.Body>
       </Card.Root>
     </Stack>

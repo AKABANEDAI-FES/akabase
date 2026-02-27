@@ -3,6 +3,7 @@ import { Flex, Stack } from "styled-system/jsx";
 import { Badge, Card, Text } from "@/components/ui";
 import { generateLoadProjectPublishedQueryOptions } from "@/features/project/actions/queries";
 import type { EventId, OrgId, ProjectId } from "@/domain/shared/ids";
+import { TipTapContentRenderer } from "./tiptap-content-renderer";
 
 interface ProjectPublishedDataCardProps {
   eventId: EventId;
@@ -54,11 +55,7 @@ export function ProjectPublishedDataCard({
           </div>
           <div>
             <Text fontWeight="medium">Web用コンテンツ</Text>
-            <pre>
-              {publishedData.webContentJson
-                ? JSON.stringify(publishedData.webContentJson, null, 2)
-                : "未設定"}
-            </pre>
+            <TipTapContentRenderer content={publishedData.webContentJson} />
           </div>
         </Stack>
       </Card.Body>

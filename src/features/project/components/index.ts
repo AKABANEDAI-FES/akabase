@@ -11,4 +11,5 @@ export * from "./submission-history-tab";
 export * from "./submission-overview-tab";
 export * from "./submission-status-badge";
 export * from "./submit-project-dialog";
+export * from "./tiptap-content-renderer";
 export * from "./withdraw-submission-dialog";
