@@ -1,3 +1,4 @@
+import { drawer } from "./drawer";
 import { scrollArea } from "./scroll-area";
 import { menu } from "./menu";
 import { toggleGroup } from "./toggle-group";
@@ -61,5 +62,6 @@ export const recipes = {
   toggleGroup,
   menu,
   scrollArea,
+  drawer,
 };
 export const slotRecipes = {};

@@ -9,6 +9,10 @@ export const globalCss = {
     },
     html: {
       colorPalette: "iris",
+      fontSize: {
+        base: "14px",
+        md: "16px",
+      },
     },
     body: {
       background: "bg.canvas",

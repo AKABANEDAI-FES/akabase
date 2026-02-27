@@ -1,0 +1,143 @@
+import { useState } from "react";
+import { Outlet } from "@tanstack/react-router";
+import { Portal } from "@ark-ui/react/portal";
+import { css } from "styled-system/css";
+import { Stack } from "styled-system/jsx";
+import { MenuIcon } from "lucide-react";
+import { Button, CloseButton, Drawer, Heading, IconButton, Text } from "@/components/ui";
+
+interface SidebarLayoutProps {
+  title: string;
+  navigation: (onNavigate?: () => void) => React.ReactNode;
+}
+
+export function SidebarLayout({ title, navigation }: SidebarLayoutProps) {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  return (
+    <div className={css({ display: "flex", flexDirection: "column", minHeight: "100svh" })}>
+      <Drawer.Root
+        open={drawerOpen}
+        onOpenChange={({ open }) => setDrawerOpen(open)}
+        placement="start"
+      >
+        <header
+          className={css({
+            display: { base: "flex", lg: "none" },
+            alignItems: "center",
+            gap: "3",
+            padding: "3",
+            backgroundColor: "bg.default",
+            shadow: "sm",
+            position: "sticky",
+            top: "0",
+            zIndex: "sticky",
+          })}
+        >
+          <Drawer.Trigger asChild>
+            <IconButton variant="plain" colorPalette="gray" size="md" aria-label="メニューを開く">
+              <MenuIcon />
+            </IconButton>
+          </Drawer.Trigger>
+          <Heading as="h1" textStyle="lg">
+            {title}
+          </Heading>
+        </header>
+
+        <Portal>
+          <Drawer.Backdrop />
+          <Drawer.Positioner>
+            <Drawer.Content>
+              <Drawer.CloseTrigger asChild>
+                <CloseButton />
+              </Drawer.CloseTrigger>
+              <Drawer.Header>
+                <Drawer.Title>{title}</Drawer.Title>
+              </Drawer.Header>
+              <Drawer.Body gap="8" css={{ "& > *": { w: "full" } }}>
+                {navigation(() => setDrawerOpen(false))}
+              </Drawer.Body>
+            </Drawer.Content>
+          </Drawer.Positioner>
+        </Portal>
+      </Drawer.Root>
+
+      <div
+        className={css({
+          display: "grid",
+          gridTemplateColumns: { base: "1fr", lg: "auto 1fr" },
+          flex: "1",
+        })}
+      >
+        <nav
+          className={css({
+            display: { base: "none", lg: "block" },
+            width: "xs",
+            backgroundColor: "bg.default",
+            shadow: "sm",
+            padding: "4",
+            h: "100svh",
+            position: "sticky",
+            top: "0",
+          })}
+        >
+          <Stack gap="8">
+            <Heading as="h1" textStyle="lg">
+              {title}
+            </Heading>
+            {navigation()}
+          </Stack>
+        </nav>
+
+        <main>
+          <Outlet />
+        </main>
+      </div>
+    </div>
+  );
+}
+
+interface NavLinkProps {
+  children: React.ReactNode;
+  onNavigate?: () => void;
+}
+
+export function NavLink({ children, onNavigate }: NavLinkProps) {
+  return (
+    <Button
+      variant="plain"
+      size="md"
+      colorPalette="gray"
+      justifyContent="flex-start"
+      css={{
+        _currentPage: {
+          backgroundColor: "colorPalette.plain.bg.hover",
+          color: "colorPalette.surface.fg",
+          _hover: {
+            backgroundColor: "colorPalette.plain.bg.active",
+          },
+        },
+      }}
+      asChild
+      onClick={onNavigate}
+    >
+      {children}
+    </Button>
+  );
+}
+
+interface NavSectionProps {
+  label: string;
+  children: React.ReactNode;
+}
+
+export function NavSection({ label, children }: NavSectionProps) {
+  return (
+    <Stack gap="2">
+      <Text textStyle="xs" fontWeight="semibold" color="fg.muted" pl="3.5">
+        {label}
+      </Text>
+      <Stack gap="1">{children}</Stack>
+    </Stack>
+  );
+}

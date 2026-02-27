@@ -9,6 +9,7 @@ export { CloseButton, type CloseButtonProps } from "./close-button";
 export { Code, type CodeProps } from "./code";
 export * as Combobox from "./combobox";
 export * as Dialog from "./dialog";
+export * as Drawer from "./drawer";
 export * as Field from "./field";
 export * as Fieldset from "./fieldset";
 export { Group, type GroupProps } from "./group";

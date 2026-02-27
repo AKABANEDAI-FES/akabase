@@ -142,7 +142,7 @@ export const dialog = defineSlotRecipe({
       lg: { content: { maxW: "min(95vw, token(sizes.lg))" } },
       xl: { content: { maxW: "min(95vw, token(sizes.xl))" } },
       cover: {
-        positioner: { padding: "8" },
+        positioner: { padding: { base: "4", md: "8" } },
         content: {
           width: "100%",
           height: "100%",
