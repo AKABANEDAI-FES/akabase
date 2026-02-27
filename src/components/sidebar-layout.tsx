@@ -89,7 +89,7 @@ export function SidebarLayout({ title, navigation }: SidebarLayoutProps) {
           </Stack>
         </nav>
 
-        <main>
+        <main className={css({ minWidth: 0 })}>
           <Outlet />
         </main>
       </div>
