@@ -1,4 +1,4 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { ClientOnly, Link, createFileRoute } from "@tanstack/react-router";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { Container, Flex, Stack } from "styled-system/jsx";
 import { Button, Field, Heading, Select, Textarea, toaster } from "@/components/ui";
@@ -10,7 +10,7 @@ import {
   updateProjectDraftInputSchema,
   useUpdateProjectDraftMutation,
 } from "@/features/project/actions";
-import { SubmitProjectDialog } from "@/features/project/components";
+import { RichTextEditor, SubmitProjectDialog } from "@/features/project/components";
 import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions";
 import { generateLoadTagsQueryOptions } from "@/features/event/actions/queries/tag";
 import { generateCheckOrganizationPermissionsQueryOptions } from "@/features/authorization/actions/queries";
@@ -20,6 +20,7 @@ import { Portal } from "@ark-ui/react/portal";
 import { PROJECT_MAX_TAGS, PROJECT_PAMPHLET_TEXT_MAX_LENGTH } from "@/domain/project/schema";
 import type { OrgId, ProjectId } from "@/domain/shared/ids";
 import { cast } from "@/domain/shared/ids";
+import z from "zod";
 
 const hasReachedMax = <T,>(value: T[]) => value.length >= PROJECT_MAX_TAGS;
 
@@ -61,16 +62,28 @@ function ProjectEditPage() {
     defaultValues: {
       pamphletText: draft?.pamphletText ?? "",
       tags: draft?.tags.map((tag) => tag.id as string) ?? [],
+      webContentJson: (draft?.webContentJson ?? null) as unknown,
     },
     validators: {
-      onDynamic: updateProjectDraftInputSchema.pick({
-        pamphletText: true,
-        tags: true,
+      onDynamic: z.object({
+        pamphletText: updateProjectDraftInputSchema.shape.pamphletText,
+        tags: updateProjectDraftInputSchema.shape.tags,
+        webContentJson: z.unknown(),
       }),
       onSubmitAsync: async ({ value }) => {
+        const result = await updateProjectDraftInputSchema["~standard"].validate({
+          ...value,
+          projectId,
+          eventId: event.id,
+          orgId,
+        });
+        if (result.issues != null) {
+          return value;
+        }
+        const data = result.value;
         try {
           const result = await mutateAsync({
-            data: { ...value, projectId, eventId: event.id, orgId },
+            data,
           });
 
           if (Result.isFailure(result)) {
@@ -105,6 +118,7 @@ function ProjectEditPage() {
       form.reset({
         pamphletText: draft?.pamphletText ?? "",
         tags: draft?.tags.map((tag) => tag.id) ?? [],
+        webContentJson: draft?.webContentJson ?? null,
       });
       toaster.create({
         type: "success",
@@ -216,6 +230,31 @@ function ProjectEditPage() {
                   <Field.HelperText>
                     企画のカテゴリに該当するタグを選択してください（最大{PROJECT_MAX_TAGS}個）
                   </Field.HelperText>
+                </Field.Root>
+              )}
+            </form.Field>
+
+            <form.Field name="webContentJson">
+              {(field) => (
+                <Field.Root invalid={!field.state.meta.isValid}>
+                  <Field.Label htmlFor={field.name}>Web用コンテンツ</Field.Label>
+                  <ClientOnly>
+                    <RichTextEditor
+                      value={field.state.value}
+                      onChange={(value) => field.handleChange(value)}
+                      onBlur={field.handleBlur}
+                      invalid={!field.state.meta.isValid}
+                      placeholder="企画のWeb用コンテンツを入力してください"
+                    />
+                  </ClientOnly>
+                  {!field.state.meta.isValid && (
+                    <Field.ErrorText>
+                      {nl2br(
+                        field.state.meta.errors.map((error) => error?.message ?? "").join("\n"),
+                      )}
+                    </Field.ErrorText>
+                  )}
+                  <Field.HelperText>Webサイト用の詳細な企画説明を入力できます</Field.HelperText>
                 </Field.Root>
               )}
             </form.Field>

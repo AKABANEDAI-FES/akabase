@@ -56,6 +56,9 @@ export const button = defineRecipe({
         _on: {
           bg: "colorPalette.surface.bg.active",
         },
+        _pressed: {
+          bg: "colorPalette.surface.bg.active",
+        },
       },
       subtle: {
         bg: "colorPalette.subtle.bg",
@@ -67,6 +70,9 @@ export const button = defineRecipe({
           bg: "colorPalette.subtle.bg.active",
         },
         _on: {
+          bg: "colorPalette.subtle.bg.active",
+        },
+        _pressed: {
           bg: "colorPalette.subtle.bg.active",
         },
       },
@@ -83,6 +89,9 @@ export const button = defineRecipe({
         _on: {
           bg: "colorPalette.outline.bg.active",
         },
+        _pressed: {
+          bg: "colorPalette.outline.bg.active",
+        },
       },
       plain: {
         color: "colorPalette.plain.fg",
@@ -93,6 +102,9 @@ export const button = defineRecipe({
           bg: "colorPalette.plain.bg.active",
         },
         _on: {
+          bg: "colorPalette.plain.bg.active",
+        },
+        _pressed: {
           bg: "colorPalette.plain.bg.active",
         },
       },

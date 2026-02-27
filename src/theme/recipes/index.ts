@@ -1,3 +1,7 @@
+import { scrollArea } from "./scroll-area";
+import { menu } from "./menu";
+import { toggleGroup } from "./toggle-group";
+import { tooltip } from "./tooltip";
 import { combobox } from "./combobox";
 import { segmentGroup } from "./segment-group";
 import { code } from "./code";
@@ -24,6 +28,7 @@ import { checkbox } from "./checkbox";
 import { spinner } from "./spinner";
 import { avatar } from "./avatar";
 import { button } from "./button";
+import { richTextEditor } from "./rich-text-editor";
 export const recipes = {
   button,
   avatar,
@@ -51,5 +56,10 @@ export const recipes = {
   code,
   segmentGroup,
   combobox,
+  richTextEditor,
+  tooltip,
+  toggleGroup,
+  menu,
+  scrollArea,
 };
 export const slotRecipes = {};

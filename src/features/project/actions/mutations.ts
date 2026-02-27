@@ -80,7 +80,6 @@ export function useCreateProjectMutation() {
 
 /**
  * Update project draft input validation schema
- * Excludes webContentJson (rich editor) for now
  */
 export const updateProjectDraftInputSchema = z.object({
   projectId: projectIdSchema,
@@ -88,6 +87,7 @@ export const updateProjectDraftInputSchema = z.object({
   orgId: projectSchema.shape.orgId,
   pamphletText: draftWithTagsSchema.shape.pamphletText,
   tags: draftWithTagsSchema.shape.tags,
+  webContentJson: draftWithTagsSchema.shape.webContentJson,
 });
 
 /**
@@ -105,12 +105,12 @@ export const updateProjectDraftFn = createServerFn({ method: "POST" })
         orgIds: [data.orgId],
       });
 
-      // Update draft (webContentJson set to null since rich editor is not implemented yet)
+      // Update draft
       return yield* $(
         await updateProjectDraft(dependencies, {
           projectId: data.projectId,
           pamphletText: data.pamphletText,
-          webContentJson: null,
+          webContentJson: data.webContentJson,
           tags: data.tags,
           actor,
         }),
