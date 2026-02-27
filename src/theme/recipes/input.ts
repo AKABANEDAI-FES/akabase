@@ -20,7 +20,7 @@ export const input = {
   },
   defaultVariants: {
     size: "md",
-    variant: "outline",
+    variant: "surface",
   },
   variants: {
     variant: {

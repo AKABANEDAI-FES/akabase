@@ -13,7 +13,10 @@ import { Result } from "@praha/byethrow";
  */
 export const projectDetailSchema = z.object({
   id: projectIdSchema,
+  eventId: z.string(),
+  orgId: z.string(),
   name: z.string(),
+  placeId: z.string().nullable(),
   placeName: z.string().nullable(),
   logoKey: z.string().nullable(),
   createdAt: z.date(),
@@ -67,7 +70,10 @@ export async function getProjectDetail(
 
     const detail = projectDetailSchema.parse({
       id: project.id,
+      eventId: project.eventId,
+      orgId: project.orgId,
       name: project.name,
+      placeId: project.placeId,
       placeName: project.place?.name ?? null,
       logoKey: project.logoKey,
       createdAt: project.createdAt,

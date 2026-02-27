@@ -3,6 +3,8 @@ import { Result } from "@praha/byethrow";
 import { dependencies } from "@/infrastructure/di";
 import { createProject } from "@/application/command/project/create-project";
 import { updateProjectDraft } from "@/application/command/project/update-project-draft";
+import { updateProject } from "@/application/command/project/update-project";
+import { updatePublished } from "@/application/command/project/update-published";
 import { submitProject } from "@/application/command/project/submit-project";
 import { approveProject } from "@/application/command/project/approve-project";
 import { returnProject } from "@/application/command/project/return-project";
@@ -20,6 +22,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   generateLoadDraftCacheKey,
   generateLoadEventSubmissionsCacheKey,
+  generateLoadProjectDetailCacheKey,
+  generateLoadProjectPublishedCacheKey,
   generateLoadProjectsCacheKey,
   generateLoadSubmissionDetailCacheKey,
   generateLoadSubmissionsCacheKey,
@@ -352,6 +356,104 @@ export function useWithdrawSubmissionMutation() {
       // Invalidate event-wide submissions cache
       queryClient.invalidateQueries({
         queryKey: generateLoadEventSubmissionsCacheKey(eventId),
+      });
+    }),
+  });
+}
+
+/**
+ * =============================================================================
+ * Update Project (metadata: name, placeId)
+ * =============================================================================
+ */
+
+export const updateProjectInputSchema = z.object({
+  projectId: projectIdSchema,
+  eventId: projectSchema.shape.eventId,
+  orgId: projectSchema.shape.orgId,
+  name: projectSchema.shape.name,
+  placeId: projectSchema.shape.placeId,
+});
+
+export const updateProjectFn = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .inputValidator(updateProjectInputSchema)
+  .handler(async ({ data, context }) => {
+    return gen(async function* ($) {
+      const actor = await resolveActor({
+        userId: cast<UserId>(context.session.user.id),
+        eventIds: [data.eventId],
+      });
+      const result = yield* $(await updateProject(dependencies, { ...data, actor }));
+      return result;
+    });
+  });
+
+export function useUpdateProjectMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateProjectFn,
+    onSuccess: Result.inspect(({ projectId, eventId, orgId }) => {
+      // Invalidate project caches
+      queryClient.invalidateQueries({
+        queryKey: ["projects", projectId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: generateLoadProjectsCacheKey(eventId, orgId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: generateLoadProjectDetailCacheKey(eventId, orgId, projectId),
+      });
+    }),
+  });
+}
+
+/**
+ * =============================================================================
+ * Update Published (content: pamphletText, webContentJson, tags)
+ * =============================================================================
+ */
+
+export const updatePublishedInputSchema = z.object({
+  projectId: projectIdSchema,
+  eventId: projectSchema.shape.eventId,
+  orgId: projectSchema.shape.orgId,
+  pamphletText: draftWithTagsSchema.shape.pamphletText,
+  webContentJson: draftWithTagsSchema.shape.webContentJson,
+  tags: draftWithTagsSchema.shape.tags,
+});
+
+export const updatePublishedFn = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .inputValidator(updatePublishedInputSchema)
+  .handler(async ({ data, context }) => {
+    return gen(async function* ($) {
+      const actor = await resolveActor({
+        userId: cast<UserId>(context.session.user.id),
+        eventIds: [data.eventId],
+      });
+      const result = yield* $(await updatePublished(dependencies, { ...data, actor }));
+      return result;
+    });
+  });
+
+export function useUpdatePublishedMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updatePublishedFn,
+    onSuccess: Result.inspect(({ projectId, eventId, orgId }) => {
+      // Invalidate published and project caches
+      queryClient.invalidateQueries({
+        queryKey: ["projects", projectId, "published"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["projects", projectId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: generateLoadProjectsCacheKey(eventId, orgId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: generateLoadProjectPublishedCacheKey(eventId, orgId, projectId),
       });
     }),
   });

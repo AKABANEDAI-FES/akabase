@@ -294,6 +294,59 @@ export class ProjectRepositoryImpl implements ProjectRepository {
     }
   }
 
+  async savePublished(published: PublishedWithTags): Promise<void> {
+    try {
+      // Upsert published
+      const q1 = db
+        .insert(projectPublished)
+        .values({
+          projectId: published.projectId,
+          pamphletText: published.pamphletText,
+          webContentJson: published.webContentJson,
+          publishedAt: published.publishedAt,
+          publishedBy: published.publishedBy,
+        })
+        .onConflictDoUpdate({
+          target: projectPublished.projectId,
+          set: {
+            // Immutable fields excluded: projectId
+            pamphletText: published.pamphletText,
+            webContentJson: published.webContentJson,
+            publishedAt: published.publishedAt,
+            publishedBy: published.publishedBy,
+          },
+        });
+
+      // Update project's updatedAt
+      const q2 = db
+        .update(projects)
+        .set({ updatedAt: published.publishedAt })
+        .where(eq(projects.id, published.projectId));
+
+      // Replace tags (delete + insert)
+      const q3 = db
+        .delete(projectPublishedTags)
+        .where(eq(projectPublishedTags.projectId, published.projectId));
+
+      const query: [BatchItem<"sqlite">, ...BatchItem<"sqlite">[]] = [q1, q2, q3];
+
+      if (published.tags.length > 0) {
+        const q4 = db.insert(projectPublishedTags).values(
+          published.tags.map((tagId) => ({
+            id: generateId(),
+            projectId: published.projectId,
+            tagId,
+          })),
+        );
+        query.push(q4);
+      }
+
+      await db.batch(query);
+    } catch (error) {
+      throw new RepositoryException("DATABASE_ERROR", "Failed to save published data", error);
+    }
+  }
+
   async findApprovalAction(
     submissionId: SubmissionId,
     userId: UserId,

@@ -67,6 +67,12 @@ export interface ProjectRepository {
   saveDraft(draft: DraftWithTags): Promise<void>;
 
   /**
+   * Save published data (insert or update)
+   * @throws {RepositoryException} on database errors
+   */
+  savePublished(published: PublishedWithTags): Promise<void>;
+
+  /**
    * Find approval action by submission and user
    * Used to check if a user has already approved a submission
    * @throws {RepositoryException} on database errors

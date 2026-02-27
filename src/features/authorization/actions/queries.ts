@@ -88,6 +88,7 @@ export const checkCommitteePermissionsFn = createServerFn({ method: "GET" })
       canUpdateTag: check(eventRes, "tag:update"),
       canDeleteTag: check(eventRes, "tag:delete"),
       canCreateProject: check(projectRes, "project:create"),
+      canUpdateProject: check(projectRes, "project:update"),
       canApproveProject: check(projectRes, "project:approve"),
     };
   });

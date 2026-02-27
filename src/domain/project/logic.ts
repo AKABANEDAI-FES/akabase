@@ -54,7 +54,7 @@ export function createProjectEntity(input: {
     id: input.id,
     eventId: input.eventId,
     orgId: input.orgId,
-    name: input.name,
+    name: input.name.trim(),
     placeId: input.placeId,
     logoKey: input.logoKey,
     createdAt: now,
@@ -64,6 +64,35 @@ export function createProjectEntity(input: {
   return Result.try({
     try: () => projectSchema.parse(data),
     catch: () => projectError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "企画の作成に失敗しました"),
+  });
+}
+
+/**
+ * Update an existing Project entity
+ * Validates input using zod schema
+ *
+ * Business rules:
+ * - name is trimmed before validation
+ * - All fields can be updated except id, eventId, orgId, createdAt
+ * - updatedAt is automatically set to current time
+ */
+export function updateProjectEntity(input: {
+  project: Project;
+  name: string;
+  placeId: PlaceId | null;
+  now?: Date;
+}): Result.Result<Project, ProjectError> {
+  const now = input.now ?? new Date();
+
+  return Result.try({
+    try: () =>
+      projectSchema.parse({
+        ...input.project,
+        name: input.name.trim(),
+        placeId: input.placeId,
+        updatedAt: now,
+      }),
+    catch: () => projectError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "企画の更新に失敗しました"),
   });
 }
 
@@ -331,6 +360,40 @@ export function createPublishedEntity(input: {
   return Result.try({
     try: () => publishedWithTagsSchema.parse(data),
     catch: () => projectError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "公開データの作成に失敗しました"),
+  });
+}
+
+/**
+ * Update an existing PublishedWithTags entity
+ * Validates input using zod schema
+ *
+ * Business rules:
+ * - pamphletText is trimmed before validation
+ * - publishedAt and publishedBy are updated to reflect the editor
+ * - All fields can be updated except projectId
+ */
+export function updatePublishedEntity(input: {
+  projectId: ProjectId;
+  pamphletText: string;
+  webContentJson: unknown | null;
+  tags: TagId[];
+  publishedBy: UserId;
+  now?: Date;
+}): Result.Result<PublishedWithTags, ProjectError> {
+  const now = input.now ?? new Date();
+
+  const data = {
+    projectId: input.projectId,
+    pamphletText: input.pamphletText.trim(),
+    webContentJson: input.webContentJson,
+    tags: input.tags,
+    publishedAt: now,
+    publishedBy: input.publishedBy,
+  };
+
+  return Result.try({
+    try: () => publishedWithTagsSchema.parse(data),
+    catch: () => projectError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "公開データの更新に失敗しました"),
   });
 }
 
