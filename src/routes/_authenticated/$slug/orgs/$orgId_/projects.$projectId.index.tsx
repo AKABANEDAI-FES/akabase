@@ -2,7 +2,7 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Container, Flex, Stack } from "styled-system/jsx";
 import { Button, Heading, Text } from "@/components/ui";
-import { ArrowLeftIcon, EditIcon, HistoryIcon } from "lucide-react";
+import { ArrowLeftIcon, EditIcon, HistoryIcon, MapPinIcon } from "lucide-react";
 import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions";
 import {
   generateLoadProjectDetailQueryOptions,
@@ -47,15 +47,27 @@ function ProjectDetailPage() {
               組織に戻る
             </Link>
           </Button>
-          <Flex justify="space-between" align="center">
-            <div>
+          <Flex gap="5" align="start">
+            {project.logoUrl && (
+              <img
+                src={project.logoUrl}
+                alt={`${project.name}のロゴ`}
+                width={80}
+                height={80}
+                style={{ objectFit: "contain", borderRadius: "8px", flexShrink: 0 }}
+              />
+            )}
+            <Stack gap="1">
               <Heading as="h1" textStyle="2xl" fontWeight="bold">
                 {project.name}
               </Heading>
-              <Text textStyle="sm" color="fg.muted">
-                最終更新: {new Date(project.updatedAt).toLocaleDateString("ja-JP")}
-              </Text>
-            </div>
+              {project.placeName && (
+                <Flex align="center" gap="1" color="fg.muted">
+                  <MapPinIcon size={16} />
+                  <Text textStyle="sm">{project.placeName}</Text>
+                </Flex>
+              )}
+            </Stack>
           </Flex>
         </div>
 
