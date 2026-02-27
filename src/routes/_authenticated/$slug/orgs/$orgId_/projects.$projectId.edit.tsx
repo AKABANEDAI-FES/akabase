@@ -1,7 +1,7 @@
 import { ClientOnly, Link, createFileRoute } from "@tanstack/react-router";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { Container, Flex, Stack } from "styled-system/jsx";
-import { Button, Field, Heading, Select, Textarea, toaster } from "@/components/ui";
+import { Alert, Badge, Button, Field, Heading, Select, Textarea, toaster } from "@/components/ui";
 import { ArrowLeftIcon, SaveIcon, SendIcon } from "lucide-react";
 import { revalidateLogic, useForm, useStore } from "@tanstack/react-form";
 import { Result } from "@praha/byethrow";
@@ -13,14 +13,17 @@ import {
 import { RichTextEditor, SubmitProjectDialog } from "@/features/project/components";
 import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions";
 import { generateLoadTagsQueryOptions } from "@/features/event/actions/queries/tag";
+import { generateLoadDeadlinesQueryOptions } from "@/features/event/actions/queries/deadline";
 import { generateCheckOrganizationPermissionsQueryOptions } from "@/features/authorization/actions/queries";
 import { nl2br } from "@/libs/text";
 import { createListCollection } from "@ark-ui/react/collection";
 import { Portal } from "@ark-ui/react/portal";
+import { getDeadlineMessage, getFieldDeadlineStatus } from "@/features/project/utils/deadline";
 import { PROJECT_MAX_TAGS, PROJECT_PAMPHLET_TEXT_MAX_LENGTH } from "@/domain/project/schema";
 import type { OrgId, ProjectId } from "@/domain/shared/ids";
 import { cast } from "@/domain/shared/ids";
 import z from "zod";
+import { getBlockedFieldKeys } from "@/domain/event/logic";
 
 const hasReachedMax = <T,>(value: T[]) => value.length >= PROJECT_MAX_TAGS;
 
@@ -38,6 +41,7 @@ export const Route = createFileRoute("/_authenticated/$slug/orgs/$orgId_/project
         context.queryClient.ensureQueryData(
           generateCheckOrganizationPermissionsQueryOptions(event.id, params.orgId),
         ),
+        context.queryClient.ensureQueryData(generateLoadDeadlinesQueryOptions(event.id)),
       ]);
     },
     component: ProjectEditPage,
@@ -56,7 +60,12 @@ function ProjectEditPage() {
   const { data: permissions } = useSuspenseQuery(
     generateCheckOrganizationPermissionsQueryOptions(event.id, orgId),
   );
+  const { data: deadlines } = useSuspenseQuery(generateLoadDeadlinesQueryOptions(event.id));
   const { mutateAsync } = useUpdateProjectDraftMutation();
+
+  // Calculate blocked fields once
+  const now = new Date();
+  const blockedFields = getBlockedFieldKeys(deadlines, now);
 
   const form = useForm({
     defaultValues: {
@@ -160,103 +169,187 @@ function ProjectEditPage() {
           </div>
           <Stack gap="6">
             <form.Field name="pamphletText">
-              {(field) => (
-                <Field.Root invalid={!field.state.meta.isValid}>
-                  <Field.Label htmlFor={field.name}>
-                    パンフレット用説明（{PROJECT_PAMPHLET_TEXT_MAX_LENGTH}文字以内）
-                  </Field.Label>
-                  <Textarea
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder="パンフレットに掲載される説明文"
-                    rows={3}
-                  />
-                  {!field.state.meta.isValid && (
-                    <Field.ErrorText>
-                      {nl2br(
-                        field.state.meta.errors.map((error) => error?.message ?? "").join("\n"),
+              {(field) => {
+                const status = getFieldDeadlineStatus("pamphlet_text", deadlines, now);
+                const isBlocked = blockedFields.has("pamphlet_text");
+                const deadlineMsg = getDeadlineMessage("pamphlet_text", deadlines, now);
+
+                // 編集期間開始前の場合はフィールドを非表示
+                if (status === "before_start") {
+                  return (
+                    <Alert.Root colorPalette="gray">
+                      <Alert.Content>
+                        <Alert.Title>パンフレット用説明</Alert.Title>
+                        <Alert.Description>{deadlineMsg}</Alert.Description>
+                      </Alert.Content>
+                    </Alert.Root>
+                  );
+                }
+
+                return (
+                  <Field.Root invalid={!field.state.meta.isValid}>
+                    <Field.Label htmlFor={field.name}>
+                      パンフレット用説明（{PROJECT_PAMPHLET_TEXT_MAX_LENGTH}文字以内）
+                      {isBlocked && (
+                        <Badge ml="2" variant="subtle">
+                          編集不可
+                        </Badge>
                       )}
-                    </Field.ErrorText>
-                  )}
-                  <Field.HelperText>
-                    残り: {PROJECT_PAMPHLET_TEXT_MAX_LENGTH - field.state.value.length}文字
-                  </Field.HelperText>
-                </Field.Root>
-              )}
+                    </Field.Label>
+                    <Textarea
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder="パンフレットに掲載される説明文"
+                      rows={3}
+                      disabled={isBlocked}
+                    />
+                    {!field.state.meta.isValid && (
+                      <Field.ErrorText>
+                        {nl2br(
+                          field.state.meta.errors.map((error) => error?.message ?? "").join("\n"),
+                        )}
+                      </Field.ErrorText>
+                    )}
+                    <Field.HelperText>
+                      {isBlocked && deadlineMsg
+                        ? deadlineMsg
+                        : `残り: ${PROJECT_PAMPHLET_TEXT_MAX_LENGTH - field.state.value.length}文字`}
+                    </Field.HelperText>
+                  </Field.Root>
+                );
+              }}
             </form.Field>
 
             <form.Field name="tags">
-              {(field) => (
-                <Field.Root invalid={!field.state.meta.isValid}>
-                  <Field.Label htmlFor={field.name}>タグ</Field.Label>
-                  <Select.Root
-                    collection={tagsCollection}
-                    value={field.state.value}
-                    onValueChange={({ value }) => {
-                      field.handleChange(value);
-                    }}
-                    positioning={{ sameWidth: true }}
-                    multiple
-                  >
-                    <Select.Control>
-                      <Select.Trigger>
-                        <Select.ValueText placeholder="タグを選択" />
-                        <Select.Indicator />
-                      </Select.Trigger>
-                    </Select.Control>
-                    <Portal>
-                      <Select.Positioner>
-                        <Select.Content>
-                          {tagsCollection.items.map((option) => (
-                            <Select.Item key={option.value} item={option}>
-                              <Select.ItemText>{option.label}</Select.ItemText>
-                              <Select.ItemIndicator />
-                            </Select.Item>
-                          ))}
-                        </Select.Content>
-                      </Select.Positioner>
-                    </Portal>
-                  </Select.Root>
-                  {!field.state.meta.isValid && (
-                    <Field.ErrorText>
-                      {nl2br(
-                        field.state.meta.errors.map((error) => error?.message ?? "").join("\n"),
+              {(field) => {
+                const status = getFieldDeadlineStatus("tags", deadlines, now);
+                const isBlocked = blockedFields.has("tags");
+                const deadlineMsg = getDeadlineMessage("tags", deadlines, now);
+
+                // 編集期間開始前の場合はフィールドを非表示
+                if (status === "before_start") {
+                  return (
+                    <Alert.Root colorPalette="gray">
+                      <Alert.Content>
+                        <Alert.Title>タグ</Alert.Title>
+                        <Alert.Description>{deadlineMsg}</Alert.Description>
+                      </Alert.Content>
+                    </Alert.Root>
+                  );
+                }
+
+                return (
+                  <Field.Root invalid={!field.state.meta.isValid}>
+                    <Field.Label htmlFor={field.name}>
+                      タグ
+                      {isBlocked && (
+                        <Badge ml="2" variant="subtle">
+                          編集不可
+                        </Badge>
                       )}
-                    </Field.ErrorText>
-                  )}
-                  <Field.HelperText>
-                    企画のカテゴリに該当するタグを選択してください（最大{PROJECT_MAX_TAGS}個）
-                  </Field.HelperText>
-                </Field.Root>
-              )}
+                    </Field.Label>
+                    <Select.Root
+                      collection={tagsCollection}
+                      value={field.state.value}
+                      onValueChange={({ value }) => {
+                        field.handleChange(value);
+                      }}
+                      positioning={{ sameWidth: true }}
+                      multiple
+                      disabled={isBlocked}
+                    >
+                      <Select.Control>
+                        <Select.Trigger>
+                          <Select.ValueText placeholder="タグを選択" />
+                          <Select.Indicator />
+                        </Select.Trigger>
+                      </Select.Control>
+                      <Portal>
+                        <Select.Positioner>
+                          <Select.Content>
+                            {tagsCollection.items.map((option) => (
+                              <Select.Item key={option.value} item={option}>
+                                <Select.ItemText>{option.label}</Select.ItemText>
+                                <Select.ItemIndicator />
+                              </Select.Item>
+                            ))}
+                          </Select.Content>
+                        </Select.Positioner>
+                      </Portal>
+                    </Select.Root>
+                    {!field.state.meta.isValid && (
+                      <Field.ErrorText>
+                        {nl2br(
+                          field.state.meta.errors.map((error) => error?.message ?? "").join("\n"),
+                        )}
+                      </Field.ErrorText>
+                    )}
+                    <Field.HelperText>
+                      {isBlocked && deadlineMsg
+                        ? deadlineMsg
+                        : `企画のカテゴリに該当するタグを選択してください（最大${PROJECT_MAX_TAGS}個）`}
+                    </Field.HelperText>
+                  </Field.Root>
+                );
+              }}
             </form.Field>
 
             <form.Field name="webContentJson">
-              {(field) => (
-                <Field.Root invalid={!field.state.meta.isValid}>
-                  <Field.Label htmlFor={field.name}>Web用コンテンツ</Field.Label>
-                  <ClientOnly>
-                    <RichTextEditor
-                      value={field.state.value}
-                      onChange={(value) => field.handleChange(value)}
-                      onBlur={field.handleBlur}
-                      invalid={!field.state.meta.isValid}
-                      placeholder="企画のWeb用コンテンツを入力してください"
-                    />
-                  </ClientOnly>
-                  {!field.state.meta.isValid && (
-                    <Field.ErrorText>
-                      {nl2br(
-                        field.state.meta.errors.map((error) => error?.message ?? "").join("\n"),
+              {(field) => {
+                const status = getFieldDeadlineStatus("web_content", deadlines, now);
+                const isBlocked = blockedFields.has("web_content");
+                const deadlineMsg = getDeadlineMessage("web_content", deadlines, now);
+
+                // 編集期間開始前の場合はフィールドを非表示
+                if (status === "before_start") {
+                  return (
+                    <Alert.Root colorPalette="gray">
+                      <Alert.Content>
+                        <Alert.Title>Web用コンテンツ</Alert.Title>
+                        <Alert.Description>{deadlineMsg}</Alert.Description>
+                      </Alert.Content>
+                    </Alert.Root>
+                  );
+                }
+
+                return (
+                  <Field.Root invalid={!field.state.meta.isValid}>
+                    <Field.Label htmlFor={field.name}>
+                      Web用コンテンツ
+                      {isBlocked && (
+                        <Badge ml="2" variant="subtle">
+                          編集不可
+                        </Badge>
                       )}
-                    </Field.ErrorText>
-                  )}
-                  <Field.HelperText>Webサイト用の詳細な企画説明を入力できます</Field.HelperText>
-                </Field.Root>
-              )}
+                    </Field.Label>
+                    <ClientOnly>
+                      <RichTextEditor
+                        value={field.state.value}
+                        onChange={(value) => field.handleChange(value)}
+                        onBlur={field.handleBlur}
+                        invalid={!field.state.meta.isValid}
+                        placeholder="企画のWeb用コンテンツを入力してください"
+                        disabled={isBlocked}
+                      />
+                    </ClientOnly>
+                    {!field.state.meta.isValid && (
+                      <Field.ErrorText>
+                        {nl2br(
+                          field.state.meta.errors.map((error) => error?.message ?? "").join("\n"),
+                        )}
+                      </Field.ErrorText>
+                    )}
+                    <Field.HelperText>
+                      {isBlocked && deadlineMsg
+                        ? deadlineMsg
+                        : "Webサイト用の詳細な企画説明を入力できます"}
+                    </Field.HelperText>
+                  </Field.Root>
+                );
+              }}
             </form.Field>
 
             <form.Subscribe

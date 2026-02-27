@@ -8,7 +8,7 @@ import type { AuthorizationError } from "@/domain/authorization/errors";
 import type { Actor } from "@/domain/authorization/schema";
 import { projectResource } from "@/domain/authorization/logic";
 import { updateProjectDraftEntity } from "@/domain/project/logic";
-import type { Deadline } from "@/domain/event/schema";
+import { getBlockedFieldKeys } from "@/domain/event/logic";
 import type { DraftWithTags } from "@/domain/project/schema";
 import type { Dependencies } from "@/infrastructure/di";
 
@@ -36,25 +36,6 @@ export type UpdateProjectDraftOutput = {
  * Errors that can occur during draft update
  */
 export type UpdateProjectDraftError = ProjectError | EventError | AuthorizationError;
-
-/**
- * Build a set of blocked field keys based on deadline window
- * Field is blocked if:
- * - now < startAt (not yet open) OR
- * - deadlineAt <= now (deadline passed)
- */
-function getBlockedFieldKeys(deadlines: Deadline[], now: Date): Set<string> {
-  const keys = new Set<string>();
-  for (const deadline of deadlines) {
-    const beforeStart = deadline.startAt && now < deadline.startAt;
-    const afterDeadline = deadline.deadlineAt <= now;
-
-    if (beforeStart || afterDeadline) {
-      keys.add(deadline.fieldKey);
-    }
-  }
-  return keys;
-}
 
 /**
  * Apply deadline enforcement by keeping existing values for blocked fields

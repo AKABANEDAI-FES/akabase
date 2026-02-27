@@ -4,6 +4,7 @@ import { deadlines } from "@/db/schema";
 import { asc, eq } from "drizzle-orm";
 import type { EventId } from "@/domain/shared/ids";
 import { deadlineIdSchema, eventIdSchema } from "@/domain/shared/ids";
+import { DEADLINE_FIELD_KEYS } from "@/domain/event/schema";
 import { QueryException } from "../shared";
 
 /**
@@ -12,7 +13,7 @@ import { QueryException } from "../shared";
 export const deadlineListItemSchema = z.object({
   id: deadlineIdSchema,
   eventId: eventIdSchema,
-  fieldKey: z.string(),
+  fieldKey: z.enum(DEADLINE_FIELD_KEYS),
   startAt: z.date().optional(),
   deadlineAt: z.date(),
   createdAt: z.date(),

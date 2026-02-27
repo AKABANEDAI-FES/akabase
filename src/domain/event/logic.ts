@@ -271,3 +271,26 @@ export function updateDeadlineEntity(
     catch: () => eventError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "締切の更新に失敗しました"),
   });
 }
+
+/**
+ * Calculate which fields are currently blocked based on deadlines
+ * Field is blocked if:
+ * - now < startAt (editing window not yet open) OR
+ * - deadlineAt <= now (deadline has passed)
+ *
+ * @param deadlines - List of deadlines for an event
+ * @param now - Current date/time
+ * @returns Set of blocked field keys
+ */
+export function getBlockedFieldKeys(deadlines: Deadline[], now: Date): Set<string> {
+  const keys = new Set<string>();
+  for (const deadline of deadlines) {
+    const beforeStart = deadline.startAt && now < deadline.startAt;
+    const afterDeadline = deadline.deadlineAt <= now;
+
+    if (beforeStart || afterDeadline) {
+      keys.add(deadline.fieldKey);
+    }
+  }
+  return keys;
+}
