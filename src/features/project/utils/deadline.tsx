@@ -1,5 +1,6 @@
 import type { Deadline } from "@/domain/event/schema";
 import { DEADLINE_FIELD_LABELS } from "@/domain/event/schema";
+import { FormatDate } from "@/libs/date";
 
 /**
  * Get deadline status for a specific field
@@ -33,7 +34,7 @@ export function getDeadlineMessage(
   fieldKey: string,
   deadlines: Deadline[],
   now: Date,
-): string | null {
+): React.ReactNode {
   const deadline = deadlines.find((d) => d.fieldKey === fieldKey);
   const fieldLabel = DEADLINE_FIELD_LABELS[fieldKey as keyof typeof DEADLINE_FIELD_LABELS];
 
@@ -42,25 +43,41 @@ export function getDeadlineMessage(
   }
 
   if (deadline.startAt && now < deadline.startAt) {
-    const formatted = deadline.startAt.toLocaleString("ja-JP", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    return `${fieldLabel}の編集期間は${formatted}から開始されます`;
+    return (
+      <>
+        {fieldLabel}の編集期間は
+        <FormatDate
+          value={deadline.startAt}
+          option={{
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          }}
+        />
+        から開始されます
+      </>
+    );
   }
 
   if (deadline.deadlineAt <= now) {
-    const formatted = deadline.deadlineAt.toLocaleString("ja-JP", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    return `${fieldLabel}の締切（${formatted}）を過ぎているため、編集できません`;
+    return (
+      <>
+        {fieldLabel}の締切（
+        <FormatDate
+          value={deadline.deadlineAt}
+          option={{
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          }}
+        />
+        ）を過ぎているため、編集できません
+      </>
+    );
   }
 
   return null;

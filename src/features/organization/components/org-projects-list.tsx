@@ -5,6 +5,7 @@ import { Text } from "@/components/ui";
 import { css } from "styled-system/css";
 import { generateLoadProjectsQueryOptions } from "@/features/project/actions/queries";
 import type { EventId, OrgId } from "@/domain/shared/ids";
+import { FormatDate } from "@/libs/date";
 
 interface OrgProjectsListProps {
   eventId: EventId;
@@ -39,7 +40,11 @@ export function OrgProjectsList({ eventId, orgId, slug }: OrgProjectsListProps) 
             {project.name}
           </Text>
           <Text color="fg.muted" fontSize="sm">
-            最終更新: {project.updatedAt.toLocaleString("ja-JP")}
+            最終更新:{" "}
+            <FormatDate
+              value={project.updatedAt}
+              option={{ dateStyle: "medium", timeStyle: "short" }}
+            />
           </Text>
         </Link>
       ))}

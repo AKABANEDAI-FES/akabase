@@ -3,6 +3,7 @@ import { TagIcon } from "lucide-react";
 import { Badge, Card, Text } from "@/components/ui";
 import type { SubmissionDetail } from "@/application/query/project/get-submission-detail";
 import { TipTapContentRenderer } from "./tiptap-content-renderer";
+import { FormatDate } from "@/libs/date";
 
 interface SubmissionOverviewTabProps {
   submission: SubmissionDetail;
@@ -59,7 +60,12 @@ function SubmissionInfoCard({
             <Text textStyle="sm" color="fg.muted">
               提出日時
             </Text>
-            <Text textStyle="sm">{submission.submittedAt.toLocaleString("ja-JP")}</Text>
+            <Text textStyle="sm">
+              <FormatDate
+                value={submission.submittedAt}
+                option={{ dateStyle: "medium", timeStyle: "short" }}
+              />
+            </Text>
           </Flex>
         </Stack>
       </Card.Body>

@@ -8,6 +8,7 @@ import { generateLoadProjectsQueryOptions } from "@/features/project/actions";
 import { cast } from "@/domain/shared/ids";
 import type { EventId } from "@/domain/shared/ids";
 import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions";
+import { FormatDate } from "@/libs/date";
 
 export const Route = createFileRoute(
   "/_authenticated/$slug/committee/organizations_/$orgId/projects",
@@ -57,7 +58,9 @@ function ProjectsPage() {
               <Table.Row key={project.id}>
                 <Table.Cell fontWeight="medium">{project.name}</Table.Cell>
                 <Table.Cell>{project.placeName || "—"}</Table.Cell>
-                <Table.Cell>{new Date(project.createdAt).toLocaleDateString("ja-JP")}</Table.Cell>
+                <Table.Cell>
+                  <FormatDate value={project.createdAt} option={{ dateStyle: "medium" }} />
+                </Table.Cell>
                 {canUpdate && (
                   <Table.Cell>
                     <Flex gap="2">

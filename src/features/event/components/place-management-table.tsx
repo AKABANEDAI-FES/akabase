@@ -6,6 +6,7 @@ import type { EventId } from "@/domain/shared/ids";
 import type { PlaceListItem } from "@/application/query/event/list-places";
 import { DeletePlaceDialog } from "./delete-place-dialog";
 import { EditPlaceDialog } from "./edit-place-dialog";
+import { FormatDate } from "@/libs/date";
 
 interface PlaceManagementTableProps {
   places: PlaceListItem[];
@@ -81,7 +82,9 @@ export function PlaceManagementTable({
                 <Table.Cell fontWeight="medium">
                   <span style={{ paddingLeft: `${place.depth * 24}px` }}>{place.name}</span>
                 </Table.Cell>
-                <Table.Cell>{new Date(place.createdAt).toLocaleDateString("ja-JP")}</Table.Cell>
+                <Table.Cell>
+                  <FormatDate value={place.createdAt} option={{ dateStyle: "medium" }} />
+                </Table.Cell>
                 {showActions && (
                   <Table.Cell>
                     <Flex gap="2">

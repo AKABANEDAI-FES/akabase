@@ -6,6 +6,7 @@ import { SubmissionStatusBadge } from "./submission-status-badge";
 import { SUBMISSION_ACTION_LABELS } from "@/domain/project/schema";
 import { generateLoadSubmissionsQueryOptions } from "@/features/project/actions/queries";
 import type { EventId, OrgId, ProjectId } from "@/domain/shared/ids";
+import { FormatDate } from "@/libs/date";
 
 interface ProjectSubmissionsHistoryProps {
   eventId: EventId;
@@ -50,8 +51,10 @@ export function ProjectSubmissionsHistory({
             >
               <div>
                 <Card.Title>
-                  {submission.submittedAt.toLocaleDateString("ja-JP")}{" "}
-                  {submission.submittedAt.toLocaleTimeString("ja-JP")}
+                  <FormatDate
+                    value={submission.submittedAt}
+                    option={{ dateStyle: "medium", timeStyle: "medium" }}
+                  />
                 </Card.Title>
                 <Card.Description>提出者: {submission.submittedBy}</Card.Description>
               </div>
@@ -64,7 +67,10 @@ export function ProjectSubmissionsHistory({
                     <div>
                       <Text textStyle="sm" color="fg.muted">
                         {SUBMISSION_ACTION_LABELS[submission.currentAction.actionType]}日時:{" "}
-                        {submission.currentAction.performedAt.toLocaleString("ja-JP")}
+                        <FormatDate
+                          value={submission.currentAction.performedAt}
+                          option={{ dateStyle: "medium", timeStyle: "short" }}
+                        />
                       </Text>
                       <Text textStyle="sm" color="fg.muted">
                         {SUBMISSION_ACTION_LABELS[submission.currentAction.actionType]}者:{" "}

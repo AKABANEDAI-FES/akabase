@@ -28,6 +28,7 @@ import { generateLoadEventSubmissionsQueryOptions } from "@/features/project/act
 import type { EventSubmissionListItem } from "@/application/query/project/list-event-submissions";
 import type { SubmissionStatus } from "@/domain/project/schema";
 import type { EventId } from "@/domain/shared/ids";
+import { FormatDate } from "@/libs/date";
 
 const PAGE_SIZE = 10;
 
@@ -46,14 +47,18 @@ const createColumns = (slug: string) => [
   }),
   columnHelper.accessor("submittedAt", {
     header: "提出日時",
-    cell: (info) =>
-      info.getValue().toLocaleString("ja-JP", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
+    cell: (info) => (
+      <FormatDate
+        value={info.getValue()}
+        option={{
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+        }}
+      />
+    ),
   }),
   columnHelper.accessor("submittedBy", {
     header: "提出者",

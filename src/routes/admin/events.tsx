@@ -5,6 +5,7 @@ import { Container, Flex, Stack } from "styled-system/jsx";
 import { PencilIcon, PlusIcon } from "lucide-react";
 import { generateLoadEventsQueryOptions } from "@/features/event/actions";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { FormatDate } from "@/libs/date";
 
 export const Route = createFileRoute("/admin/events")({
   loader: async ({ context }) =>
@@ -53,7 +54,9 @@ function EventListPage() {
                   <Table.Cell>
                     <EventStatusBadge status={event.status} />
                   </Table.Cell>
-                  <Table.Cell>{new Date(event.createdAt).toLocaleDateString("ja-JP")}</Table.Cell>
+                  <Table.Cell>
+                    <FormatDate value={event.createdAt} option={{ dateStyle: "medium" }} />
+                  </Table.Cell>
                   <Table.Cell>
                     <Button size="sm" variant="plain" asChild>
                       <Link to="/admin/events/$eventId" params={{ eventId: event.id }}>

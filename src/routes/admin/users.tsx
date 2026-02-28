@@ -4,6 +4,7 @@ import { generateLoadUsersWithRolesQueryOptions } from "@/features/user/actions"
 import { GlobalRoleSelect } from "@/features/user/components";
 import { Code, Heading, Table } from "@/components/ui";
 import { Container, Flex, Stack } from "styled-system/jsx";
+import { FormatDate } from "@/libs/date";
 
 export const Route = createFileRoute("/admin/users")({
   loader: async ({ context }) =>
@@ -45,7 +46,9 @@ function UserListPage() {
                   <Table.Cell>
                     <GlobalRoleSelect userId={user.id} currentRole={user.globalRole} />
                   </Table.Cell>
-                  <Table.Cell>{new Date(user.createdAt).toLocaleDateString("ja-JP")}</Table.Cell>
+                  <Table.Cell>
+                    <FormatDate value={user.createdAt} option={{ dateStyle: "medium" }} />
+                  </Table.Cell>
                 </Table.Row>
               ))}
             </Table.Body>

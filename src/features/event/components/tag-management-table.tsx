@@ -5,6 +5,7 @@ import type { EventId } from "@/domain/shared/ids";
 import type { TagListItem } from "@/application/query/event/list-tags";
 import { EditTagDialog } from "./edit-tag-dialog";
 import { DeleteTagDialog } from "./delete-tag-dialog";
+import { FormatDate } from "@/libs/date";
 
 interface TagManagementTableProps {
   tags: TagListItem[];
@@ -41,7 +42,9 @@ export function TagManagementTable({
             {tags.map((tag) => (
               <Table.Row key={tag.id}>
                 <Table.Cell fontWeight="medium">{tag.name}</Table.Cell>
-                <Table.Cell>{new Date(tag.createdAt).toLocaleDateString("ja-JP")}</Table.Cell>
+                <Table.Cell>
+                  <FormatDate value={tag.createdAt} option={{ dateStyle: "medium" }} />
+                </Table.Cell>
                 {showActions && (
                   <Table.Cell>
                     <Flex gap="2">

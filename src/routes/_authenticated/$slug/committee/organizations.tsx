@@ -6,6 +6,7 @@ import { PlusIcon } from "lucide-react";
 import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions";
 import { generateLoadOrganizationsQueryOptions } from "@/features/organization/actions";
 import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions";
+import { FormatDate } from "@/libs/date";
 
 export const Route = createFileRoute("/_authenticated/$slug/committee/organizations")({
   loader: async ({ params, context }) => {
@@ -62,7 +63,9 @@ function OrganizationsPage() {
                 <Table.Row key={org.id}>
                   <Table.Cell fontWeight="medium">{org.name}</Table.Cell>
                   <Table.Cell>{org.description || "—"}</Table.Cell>
-                  <Table.Cell>{new Date(org.createdAt).toLocaleDateString("ja-JP")}</Table.Cell>
+                  <Table.Cell>
+                    <FormatDate value={org.createdAt} option={{ dateStyle: "medium" }} />
+                  </Table.Cell>
                   <Table.Cell>
                     <Button variant="plain" size="sm" asChild>
                       <Link

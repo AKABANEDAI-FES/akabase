@@ -11,6 +11,7 @@ import {
 import { Card, Text } from "@/components/ui";
 import type { SubmissionDetail } from "@/application/query/project/get-submission-detail";
 import { SUBMISSION_ACTION_LABELS } from "@/domain/project/schema";
+import { FormatDate } from "@/libs/date";
 
 interface SubmissionHistoryTabProps {
   submission: SubmissionDetail;
@@ -105,7 +106,10 @@ function ActionHistoryItem({
             {SUBMISSION_ACTION_LABELS[action.actionType]}
           </Text>
           <Text textStyle="xs" color="fg.muted">
-            {action.createdAt.toLocaleString("ja-JP")}
+            <FormatDate
+              value={action.createdAt}
+              option={{ dateStyle: "medium", timeStyle: "short" }}
+            />
           </Text>
         </Flex>
         <Text textStyle="xs" color="fg.muted">
@@ -144,7 +148,10 @@ function StandaloneMessageItem({ message }: { message: SubmissionDetail["message
             コメント
           </Text>
           <Text textStyle="xs" color="fg.muted">
-            {message.createdAt.toLocaleString("ja-JP")}
+            <FormatDate
+              value={message.createdAt}
+              option={{ dateStyle: "medium", timeStyle: "short" }}
+            />
           </Text>
         </Flex>
         <Text textStyle="xs" color="fg.muted">

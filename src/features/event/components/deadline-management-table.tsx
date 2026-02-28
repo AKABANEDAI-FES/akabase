@@ -7,6 +7,7 @@ import { DEADLINE_FIELD_LABELS } from "@/domain/event/schema";
 import type { DeadlineFieldKey } from "@/domain/event/schema";
 import { EditDeadlineDialog } from "./edit-deadline-dialog";
 import { DeleteDeadlineDialog } from "./delete-deadline-dialog";
+import { FormatDate } from "@/libs/date";
 
 interface DeadlineManagementTableProps {
   deadlines: DeadlineListItem[];
@@ -50,27 +51,35 @@ export function DeadlineManagementTable({
                 </Table.Cell>
                 <Table.Cell>
                   {deadline.startAt ? (
-                    new Date(deadline.startAt).toLocaleString("ja-JP", {
-                      year: "numeric",
-                      month: "2-digit",
-                      day: "2-digit",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })
+                    <FormatDate
+                      value={deadline.startAt}
+                      option={{
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      }}
+                    />
                   ) : (
                     <span style={{ color: "gray" }}>制限なし</span>
                   )}
                 </Table.Cell>
                 <Table.Cell>
-                  {new Date(deadline.deadlineAt).toLocaleString("ja-JP", {
-                    year: "numeric",
-                    month: "2-digit",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                  <FormatDate
+                    value={deadline.deadlineAt}
+                    option={{
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }}
+                  />
                 </Table.Cell>
-                <Table.Cell>{new Date(deadline.createdAt).toLocaleDateString("ja-JP")}</Table.Cell>
+                <Table.Cell>
+                  <FormatDate value={deadline.createdAt} option={{ dateStyle: "medium" }} />
+                </Table.Cell>
                 {showActions && (
                   <Table.Cell>
                     <Flex gap="2">
