@@ -184,7 +184,7 @@ export function HeadingSelect({ editor: providedEditor, levels = [2, 3, 4] }: He
         <ChevronDownIcon />
       </Menu.Trigger>
       <Portal>
-        <Menu.Positioner>
+        <Menu.Positioner style={{ zIndex: "1500" }}>
           <Menu.Content minW="0" w="fit-content">
             {filteredOptions.map((option) => (
               <Menu.Item
