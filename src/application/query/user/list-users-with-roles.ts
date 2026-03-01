@@ -7,9 +7,11 @@ import { z } from "zod";
 import { db } from "@/db";
 import { globalRoleSchema } from "@/domain/authorization/schema";
 import type { Actor } from "@/domain/authorization/schema";
-import { isGlobalAdmin } from "@/domain/authorization/logic";
+import { userResource } from "@/domain/authorization/logic";
 import { userIdSchema } from "@/domain/shared/ids";
 import { QueryException } from "../shared";
+import type { Dependencies } from "@/infrastructure/di";
+import { Result } from "@praha/byethrow";
 
 /**
  * User list item DTO
@@ -34,17 +36,19 @@ export type UserListItem = z.infer<typeof userListItemSchema>;
  * - Fetch all users from the user table ordered by creation date
  * - Map to DTO with basic user information and global role
  *
+ * @param deps - Dependencies (authService)
  * @param actor - Actor (authenticated user with permissions)
  * @returns List of users or query error
  * @throws {QueryException} When database operation fails or permission denied
  */
-export async function listUsersWithRoles(actor: Actor): Promise<UserListItem[]> {
-  // Authorization check: only global admins can list all users
-  if (!isGlobalAdmin(actor)) {
-    throw new QueryException(
-      "VALIDATION_ERROR",
-      "ユーザー一覧を閲覧する権限がありません。グローバル管理者のみアクセス可能です。",
-    );
+export async function listUsersWithRoles(
+  deps: Pick<Dependencies, "authService">,
+  actor: Actor,
+): Promise<UserListItem[]> {
+  // Authorization check: user:list permission
+  const authResult = deps.authService.enforce(actor, userResource(actor.userId), "user:list");
+  if (Result.isFailure(authResult)) {
+    throw new QueryException("VALIDATION_ERROR", authResult.error.message, authResult.error);
   }
 
   try {

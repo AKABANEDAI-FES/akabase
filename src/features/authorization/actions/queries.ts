@@ -112,7 +112,6 @@ export const checkOrganizationPermissionsFn = createServerFn({ method: "GET" })
     const actor = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
-      orgIds: [data.orgId],
     });
 
     const { authService } = dependencies;

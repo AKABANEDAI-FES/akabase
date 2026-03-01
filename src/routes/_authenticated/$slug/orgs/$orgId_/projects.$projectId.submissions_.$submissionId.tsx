@@ -25,11 +25,7 @@ export const Route = createFileRoute(
     );
     await Promise.all([
       context.queryClient.ensureQueryData(
-        generateLoadSubmissionDetailQueryOptions(
-          event.id,
-          params.submissionId,
-          cast<OrgId>(params.orgId),
-        ),
+        generateLoadSubmissionDetailQueryOptions(event.id, params.submissionId),
       ),
       context.queryClient.ensureQueryData(
         generateCheckOrganizationPermissionsQueryOptions(event.id, params.orgId),
@@ -43,7 +39,7 @@ function OrgSubmissionDetailPage() {
   const { slug, orgId, projectId, submissionId } = Route.useParams();
   const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
   const { data: submission } = useSuspenseQuery(
-    generateLoadSubmissionDetailQueryOptions(event.id, submissionId, cast<OrgId>(orgId)),
+    generateLoadSubmissionDetailQueryOptions(event.id, submissionId),
   );
   const { data: permissions } = useSuspenseQuery(
     generateCheckOrganizationPermissionsQueryOptions(event.id, orgId),

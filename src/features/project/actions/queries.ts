@@ -53,7 +53,6 @@ export const loadProjectsFn = createServerFn({ method: "GET" })
     const actor = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
-      orgIds: [data.orgId],
     });
 
     // Query with authorization check
@@ -84,7 +83,6 @@ export const loadDraftFn = createServerFn({ method: "GET" })
     const actor = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
-      orgIds: [data.orgId],
     });
 
     // Query with authorization check
@@ -115,7 +113,6 @@ export const loadProjectDetailFn = createServerFn({ method: "GET" })
     const actor = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
-      orgIds: [data.orgId],
     });
 
     // Query with authorization check
@@ -166,7 +163,6 @@ export const loadSubmissionsFn = createServerFn({ method: "GET" })
     const actor = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
-      orgIds: [data.orgId],
     });
 
     // Query with authorization check
@@ -202,7 +198,7 @@ export const loadEventSubmissionsFn = createServerFn({ method: "GET" })
     });
 
     // Query with authorization check
-    return await listEventSubmissions(data.eventId, actor);
+    return await listEventSubmissions(dependencies, data.eventId, actor);
   });
 
 export function generateLoadEventSubmissionsCacheKey(eventId: string) {
@@ -229,7 +225,6 @@ export const loadProjectPublishedFn = createServerFn({ method: "GET" })
     const actor = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
-      orgIds: [data.orgId],
     });
 
     // Query with authorization check
@@ -264,17 +259,15 @@ export const loadSubmissionDetailFn = createServerFn({ method: "GET" })
     z.object({
       eventId: eventIdSchema,
       submissionId: submissionIdSchema,
-      orgId: orgIdSchema.optional(),
     }),
   )
   .handler(async ({ data, context }) => {
     const actor = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
-      orgIds: data.orgId ? [data.orgId] : undefined,
     });
 
-    const detail = await getSubmissionDetail(data.eventId, data.submissionId, actor, data.orgId);
+    const detail = await getSubmissionDetail(dependencies, data.eventId, data.submissionId, actor);
     if (!detail) {
       throw new Error("提出が見つかりません。");
     }
@@ -285,13 +278,9 @@ export function generateLoadSubmissionDetailCacheKey(eventId: string, submission
   return ["submission-detail", [eventId, submissionId]];
 }
 
-export function generateLoadSubmissionDetailQueryOptions(
-  eventId: string,
-  submissionId: string,
-  orgId?: string,
-) {
+export function generateLoadSubmissionDetailQueryOptions(eventId: string, submissionId: string) {
   return queryOptions({
     queryKey: generateLoadSubmissionDetailCacheKey(eventId, submissionId),
-    queryFn: () => loadSubmissionDetailFn({ data: { eventId, submissionId, orgId } }),
+    queryFn: () => loadSubmissionDetailFn({ data: { eventId, submissionId } }),
   });
 }

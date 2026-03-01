@@ -3,6 +3,7 @@
  * Helper functions for creating and querying actors and resources
  */
 
+import { actorSchema } from "./schema";
 import type {
   Actor,
   CommitteeRole,
@@ -39,12 +40,12 @@ export function createActor(
   committeeRoles: Map<EventId, CommitteeRole> = new Map(),
   orgRoles: Map<OrgId, OrgRole> = new Map(),
 ): Actor {
-  return {
+  return actorSchema.parse({
     userId,
     globalRole,
     committeeRoles,
     orgRoles,
-  };
+  });
 }
 
 /**

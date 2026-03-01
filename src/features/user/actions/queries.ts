@@ -7,6 +7,7 @@ import { cast, eventIdSchema } from "@/domain/shared/ids";
 import type { UserId } from "@/domain/shared/ids";
 import { queryOptions } from "@tanstack/react-query";
 import { resolveActor } from "@/application/query/authorization/resolve-actor";
+import { dependencies } from "@/infrastructure/di";
 
 export const loadUsersWithRolesFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
@@ -17,7 +18,7 @@ export const loadUsersWithRolesFn = createServerFn({ method: "GET" })
     });
 
     // Query with authorization check
-    return await listUsersWithRoles(actor);
+    return await listUsersWithRoles(dependencies, actor);
   });
 
 export function generateLoadUsersWithRolesCacheKey() {
@@ -40,7 +41,7 @@ export const loadUsersForEventFn = createServerFn({ method: "GET" })
       eventIds: [data.eventId],
     });
 
-    return await listUsersForEvent(data.eventId, actor);
+    return await listUsersForEvent(dependencies, data.eventId, actor);
   });
 
 export function generateLoadUsersForEventCacheKey(eventId: string) {

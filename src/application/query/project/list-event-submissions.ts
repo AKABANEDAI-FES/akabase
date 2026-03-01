@@ -5,8 +5,10 @@ import { submissionStatusSchema } from "@/domain/project/schema";
 import { orgIdSchema, projectIdSchema, submissionIdSchema } from "@/domain/shared/ids";
 import type { EventId } from "@/domain/shared/ids";
 import type { Actor } from "@/domain/authorization/schema";
-import { getCommitteeRoleForEvent } from "@/domain/authorization/logic";
+import { eventResource } from "@/domain/authorization/logic";
 import { QueryException } from "../shared";
+import type { Dependencies } from "@/infrastructure/di";
+import { Result } from "@praha/byethrow";
 
 /**
  * DTO schema for event submission list item
@@ -34,19 +36,25 @@ export type EventSubmissionListItem = z.infer<typeof eventSubmissionListItemSche
  *
  * Authorization: Committee members (admin/approver/member) can view all submissions for an event
  *
+ * @param deps - Dependencies (authService)
  * @param eventId - Event ID
  * @param actor - Actor (authenticated user with permissions)
  * @returns List of submissions for the event
  * @throws {QueryException} When database operation fails or authorization is denied
  */
 export async function listEventSubmissions(
+  deps: Pick<Dependencies, "authService">,
   eventId: EventId,
   actor: Actor,
 ): Promise<EventSubmissionListItem[]> {
-  // Authorization check: Committee role check
-  const committeeRole = getCommitteeRoleForEvent(actor, eventId);
-  if (committeeRole === "default") {
-    throw new QueryException("VALIDATION_ERROR", "委員会メンバーのみアクセス可能です。");
+  // Authorization check: event:list_submissions permission
+  const authResult = deps.authService.enforce(
+    actor,
+    eventResource(eventId),
+    "event:list_submissions",
+  );
+  if (Result.isFailure(authResult)) {
+    throw new QueryException("VALIDATION_ERROR", authResult.error.message, authResult.error);
   }
 
   try {

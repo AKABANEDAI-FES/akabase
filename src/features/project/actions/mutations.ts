@@ -105,7 +105,6 @@ export const updateProjectDraftFn = createServerFn({ method: "POST" })
       const actor = await resolveActor({
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
-        orgIds: [data.orgId],
       });
 
       // Update draft
@@ -154,7 +153,6 @@ export const submitProjectFn = createServerFn({ method: "POST" })
       const actor = await resolveActor({
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
-        orgIds: [data.orgId],
       });
 
       return yield* $(

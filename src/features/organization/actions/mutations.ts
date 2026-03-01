@@ -94,7 +94,6 @@ export const updateOrganizationFn = createServerFn({ method: "POST" })
       const actor = await resolveActor({
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
-        orgIds: [data.id],
       });
 
       return yield* $(
@@ -146,7 +145,6 @@ export const deleteOrganizationFn = createServerFn({ method: "POST" })
       const actor = await resolveActor({
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
-        orgIds: [data.orgId],
       });
 
       return yield* $(
@@ -195,7 +193,6 @@ export const addOrganizationMemberFn = createServerFn({ method: "POST" })
       const actor = await resolveActor({
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
-        orgIds: [data.orgId],
       });
 
       return yield* $(
@@ -245,7 +242,6 @@ export const removeOrganizationMemberFn = createServerFn({ method: "POST" })
       const actor = await resolveActor({
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
-        orgIds: [data.orgId],
       });
 
       return yield* $(
@@ -295,7 +291,6 @@ export const updateOrganizationMemberRoleFn = createServerFn({ method: "POST" })
       const actor = await resolveActor({
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
-        orgIds: [data.orgId],
       });
 
       return yield* $(

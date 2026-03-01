@@ -11,6 +11,7 @@ import {
   eventResource,
   organizationResource,
   projectResource,
+  userResource,
 } from "@/domain/authorization/logic";
 import { cast } from "@/domain/shared/ids";
 import type { EventId, OrgId, ProjectId, UserId } from "@/domain/shared/ids";
@@ -517,6 +518,105 @@ describe("AuthorizationServiceImpl", () => {
       if (Result.isFailure(result)) {
         expect(result.error.code).toBe("PERMISSION_DENIED");
       }
+    });
+  });
+
+  describe("User Authorization", () => {
+    describe("user:list", () => {
+      it("should deny non-global-admin users", () => {
+        const actor = createActor(cast<UserId>("user_1"));
+        const resource = userResource(cast<UserId>("user_2"));
+        const result = authService.checkPermission(actor, resource, "user:list");
+
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.allowed).toBe(false);
+          expect(result.value.reason).toContain("グローバル管理者");
+        }
+      });
+
+      it("should allow global admins", () => {
+        const actor = createActor(cast<UserId>("user_1"), "admin");
+        const resource = userResource(cast<UserId>("user_2"));
+        const result = authService.isAllowed(actor, resource, "user:list");
+
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value).toBe(true);
+        }
+      });
+    });
+
+    describe("user:search", () => {
+      it("should allow any authenticated user", () => {
+        const actor = createActor(cast<UserId>("user_1"));
+        const eventId = cast<EventId>("event_1");
+        const resource = eventResource(eventId);
+        const result = authService.isAllowed(actor, resource, "user:search");
+
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value).toBe(true);
+        }
+      });
+    });
+
+    describe("user:list_for_event", () => {
+      it("should allow committee members", () => {
+        const eventId = cast<EventId>("event_1");
+        const committeeRoles = new Map<EventId, CommitteeRole>([[eventId, "member"]]);
+        const actor = createActor(cast<UserId>("user_1"), "user", committeeRoles);
+        const resource = eventResource(eventId);
+
+        const result = authService.isAllowed(actor, resource, "user:list_for_event");
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value).toBe(true);
+        }
+      });
+
+      it("should deny non-committee members", () => {
+        const eventId = cast<EventId>("event_1");
+        const actor = createActor(cast<UserId>("user_1"));
+        const resource = eventResource(eventId);
+
+        const result = authService.checkPermission(actor, resource, "user:list_for_event");
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.allowed).toBe(false);
+          expect(result.value.reason).toContain("委員会メンバー");
+        }
+      });
+    });
+  });
+
+  describe("Event Authorization - Submissions", () => {
+    describe("event:list_submissions", () => {
+      it("should allow committee members", () => {
+        const eventId = cast<EventId>("event_1");
+        const committeeRoles = new Map<EventId, CommitteeRole>([[eventId, "member"]]);
+        const actor = createActor(cast<UserId>("user_1"), "user", committeeRoles);
+        const resource = eventResource(eventId);
+
+        const result = authService.isAllowed(actor, resource, "event:list_submissions");
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value).toBe(true);
+        }
+      });
+
+      it("should deny non-committee members", () => {
+        const eventId = cast<EventId>("event_1");
+        const actor = createActor(cast<UserId>("user_1"));
+        const resource = eventResource(eventId);
+
+        const result = authService.checkPermission(actor, resource, "event:list_submissions");
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.allowed).toBe(false);
+          expect(result.value.reason).toContain("委員会メンバー");
+        }
+      });
     });
   });
 });

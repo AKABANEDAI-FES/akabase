@@ -43,7 +43,6 @@ export const loadOrganizationDetailFn = createServerFn({ method: "GET" })
     const actor = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
-      orgIds: [data.orgId],
     });
 
     const organization = await getOrganizationDetail(dependencies, data.eventId, data.orgId, actor);
@@ -74,7 +73,6 @@ export const loadOrganizationMembersFn = createServerFn({ method: "GET" })
     const actor = await resolveActor({
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
-      orgIds: [data.orgId],
     });
 
     return await listOrganizationMembers(dependencies, data.eventId, data.orgId, actor);
@@ -103,7 +101,7 @@ export const searchUsersByEmailFn = createServerFn({ method: "GET" })
       eventIds: [data.eventId],
     });
 
-    return await searchUsersByEmail(data.query, actor, data.eventId);
+    return await searchUsersByEmail(dependencies, data.query, actor, data.eventId);
   });
 
 /**

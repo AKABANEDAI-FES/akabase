@@ -3,6 +3,7 @@ import { db, schema } from "@/db";
 import { eq } from "drizzle-orm";
 import { submissionActionTypeSchema, submissionStatusSchema } from "@/domain/project/schema";
 import {
+  cast,
   orgIdSchema,
   projectIdSchema,
   submissionActionIdSchema,
@@ -10,10 +11,12 @@ import {
   submissionMessageIdSchema,
   userIdSchema,
 } from "@/domain/shared/ids";
-import type { EventId, OrgId, SubmissionId } from "@/domain/shared/ids";
+import type { EventId, OrgId, ProjectId, SubmissionId } from "@/domain/shared/ids";
 import type { Actor } from "@/domain/authorization/schema";
-import { getCommitteeRoleForEvent, getOrgRoleForOrg } from "@/domain/authorization/logic";
+import { projectResource } from "@/domain/authorization/logic";
 import { QueryException } from "../shared";
+import type { Dependencies } from "@/infrastructure/di";
+import { Result } from "@praha/byethrow";
 
 /**
  * DTO schema for submission detail
@@ -62,36 +65,16 @@ export type SubmissionDetail = z.infer<typeof submissionDetailSchema>;
 /**
  * Get submission detail
  *
- * Authorization:
- * - If orgId is provided: Committee members OR organization members can view
- * - If orgId is not provided: Committee members only can view
+ * Authorization: Committee members OR organization members can view
  */
 export async function getSubmissionDetail(
+  deps: Pick<Dependencies, "authService">,
   eventId: EventId,
   submissionId: SubmissionId,
   actor: Actor,
-  orgId?: OrgId,
 ): Promise<SubmissionDetail | null> {
-  // Authorization: check if actor is committee member OR org member
-  const checkCommittee = () => {
-    const committeeRole = getCommitteeRoleForEvent(actor, eventId);
-    return committeeRole !== "default";
-  };
-  const checkOrg = () => {
-    if (orgId === undefined) return false;
-    const orgRole = getOrgRoleForOrg(actor, orgId);
-    return orgRole !== null;
-  };
-
-  // Must be either committee member or org member
-  if (!checkCommittee() && !checkOrg()) {
-    throw new QueryException(
-      "VALIDATION_ERROR",
-      "委員会メンバーまたはこの団体のメンバーのみアクセス可能です。",
-    );
-  }
-
   try {
+    // Fetch submission first to get projectId and orgId
     const submission = await db.query.projectSubmissions.findFirst({
       where: eq(schema.projectSubmissions.id, submissionId),
       with: {
@@ -107,13 +90,23 @@ export async function getSubmissionDetail(
       },
     });
 
-    // Verify submission exists and belongs to the correct event (and optionally org)
-    if (
-      !submission ||
-      submission.project.eventId !== eventId ||
-      (orgId !== undefined && submission.project.orgId !== orgId)
-    ) {
+    // Verify submission exists and belongs to the correct event
+    if (!submission || submission.project.eventId !== eventId) {
       return null;
+    }
+
+    // Authorization check using project resource
+    const authResult = deps.authService.enforce(
+      actor,
+      projectResource(
+        cast<ProjectId>(submission.project.id),
+        cast<EventId>(submission.project.eventId),
+        cast<OrgId>(submission.project.organization.id),
+      ),
+      "project:read",
+    );
+    if (Result.isFailure(authResult)) {
+      throw new QueryException("VALIDATION_ERROR", authResult.error.message, authResult.error);
     }
 
     return submissionDetailSchema.parse({

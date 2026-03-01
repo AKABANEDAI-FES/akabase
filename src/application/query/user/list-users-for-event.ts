@@ -11,8 +11,10 @@ import { userIdSchema } from "@/domain/shared/ids";
 import type { EventId } from "@/domain/shared/ids";
 import { committeeRoleSchema } from "@/domain/authorization/schema";
 import type { Actor } from "@/domain/authorization/schema";
-import { getCommitteeRoleForEvent, isGlobalAdmin } from "@/domain/authorization/logic";
+import { eventResource } from "@/domain/authorization/logic";
 import { QueryException } from "../shared";
+import type { Dependencies } from "@/infrastructure/di";
+import { Result } from "@praha/byethrow";
 
 // DTO schema for user in event context
 export const userForEventSchema = z.object({
@@ -31,12 +33,20 @@ export type UserForEvent = z.infer<typeof userForEventSchema>;
  *
  * Authorization: Only global admins and committee admin/approver/member can access
  *
+ * @param deps - Dependencies (authService)
+ * @param eventId - Event ID
+ * @param actor - Actor (authenticated user with permissions)
  * @throws {QueryException} When database operation fails or permission denied
  */
-export async function listUsersForEvent(eventId: EventId, actor: Actor): Promise<UserForEvent[]> {
-  const committeeRole = getCommitteeRoleForEvent(actor, eventId);
-  if (!isGlobalAdmin(actor) && !["admin", "approver", "member"].includes(committeeRole)) {
-    throw new QueryException("VALIDATION_ERROR", "ユーザー一覧を閲覧する権限がありません。");
+export async function listUsersForEvent(
+  deps: Pick<Dependencies, "authService">,
+  eventId: EventId,
+  actor: Actor,
+): Promise<UserForEvent[]> {
+  // Authorization check: user:list_for_event permission
+  const authResult = deps.authService.enforce(actor, eventResource(eventId), "user:list_for_event");
+  if (Result.isFailure(authResult)) {
+    throw new QueryException("VALIDATION_ERROR", authResult.error.message, authResult.error);
   }
 
   try {

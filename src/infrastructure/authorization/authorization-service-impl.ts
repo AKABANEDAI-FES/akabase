@@ -159,6 +159,38 @@ export class AuthorizationServiceImpl implements AuthorizationService {
           reason: "委員会管理者のみがタグを管理できます",
         });
 
+      case "user:list_for_event":
+        // Committee members (admin/approver/member) can list users for event
+        if (
+          committeeRole === "admin" ||
+          committeeRole === "approver" ||
+          committeeRole === "member"
+        ) {
+          return Result.succeed({ allowed: true, reason: "委員会メンバー" });
+        }
+        return Result.succeed({
+          allowed: false,
+          reason: "委員会メンバーのみがユーザー一覧を閲覧できます",
+        });
+
+      case "event:list_submissions":
+        // Committee members (admin/approver/member) can list all event submissions
+        if (
+          committeeRole === "admin" ||
+          committeeRole === "approver" ||
+          committeeRole === "member"
+        ) {
+          return Result.succeed({ allowed: true, reason: "委員会メンバー" });
+        }
+        return Result.succeed({
+          allowed: false,
+          reason: "委員会メンバーのみが企画提出一覧を閲覧できます",
+        });
+
+      case "user:search":
+        // Anyone authenticated can search users (search mode determined by role in query layer)
+        return Result.succeed({ allowed: true });
+
       default:
         return Result.succeed({ allowed: false, reason: "不明なアクション" });
     }
@@ -332,6 +364,13 @@ export class AuthorizationServiceImpl implements AuthorizationService {
         return Result.succeed({
           allowed: false,
           reason: "グローバル管理者のみがユーザーのロールを更新できます",
+        });
+
+      case "user:list":
+        // Only global admins can list all users (already checked at top of checkPermission)
+        return Result.succeed({
+          allowed: false,
+          reason: "グローバル管理者のみが全ユーザー一覧を閲覧できます",
         });
 
       default:

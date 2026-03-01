@@ -5,8 +5,10 @@ import { eq, like } from "drizzle-orm";
 import { userIdSchema } from "@/domain/shared/ids";
 import type { EventId } from "@/domain/shared/ids";
 import type { Actor } from "@/domain/authorization/schema";
-import { getCommitteeRoleForEvent } from "@/domain/authorization/logic";
+import { eventResource, getCommitteeRoleForEvent } from "@/domain/authorization/logic";
 import { QueryException } from "../shared";
+import type { Dependencies } from "@/infrastructure/di";
+import { Result } from "@praha/byethrow";
 
 /**
  * User search result DTO
@@ -26,6 +28,7 @@ export type UserSearchResult = z.infer<typeof userSearchResultSchema>;
  * - admin/approver/member: prefix match (前方一致)
  * - default: exact match (完全一致)
  *
+ * @param deps - Dependencies (authService)
  * @param query - Email search query
  * @param actor - The actor performing the search
  * @param eventId - Event ID to determine committee role
@@ -33,10 +36,18 @@ export type UserSearchResult = z.infer<typeof userSearchResultSchema>;
  * @throws {QueryException} When database operation fails
  */
 export async function searchUsersByEmail(
+  deps: Pick<Dependencies, "authService">,
   query: string,
   actor: Actor,
   eventId: EventId,
 ): Promise<UserSearchResult[]> {
+  // Authorization check: user:search permission
+  const authResult = deps.authService.enforce(actor, eventResource(eventId), "user:search");
+  if (Result.isFailure(authResult)) {
+    throw new QueryException("VALIDATION_ERROR", authResult.error.message, authResult.error);
+  }
+
+  // Feature logic: Determine search mode based on committee role
   const committeeRole = getCommitteeRoleForEvent(actor, eventId);
   const condition =
     committeeRole === "default" ? eq(user.email, query) : like(user.email, `${query}%`);
