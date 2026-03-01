@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { createContext, use, useState } from "react";
 import { Outlet } from "@tanstack/react-router";
 import { Portal } from "@ark-ui/react/portal";
 import { css } from "styled-system/css";
@@ -6,12 +6,14 @@ import { Stack } from "styled-system/jsx";
 import { MenuIcon } from "lucide-react";
 import { Button, CloseButton, Drawer, Heading, IconButton, Text } from "@/components/ui";
 
+const SidebarNavContext = createContext<{ onNavigate?: () => void }>({});
+
 interface SidebarLayoutProps {
   title: string;
-  navigation: (onNavigate?: () => void) => React.ReactNode;
+  children: React.ReactNode;
 }
 
-export function SidebarLayout({ title, navigation }: SidebarLayoutProps) {
+export function SidebarLayout({ title, children }: SidebarLayoutProps) {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
@@ -55,7 +57,9 @@ export function SidebarLayout({ title, navigation }: SidebarLayoutProps) {
                 <Drawer.Title>{title}</Drawer.Title>
               </Drawer.Header>
               <Drawer.Body gap="8" css={{ "& > *": { w: "full" } }}>
-                {navigation(() => setDrawerOpen(false))}
+                <SidebarNavContext value={{ onNavigate: () => setDrawerOpen(false) }}>
+                  {children}
+                </SidebarNavContext>
               </Drawer.Body>
             </Drawer.Content>
           </Drawer.Positioner>
@@ -85,7 +89,7 @@ export function SidebarLayout({ title, navigation }: SidebarLayoutProps) {
             <Heading as="h1" textStyle="lg">
               {title}
             </Heading>
-            {navigation()}
+            {children}
           </Stack>
         </nav>
 
@@ -99,10 +103,10 @@ export function SidebarLayout({ title, navigation }: SidebarLayoutProps) {
 
 interface NavLinkProps {
   children: React.ReactNode;
-  onNavigate?: () => void;
 }
 
-export function NavLink({ children, onNavigate }: NavLinkProps) {
+export function NavLink({ children }: NavLinkProps) {
+  const { onNavigate } = use(SidebarNavContext);
   return (
     <Button
       variant="plain"

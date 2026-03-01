@@ -32,26 +32,21 @@ export const Route = createFileRoute("/admin")({
 
 function AdminLayout() {
   return (
-    <SidebarLayout
-      title="管理画面"
-      navigation={(onNavigate) => (
-        <>
-          <Stack gap="1">
-            <NavLink onNavigate={onNavigate}>
-              <Link to="/admin/events">
-                <CalendarIcon />
-                イベント管理
-              </Link>
-            </NavLink>
-            <NavLink onNavigate={onNavigate}>
-              <Link to="/admin/users">
-                <UsersIcon />
-                ユーザー管理
-              </Link>
-            </NavLink>
-          </Stack>
-        </>
-      )}
-    />
+    <SidebarLayout title="管理画面">
+      <Stack gap="1">
+        <NavLink>
+          <Link to="/admin/events">
+            <CalendarIcon />
+            イベント管理
+          </Link>
+        </NavLink>
+        <NavLink>
+          <Link to="/admin/users">
+            <UsersIcon />
+            ユーザー管理
+          </Link>
+        </NavLink>
+      </Stack>
+    </SidebarLayout>
   );
 }

@@ -36,61 +36,56 @@ function SlugLayout() {
   const isCommitteeMember = committeeRole !== "default";
 
   return (
-    <SidebarLayout
-      title={event.name}
-      navigation={(onNavigate) => (
-        <>
-          {isCommitteeMember && (
-            <NavSection label="委員会管理">
-              <NavLink onNavigate={onNavigate}>
-                <Link to="/$slug/committee/organizations" params={{ slug }}>
-                  <Building2Icon />
-                  出展団体管理
-                </Link>
-              </NavLink>
-              <NavLink onNavigate={onNavigate}>
-                <Link to="/$slug/committee/tags" params={{ slug }}>
-                  <TagIcon />
-                  タグ管理
-                </Link>
-              </NavLink>
-              <NavLink onNavigate={onNavigate}>
-                <Link to="/$slug/committee/places" params={{ slug }}>
-                  <MapPinIcon />
-                  場所管理
-                </Link>
-              </NavLink>
-              <NavLink onNavigate={onNavigate}>
-                <Link to="/$slug/committee/deadlines" params={{ slug }}>
-                  <CalendarClockIcon />
-                  締切管理
-                </Link>
-              </NavLink>
-              <NavLink onNavigate={onNavigate}>
-                <Link to="/$slug/committee/members" params={{ slug }}>
-                  <UsersIcon />
-                  メンバー管理
-                </Link>
-              </NavLink>
-              <NavLink onNavigate={onNavigate}>
-                <Link to="/$slug/committee/submissions" params={{ slug }}>
-                  <FileClockIcon />
-                  提出一覧
-                </Link>
-              </NavLink>
-            </NavSection>
-          )}
-
-          <NavSection label="出展団体管理">
-            <OrganizationLinks slug={slug} onNavigate={onNavigate} />
-          </NavSection>
-        </>
+    <SidebarLayout title={event.name}>
+      {isCommitteeMember && (
+        <NavSection label="委員会管理">
+          <NavLink>
+            <Link to="/$slug/committee/organizations" params={{ slug }}>
+              <Building2Icon />
+              出展団体管理
+            </Link>
+          </NavLink>
+          <NavLink>
+            <Link to="/$slug/committee/tags" params={{ slug }}>
+              <TagIcon />
+              タグ管理
+            </Link>
+          </NavLink>
+          <NavLink>
+            <Link to="/$slug/committee/places" params={{ slug }}>
+              <MapPinIcon />
+              場所管理
+            </Link>
+          </NavLink>
+          <NavLink>
+            <Link to="/$slug/committee/deadlines" params={{ slug }}>
+              <CalendarClockIcon />
+              締切管理
+            </Link>
+          </NavLink>
+          <NavLink>
+            <Link to="/$slug/committee/members" params={{ slug }}>
+              <UsersIcon />
+              メンバー管理
+            </Link>
+          </NavLink>
+          <NavLink>
+            <Link to="/$slug/committee/submissions" params={{ slug }}>
+              <FileClockIcon />
+              提出一覧
+            </Link>
+          </NavLink>
+        </NavSection>
       )}
-    />
+
+      <NavSection label="出展団体管理">
+        <OrganizationLinks slug={slug} />
+      </NavSection>
+    </SidebarLayout>
   );
 }
 
-function OrganizationLinks({ slug, onNavigate }: { slug: string; onNavigate?: () => void }) {
+function OrganizationLinks({ slug }: { slug: string }) {
   const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
   const { data: myOrganizations } = useSuspenseQuery(
     generateLoadMyOrganizationsQueryOptions(event.id),
@@ -99,7 +94,7 @@ function OrganizationLinks({ slug, onNavigate }: { slug: string; onNavigate?: ()
   return (
     <>
       {myOrganizations.map((org) => (
-        <NavLink key={org.id} onNavigate={onNavigate}>
+        <NavLink key={org.id}>
           <Link to="/$slug/orgs/$orgId" params={{ slug, orgId: org.id }}>
             {org.name}
           </Link>
