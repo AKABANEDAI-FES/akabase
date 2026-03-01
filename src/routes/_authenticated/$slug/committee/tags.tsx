@@ -38,7 +38,7 @@ function TagsManagementPage() {
           <Heading as="h1" textStyle="2xl" fontWeight="bold">
             タグ管理
           </Heading>
-          {permissions.canCreateTag && (
+          {permissions.canManageTags && (
             <Button asChild>
               <Link to="/$slug/committee/tags/new" params={{ slug }}>
                 <PlusIcon />
@@ -51,8 +51,8 @@ function TagsManagementPage() {
         <TagManagementTable
           tags={tags}
           eventId={event.id}
-          canUpdate={permissions.canUpdateTag}
-          canDelete={permissions.canDeleteTag}
+          canUpdate={permissions.canManageTags}
+          canDelete={permissions.canManageTags}
         />
       </Stack>
       <Outlet />

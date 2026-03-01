@@ -123,42 +123,6 @@ export class AuthorizationServiceImpl implements AuthorizationService {
           reason: "システム管理者のみがイベントを有効化できます",
         });
 
-      case "deadline:create":
-      case "deadline:update":
-      case "deadline:delete":
-        // Only committee admins can manage deadlines
-        if (committeeRole === "admin") {
-          return Result.succeed({ allowed: true, reason: "委員会管理者" });
-        }
-        return Result.succeed({
-          allowed: false,
-          reason: "委員会管理者のみが締切を管理できます",
-        });
-
-      case "place:create":
-      case "place:update":
-      case "place:delete":
-        // Only committee admins can manage places
-        if (committeeRole === "admin") {
-          return Result.succeed({ allowed: true, reason: "委員会管理者" });
-        }
-        return Result.succeed({
-          allowed: false,
-          reason: "委員会管理者のみが場所を管理できます",
-        });
-
-      case "tag:create":
-      case "tag:update":
-      case "tag:delete":
-        // Only committee admins can manage tags
-        if (committeeRole === "admin") {
-          return Result.succeed({ allowed: true, reason: "委員会管理者" });
-        }
-        return Result.succeed({
-          allowed: false,
-          reason: "委員会管理者のみがタグを管理できます",
-        });
-
       case "user:list_for_event":
         // Committee members (admin/approver/member) can list users for event
         if (
@@ -273,7 +237,7 @@ export class AuthorizationServiceImpl implements AuthorizationService {
           reason: "委員会管理者または出展団体のメンバーのみがプロジェクトを閲覧できます",
         });
 
-      case "project_draft:update":
+      case "project:update_draft":
         // Committee admins and organization managers/editors can update drafts
         if (committeeRole === "admin") {
           return Result.succeed({ allowed: true, reason: "委員会管理者" });

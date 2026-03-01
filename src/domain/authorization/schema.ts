@@ -182,23 +182,8 @@ export const actionSchema = z.enum([
   "organization:delete",
   "organization:manage_members",
 
-  // Deadline actions (sub-resource of event)
-  "deadline:create",
-  "deadline:update",
-  "deadline:delete",
-
-  // Place actions (sub-resource of event)
-  "place:create",
-  "place:update",
-  "place:delete",
-
-  // Tag actions (sub-resource of event)
-  "tag:create",
-  "tag:update",
-  "tag:delete",
-
   // Project draft actions
-  "project_draft:update",
+  "project:update_draft",
 
   // User actions
   "user:update_role",

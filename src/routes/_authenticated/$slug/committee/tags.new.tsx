@@ -13,7 +13,7 @@ export const Route = createFileRoute("/_authenticated/$slug/committee/tags/new")
     const permissions = await context.queryClient.ensureQueryData(
       generateCheckCommitteePermissionsQueryOptions(event.id),
     );
-    if (!permissions.canCreateTag) {
+    if (!permissions.canManageTags) {
       throw redirect({ to: "/$slug/committee/tags", params });
     }
   },

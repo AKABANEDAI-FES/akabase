@@ -86,7 +86,7 @@ export async function updateProjectDraft(
 
     // Authorization check: only committee admins can update drafts
     const resource = projectResource(input.projectId, project.eventId, project.orgId);
-    yield* $(deps.authService.enforce(input.actor, resource, "project_draft:update"));
+    yield* $(deps.authService.enforce(input.actor, resource, "project:update_draft"));
 
     // Fetch event and check if modifiable
     yield* $(await deps.eventDomainService.resolveModifiableEvent(project.eventId));

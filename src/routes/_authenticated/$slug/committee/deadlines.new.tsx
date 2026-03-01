@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_authenticated/$slug/committee/deadlines/
     const permissions = await context.queryClient.ensureQueryData(
       generateCheckCommitteePermissionsQueryOptions(event.id),
     );
-    if (!permissions.canCreateDeadline) {
+    if (!permissions.canManageDeadlines) {
       throw redirect({ to: "/$slug/committee/deadlines", params });
     }
   },

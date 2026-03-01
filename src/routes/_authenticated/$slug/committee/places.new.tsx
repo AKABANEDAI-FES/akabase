@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_authenticated/$slug/committee/places/new
     const permissions = await context.queryClient.ensureQueryData(
       generateCheckCommitteePermissionsQueryOptions(event.id),
     );
-    if (!permissions.canCreatePlace) {
+    if (!permissions.canManagePlaces) {
       throw redirect({ to: "/$slug/committee/places", params });
     }
   },

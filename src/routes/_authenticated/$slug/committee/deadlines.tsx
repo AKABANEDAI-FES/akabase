@@ -38,7 +38,7 @@ function DeadlinesManagementPage() {
           <Heading as="h1" textStyle="2xl" fontWeight="bold">
             締切管理
           </Heading>
-          {permissions.canCreateDeadline && (
+          {permissions.canManageDeadlines && (
             <Button asChild>
               <Link to="/$slug/committee/deadlines/new" params={{ slug }}>
                 <PlusIcon />
@@ -51,8 +51,8 @@ function DeadlinesManagementPage() {
         <DeadlineManagementTable
           deadlines={deadlines}
           eventId={event.id}
-          canUpdate={permissions.canUpdateDeadline}
-          canDelete={permissions.canDeleteDeadline}
+          canUpdate={permissions.canManageDeadlines}
+          canDelete={permissions.canManageDeadlines}
         />
       </Stack>
       <Outlet />

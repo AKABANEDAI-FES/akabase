@@ -39,7 +39,7 @@ function PlacesManagementPage() {
             <Heading as="h1" textStyle="2xl" fontWeight="bold">
               場所管理
             </Heading>
-            {permissions.canCreatePlace && (
+            {permissions.canManagePlaces && (
               <Button asChild>
                 <Link to="/$slug/committee/places/new" params={{ slug }}>
                   <PlusIcon />
@@ -52,8 +52,8 @@ function PlacesManagementPage() {
           <PlaceManagementTable
             places={places}
             eventId={event.id}
-            canUpdate={permissions.canUpdatePlace}
-            canDelete={permissions.canDeletePlace}
+            canUpdate={permissions.canManagePlaces}
+            canDelete={permissions.canManagePlaces}
           />
         </Stack>
       </Container>
