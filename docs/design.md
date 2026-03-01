@@ -48,7 +48,7 @@
 - eventId
 - orgId
 - name
-- placeText
+- placeId（placesへの参照）
 - logo
 
 #### 内部モデル
@@ -56,7 +56,6 @@
 - Draft（単一）
 - Submission（複数：履歴）
 - Published（単一）
-- activeSubmissionId（nullable）
 - status
 - feedbackThread
 
@@ -170,14 +169,12 @@ EditProjectDraft(projectId, input, actor)
 SubmitProject(projectId, actor)
 
 - DraftをコピーしてSubmission生成
-- activeSubmissionId更新
 
 ### 6.3 差戻し
 
 ReturnProject(projectId, message, actor)
 
 - Submission.status = Returned
-- activeSubmissionId = null
 
 ### 6.4 承認
 
@@ -185,14 +182,12 @@ ApproveProject(projectId, actor)
 
 - Submission.status = Approved
 - Published更新
-- activeSubmissionId = null
 
 ### 6.5 取り下げ
 
 WithdrawProject(projectId, actor)
 
 - Submission.status = Withdrawn
-- activeSubmissionId = null
 
 ---
 
@@ -219,9 +214,8 @@ WithdrawProject(projectId, actor)
 - event_id
 - org_id
 - name
-- place_text
+- place_id (FK → places)
 - logo_key
-- active_submission_id
 
 ### project_drafts
 
