@@ -10,10 +10,12 @@ import type { QueryClient } from "@tanstack/react-query";
 import { getSessionFn } from "@/libs/session-server";
 import type { SessionData } from "@/libs/session-server";
 import { Toaster } from "@/components/ui";
+import type { Event } from "@/domain/event/schema";
 
 interface MyRouterContext {
   queryClient: QueryClient;
   session: SessionData;
+  activeEvent: Event;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({

@@ -1,5 +1,4 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { Container, Stack } from "styled-system/jsx";
 import { Button, Heading, Tabs } from "@/components/ui";
 import { ArrowLeftIcon } from "lucide-react";
@@ -8,7 +7,6 @@ import {
   generateLoadProjectPublishedQueryOptions,
 } from "@/features/project/actions";
 import { ProjectBasicInfoForm, ProjectPublishedDataForm } from "@/features/project/components";
-import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions";
 import { generateLoadTagsQueryOptions } from "@/features/event/actions/queries/tag";
 import { generateLoadPlacesQueryOptions } from "@/features/event/actions/queries/place";
 import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions/queries";
@@ -17,9 +15,7 @@ export const Route = createFileRoute(
   "/_authenticated/$slug/committee/organizations_/$orgId_/projects/$projectId",
 )({
   loader: async ({ params, context }) => {
-    const event = await context.queryClient.ensureQueryData(
-      generateLoadEventBySlugQueryOptions(params.slug),
-    );
+    const event = context.activeEvent;
     await Promise.all([
       context.queryClient.ensureQueryData(
         generateLoadProjectDetailQueryOptions(event.id, params.orgId, params.projectId),
@@ -37,8 +33,7 @@ export const Route = createFileRoute(
 
 function CommitteeProjectEditPage() {
   const { slug, orgId, projectId } = Route.useParams();
-
-  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
+  const { activeEvent: event } = Route.useRouteContext();
 
   return (
     <Container maxW="4xl" py="8">

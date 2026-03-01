@@ -3,18 +3,13 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Button, Heading } from "@/components/ui";
 import { Container, Flex, Stack } from "styled-system/jsx";
 import { PlusIcon } from "lucide-react";
-import {
-  generateLoadEventBySlugQueryOptions,
-  generateLoadTagsQueryOptions,
-} from "@/features/event/actions/queries";
+import { generateLoadTagsQueryOptions } from "@/features/event/actions/queries";
 import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions";
 import { TagManagementTable } from "@/features/event/components/tag-management-table";
 
 export const Route = createFileRoute("/_authenticated/$slug/committee/tags")({
-  loader: async ({ params, context }) => {
-    const event = await context.queryClient.ensureQueryData(
-      generateLoadEventBySlugQueryOptions(params.slug),
-    );
+  loader: async ({ context }) => {
+    const event = context.activeEvent;
     await Promise.all([
       context.queryClient.ensureQueryData(generateLoadTagsQueryOptions(event.id)),
       context.queryClient.ensureQueryData(generateCheckCommitteePermissionsQueryOptions(event.id)),
@@ -25,7 +20,7 @@ export const Route = createFileRoute("/_authenticated/$slug/committee/tags")({
 
 function TagsManagementPage() {
   const { slug } = Route.useParams();
-  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
+  const { activeEvent: event } = Route.useRouteContext();
   const { data: tags } = useSuspenseQuery(generateLoadTagsQueryOptions(event.id));
   const { data: permissions } = useSuspenseQuery(
     generateCheckCommitteePermissionsQueryOptions(event.id),

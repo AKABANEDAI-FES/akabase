@@ -3,7 +3,6 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Flex, Stack } from "styled-system/jsx";
 import { Button, Heading } from "@/components/ui";
 import { PlusIcon } from "lucide-react";
-import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions/queries";
 import { generateLoadOrganizationMembersQueryOptions } from "@/features/organization/actions/queries";
 import { generateCheckOrganizationPermissionsQueryOptions } from "@/features/authorization/actions/queries";
 import { OrgMembersTable } from "@/features/organization/components";
@@ -12,9 +11,7 @@ import type { OrgId } from "@/domain/shared/ids";
 
 export const Route = createFileRoute("/_authenticated/$slug/orgs/$orgId/members")({
   loader: async ({ params, context }) => {
-    const event = await context.queryClient.ensureQueryData(
-      generateLoadEventBySlugQueryOptions(params.slug),
-    );
+    const event = context.activeEvent;
     await Promise.all([
       context.queryClient.ensureQueryData(
         generateLoadOrganizationMembersQueryOptions(event.id, params.orgId),
@@ -29,8 +26,7 @@ export const Route = createFileRoute("/_authenticated/$slug/orgs/$orgId/members"
 
 function OrganizationMembersPage() {
   const { slug, orgId } = Route.useParams();
-
-  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
+  const { activeEvent: event } = Route.useRouteContext();
   const { data: members } = useSuspenseQuery(
     generateLoadOrganizationMembersQueryOptions(event.id, orgId),
   );

@@ -2,7 +2,6 @@ import { createFileRoute, redirect, useNavigate, useRouter } from "@tanstack/rea
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { AddMemberDialog } from "@/features/organization/components/add-member-dialog";
 import { generateLoadOrganizationDetailQueryOptions } from "@/features/organization/actions";
-import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions";
 import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions";
 import type { OrgId } from "@/domain/shared/ids";
 
@@ -10,9 +9,7 @@ export const Route = createFileRoute(
   "/_authenticated/$slug/committee/organizations_/$orgId/members/new",
 )({
   beforeLoad: async ({ params, context }) => {
-    const event = await context.queryClient.ensureQueryData(
-      generateLoadEventBySlugQueryOptions(params.slug),
-    );
+    const event = context.activeEvent;
     const permissions = await context.queryClient.ensureQueryData(
       generateCheckCommitteePermissionsQueryOptions(event.id),
     );
@@ -24,9 +21,7 @@ export const Route = createFileRoute(
     }
   },
   loader: async ({ params, context }) => {
-    const event = await context.queryClient.ensureQueryData(
-      generateLoadEventBySlugQueryOptions(params.slug),
-    );
+    const event = context.activeEvent;
     await context.queryClient.ensureQueryData(
       generateLoadOrganizationDetailQueryOptions(event.id, params.orgId),
     );
@@ -37,8 +32,8 @@ export const Route = createFileRoute(
 function AddMemberPage() {
   const router = useRouter();
   const navigate = useNavigate();
-  const { slug, orgId } = Route.useParams();
-  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
+  const { orgId } = Route.useParams();
+  const { activeEvent: event } = Route.useRouteContext();
   const { data: organization } = useSuspenseQuery(
     generateLoadOrganizationDetailQueryOptions(event.id, orgId),
   );

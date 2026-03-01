@@ -3,7 +3,6 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Container, Flex, Stack } from "styled-system/jsx";
 import { Button, Heading, Text } from "@/components/ui";
 import { ArrowLeftIcon, EditIcon, HistoryIcon, MapPinIcon } from "lucide-react";
-import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions";
 import {
   generateLoadProjectDetailQueryOptions,
   generateLoadProjectPublishedQueryOptions,
@@ -14,9 +13,7 @@ import type { OrgId, ProjectId } from "@/domain/shared/ids";
 
 export const Route = createFileRoute("/_authenticated/$slug/orgs/$orgId_/projects/$projectId/")({
   loader: async ({ params, context }) => {
-    const event = await context.queryClient.ensureQueryData(
-      generateLoadEventBySlugQueryOptions(params.slug),
-    );
+    const event = context.activeEvent;
     await Promise.all([
       context.queryClient.ensureQueryData(
         generateLoadProjectDetailQueryOptions(event.id, params.orgId, params.projectId),
@@ -31,8 +28,7 @@ export const Route = createFileRoute("/_authenticated/$slug/orgs/$orgId_/project
 
 function ProjectDetailPage() {
   const { slug, orgId, projectId } = Route.useParams();
-
-  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
+  const { activeEvent: event } = Route.useRouteContext();
   const { data: project } = useSuspenseQuery(
     generateLoadProjectDetailQueryOptions(event.id, orgId, projectId),
   );

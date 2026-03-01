@@ -3,16 +3,13 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Button, Heading, Table } from "@/components/ui";
 import { Container, Flex, Stack } from "styled-system/jsx";
 import { PlusIcon } from "lucide-react";
-import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions";
 import { generateLoadOrganizationsQueryOptions } from "@/features/organization/actions";
 import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions";
 import { FormatDate } from "@/libs/date";
 
 export const Route = createFileRoute("/_authenticated/$slug/committee/organizations")({
-  loader: async ({ params, context }) => {
-    const event = await context.queryClient.ensureQueryData(
-      generateLoadEventBySlugQueryOptions(params.slug),
-    );
+  loader: async ({ context }) => {
+    const event = context.activeEvent;
     await Promise.all([
       context.queryClient.ensureQueryData(generateLoadOrganizationsQueryOptions(event.id)),
       context.queryClient.ensureQueryData(generateCheckCommitteePermissionsQueryOptions(event.id)),
@@ -23,7 +20,7 @@ export const Route = createFileRoute("/_authenticated/$slug/committee/organizati
 
 function OrganizationsPage() {
   const { slug } = Route.useParams();
-  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
+  const { activeEvent: event } = Route.useRouteContext();
   const { data: organizations } = useSuspenseQuery(generateLoadOrganizationsQueryOptions(event.id));
   const { data: permissions } = useSuspenseQuery(
     generateCheckCommitteePermissionsQueryOptions(event.id),

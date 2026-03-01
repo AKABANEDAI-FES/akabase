@@ -4,13 +4,10 @@ import { Container, Stack } from "styled-system/jsx";
 import { Button, Heading, SegmentGroup } from "@/components/ui";
 import { ArrowLeftIcon } from "lucide-react";
 import { generateLoadOrganizationDetailQueryOptions } from "@/features/organization/actions";
-import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions/queries";
 
 export const Route = createFileRoute("/_authenticated/$slug/committee/organizations_/$orgId")({
   loader: async ({ params, context }) => {
-    const event = await context.queryClient.ensureQueryData(
-      generateLoadEventBySlugQueryOptions(params.slug),
-    );
+    const event = context.activeEvent;
     await context.queryClient.ensureQueryData(
       generateLoadOrganizationDetailQueryOptions(event.id, params.orgId),
     );
@@ -21,7 +18,7 @@ export const Route = createFileRoute("/_authenticated/$slug/committee/organizati
 function EditOrganizationPage() {
   const location = useLocation();
   const { slug, orgId } = Route.useParams();
-  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
+  const { activeEvent: event } = Route.useRouteContext();
   const { data: organization } = useSuspenseQuery(
     generateLoadOrganizationDetailQueryOptions(event.id, orgId),
   );

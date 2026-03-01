@@ -11,7 +11,6 @@ import {
   useUpdateProjectDraftMutation,
 } from "@/features/project/actions";
 import { RichTextEditor, SubmitProjectDialog } from "@/features/project/components";
-import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions";
 import { generateLoadTagsQueryOptions } from "@/features/event/actions/queries/tag";
 import { generateLoadDeadlinesQueryOptions } from "@/features/event/actions/queries/deadline";
 import { generateCheckOrganizationPermissionsQueryOptions } from "@/features/authorization/actions/queries";
@@ -30,9 +29,7 @@ const hasReachedMax = <T,>(value: T[]) => value.length >= PROJECT_MAX_TAGS;
 export const Route = createFileRoute("/_authenticated/$slug/orgs/$orgId_/projects/$projectId/edit")(
   {
     loader: async ({ params, context }) => {
-      const event = await context.queryClient.ensureQueryData(
-        generateLoadEventBySlugQueryOptions(params.slug),
-      );
+      const event = context.activeEvent;
       await Promise.all([
         context.queryClient.ensureQueryData(
           generateLoadDraftQueryOptions(event.id, params.orgId, params.projectId),
@@ -50,9 +47,9 @@ export const Route = createFileRoute("/_authenticated/$slug/orgs/$orgId_/project
 
 function ProjectEditPage() {
   const { slug, orgId, projectId } = Route.useParams();
+  const { activeEvent: event } = Route.useRouteContext();
 
   const queryClient = useQueryClient();
-  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
   const { data: draft } = useSuspenseQuery(
     generateLoadDraftQueryOptions(event.id, orgId, projectId),
   );

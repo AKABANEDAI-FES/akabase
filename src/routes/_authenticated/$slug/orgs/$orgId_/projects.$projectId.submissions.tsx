@@ -1,9 +1,7 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { Container, Stack } from "styled-system/jsx";
 import { Button, Heading } from "@/components/ui";
 import { ArrowLeftIcon } from "lucide-react";
-import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions/queries";
 import { generateLoadSubmissionsQueryOptions } from "@/features/project/actions/queries";
 import { ProjectSubmissionsHistory } from "@/features/project/components";
 import { cast } from "@/domain/shared/ids";
@@ -13,9 +11,7 @@ export const Route = createFileRoute(
   "/_authenticated/$slug/orgs/$orgId_/projects/$projectId/submissions",
 )({
   loader: async ({ params, context }) => {
-    const event = await context.queryClient.ensureQueryData(
-      generateLoadEventBySlugQueryOptions(params.slug),
-    );
+    const event = context.activeEvent;
     await context.queryClient.ensureQueryData(
       generateLoadSubmissionsQueryOptions(event.id, params.orgId, params.projectId),
     );
@@ -25,8 +21,7 @@ export const Route = createFileRoute(
 
 function ProjectSubmissionsPage() {
   const { slug, orgId, projectId } = Route.useParams();
-
-  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
+  const { activeEvent: event } = Route.useRouteContext();
 
   return (
     <Container maxW="4xl" py="8">

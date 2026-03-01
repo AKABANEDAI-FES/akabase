@@ -1,16 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { Container, Flex, Stack } from "styled-system/jsx";
 import { Heading } from "@/components/ui";
-import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions/queries";
 import { generateLoadEventSubmissionsQueryOptions } from "@/features/project/actions/queries";
 import { EventSubmissionsTable } from "@/features/project/components";
 
 export const Route = createFileRoute("/_authenticated/$slug/committee/submissions")({
-  loader: async ({ params, context }) => {
-    const event = await context.queryClient.ensureQueryData(
-      generateLoadEventBySlugQueryOptions(params.slug),
-    );
+  loader: async ({ context }) => {
+    const event = context.activeEvent;
     await context.queryClient.ensureQueryData(generateLoadEventSubmissionsQueryOptions(event.id));
   },
   component: SubmissionsPage,
@@ -18,7 +14,7 @@ export const Route = createFileRoute("/_authenticated/$slug/committee/submission
 
 function SubmissionsPage() {
   const { slug } = Route.useParams();
-  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
+  const { activeEvent: event } = Route.useRouteContext();
 
   return (
     <Container maxW="6xl" py="8">

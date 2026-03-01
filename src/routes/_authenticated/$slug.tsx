@@ -14,21 +14,30 @@ import { generateCheckCommitteeRoleQueryOptions } from "@/features/authorization
 import { generateLoadMyOrganizationsQueryOptions } from "@/features/organization/actions/queries";
 
 export const Route = createFileRoute("/_authenticated/$slug")({
-  loader: async ({ params, context }) => {
+  beforeLoad: async ({ params, context }) => {
     const event = await context.queryClient.ensureQueryData(
       generateLoadEventBySlugQueryOptions(params.slug),
     );
+    return {
+      activeEvent: event,
+    };
+  },
+  loader: async ({ context }) => {
     await Promise.all([
-      context.queryClient.ensureQueryData(generateCheckCommitteeRoleQueryOptions(event.id)),
-      context.queryClient.ensureQueryData(generateLoadMyOrganizationsQueryOptions(event.id)),
+      context.queryClient.ensureQueryData(
+        generateCheckCommitteeRoleQueryOptions(context.activeEvent.id),
+      ),
+      context.queryClient.ensureQueryData(
+        generateLoadMyOrganizationsQueryOptions(context.activeEvent.id),
+      ),
     ]);
   },
   component: SlugLayout,
 });
 
 function SlugLayout() {
+  const { activeEvent: event } = Route.useRouteContext();
   const { slug } = Route.useParams();
-  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
   const {
     data: { committeeRole },
   } = useSuspenseQuery(generateCheckCommitteeRoleQueryOptions(event.id));
@@ -86,7 +95,7 @@ function SlugLayout() {
 }
 
 function OrganizationLinks({ slug }: { slug: string }) {
-  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
+  const { activeEvent: event } = Route.useRouteContext();
   const { data: myOrganizations } = useSuspenseQuery(
     generateLoadMyOrganizationsQueryOptions(event.id),
   );

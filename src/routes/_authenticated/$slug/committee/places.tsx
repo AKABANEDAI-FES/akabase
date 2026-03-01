@@ -3,18 +3,13 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Button, Heading } from "@/components/ui";
 import { Container, Flex, Stack } from "styled-system/jsx";
 import { PlusIcon } from "lucide-react";
-import {
-  generateLoadEventBySlugQueryOptions,
-  generateLoadPlacesQueryOptions,
-} from "@/features/event/actions/queries";
+import { generateLoadPlacesQueryOptions } from "@/features/event/actions/queries";
 import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions";
 import { PlaceManagementTable } from "@/features/event/components/place-management-table";
 
 export const Route = createFileRoute("/_authenticated/$slug/committee/places")({
-  loader: async ({ params, context }) => {
-    const event = await context.queryClient.ensureQueryData(
-      generateLoadEventBySlugQueryOptions(params.slug),
-    );
+  loader: async ({ context }) => {
+    const event = context.activeEvent;
     await Promise.all([
       context.queryClient.ensureQueryData(generateLoadPlacesQueryOptions(event.id)),
       context.queryClient.ensureQueryData(generateCheckCommitteePermissionsQueryOptions(event.id)),
@@ -25,7 +20,7 @@ export const Route = createFileRoute("/_authenticated/$slug/committee/places")({
 
 function PlacesManagementPage() {
   const { slug } = Route.useParams();
-  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
+  const { activeEvent: event } = Route.useRouteContext();
   const { data: places } = useSuspenseQuery(generateLoadPlacesQueryOptions(event.id));
   const { data: permissions } = useSuspenseQuery(
     generateCheckCommitteePermissionsQueryOptions(event.id),

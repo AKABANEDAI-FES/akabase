@@ -3,18 +3,13 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Button, Heading } from "@/components/ui";
 import { Container, Flex, Stack } from "styled-system/jsx";
 import { PlusIcon } from "lucide-react";
-import {
-  generateLoadDeadlinesQueryOptions,
-  generateLoadEventBySlugQueryOptions,
-} from "@/features/event/actions/queries";
+import { generateLoadDeadlinesQueryOptions } from "@/features/event/actions/queries";
 import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions";
 import { DeadlineManagementTable } from "@/features/event/components/deadline-management-table";
 
 export const Route = createFileRoute("/_authenticated/$slug/committee/deadlines")({
-  loader: async ({ params, context }) => {
-    const event = await context.queryClient.ensureQueryData(
-      generateLoadEventBySlugQueryOptions(params.slug),
-    );
+  loader: async ({ context }) => {
+    const event = context.activeEvent;
     await Promise.all([
       context.queryClient.ensureQueryData(generateLoadDeadlinesQueryOptions(event.id)),
       context.queryClient.ensureQueryData(generateCheckCommitteePermissionsQueryOptions(event.id)),
@@ -25,7 +20,7 @@ export const Route = createFileRoute("/_authenticated/$slug/committee/deadlines"
 
 function DeadlinesManagementPage() {
   const { slug } = Route.useParams();
-  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
+  const { activeEvent: event } = Route.useRouteContext();
   const { data: deadlines } = useSuspenseQuery(generateLoadDeadlinesQueryOptions(event.id));
   const { data: permissions } = useSuspenseQuery(
     generateCheckCommitteePermissionsQueryOptions(event.id),

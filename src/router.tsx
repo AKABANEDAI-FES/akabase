@@ -15,6 +15,7 @@ export const getRouter = () => {
     context: {
       ...rqContext,
       session: null as SessionData,
+      activeEvent: undefined!,
     },
 
     defaultPreload: "intent",

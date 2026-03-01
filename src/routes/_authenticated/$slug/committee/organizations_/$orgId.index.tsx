@@ -4,7 +4,6 @@ import { Stack } from "styled-system/jsx";
 import { Trash2Icon } from "lucide-react";
 import { generateLoadOrganizationDetailQueryOptions } from "@/features/organization/actions";
 import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions";
-import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions/queries";
 import { UpdateOrganizationForm } from "@/features/organization/components/update-organization-form";
 import { DeleteOrganizationDialog } from "@/features/organization/components/delete-organization-dialog";
 import { Button, Fieldset } from "@/components/ui";
@@ -12,10 +11,7 @@ import type { EventId, OrgId } from "@/domain/shared/ids";
 
 export const Route = createFileRoute("/_authenticated/$slug/committee/organizations_/$orgId/")({
   loader: async ({ params, context }) => {
-    // Get event first from parent route
-    const event = await context.queryClient.ensureQueryData(
-      generateLoadEventBySlugQueryOptions(params.slug),
-    );
+    const event = context.activeEvent;
     await Promise.all([
       context.queryClient.ensureQueryData(
         generateLoadOrganizationDetailQueryOptions(event.id, params.orgId),
@@ -28,7 +24,7 @@ export const Route = createFileRoute("/_authenticated/$slug/committee/organizati
 
 function EditOrganizationPage() {
   const { slug, orgId } = Route.useParams();
-  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
+  const { activeEvent: event } = Route.useRouteContext();
   const { data: organization } = useSuspenseQuery(
     generateLoadOrganizationDetailQueryOptions(event.id, orgId),
   );

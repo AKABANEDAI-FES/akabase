@@ -7,7 +7,6 @@ import {
   generateLoadOrganizationMembersQueryOptions,
 } from "@/features/organization/actions";
 import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions";
-import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions/queries";
 import { OrgMembersTable } from "@/features/organization/components/org-members-table";
 import { Button, Text } from "@/components/ui";
 import { cast } from "@/domain/shared/ids";
@@ -17,9 +16,7 @@ export const Route = createFileRoute(
   "/_authenticated/$slug/committee/organizations_/$orgId/members",
 )({
   loader: async ({ params, context }) => {
-    const event = await context.queryClient.ensureQueryData(
-      generateLoadEventBySlugQueryOptions(params.slug),
-    );
+    const event = context.activeEvent;
     await Promise.all([
       context.queryClient.ensureQueryData(
         generateLoadOrganizationDetailQueryOptions(event.id, params.orgId),
@@ -35,7 +32,7 @@ export const Route = createFileRoute(
 
 function OrganizationMembersPage() {
   const { slug, orgId } = Route.useParams();
-  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
+  const { activeEvent: event } = Route.useRouteContext();
   const { data: organization } = useSuspenseQuery(
     generateLoadOrganizationDetailQueryOptions(event.id, orgId),
   );

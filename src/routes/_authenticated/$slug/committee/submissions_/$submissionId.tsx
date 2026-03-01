@@ -10,14 +10,11 @@ import {
   SubmissionOverviewTab,
   SubmissionStatusBadge,
 } from "@/features/project/components";
-import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions/queries";
 import { generateLoadSubmissionDetailQueryOptions } from "@/features/project/actions/queries";
 
 export const Route = createFileRoute("/_authenticated/$slug/committee/submissions_/$submissionId")({
   loader: async ({ params, context }) => {
-    const event = await context.queryClient.ensureQueryData(
-      generateLoadEventBySlugQueryOptions(params.slug),
-    );
+    const event = context.activeEvent;
     await context.queryClient.ensureQueryData(
       generateLoadSubmissionDetailQueryOptions(event.id, params.submissionId),
     );
@@ -27,7 +24,7 @@ export const Route = createFileRoute("/_authenticated/$slug/committee/submission
 
 function SubmissionDetailPage() {
   const { slug, submissionId } = Route.useParams();
-  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
+  const { activeEvent: event } = Route.useRouteContext();
   const { data: submission } = useSuspenseQuery(
     generateLoadSubmissionDetailQueryOptions(event.id, submissionId),
   );

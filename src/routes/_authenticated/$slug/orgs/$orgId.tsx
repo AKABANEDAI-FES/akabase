@@ -3,13 +3,10 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Container, Stack } from "styled-system/jsx";
 import { Heading, SegmentGroup } from "@/components/ui";
 import { generateLoadOrganizationDetailQueryOptions } from "@/features/organization/actions/queries";
-import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions/queries";
 
 export const Route = createFileRoute("/_authenticated/$slug/orgs/$orgId")({
   loader: async ({ params, context }) => {
-    const event = await context.queryClient.ensureQueryData(
-      generateLoadEventBySlugQueryOptions(params.slug),
-    );
+    const event = context.activeEvent;
     await context.queryClient.ensureQueryData(
       generateLoadOrganizationDetailQueryOptions(event.id, params.orgId),
     );
@@ -20,7 +17,7 @@ export const Route = createFileRoute("/_authenticated/$slug/orgs/$orgId")({
 function OrganizationLayoutPage() {
   const location = useLocation();
   const { slug, orgId } = Route.useParams();
-  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
+  const { activeEvent: event } = Route.useRouteContext();
   const { data: organization } = useSuspenseQuery(
     generateLoadOrganizationDetailQueryOptions(event.id, orgId),
   );

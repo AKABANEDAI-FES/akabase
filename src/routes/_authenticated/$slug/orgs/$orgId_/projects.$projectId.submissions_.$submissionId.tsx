@@ -10,7 +10,6 @@ import {
   SubmissionOverviewTab,
   SubmissionStatusBadge,
 } from "@/features/project/components";
-import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions/queries";
 import { generateCheckOrganizationPermissionsQueryOptions } from "@/features/authorization/actions/queries";
 import { cast } from "@/domain/shared/ids";
 import type { OrgId } from "@/domain/shared/ids";
@@ -20,9 +19,7 @@ export const Route = createFileRoute(
   "/_authenticated/$slug/orgs/$orgId_/projects/$projectId/submissions_/$submissionId",
 )({
   loader: async ({ params, context }) => {
-    const event = await context.queryClient.ensureQueryData(
-      generateLoadEventBySlugQueryOptions(params.slug),
-    );
+    const event = context.activeEvent;
     await Promise.all([
       context.queryClient.ensureQueryData(
         generateLoadSubmissionDetailQueryOptions(event.id, params.submissionId),
@@ -37,7 +34,7 @@ export const Route = createFileRoute(
 
 function OrgSubmissionDetailPage() {
   const { slug, orgId, projectId, submissionId } = Route.useParams();
-  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
+  const { activeEvent: event } = Route.useRouteContext();
   const { data: submission } = useSuspenseQuery(
     generateLoadSubmissionDetailQueryOptions(event.id, submissionId),
   );

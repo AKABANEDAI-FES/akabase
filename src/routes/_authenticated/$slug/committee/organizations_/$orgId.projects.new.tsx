@@ -1,7 +1,5 @@
 import { createFileRoute, redirect, useNavigate, useRouter } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { CreateProjectDialog } from "@/features/project/components";
-import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions";
 import { generateLoadPlacesQueryOptions } from "@/features/project/actions";
 import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions";
 import { cast } from "@/domain/shared/ids";
@@ -11,9 +9,7 @@ export const Route = createFileRoute(
   "/_authenticated/$slug/committee/organizations_/$orgId/projects/new",
 )({
   beforeLoad: async ({ params, context }) => {
-    const event = await context.queryClient.ensureQueryData(
-      generateLoadEventBySlugQueryOptions(params.slug),
-    );
+    const event = context.activeEvent;
     const permissions = await context.queryClient.ensureQueryData(
       generateCheckCommitteePermissionsQueryOptions(event.id),
     );
@@ -24,10 +20,8 @@ export const Route = createFileRoute(
       });
     }
   },
-  loader: async ({ params, context }) => {
-    const event = await context.queryClient.ensureQueryData(
-      generateLoadEventBySlugQueryOptions(params.slug),
-    );
+  loader: async ({ context }) => {
+    const event = context.activeEvent;
     await context.queryClient.ensureQueryData(generateLoadPlacesQueryOptions(event.id));
   },
   component: CreateProjectPage,
@@ -36,8 +30,8 @@ export const Route = createFileRoute(
 function CreateProjectPage() {
   const router = useRouter();
   const navigate = useNavigate();
-  const { slug, orgId } = Route.useParams();
-  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
+  const { orgId } = Route.useParams();
+  const { activeEvent: event } = Route.useRouteContext();
 
   const handleClose = () => {
     if (router.history.canGoBack()) {

@@ -2,16 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Heading } from "@/components/ui";
 import { Container, Stack } from "styled-system/jsx";
-import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions/queries";
 import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions";
 import { generateLoadUsersForEventQueryOptions } from "@/features/user/actions";
 import { EventUsersTable } from "@/features/user/components";
 
 export const Route = createFileRoute("/_authenticated/$slug/committee/members")({
-  loader: async ({ params, context }) => {
-    const event = await context.queryClient.ensureQueryData(
-      generateLoadEventBySlugQueryOptions(params.slug),
-    );
+  loader: async ({ context }) => {
+    const event = context.activeEvent;
     await Promise.all([
       context.queryClient.ensureQueryData(generateLoadUsersForEventQueryOptions(event.id)),
       context.queryClient.ensureQueryData(generateCheckCommitteePermissionsQueryOptions(event.id)),
@@ -21,8 +18,7 @@ export const Route = createFileRoute("/_authenticated/$slug/committee/members")(
 });
 
 function MembersManagementPage() {
-  const { slug } = Route.useParams();
-  const { data: event } = useSuspenseQuery(generateLoadEventBySlugQueryOptions(slug));
+  const { activeEvent: event } = Route.useRouteContext();
   const { data: users } = useSuspenseQuery(generateLoadUsersForEventQueryOptions(event.id));
   const { data: permissions } = useSuspenseQuery(
     generateCheckCommitteePermissionsQueryOptions(event.id),
