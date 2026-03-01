@@ -41,16 +41,17 @@ export type Dependencies = {
  * In the future, this could be extended to support different implementations
  * (e.g., mock repositories for testing)
  */
-export function createDependencies(): Dependencies {
-  const eventRepo = new EventRepositoryImpl();
-  const organizationRepo = new OrganizationRepositoryImpl();
-  const projectRepo = new ProjectRepositoryImpl();
+export function createDependencies(db: Database): Dependencies {
+  const eventRepo = new EventRepositoryImpl(db);
+  const organizationRepo = new OrganizationRepositoryImpl(db);
+  const projectRepo = new ProjectRepositoryImpl(db);
+  const userRepo = new UserRepositoryImpl(db);
   return {
     db,
     projectRepo,
     eventRepo,
-    userRepo: new UserRepositoryImpl(),
-    organizationRepo: organizationRepo,
+    userRepo,
+    organizationRepo,
     eventDomainService: new EventDomainServiceImpl(eventRepo),
     organizationDomainService: new OrganizationDomainServiceImpl(organizationRepo),
     projectDomainService: new ProjectDomainServiceImpl(projectRepo),
@@ -63,4 +64,4 @@ export function createDependencies(): Dependencies {
  * Global dependencies instance
  * Use this in server-side code (loaders, actions, API routes)
  */
-export const dependencies = createDependencies();
+export const dependencies = createDependencies(db);

@@ -1,4 +1,4 @@
-import { db } from "@/db";
+import type { Database } from "@/db";
 import { deadlines, events, places, tags } from "@/db/schema";
 import { and, desc, eq } from "drizzle-orm";
 import { deadlineSchema, eventSchema, placeSchema, tagSchema } from "@/domain/event/schema";
@@ -11,9 +11,11 @@ import { RepositoryException } from "@/domain/shared/repository";
  * Event Repository Implementation using Drizzle ORM
  */
 export class EventRepositoryImpl implements EventRepository {
+  constructor(private db: Database) {}
+
   async findById(id: EventId): Promise<Event | null> {
     try {
-      const row = await db.query.events.findFirst({
+      const row = await this.db.query.events.findFirst({
         where: (events, { eq }) => eq(events.id, id),
       });
 
@@ -38,7 +40,7 @@ export class EventRepositoryImpl implements EventRepository {
 
   async findBySlug(slug: string): Promise<Event | null> {
     try {
-      const row = await db.query.events.findFirst({
+      const row = await this.db.query.events.findFirst({
         where: (events, { eq }) => eq(events.slug, slug),
       });
 
@@ -63,7 +65,7 @@ export class EventRepositoryImpl implements EventRepository {
 
   async listAll(): Promise<Event[]> {
     try {
-      const rows = await db.query.events.findMany({
+      const rows = await this.db.query.events.findMany({
         orderBy: [desc(events.createdAt)],
       });
 
@@ -86,7 +88,7 @@ export class EventRepositoryImpl implements EventRepository {
 
   async saveEvent(event: Event): Promise<void> {
     try {
-      await db
+      await this.db
         .insert(events)
         .values({
           id: event.id,
@@ -117,7 +119,7 @@ export class EventRepositoryImpl implements EventRepository {
 
   async findTags(eventId: EventId): Promise<Tag[]> {
     try {
-      const rows = await db.query.tags.findMany({
+      const rows = await this.db.query.tags.findMany({
         where: (tags, { eq }) => eq(tags.eventId, eventId),
       });
 
@@ -138,7 +140,7 @@ export class EventRepositoryImpl implements EventRepository {
 
   async saveTag(tag: Tag): Promise<void> {
     try {
-      await db
+      await this.db
         .insert(tags)
         .values({
           id: tag.id,
@@ -161,7 +163,7 @@ export class EventRepositoryImpl implements EventRepository {
 
   async deleteTag(eventId: EventId, tagId: TagId): Promise<void> {
     try {
-      await db.delete(tags).where(and(eq(tags.id, tagId), eq(tags.eventId, eventId)));
+      await this.db.delete(tags).where(and(eq(tags.id, tagId), eq(tags.eventId, eventId)));
     } catch (error) {
       throw new RepositoryException("DATABASE_ERROR", "Failed to delete tag", error);
     }
@@ -173,7 +175,7 @@ export class EventRepositoryImpl implements EventRepository {
 
   async findPlaces(eventId: EventId): Promise<Place[]> {
     try {
-      const rows = await db.query.places.findMany({
+      const rows = await this.db.query.places.findMany({
         where: (places, { eq }) => eq(places.eventId, eventId),
       });
 
@@ -195,7 +197,7 @@ export class EventRepositoryImpl implements EventRepository {
 
   async savePlace(place: Place): Promise<void> {
     try {
-      await db
+      await this.db
         .insert(places)
         .values({
           id: place.id,
@@ -220,7 +222,7 @@ export class EventRepositoryImpl implements EventRepository {
 
   async deletePlace(eventId: EventId, placeId: PlaceId): Promise<void> {
     try {
-      await db.delete(places).where(and(eq(places.id, placeId), eq(places.eventId, eventId)));
+      await this.db.delete(places).where(and(eq(places.id, placeId), eq(places.eventId, eventId)));
     } catch (error) {
       throw new RepositoryException("DATABASE_ERROR", "Failed to delete place", error);
     }
@@ -232,7 +234,7 @@ export class EventRepositoryImpl implements EventRepository {
 
   async findDeadlines(eventId: EventId): Promise<Deadline[]> {
     try {
-      const rows = await db.query.deadlines.findMany({
+      const rows = await this.db.query.deadlines.findMany({
         where: (deadlines, { eq }) => eq(deadlines.eventId, eventId),
       });
 
@@ -255,7 +257,7 @@ export class EventRepositoryImpl implements EventRepository {
 
   async saveDeadline(deadline: Deadline): Promise<void> {
     try {
-      await db
+      await this.db
         .insert(deadlines)
         .values({
           id: deadline.id,
@@ -279,7 +281,7 @@ export class EventRepositoryImpl implements EventRepository {
 
   async deleteDeadline(eventId: EventId, deadlineId: DeadlineId): Promise<void> {
     try {
-      await db
+      await this.db
         .delete(deadlines)
         .where(and(eq(deadlines.id, deadlineId), eq(deadlines.eventId, eventId)));
     } catch (error) {

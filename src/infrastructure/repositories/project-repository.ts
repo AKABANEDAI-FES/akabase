@@ -1,4 +1,4 @@
-import { db } from "@/db";
+import type { Database } from "@/db";
 import {
   projectDraftTags,
   projectDrafts,
@@ -38,9 +38,11 @@ import type { BatchItem } from "drizzle-orm/batch";
  * Project Repository Implementation using Drizzle ORM
  */
 export class ProjectRepositoryImpl implements ProjectRepository {
+  constructor(private db: Database) {}
+
   async findById(id: ProjectId): Promise<Project | null> {
     try {
-      const row = await db.query.projects.findFirst({
+      const row = await this.db.query.projects.findFirst({
         where: (projects, { eq }) => eq(projects.id, id),
       });
 
@@ -67,7 +69,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
   async findDraftWithTags(projectId: ProjectId): Promise<DraftWithTags | null> {
     try {
-      const draftRow = await db.query.projectDrafts.findFirst({
+      const draftRow = await this.db.query.projectDrafts.findFirst({
         where: (projectDrafts, { eq }) => eq(projectDrafts.projectId, projectId),
         with: {
           tags: {
@@ -99,7 +101,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
   async findSubmissionById(id: SubmissionId): Promise<SubmissionWithTags | null> {
     try {
-      const row = await db.query.projectSubmissions.findFirst({
+      const row = await this.db.query.projectSubmissions.findFirst({
         where: (projectSubmissions, { eq }) => eq(projectSubmissions.id, id),
         with: {
           tags: {
@@ -133,7 +135,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
   async findPublishedByProjectId(projectId: ProjectId): Promise<PublishedWithTags | null> {
     try {
-      const row = await db.query.projectPublished.findFirst({
+      const row = await this.db.query.projectPublished.findFirst({
         where: (projectPublished, { eq }) => eq(projectPublished.projectId, projectId),
         with: {
           tags: {
@@ -165,7 +167,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
   async listByOrganization(orgId: OrgId): Promise<Project[]> {
     try {
-      const rows = await db.query.projects.findMany({
+      const rows = await this.db.query.projects.findMany({
         where: (projects, { eq }) => eq(projects.orgId, orgId),
       });
 
@@ -190,7 +192,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
   async listSubmissionsByProject(projectId: ProjectId): Promise<ProjectSubmission[]> {
     try {
-      const rows = await db.query.projectSubmissions.findMany({
+      const rows = await this.db.query.projectSubmissions.findMany({
         where: (projectSubmissions, { eq }) => eq(projectSubmissions.projectId, projectId),
       });
 
@@ -215,7 +217,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
   async saveProject(project: Project): Promise<void> {
     try {
       // Upsert project
-      await db
+      await this.db
         .insert(projects)
         .values({
           id: project.id,
@@ -246,7 +248,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
   async saveDraft(draft: DraftWithTags): Promise<void> {
     try {
       // Upsert draft
-      const q1 = db
+      const q1 = this.db
         .insert(projectDrafts)
         .values({
           projectId: draft.projectId,
@@ -267,18 +269,20 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         });
 
       // Update project's updatedAt
-      const q2 = db
+      const q2 = this.db
         .update(projects)
         .set({ updatedAt: draft.updatedAt })
         .where(eq(projects.id, draft.projectId));
 
       // Replace tags (delete + insert)
-      const q3 = db.delete(projectDraftTags).where(eq(projectDraftTags.projectId, draft.projectId));
+      const q3 = this.db
+        .delete(projectDraftTags)
+        .where(eq(projectDraftTags.projectId, draft.projectId));
 
       const query: [BatchItem<"sqlite">, ...BatchItem<"sqlite">[]] = [q1, q2, q3];
 
       if (draft.tags.length > 0) {
-        const q4 = db.insert(projectDraftTags).values(
+        const q4 = this.db.insert(projectDraftTags).values(
           draft.tags.map((tagId) => ({
             id: generateId(),
             projectId: draft.projectId,
@@ -288,7 +292,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         query.push(q4);
       }
 
-      await db.batch(query);
+      await this.db.batch(query);
     } catch (error) {
       throw new RepositoryException("DATABASE_ERROR", "Failed to save draft", error);
     }
@@ -297,7 +301,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
   async savePublished(published: PublishedWithTags): Promise<void> {
     try {
       // Upsert published
-      const q1 = db
+      const q1 = this.db
         .insert(projectPublished)
         .values({
           projectId: published.projectId,
@@ -318,20 +322,20 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         });
 
       // Update project's updatedAt
-      const q2 = db
+      const q2 = this.db
         .update(projects)
         .set({ updatedAt: published.publishedAt })
         .where(eq(projects.id, published.projectId));
 
       // Replace tags (delete + insert)
-      const q3 = db
+      const q3 = this.db
         .delete(projectPublishedTags)
         .where(eq(projectPublishedTags.projectId, published.projectId));
 
       const query: [BatchItem<"sqlite">, ...BatchItem<"sqlite">[]] = [q1, q2, q3];
 
       if (published.tags.length > 0) {
-        const q4 = db.insert(projectPublishedTags).values(
+        const q4 = this.db.insert(projectPublishedTags).values(
           published.tags.map((tagId) => ({
             id: generateId(),
             projectId: published.projectId,
@@ -341,7 +345,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         query.push(q4);
       }
 
-      await db.batch(query);
+      await this.db.batch(query);
     } catch (error) {
       throw new RepositoryException("DATABASE_ERROR", "Failed to save published data", error);
     }
@@ -352,7 +356,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
     userId: UserId,
   ): Promise<SubmissionAction | null> {
     try {
-      const row = await db.query.submissionActions.findFirst({
+      const row = await this.db.query.submissionActions.findFirst({
         where: (submissionActions, { eq, and }) =>
           and(
             eq(submissionActions.submissionId, submissionId),
@@ -381,7 +385,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
   async countApprovalActions(submissionId: SubmissionId): Promise<number> {
     try {
-      const result = await db
+      const result = await this.db
         .select({ count: sql<number>`count(*)` })
         .from(submissionActions)
         .where(
@@ -407,7 +411,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
       // Build batch operations
       const query: [BatchItem<"sqlite">, ...BatchItem<"sqlite">[]] = [
         // 1. Save approval action
-        db.insert(submissionActions).values({
+        this.db.insert(submissionActions).values({
           id: params.approvalAction.id,
           submissionId: params.approvalAction.submissionId,
           actionType: params.approvalAction.actionType,
@@ -419,7 +423,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
       // 2. Save optional approval message
       if (params.approvalMessage) {
         query.push(
-          db.insert(submissionMessages).values({
+          this.db.insert(submissionMessages).values({
             id: params.approvalMessage.id,
             submissionId: params.approvalMessage.submissionId,
             actionId: params.approvalMessage.actionId,
@@ -432,7 +436,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
       // 3. Always update submission status to 'approved'
       query.push(
-        db
+        this.db
           .update(projectSubmissions)
           .set({ status: "approved" })
           .where(eq(projectSubmissions.id, params.submission.id)),
@@ -440,7 +444,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
       // 4. Update project updatedAt
       query.push(
-        db
+        this.db
           .update(projects)
           .set({ updatedAt: new Date() })
           .where(eq(projects.id, params.submission.projectId)),
@@ -449,7 +453,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
       // 5. Always save published data (UPSERT)
       const published = params.published;
       query.push(
-        db
+        this.db
           .insert(projectPublished)
           .values({
             projectId: published.projectId,
@@ -471,14 +475,14 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
       // 6. Delete and re-insert published tags
       query.push(
-        db
+        this.db
           .delete(projectPublishedTags)
           .where(eq(projectPublishedTags.projectId, published.projectId)),
       );
 
       if (published.tags.length > 0) {
         query.push(
-          db.insert(projectPublishedTags).values(
+          this.db.insert(projectPublishedTags).values(
             published.tags.map((tagId) => ({
               id: generateId(),
               projectId: published.projectId,
@@ -489,7 +493,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
       }
 
       // Execute all operations atomically
-      await db.batch(query);
+      await this.db.batch(query);
     } catch (error) {
       throw new RepositoryException("DATABASE_ERROR", "Failed to approve with transaction", error);
     }
@@ -502,21 +506,21 @@ export class ProjectRepositoryImpl implements ProjectRepository {
   }): Promise<void> {
     try {
       // Build batch operations
-      await db.batch([
+      await this.db.batch([
         // 1. Update submission status
-        db
+        this.db
           .update(projectSubmissions)
           .set({ status: params.updatedSubmission.status })
           .where(eq(projectSubmissions.id, params.updatedSubmission.id)),
 
         // 2. Update project's updatedAt
-        db
+        this.db
           .update(projects)
           .set({ updatedAt: new Date() })
           .where(eq(projects.id, params.updatedSubmission.projectId)),
 
         // 3. Save return action
-        db.insert(submissionActions).values({
+        this.db.insert(submissionActions).values({
           id: params.returnAction.id,
           submissionId: params.returnAction.submissionId,
           actionType: params.returnAction.actionType,
@@ -525,7 +529,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         }),
 
         // 4. Save return message
-        db.insert(submissionMessages).values({
+        this.db.insert(submissionMessages).values({
           id: params.returnMessage.id,
           submissionId: params.returnMessage.submissionId,
           actionId: params.returnMessage.actionId,
@@ -548,19 +552,19 @@ export class ProjectRepositoryImpl implements ProjectRepository {
       // Build batch operations
       const query: [BatchItem<"sqlite">, ...BatchItem<"sqlite">[]] = [
         // 1. Update submission status
-        db
+        this.db
           .update(projectSubmissions)
           .set({ status: params.updatedSubmission.status })
           .where(eq(projectSubmissions.id, params.updatedSubmission.id)),
 
         // 2. Update project's updatedAt
-        db
+        this.db
           .update(projects)
           .set({ updatedAt: new Date() })
           .where(eq(projects.id, params.updatedSubmission.projectId)),
 
         // 3. Save withdrawal action
-        db.insert(submissionActions).values({
+        this.db.insert(submissionActions).values({
           id: params.withdrawalAction.id,
           submissionId: params.withdrawalAction.submissionId,
           actionType: params.withdrawalAction.actionType,
@@ -572,7 +576,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
       // 4. Optionally save withdrawal message
       if (params.withdrawalMessage) {
         query.push(
-          db.insert(submissionMessages).values({
+          this.db.insert(submissionMessages).values({
             id: params.withdrawalMessage.id,
             submissionId: params.withdrawalMessage.submissionId,
             actionId: params.withdrawalMessage.actionId,
@@ -583,7 +587,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         );
       }
 
-      await db.batch(query);
+      await this.db.batch(query);
     } catch (error) {
       throw new RepositoryException("DATABASE_ERROR", "Failed to withdraw with transaction", error);
     }
@@ -598,7 +602,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
       // Build batch operations
       const query: [BatchItem<"sqlite">, ...BatchItem<"sqlite">[]] = [
         // 1. Insert submission
-        db.insert(projectSubmissions).values({
+        this.db.insert(projectSubmissions).values({
           id: params.submission.id,
           projectId: params.submission.projectId,
           status: params.submission.status,
@@ -609,13 +613,13 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         }),
 
         // 2. Update project's updatedAt
-        db
+        this.db
           .update(projects)
           .set({ updatedAt: params.submission.submittedAt })
           .where(eq(projects.id, params.submission.projectId)),
 
         // 3. Save submission action
-        db.insert(submissionActions).values({
+        this.db.insert(submissionActions).values({
           id: params.submissionAction.id,
           submissionId: params.submissionAction.submissionId,
           actionType: params.submissionAction.actionType,
@@ -627,7 +631,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
       // 4. Insert submission tags
       if (params.submission.tags.length > 0) {
         query.push(
-          db.insert(projectSubmissionTags).values(
+          this.db.insert(projectSubmissionTags).values(
             params.submission.tags.map((tagId) => ({
               id: generateId(),
               submissionId: params.submission.id,
@@ -640,7 +644,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
       // 5. Save optional message
       if (params.submissionMessage) {
         query.push(
-          db.insert(submissionMessages).values({
+          this.db.insert(submissionMessages).values({
             id: params.submissionMessage.id,
             submissionId: params.submissionMessage.submissionId,
             actionId: params.submissionMessage.actionId,
@@ -652,7 +656,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
       }
 
       // Execute all operations atomically
-      await db.batch(query);
+      await this.db.batch(query);
     } catch (error) {
       throw new RepositoryException("DATABASE_ERROR", "Failed to submit with transaction", error);
     }

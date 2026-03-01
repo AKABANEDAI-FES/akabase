@@ -3,7 +3,7 @@
  * Handles user data persistence using Drizzle ORM
  */
 
-import { db } from "@/db";
+import type { Database } from "@/db";
 import { committeeRoles, user as userTable } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import type { UserRepository } from "@/domain/user/repository";
@@ -14,9 +14,11 @@ import { cast } from "@/domain/shared/ids";
 import type { CommitteeRole } from "@/domain/authorization/schema";
 
 export class UserRepositoryImpl implements UserRepository {
+  constructor(private db: Database) {}
+
   async findById(userId: UserId): Promise<User | null> {
     try {
-      const row = await db.query.user.findFirst({
+      const row = await this.db.query.user.findFirst({
         where: eq(userTable.id, userId),
       });
 
@@ -43,7 +45,7 @@ export class UserRepositoryImpl implements UserRepository {
 
   async listAll(): Promise<User[]> {
     try {
-      const rows = await db.query.user.findMany({
+      const rows = await this.db.query.user.findMany({
         orderBy: (user, { desc }) => [desc(user.createdAt)],
       });
 
@@ -66,7 +68,7 @@ export class UserRepositoryImpl implements UserRepository {
 
   async saveUser(user: User): Promise<void> {
     try {
-      await db
+      await this.db
         .insert(userTable)
         .values({
           id: user.id,
@@ -101,7 +103,7 @@ export class UserRepositoryImpl implements UserRepository {
     eventId: EventId,
   ): Promise<CommitteeRoleAssignment | null> {
     try {
-      const row = await db
+      const row = await this.db
         .select()
         .from(committeeRoles)
         .where(and(eq(committeeRoles.userId, userId), eq(committeeRoles.eventId, eventId)))
@@ -132,7 +134,7 @@ export class UserRepositoryImpl implements UserRepository {
   async saveCommitteeRoleAssignment(assignment: CommitteeRoleAssignment): Promise<void> {
     try {
       // UPSERT using onConflictDoUpdate
-      await db
+      await this.db
         .insert(committeeRoles)
         .values({
           id: assignment.id,

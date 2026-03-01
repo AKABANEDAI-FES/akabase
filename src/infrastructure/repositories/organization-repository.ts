@@ -1,4 +1,4 @@
-import { db } from "@/db";
+import type { Database } from "@/db";
 import { orgMembers, organizations } from "@/db/schema";
 import { and, desc, eq } from "drizzle-orm";
 import { orgMemberSchema, organizationSchema } from "@/domain/organization/schema";
@@ -11,9 +11,11 @@ import { RepositoryException } from "@/domain/shared/repository";
  * Organization Repository Implementation using Drizzle ORM
  */
 export class OrganizationRepositoryImpl implements OrganizationRepository {
+  constructor(private db: Database) {}
+
   async findById(eventId: EventId, id: OrgId): Promise<Organization | null> {
     try {
-      const row = await db.query.organizations.findFirst({
+      const row = await this.db.query.organizations.findFirst({
         where: (organizations, { eq, and }) =>
           and(eq(organizations.id, id), eq(organizations.eventId, eventId)),
       });
@@ -40,7 +42,7 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
 
   async findMembers(orgId: OrgId): Promise<OrgMember[]> {
     try {
-      const rows = await db.query.orgMembers.findMany({
+      const rows = await this.db.query.orgMembers.findMany({
         where: (orgMembers, { eq }) => eq(orgMembers.orgId, orgId),
         orderBy: [desc(orgMembers.createdAt)],
       });
@@ -63,7 +65,7 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
 
   async listByEvent(eventId: EventId): Promise<Organization[]> {
     try {
-      const rows = await db.query.organizations.findMany({
+      const rows = await this.db.query.organizations.findMany({
         where: (organizations, { eq }) => eq(organizations.eventId, eventId),
         orderBy: [desc(organizations.createdAt)],
       });
@@ -88,7 +90,7 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
 
   async saveOrganization(org: Organization): Promise<void> {
     try {
-      await db
+      await this.db
         .insert(organizations)
         .values({
           id: org.id,
@@ -117,7 +119,7 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
 
   async deleteOrganization(eventId: EventId, id: OrgId): Promise<void> {
     try {
-      await db
+      await this.db
         .delete(organizations)
         .where(and(eq(organizations.id, id), eq(organizations.eventId, eventId)));
     } catch (error) {
@@ -127,7 +129,7 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
 
   async saveMember(member: OrgMember): Promise<void> {
     try {
-      await db
+      await this.db
         .insert(orgMembers)
         .values({
           id: member.id,
@@ -150,7 +152,7 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
 
   async removeMember(orgId: OrgId, userId: UserId): Promise<void> {
     try {
-      await db
+      await this.db
         .delete(orgMembers)
         .where(and(eq(orgMembers.orgId, orgId), eq(orgMembers.userId, userId)));
     } catch (error) {
