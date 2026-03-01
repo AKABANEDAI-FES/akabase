@@ -29,7 +29,7 @@ export const createEventFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     return gen(async function* ($) {
       // Resolve actor from session (no event context needed for creation)
-      const actor = await resolveActor({
+      const actor = await resolveActor(dependencies, {
         userId: cast<UserId>(context.session.user.id),
       });
 
@@ -67,7 +67,7 @@ export const updateEventFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     return await gen(async function* ($) {
       // Resolve actor with event context
-      const actor = await resolveActor({
+      const actor = await resolveActor(dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.id],
       });
@@ -103,7 +103,7 @@ export const archiveEventFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     return await gen(async function* ($) {
       // Resolve actor with event context
-      const actor = await resolveActor({
+      const actor = await resolveActor(dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
       });
@@ -136,7 +136,7 @@ export const activateEventFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     return await gen(async function* ($) {
       // Resolve actor with event context
-      const actor = await resolveActor({
+      const actor = await resolveActor(dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
       });

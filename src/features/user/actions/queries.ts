@@ -13,7 +13,7 @@ export const loadUsersWithRolesFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .handler(async ({ context }) => {
     // Resolve actor from session
-    const actor = await resolveActor({
+    const actor = await resolveActor(dependencies, {
       userId: cast<UserId>(context.session.user.id),
     });
 
@@ -36,7 +36,7 @@ export const loadUsersForEventFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
   .handler(async ({ data, context }) => {
-    const actor = await resolveActor({
+    const actor = await resolveActor(dependencies, {
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
     });

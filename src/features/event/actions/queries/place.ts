@@ -4,6 +4,7 @@ import { listPlaces } from "@/application/query/event/list-places";
 import { authMiddleware } from "@/libs/session-server";
 import { eventIdSchema } from "@/domain/shared/ids";
 import { queryOptions } from "@tanstack/react-query";
+import { dependencies } from "@/infrastructure/di";
 
 /**
  * Server function to load places for an event
@@ -12,7 +13,7 @@ export const loadPlacesFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
   .handler(async ({ data }) => {
-    return await listPlaces(data.eventId);
+    return await listPlaces(dependencies, data.eventId);
   });
 
 /**

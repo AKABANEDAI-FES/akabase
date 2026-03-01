@@ -7,9 +7,10 @@ import { listEvents } from "@/application/query/event/list-events";
 import { getRecentActiveEvent } from "@/application/query/event/get-recent-active-event";
 import { getEventBySlug } from "@/application/query/event/get-event-by-slug";
 import { queryOptions } from "@tanstack/react-query";
+import { dependencies } from "@/infrastructure/di";
 
 export const loadEventsFn = createServerFn({ method: "GET" }).handler(async () => {
-  return await listEvents();
+  return await listEvents(dependencies);
 });
 
 export function generateLoadEventsCacheKey() {
@@ -27,7 +28,7 @@ export const loadEventDetailFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
   .handler(async ({ data }) => {
-    const event = await getEventDetail(data.eventId);
+    const event = await getEventDetail(dependencies, data.eventId);
     if (!event) {
       throw new Error("イベントが見つかりませんでした");
     }
@@ -46,7 +47,7 @@ export function generateLoadEventDetailQueryOptions(eventId: string) {
 }
 
 export const loadRecentActiveEventFn = createServerFn({ method: "GET" }).handler(async () => {
-  return await getRecentActiveEvent();
+  return await getRecentActiveEvent(dependencies);
 });
 
 export function generateLoadRecentActiveEventCacheKey() {
@@ -63,7 +64,7 @@ export function generateLoadRecentActiveEventQueryOptions() {
 export const loadEventBySlugFn = createServerFn({ method: "GET" })
   .inputValidator(z.object({ slug: z.string().min(1) }))
   .handler(async ({ data }) => {
-    const event = await getEventBySlug(data.slug);
+    const event = await getEventBySlug(dependencies, data.slug);
 
     if (!event) {
       throw new Error("イベントが見つかりませんでした。");

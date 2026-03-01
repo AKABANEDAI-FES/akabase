@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { db } from "@/db";
 import { projectIdSchema, userIdSchema } from "@/domain/shared/ids";
 import type { EventId, OrgId, ProjectId } from "@/domain/shared/ids";
 import { projectDraftSchema } from "@/domain/project/schema";
@@ -36,7 +35,7 @@ export type DraftDetail = z.infer<typeof draftDetailSchema>;
  * @throws {QueryException} When database operation fails or authorization is denied
  */
 export async function getDraft(
-  deps: Pick<Dependencies, "authService">,
+  deps: Pick<Dependencies, "db" | "authService">,
   eventId: EventId,
   orgId: OrgId,
   projectId: ProjectId,
@@ -53,7 +52,7 @@ export async function getDraft(
   }
 
   try {
-    const project = await db.query.projects.findFirst({
+    const project = await deps.db.query.projects.findFirst({
       where: (projects, { eq, and }) =>
         and(eq(projects.id, projectId), eq(projects.eventId, eventId), eq(projects.orgId, orgId)),
       with: {

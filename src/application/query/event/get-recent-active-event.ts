@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { db } from "@/db";
 import { events } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { eventIdSchema } from "@/domain/shared/ids";
+import type { Dependencies } from "@/infrastructure/di";
 import { QueryException } from "../shared";
 
 export const recentActiveEventSchema = z.object({
@@ -22,9 +22,11 @@ export type RecentActiveEvent = z.infer<typeof recentActiveEventSchema>;
  *
  * @throws {QueryException} When database operation fails
  */
-export async function getRecentActiveEvent(): Promise<RecentActiveEvent | null> {
+export async function getRecentActiveEvent(
+  deps: Pick<Dependencies, "db">,
+): Promise<RecentActiveEvent | null> {
   try {
-    const row = await db.query.events.findFirst({
+    const row = await deps.db.query.events.findFirst({
       where: eq(events.status, "active"),
       orderBy: [desc(events.createdAt)],
     });

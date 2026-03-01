@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { db } from "@/db";
 import { events } from "@/db/schema";
 import { desc } from "drizzle-orm";
 import { eventIdSchema } from "@/domain/shared/ids";
+import type { Dependencies } from "@/infrastructure/di";
 import { QueryException } from "../shared";
 
 export const eventListItemSchema = z.object({
@@ -20,9 +20,9 @@ export type EventListItem = z.infer<typeof eventListItemSchema>;
  *
  * @throws {QueryException} When database operation fails
  */
-export async function listEvents(): Promise<EventListItem[]> {
+export async function listEvents(deps: Pick<Dependencies, "db">): Promise<EventListItem[]> {
   try {
-    const rows = await db.query.events.findMany({
+    const rows = await deps.db.query.events.findMany({
       orderBy: [desc(events.createdAt)],
     });
 

@@ -7,6 +7,8 @@ import type { EventDomainService } from "@/domain/event/service";
 import type { OrganizationDomainService } from "@/domain/organization/service";
 import type { ProjectDomainService } from "@/domain/project/service";
 import type { StorageService } from "@/domain/shared/storage";
+import type { Database } from "@/db";
+import { db } from "@/db";
 import { EventRepositoryImpl } from "./repositories/event-repository";
 import { ProjectRepositoryImpl } from "./repositories/project-repository";
 import { UserRepositoryImpl } from "./repositories/user-repository";
@@ -22,6 +24,7 @@ import { StorageServiceImpl } from "./storage/storage-service";
  * Provides repository instances and services to application layer
  */
 export type Dependencies = {
+  db: Database;
   projectRepo: ProjectRepository;
   eventRepo: EventRepository;
   userRepo: UserRepository;
@@ -43,6 +46,7 @@ export function createDependencies(): Dependencies {
   const organizationRepo = new OrganizationRepositoryImpl();
   const projectRepo = new ProjectRepositoryImpl();
   return {
+    db,
     projectRepo,
     eventRepo,
     userRepo: new UserRepositoryImpl(),

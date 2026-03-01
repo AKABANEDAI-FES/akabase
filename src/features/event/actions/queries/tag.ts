@@ -4,6 +4,7 @@ import { listTags } from "@/application/query/event/list-tags";
 import { authMiddleware } from "@/libs/session-server";
 import { eventIdSchema } from "@/domain/shared/ids";
 import { queryOptions } from "@tanstack/react-query";
+import { dependencies } from "@/infrastructure/di";
 
 /**
  * Server function to load tags for an event
@@ -12,7 +13,7 @@ export const loadTagsFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
   .handler(async ({ data }) => {
-    return await listTags(data.eventId);
+    return await listTags(dependencies, data.eventId);
   });
 
 /**

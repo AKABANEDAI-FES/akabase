@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { db } from "@/db";
 import { projectSubmissions } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { submissionStatusSchema } from "@/domain/project/schema";
@@ -45,7 +44,7 @@ export type SubmissionListItem = z.infer<typeof submissionListItemSchema>;
  * @throws {QueryException} When database operation fails or authorization is denied
  */
 export async function listSubmissions(
-  deps: Pick<Dependencies, "authService">,
+  deps: Pick<Dependencies, "db" | "authService">,
   eventId: EventId,
   orgId: OrgId,
   projectId: ProjectId,
@@ -62,7 +61,7 @@ export async function listSubmissions(
   }
 
   try {
-    const submissions = await db.query.projectSubmissions.findMany({
+    const submissions = await deps.db.query.projectSubmissions.findMany({
       where: eq(projectSubmissions.projectId, projectId),
       orderBy: [desc(projectSubmissions.submittedAt)],
       with: {

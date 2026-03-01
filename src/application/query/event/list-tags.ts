@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { db } from "@/db";
 import { tags } from "@/db/schema";
 import { asc, eq } from "drizzle-orm";
 import type { EventId } from "@/domain/shared/ids";
 import { eventIdSchema, tagIdSchema } from "@/domain/shared/ids";
+import type { Dependencies } from "@/infrastructure/di";
 import { QueryException } from "../shared";
 
 /**
@@ -24,9 +24,12 @@ export type TagListItem = z.infer<typeof tagListItemSchema>;
  *
  * @throws {QueryException} When database operation fails
  */
-export async function listTags(eventId: EventId): Promise<TagListItem[]> {
+export async function listTags(
+  deps: Pick<Dependencies, "db">,
+  eventId: EventId,
+): Promise<TagListItem[]> {
   try {
-    const rows = await db.query.tags.findMany({
+    const rows = await deps.db.query.tags.findMany({
       where: eq(tags.eventId, eventId),
       orderBy: [asc(tags.name)], // Alphabetical order
     });

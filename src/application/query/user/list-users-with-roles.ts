@@ -4,7 +4,6 @@
  */
 
 import { z } from "zod";
-import { db } from "@/db";
 import { globalRoleSchema } from "@/domain/authorization/schema";
 import type { Actor } from "@/domain/authorization/schema";
 import { userResource } from "@/domain/authorization/logic";
@@ -42,7 +41,7 @@ export type UserListItem = z.infer<typeof userListItemSchema>;
  * @throws {QueryException} When database operation fails or permission denied
  */
 export async function listUsersWithRoles(
-  deps: Pick<Dependencies, "authService">,
+  deps: Pick<Dependencies, "db" | "authService">,
   actor: Actor,
 ): Promise<UserListItem[]> {
   // Authorization check: user:list permission
@@ -53,7 +52,7 @@ export async function listUsersWithRoles(
 
   try {
     // Fetch all users
-    const users = await db.query.user.findMany({
+    const users = await deps.db.query.user.findMany({
       columns: {
         id: true,
         name: true,

@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { db } from "@/db";
 import { organizations } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 import type { EventId } from "@/domain/shared/ids";
+import type { Dependencies } from "@/infrastructure/di";
 import { QueryException } from "../shared";
 
 /**
@@ -27,9 +27,12 @@ export type OrganizationListItem = z.infer<typeof organizationListItemSchema>;
  * @returns List of organizations sorted by creation date (newest first)
  * @throws {QueryException} When database operation fails
  */
-export async function listOrganizations(eventId: EventId): Promise<OrganizationListItem[]> {
+export async function listOrganizations(
+  deps: Pick<Dependencies, "db">,
+  eventId: EventId,
+): Promise<OrganizationListItem[]> {
   try {
-    const rows = await db.query.organizations.findMany({
+    const rows = await deps.db.query.organizations.findMany({
       where: eq(organizations.eventId, eventId),
       orderBy: [desc(organizations.createdAt)],
     });

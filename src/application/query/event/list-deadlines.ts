@@ -1,10 +1,10 @@
 import { z } from "zod";
-import { db } from "@/db";
 import { deadlines } from "@/db/schema";
 import { asc, eq } from "drizzle-orm";
 import type { EventId } from "@/domain/shared/ids";
 import { deadlineIdSchema, eventIdSchema } from "@/domain/shared/ids";
 import { DEADLINE_FIELD_KEYS } from "@/domain/event/schema";
+import type { Dependencies } from "@/infrastructure/di";
 import { QueryException } from "../shared";
 
 /**
@@ -27,9 +27,12 @@ export type DeadlineListItem = z.infer<typeof deadlineListItemSchema>;
  *
  * @throws {QueryException} When database operation fails
  */
-export async function listDeadlines(eventId: EventId): Promise<DeadlineListItem[]> {
+export async function listDeadlines(
+  deps: Pick<Dependencies, "db">,
+  eventId: EventId,
+): Promise<DeadlineListItem[]> {
   try {
-    const rows = await db.query.deadlines.findMany({
+    const rows = await deps.db.query.deadlines.findMany({
       where: eq(deadlines.eventId, eventId),
       orderBy: [asc(deadlines.deadlineAt)], // Chronological order
     });

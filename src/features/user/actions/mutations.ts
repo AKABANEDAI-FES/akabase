@@ -24,7 +24,7 @@ export const updateCommitteeRoleFn = createServerFn({ method: "POST" })
   .inputValidator(updateCommitteeRoleInputSchema)
   .handler(async ({ data, context }) => {
     return gen(async function* ($) {
-      const actor = await resolveActor({
+      const actor = await resolveActor(dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId], // Load permissions for the target event
       });
@@ -64,7 +64,7 @@ export const updateGlobalRoleFn = createServerFn({ method: "POST" })
   .inputValidator(updateGlobalRoleInputSchema)
   .handler(async ({ data, context }) => {
     return gen(async function* ($) {
-      const actor = await resolveActor({
+      const actor = await resolveActor(dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [], // No event context needed for global role updates
       });

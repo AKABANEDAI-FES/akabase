@@ -1,11 +1,11 @@
 import { z } from "zod";
-import { db } from "@/db";
 import { orgMembers } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { orgIdSchema } from "@/domain/shared/ids";
 import type { EventId } from "@/domain/shared/ids";
 import type { Actor } from "@/domain/authorization/schema";
 import { orgMemberRoleSchema, organizationSchema } from "@/domain/organization/schema";
+import type { Dependencies } from "@/infrastructure/di";
 import { QueryException } from "../shared";
 
 /**
@@ -28,11 +28,12 @@ export type MyOrganizationListItem = z.infer<typeof myOrganizationListItemSchema
  * @throws {QueryException} When database operation fails
  */
 export async function listMyOrganizations(
+  deps: Pick<Dependencies, "db">,
   eventId: EventId,
   actor: Actor,
 ): Promise<MyOrganizationListItem[]> {
   try {
-    const rows = await db.query.orgMembers.findMany({
+    const rows = await deps.db.query.orgMembers.findMany({
       where: and(eq(orgMembers.userId, actor.userId)),
       columns: {
         role: true,

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { db, schema } from "@/db";
+import { schema } from "@/db";
 import { desc, eq } from "drizzle-orm";
 import { submissionStatusSchema } from "@/domain/project/schema";
 import { orgIdSchema, projectIdSchema, submissionIdSchema } from "@/domain/shared/ids";
@@ -43,7 +43,7 @@ export type EventSubmissionListItem = z.infer<typeof eventSubmissionListItemSche
  * @throws {QueryException} When database operation fails or authorization is denied
  */
 export async function listEventSubmissions(
-  deps: Pick<Dependencies, "authService">,
+  deps: Pick<Dependencies, "db" | "authService">,
   eventId: EventId,
   actor: Actor,
 ): Promise<EventSubmissionListItem[]> {
@@ -58,7 +58,7 @@ export async function listEventSubmissions(
   }
 
   try {
-    const rows = await db
+    const rows = await deps.db
       .select({
         // Submission info
         id: schema.projectSubmissions.id,

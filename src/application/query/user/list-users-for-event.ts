@@ -4,7 +4,6 @@
  */
 
 import { z } from "zod";
-import { db } from "@/db";
 import { committeeRoles, user } from "@/db/schema";
 import { and, desc, eq } from "drizzle-orm";
 import { userIdSchema } from "@/domain/shared/ids";
@@ -39,7 +38,7 @@ export type UserForEvent = z.infer<typeof userForEventSchema>;
  * @throws {QueryException} When database operation fails or permission denied
  */
 export async function listUsersForEvent(
-  deps: Pick<Dependencies, "authService">,
+  deps: Pick<Dependencies, "db" | "authService">,
   eventId: EventId,
   actor: Actor,
 ): Promise<UserForEvent[]> {
@@ -51,7 +50,7 @@ export async function listUsersForEvent(
 
   try {
     // Get all users with their committee role for this event in a single query
-    const rows = await db
+    const rows = await deps.db
       .select({
         id: user.id,
         name: user.name,

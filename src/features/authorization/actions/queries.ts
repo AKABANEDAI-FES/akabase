@@ -22,7 +22,7 @@ export const checkCommitteeRoleFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
   .handler(async ({ data, context }) => {
-    const actor = await resolveActor({
+    const actor = await resolveActor(dependencies, {
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
     });
@@ -53,7 +53,7 @@ export const checkCommitteePermissionsFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
   .handler(async ({ data, context }) => {
-    const actor = await resolveActor({
+    const actor = await resolveActor(dependencies, {
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
     });
@@ -103,7 +103,7 @@ export const checkOrganizationPermissionsFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema, orgId: orgIdSchema }))
   .handler(async ({ data, context }) => {
-    const actor = await resolveActor({
+    const actor = await resolveActor(dependencies, {
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
     });

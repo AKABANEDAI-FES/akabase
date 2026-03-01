@@ -156,7 +156,7 @@ The application layer is split into **Command** (write) and **Query** (read) to 
 **Query** (`application/query/`):
 
 - Handles data retrieval for display (Read)
-- Direct database access with Drizzle ORM
+- Database access via `deps: Pick<Dependencies, "db" | ...>` (same DI pattern as Command)
 - Can JOIN across aggregates for optimized reads
 - Returns DTOs (Data Transfer Objects) defined with zod schemas
 - DTOs are defined in the same file as query functions (no separate `types.ts`)
@@ -178,10 +178,12 @@ export const eventListItemSchema = z.object({
 // Type derived from schema
 export type EventListItem = z.infer<typeof eventListItemSchema>;
 
-// Query function
-export async function listEvents(): Promise<Result<EventListItem[], QueryError>> {
-  // Direct DB access with JOIN
-  const rows = await db
+// Query function (receives deps via DI)
+export async function listEvents(
+  deps: Pick<Dependencies, "db">,
+): Promise<Result<EventListItem[], QueryError>> {
+  // DB access via deps
+  const rows = await deps.db
     .select({
       /* ... */
     })
@@ -343,17 +345,19 @@ const db = env.DB; // D1 database
    });
    export type EventListItem = z.infer<typeof eventListItemSchema>;
    ```
-3. Implement query function with direct DB access:
+3. Implement query function with deps parameter (DB access via DI):
    ```typescript
-   export async function listEvents(): Promise<Result<EventListItem[], QueryError>> {
-     const rows = await db.select({ /* ... */ }).from(events).leftJoin(projects, ...);
+   export async function listEvents(
+     deps: Pick<Dependencies, "db">,
+   ): Promise<Result<EventListItem[], QueryError>> {
+     const rows = await deps.db.select({ /* ... */ }).from(events).leftJoin(projects, ...);
      return Result.succeed(rows.map(row => eventListItemSchema.parse(row)));
    }
    ```
-4. Use in route `loader`:
+4. Use in route `loader` (pass `dependencies` from DI):
    ```typescript
    const loadEventsFn = createServerFn({ method: "GET" }).handler(async () => {
-     const result = await listEvents();
+     const result = await listEvents(dependencies);
      if (Result.isFailure(result)) throw new Error(result.error.message);
      return result.value;
    });

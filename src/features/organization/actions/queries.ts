@@ -19,7 +19,7 @@ export const loadOrganizationsFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
   .handler(async ({ data }) => {
-    return await listOrganizations(data.eventId);
+    return await listOrganizations(dependencies, data.eventId);
   });
 
 export function generateLoadOrganizationsCacheKey(eventId: string) {
@@ -40,7 +40,7 @@ export const loadOrganizationDetailFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema, orgId: orgIdSchema }))
   .handler(async ({ data, context }) => {
-    const actor = await resolveActor({
+    const actor = await resolveActor(dependencies, {
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
     });
@@ -70,7 +70,7 @@ export const loadOrganizationMembersFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema, orgId: orgIdSchema }))
   .handler(async ({ data, context }) => {
-    const actor = await resolveActor({
+    const actor = await resolveActor(dependencies, {
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
     });
@@ -96,7 +96,7 @@ export const searchUsersByEmailFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ query: z.string().min(1).max(256), eventId: eventIdSchema }))
   .handler(async ({ data, context }) => {
-    const actor = await resolveActor({
+    const actor = await resolveActor(dependencies, {
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
     });
@@ -111,11 +111,11 @@ export const loadMyOrganizationsFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
   .handler(async ({ data, context }) => {
-    const actor = await resolveActor({
+    const actor = await resolveActor(dependencies, {
       userId: cast<UserId>(context.session.user.id),
     });
 
-    return await listMyOrganizations(data.eventId, actor);
+    return await listMyOrganizations(dependencies, data.eventId, actor);
   });
 
 export function generateLoadMyOrganizationsCacheKey(eventId: string) {

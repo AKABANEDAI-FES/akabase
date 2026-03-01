@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { db } from "@/db";
 import { events } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { eventIdSchema } from "@/domain/shared/ids";
+import type { Dependencies } from "@/infrastructure/di";
 import { QueryException } from "../shared";
 
 /**
@@ -25,9 +25,12 @@ export type EventBySlug = z.infer<typeof eventBySlugSchema>;
  *
  * @throws {QueryException} When database operation fails
  */
-export async function getEventBySlug(slug: string): Promise<EventBySlug | null> {
+export async function getEventBySlug(
+  deps: Pick<Dependencies, "db">,
+  slug: string,
+): Promise<EventBySlug | null> {
   try {
-    const row = await db.query.events.findFirst({
+    const row = await deps.db.query.events.findFirst({
       where: eq(events.slug, slug),
     });
 

@@ -41,7 +41,7 @@ export const createOrganizationFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     return await gen(async function* ($) {
       // Resolve actor with event context
-      const actor = await resolveActor({
+      const actor = await resolveActor(dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
       });
@@ -91,7 +91,7 @@ export const updateOrganizationFn = createServerFn({ method: "POST" })
   .inputValidator(updateOrganizationInputSchema)
   .handler(async ({ data, context }) => {
     return gen(async function* ($) {
-      const actor = await resolveActor({
+      const actor = await resolveActor(dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
       });
@@ -142,7 +142,7 @@ export const deleteOrganizationFn = createServerFn({ method: "POST" })
   .inputValidator(deleteOrganizationInputSchema)
   .handler(async ({ data, context }) => {
     return gen(async function* ($) {
-      const actor = await resolveActor({
+      const actor = await resolveActor(dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
       });
@@ -190,7 +190,7 @@ export const addOrganizationMemberFn = createServerFn({ method: "POST" })
   .inputValidator(addOrganizationMemberInputSchema)
   .handler(async ({ data, context }) => {
     return gen(async function* ($) {
-      const actor = await resolveActor({
+      const actor = await resolveActor(dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
       });
@@ -239,7 +239,7 @@ export const removeOrganizationMemberFn = createServerFn({ method: "POST" })
   .inputValidator(removeOrganizationMemberInputSchema)
   .handler(async ({ data, context }) => {
     return gen(async function* ($) {
-      const actor = await resolveActor({
+      const actor = await resolveActor(dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
       });
@@ -288,7 +288,7 @@ export const updateOrganizationMemberRoleFn = createServerFn({ method: "POST" })
   .inputValidator(updateOrganizationMemberRoleInputSchema)
   .handler(async ({ data, context }) => {
     return gen(async function* ($) {
-      const actor = await resolveActor({
+      const actor = await resolveActor(dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
       });

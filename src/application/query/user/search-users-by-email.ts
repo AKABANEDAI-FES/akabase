@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { db } from "@/db";
 import { user } from "@/db/schema";
 import { eq, like } from "drizzle-orm";
 import { userIdSchema } from "@/domain/shared/ids";
@@ -36,7 +35,7 @@ export type UserSearchResult = z.infer<typeof userSearchResultSchema>;
  * @throws {QueryException} When database operation fails
  */
 export async function searchUsersByEmail(
-  deps: Pick<Dependencies, "authService">,
+  deps: Pick<Dependencies, "db" | "authService">,
   query: string,
   actor: Actor,
   eventId: EventId,
@@ -53,7 +52,7 @@ export async function searchUsersByEmail(
     committeeRole === "default" ? eq(user.email, query) : like(user.email, `${query}%`);
 
   try {
-    const rows = await db.query.user.findMany({
+    const rows = await deps.db.query.user.findMany({
       where: condition,
       columns: {
         id: true,

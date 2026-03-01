@@ -33,7 +33,7 @@ export const createDeadlineFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     return await gen(async function* ($) {
       // Resolve actor with event context
-      const actor = await resolveActor({
+      const actor = await resolveActor(dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
       });
@@ -85,7 +85,7 @@ export const updateDeadlineFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     return await gen(async function* ($) {
       // Resolve actor with event context
-      const actor = await resolveActor({
+      const actor = await resolveActor(dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
       });
@@ -134,7 +134,7 @@ export const deleteDeadlineFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     return await gen(async function* ($) {
       // Resolve actor with event context
-      const actor = await resolveActor({
+      const actor = await resolveActor(dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
       });

@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { db } from "@/db";
 import { eventIdSchema } from "@/domain/shared/ids";
 import type { EventId } from "@/domain/shared/ids";
+import type { Dependencies } from "@/infrastructure/di";
 import { QueryException } from "../shared";
 
 export const eventDetailSchema = z.object({
@@ -21,9 +21,12 @@ export type EventDetail = z.infer<typeof eventDetailSchema>;
  *
  * @throws {QueryException} When database operation fails
  */
-export async function getEventDetail(eventId: EventId): Promise<EventDetail | null> {
+export async function getEventDetail(
+  deps: Pick<Dependencies, "db">,
+  eventId: EventId,
+): Promise<EventDetail | null> {
   try {
-    const row = await db.query.events.findFirst({
+    const row = await deps.db.query.events.findFirst({
       where: (events, { eq }) => eq(events.id, eventId),
     });
 

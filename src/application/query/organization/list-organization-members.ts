@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { db } from "@/db";
 import { orgMembers, organizations, user } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { userIdSchema } from "@/domain/shared/ids";
@@ -38,7 +37,7 @@ export type OrganizationMemberListItem = z.infer<typeof organizationMemberListIt
  * @throws {QueryException} When database operation fails or authorization is denied
  */
 export async function listOrganizationMembers(
-  deps: Pick<Dependencies, "authService">,
+  deps: Pick<Dependencies, "db" | "authService">,
   eventId: EventId,
   orgId: OrgId,
   actor: Actor,
@@ -54,7 +53,7 @@ export async function listOrganizationMembers(
   }
 
   try {
-    const rows = await db
+    const rows = await deps.db
       .select({
         id: orgMembers.id,
         userId: orgMembers.userId,

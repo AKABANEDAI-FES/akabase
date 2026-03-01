@@ -2,10 +2,10 @@
  * Resolve an Actor from userId with permission context
  */
 
-import { db } from "@/db";
 import { committeeRoles, orgMembers, organizations, user } from "@/db/schema";
 import { and, eq, inArray } from "drizzle-orm";
 import type { EventId, OrgId, UserId } from "@/domain/shared/ids";
+import type { Dependencies } from "@/infrastructure/di";
 import type { Actor, CommitteeRole, GlobalRole, OrgRole } from "@/domain/authorization/schema";
 import { createActor } from "@/domain/authorization/logic";
 import { globalRoleSchema } from "@/domain/authorization/schema";
@@ -33,18 +33,21 @@ export type ResolveActorOptions = {
  * @returns Actor instance with loaded permissions
  * @throws {QueryException} When actor resolution fails
  */
-export async function resolveActor(options: ResolveActorOptions): Promise<Actor> {
+export async function resolveActor(
+  deps: Pick<Dependencies, "db">,
+  options: ResolveActorOptions,
+): Promise<Actor> {
   try {
     const hasEventIds = options.eventIds && options.eventIds.length > 0;
 
     // Run all queries in parallel
     const [userRow, committeeRows, orgRows] = await Promise.all([
-      db.query.user.findFirst({
+      deps.db.query.user.findFirst({
         where: eq(user.id, options.userId),
         columns: { role: true },
       }),
       hasEventIds
-        ? db
+        ? deps.db
             .select({ eventId: committeeRoles.eventId, role: committeeRoles.role })
             .from(committeeRoles)
             .where(
@@ -55,7 +58,7 @@ export async function resolveActor(options: ResolveActorOptions): Promise<Actor>
             )
         : Promise.resolve([]),
       hasEventIds
-        ? db
+        ? deps.db
             .select({ orgId: orgMembers.orgId, role: orgMembers.role })
             .from(orgMembers)
             .innerJoin(organizations, eq(orgMembers.orgId, organizations.id))

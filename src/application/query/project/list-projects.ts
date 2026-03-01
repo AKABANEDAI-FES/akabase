@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { db } from "@/db";
 import { projects } from "@/db/schema";
 import { and, desc, eq } from "drizzle-orm";
 import { eventIdSchema, orgIdSchema, placeIdSchema, projectIdSchema } from "@/domain/shared/ids";
@@ -40,7 +39,7 @@ export type ProjectListItem = z.infer<typeof projectListItemSchema>;
  * @throws {QueryException} When database operation fails or authorization is denied
  */
 export async function listProjects(
-  deps: Pick<Dependencies, "authService">,
+  deps: Pick<Dependencies, "db" | "authService">,
   eventId: EventId,
   orgId: OrgId,
   actor: Actor,
@@ -56,7 +55,7 @@ export async function listProjects(
   }
 
   try {
-    const rows = await db.query.projects.findMany({
+    const rows = await deps.db.query.projects.findMany({
       where: and(eq(projects.orgId, orgId), eq(projects.eventId, eventId)),
       orderBy: [desc(projects.createdAt)],
       with: { place: true },

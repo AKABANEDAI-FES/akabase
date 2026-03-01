@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { db, schema } from "@/db";
+import { schema } from "@/db";
 import { eq } from "drizzle-orm";
 import { submissionActionTypeSchema, submissionStatusSchema } from "@/domain/project/schema";
 import {
@@ -68,14 +68,14 @@ export type SubmissionDetail = z.infer<typeof submissionDetailSchema>;
  * Authorization: Committee members OR organization members can view
  */
 export async function getSubmissionDetail(
-  deps: Pick<Dependencies, "authService">,
+  deps: Pick<Dependencies, "db" | "authService">,
   eventId: EventId,
   submissionId: SubmissionId,
   actor: Actor,
 ): Promise<SubmissionDetail | null> {
   try {
     // Fetch submission first to get projectId and orgId
-    const submission = await db.query.projectSubmissions.findFirst({
+    const submission = await deps.db.query.projectSubmissions.findFirst({
       where: eq(schema.projectSubmissions.id, submissionId),
       with: {
         project: {

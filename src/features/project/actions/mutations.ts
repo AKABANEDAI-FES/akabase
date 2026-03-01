@@ -51,7 +51,7 @@ export const createProjectFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     return gen(async function* ($) {
       // Resolve actor with event context
-      const actor = await resolveActor({
+      const actor = await resolveActor(dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
       });
@@ -102,7 +102,7 @@ export const updateProjectDraftFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     return gen(async function* ($) {
       // Resolve actor with event and organization context
-      const actor = await resolveActor({
+      const actor = await resolveActor(dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
       });
@@ -150,7 +150,7 @@ export const submitProjectFn = createServerFn({ method: "POST" })
   .inputValidator(submitProjectInputSchema)
   .handler(async ({ data, context }) => {
     return gen(async function* ($) {
-      const actor = await resolveActor({
+      const actor = await resolveActor(dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
       });
@@ -207,7 +207,7 @@ export const approveProjectFn = createServerFn({ method: "POST" })
   .inputValidator(approveProjectInputSchema)
   .handler(async ({ data, context }) => {
     return gen(async function* ($) {
-      const actor = await resolveActor({
+      const actor = await resolveActor(dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
       });
@@ -258,7 +258,7 @@ export const returnProjectFn = createServerFn({ method: "POST" })
   .inputValidator(returnProjectInputSchema)
   .handler(async ({ data, context }) => {
     return gen(async function* ($) {
-      const actor = await resolveActor({
+      const actor = await resolveActor(dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
       });
@@ -320,7 +320,7 @@ export const withdrawSubmissionFn = createServerFn({ method: "POST" })
   .inputValidator(withdrawSubmissionInputSchema)
   .handler(async ({ data, context }) => {
     return gen(async function* ($) {
-      const actor = await resolveActor({
+      const actor = await resolveActor(dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
       });
@@ -379,7 +379,7 @@ export const updateProjectFn = createServerFn({ method: "POST" })
   .inputValidator(updateProjectInputSchema)
   .handler(async ({ data, context }) => {
     return gen(async function* ($) {
-      const actor = await resolveActor({
+      const actor = await resolveActor(dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
       });
@@ -427,7 +427,7 @@ export const updatePublishedFn = createServerFn({ method: "POST" })
   .inputValidator(updatePublishedInputSchema)
   .handler(async ({ data, context }) => {
     return gen(async function* ($) {
-      const actor = await resolveActor({
+      const actor = await resolveActor(dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
       });

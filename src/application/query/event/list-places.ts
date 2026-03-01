@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { db } from "@/db";
 import { places } from "@/db/schema";
 import { asc, eq } from "drizzle-orm";
 import type { EventId } from "@/domain/shared/ids";
 import { eventIdSchema, placeIdSchema } from "@/domain/shared/ids";
+import type { Dependencies } from "@/infrastructure/di";
 import { QueryException } from "../shared";
 
 /**
@@ -25,9 +25,12 @@ export type PlaceListItem = z.infer<typeof placeListItemSchema>;
  *
  * @throws {QueryException} When database operation fails
  */
-export async function listPlaces(eventId: EventId): Promise<PlaceListItem[]> {
+export async function listPlaces(
+  deps: Pick<Dependencies, "db">,
+  eventId: EventId,
+): Promise<PlaceListItem[]> {
   try {
-    const rows = await db.query.places.findMany({
+    const rows = await deps.db.query.places.findMany({
       where: eq(places.eventId, eventId),
       orderBy: [asc(places.name)], // Alphabetical order for Select UI
     });

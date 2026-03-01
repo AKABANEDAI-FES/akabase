@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { db } from "@/db";
 import { projectIdSchema } from "@/domain/shared/ids";
 import type { EventId, OrgId, ProjectId } from "@/domain/shared/ids";
 import type { Actor } from "@/domain/authorization/schema";
@@ -40,7 +39,7 @@ export type ProjectDetail = z.infer<typeof projectDetailSchema>;
  * @throws {QueryException} When database operation fails or authorization is denied
  */
 export async function getProjectDetail(
-  deps: Pick<Dependencies, "authService" | "storageService">,
+  deps: Pick<Dependencies, "db" | "authService" | "storageService">,
   eventId: EventId,
   orgId: OrgId,
   projectId: ProjectId,
@@ -57,7 +56,7 @@ export async function getProjectDetail(
   }
 
   try {
-    const project = await db.query.projects.findFirst({
+    const project = await deps.db.query.projects.findFirst({
       where: (projects, { eq, and }) =>
         and(eq(projects.id, projectId), eq(projects.eventId, eventId), eq(projects.orgId, orgId)),
       with: {

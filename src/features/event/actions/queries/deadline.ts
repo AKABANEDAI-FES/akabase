@@ -4,6 +4,7 @@ import { listDeadlines } from "@/application/query/event/list-deadlines";
 import { authMiddleware } from "@/libs/session-server";
 import { eventIdSchema } from "@/domain/shared/ids";
 import { queryOptions } from "@tanstack/react-query";
+import { dependencies } from "@/infrastructure/di";
 
 /**
  * Server function to load deadlines for an event
@@ -12,7 +13,7 @@ export const loadDeadlinesFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
   .handler(async ({ data }) => {
-    return await listDeadlines(data.eventId);
+    return await listDeadlines(dependencies, data.eventId);
   });
 
 /**

@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { db } from "@/db";
 import { eventIdSchema, orgIdSchema } from "@/domain/shared/ids";
 import type { EventId, OrgId } from "@/domain/shared/ids";
 import type { Actor } from "@/domain/authorization/schema";
@@ -36,7 +35,7 @@ export type OrganizationDetail = z.infer<typeof organizationDetailSchema>;
  * @throws {QueryException} When database operation fails or authorization is denied
  */
 export async function getOrganizationDetail(
-  deps: Pick<Dependencies, "authService">,
+  deps: Pick<Dependencies, "db" | "authService">,
   eventId: EventId,
   orgId: OrgId,
   actor: Actor,
@@ -52,7 +51,7 @@ export async function getOrganizationDetail(
   }
 
   try {
-    const row = await db.query.organizations.findFirst({
+    const row = await deps.db.query.organizations.findFirst({
       where: (organizations, { eq, and }) =>
         and(eq(organizations.id, orgId), eq(organizations.eventId, eventId)),
     });

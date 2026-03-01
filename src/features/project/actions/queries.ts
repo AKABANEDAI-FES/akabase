@@ -28,7 +28,7 @@ export const loadPlacesFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
   .handler(async ({ data }) => {
-    return await listPlaces(data.eventId);
+    return await listPlaces(dependencies, data.eventId);
   });
 
 export function generateLoadPlacesCacheKey(eventId: string) {
@@ -50,7 +50,7 @@ export const loadProjectsFn = createServerFn({ method: "GET" })
   .inputValidator(z.object({ eventId: eventIdSchema, orgId: orgIdSchema }))
   .handler(async ({ data, context }) => {
     // Resolve actor from session
-    const actor = await resolveActor({
+    const actor = await resolveActor(dependencies, {
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
     });
@@ -80,7 +80,7 @@ export const loadDraftFn = createServerFn({ method: "GET" })
   )
   .handler(async ({ data, context }) => {
     // Resolve actor from session
-    const actor = await resolveActor({
+    const actor = await resolveActor(dependencies, {
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
     });
@@ -110,7 +110,7 @@ export const loadProjectDetailFn = createServerFn({ method: "GET" })
   )
   .handler(async ({ data, context }) => {
     // Resolve actor from session
-    const actor = await resolveActor({
+    const actor = await resolveActor(dependencies, {
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
     });
@@ -160,7 +160,7 @@ export const loadSubmissionsFn = createServerFn({ method: "GET" })
   )
   .handler(async ({ data, context }) => {
     // Resolve actor from session
-    const actor = await resolveActor({
+    const actor = await resolveActor(dependencies, {
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
     });
@@ -192,7 +192,7 @@ export const loadEventSubmissionsFn = createServerFn({ method: "GET" })
   .inputValidator(z.object({ eventId: eventIdSchema }))
   .handler(async ({ data, context }) => {
     // Resolve actor from session
-    const actor = await resolveActor({
+    const actor = await resolveActor(dependencies, {
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
     });
@@ -222,7 +222,7 @@ export const loadProjectPublishedFn = createServerFn({ method: "GET" })
   )
   .handler(async ({ data, context }) => {
     // Resolve actor from session
-    const actor = await resolveActor({
+    const actor = await resolveActor(dependencies, {
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
     });
@@ -262,7 +262,7 @@ export const loadSubmissionDetailFn = createServerFn({ method: "GET" })
     }),
   )
   .handler(async ({ data, context }) => {
-    const actor = await resolveActor({
+    const actor = await resolveActor(dependencies, {
       userId: cast<UserId>(context.session.user.id),
       eventIds: [data.eventId],
     });
