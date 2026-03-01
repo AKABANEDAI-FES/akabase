@@ -37,13 +37,13 @@ function AdminLayout() {
         <NavLink>
           <Link to="/admin/events">
             <CalendarIcon />
-            イベント管理
+            イベント
           </Link>
         </NavLink>
         <NavLink>
           <Link to="/admin/users">
             <UsersIcon />
-            ユーザー管理
+            ユーザー
           </Link>
         </NavLink>
       </Stack>

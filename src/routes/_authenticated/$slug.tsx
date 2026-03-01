@@ -42,31 +42,31 @@ function SlugLayout() {
           <NavLink>
             <Link to="/$slug/committee/organizations" params={{ slug }}>
               <Building2Icon />
-              出展団体管理
+              出展団体
             </Link>
           </NavLink>
           <NavLink>
             <Link to="/$slug/committee/tags" params={{ slug }}>
               <TagIcon />
-              タグ管理
+              タグ
             </Link>
           </NavLink>
           <NavLink>
             <Link to="/$slug/committee/places" params={{ slug }}>
               <MapPinIcon />
-              場所管理
+              場所
             </Link>
           </NavLink>
           <NavLink>
             <Link to="/$slug/committee/deadlines" params={{ slug }}>
               <CalendarClockIcon />
-              締切管理
+              締切
             </Link>
           </NavLink>
           <NavLink>
             <Link to="/$slug/committee/members" params={{ slug }}>
               <UsersIcon />
-              メンバー管理
+              メンバー
             </Link>
           </NavLink>
           <NavLink>
