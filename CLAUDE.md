@@ -392,11 +392,56 @@ const db = env.DB; // D1 database
 
 ### When Writing Tests
 
-- Tests live alongside source files (e.g., `result.test.ts`)
-- Use Vitest with React Testing Library
-- JSDOM environment configured for React components
-- Mock dependencies for Command tests
-- Mock DB for Query tests
+- テスト名は日本語で書く
+- テストファイルはソースファイルと同じディレクトリに配置（e.g., `create-event.test.ts`）
+- テストヘルパーは `src/test/` に配置
+
+**テストDB:**
+
+`createTestDb()` でインメモリSQLiteを使用。マイグレーションが自動適用される。
+
+```typescript
+import { createTestDb } from "@/test/db-mock";
+
+let testDb: ReturnType<typeof createTestDb>;
+
+beforeEach(() => {
+  testDb = createTestDb();
+});
+
+afterEach(() => {
+  testDb.cleanup();
+});
+```
+
+**Commandテスト:**
+
+`createTestDependencies(db)` で実際のリポジトリを含む依存関係を構築。モックではなく実DBで統合テスト。
+
+```typescript
+import { createTestDependencies } from "@/test/test-dependencies";
+import { createAdminActor, createUserActor } from "@/test/test-helpers";
+
+const deps = createTestDependencies(testDb.db);
+const actor = createAdminActor();
+const result = await createEvent(deps, { name: "Event", slug: "2025", actor });
+
+expect(Result.isSuccess(result)).toBe(true);
+```
+
+**Queryテスト:**
+
+`testDb.db` を直接渡す。テストデータは `testDb.db.insert()` で投入。
+
+```typescript
+await testDb.db.insert(events).values({ id: "event-1", slug: "2025", ... });
+const result = await listEvents({ db: testDb.db });
+```
+
+**テストカバレッジの方針:**
+
+- Command: 認可（成功/失敗）、ドメインルール違反、バリデーションエラー、正常系を網羅
+- Query: 0件、複数件、ソート順、DTOの形状を確認
 
 ### Code Quality Tools
 

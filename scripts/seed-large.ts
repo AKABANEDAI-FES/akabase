@@ -6,8 +6,8 @@
  * 使い方: pnpm seed:large
  */
 import crypto from "node:crypto";
-import { createClient } from "@libsql/client";
-import { drizzle } from "drizzle-orm/libsql";
+import Database from "better-sqlite3";
+import { drizzle } from "drizzle-orm/better-sqlite3";
 import * as schema from "../src/db/schema";
 
 // ---------------------------------------------------------------------------
@@ -25,7 +25,7 @@ const UNIQUE_KEY = "miniflare-D1DatabaseObject";
 const PREVIEW_ID = "DB";
 const dbPath = `${PERSIST}/${UNIQUE_KEY}/${durableObjectNamespaceIdFromName(UNIQUE_KEY, PREVIEW_ID)}.sqlite`;
 
-const client = createClient({ url: `file:${dbPath}` });
+const client = new Database(dbPath);
 const db = drizzle(client, { schema });
 
 // ---------------------------------------------------------------------------
