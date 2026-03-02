@@ -14,35 +14,27 @@ export const card = defineSlotRecipe({
     header: {
       display: "flex",
       flexDirection: "column",
-      gap: "1",
-      p: "6",
     },
     body: {
       display: "flex",
       flex: "1",
       flexDirection: "column",
-      pb: "6",
-      px: "6",
     },
     footer: {
       display: "flex",
       justifyContent: "flex-end",
       gap: "3",
-      pb: "6",
-      pt: "2",
-      px: "6",
     },
     title: {
-      textStyle: "lg",
       fontWeight: "semibold",
     },
     description: {
       color: "fg.muted",
-      textStyle: "sm",
     },
   },
   defaultVariants: {
     variant: "outline",
+    size: "md",
   },
   variants: {
     variant: {
@@ -61,6 +53,62 @@ export const card = defineSlotRecipe({
       subtle: {
         root: {
           bg: "gray.subtle.bg",
+        },
+      },
+    },
+    size: {
+      sm: {
+        root: {
+          p: "4",
+        },
+        header: {
+          gap: "1",
+          pb: "4",
+        },
+        footer: {
+          pt: "6",
+        },
+        title: {
+          textStyle: "md",
+        },
+        description: {
+          textStyle: "xs",
+        },
+      },
+      md: {
+        root: {
+          p: "6",
+        },
+        header: {
+          gap: "1",
+          pb: "6",
+        },
+        footer: {
+          pt: "8",
+        },
+        title: {
+          textStyle: "lg",
+        },
+        description: {
+          textStyle: "sm",
+        },
+      },
+      lg: {
+        root: {
+          p: "8",
+        },
+        header: {
+          gap: "1.5",
+          pb: "8",
+        },
+        footer: {
+          pt: "10",
+        },
+        title: {
+          textStyle: "xl",
+        },
+        description: {
+          textStyle: "md",
         },
       },
     },

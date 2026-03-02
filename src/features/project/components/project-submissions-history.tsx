@@ -78,11 +78,11 @@ export function ProjectSubmissionsHistory({
                       </Text>
                     </div>
                     {submission.currentAction.message && (
-                      <Card.Root variant="subtle">
-                        <Card.Header p="3" pb="2">
-                          <Card.Title textStyle="md">コメント</Card.Title>
+                      <Card.Root variant="subtle" size="sm">
+                        <Card.Header>
+                          <Card.Title>コメント</Card.Title>
                         </Card.Header>
-                        <Card.Body p="3" pt="0" textStyle="sm">
+                        <Card.Body textStyle="sm">
                           <Text>{submission.currentAction.message}</Text>
                         </Card.Body>
                       </Card.Root>
