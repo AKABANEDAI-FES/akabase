@@ -208,6 +208,7 @@ export function EventSubmissionsTable({ eventId, slug }: EventSubmissionsTablePr
                       params={{ slug }}
                       search={{
                         page: page.value === 1 ? undefined : page.value,
+                        status: status ?? undefined,
                       }}
                     >
                       {page.value}
@@ -220,6 +221,7 @@ export function EventSubmissionsTable({ eventId, slug }: EventSubmissionsTablePr
                       params={{ slug }}
                       search={{
                         page: page.value === 1 ? undefined : page.value,
+                        status: status ?? undefined,
                       }}
                     >
                       {page.value}
