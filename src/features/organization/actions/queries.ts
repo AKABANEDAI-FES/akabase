@@ -4,7 +4,6 @@ import { listOrganizations } from "@/application/query/organization/list-organiz
 import { getOrganizationDetail } from "@/application/query/organization/get-organization-detail";
 import { listOrganizationMembers } from "@/application/query/organization/list-organization-members";
 import { listMyOrganizations } from "@/application/query/organization/list-my-organizations";
-import { searchUsersByEmail } from "@/application/query/user/search-users-by-email";
 import { resolveActor } from "@/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/session-server";
 import { cast, eventIdSchema, orgIdSchema } from "@/domain/shared/ids";
@@ -88,21 +87,6 @@ export function generateLoadOrganizationMembersQueryOptions(eventId: string, org
     queryFn: () => loadOrganizationMembersFn({ data: { eventId, orgId } }),
   });
 }
-
-/**
- * Server function to search users by email (for adding members)
- */
-export const searchUsersByEmailFn = createServerFn({ method: "GET" })
-  .middleware([authMiddleware])
-  .inputValidator(z.object({ query: z.string().min(1).max(256), eventId: eventIdSchema }))
-  .handler(async ({ data, context }) => {
-    const actor = await resolveActor(dependencies, {
-      userId: cast<UserId>(context.session.user.id),
-      eventIds: [data.eventId],
-    });
-
-    return await searchUsersByEmail(dependencies, data.query, actor, data.eventId);
-  });
 
 /**
  * Server function to load organizations the current user belongs to
