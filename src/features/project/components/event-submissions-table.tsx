@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { useMemo } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
   createColumnHelper,
@@ -25,6 +25,7 @@ import {
 import { Flex, Stack } from "styled-system/jsx";
 import { SubmissionStatusBadge } from "./submission-status-badge";
 import { generateLoadEventSubmissionsQueryOptions } from "@/features/project/actions/queries";
+import { Route } from "@/routes/_authenticated/$slug/committee/submissions";
 import type { EventSubmissionListItem } from "@/application/query/project/list-event-submissions";
 import type { SubmissionStatus } from "@/domain/project/schema";
 import type { EventId } from "@/domain/shared/ids";
@@ -98,38 +99,48 @@ interface EventSubmissionsTableProps {
 
 export function EventSubmissionsTable({ eventId, slug }: EventSubmissionsTableProps) {
   const { data: submissions } = useSuspenseQuery(generateLoadEventSubmissionsQueryOptions(eventId));
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const { status, page } = Route.useSearch();
+  const navigate = useNavigate({ from: Route.fullPath });
   const columns = useMemo(() => createColumns(slug), [slug]);
+
+  const columnFilters: ColumnFiltersState = useMemo(
+    () => (status ? [{ id: "status", value: status }] : []),
+    [status],
+  );
+
+  const pageIndex = (page ?? 1) - 1;
 
   const table = useReactTable({
     data: submissions,
     columns,
-    state: { columnFilters },
-    onColumnFiltersChange: setColumnFilters,
+    state: {
+      columnFilters,
+      pagination: { pageIndex, pageSize: PAGE_SIZE },
+    },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    initialState: { pagination: { pageSize: PAGE_SIZE } },
   });
 
   if (submissions.length === 0) {
     return <Text>まだ提出がありません。</Text>;
   }
 
-  const selectedStatuses =
-    (columnFilters.find((f) => f.id === "status")?.value as SubmissionStatus[] | undefined) ??
-    statusOptions;
+  const selectedStatuses = status ?? statusOptions;
 
-  const toggleStatus = (status: SubmissionStatus) => {
-    const isCurrentlySelected = selectedStatuses.includes(status);
+  const toggleStatus = (s: SubmissionStatus) => {
+    const isCurrentlySelected = selectedStatuses.includes(s);
     const next = isCurrentlySelected
-      ? selectedStatuses.filter((s) => s !== status)
-      : [...selectedStatuses, status];
+      ? selectedStatuses.filter((x) => x !== s)
+      : [...selectedStatuses, s];
 
-    setColumnFilters((prev) => [
-      ...prev.filter((f) => f.id !== "status"),
-      { id: "status", value: next },
-    ]);
+    navigate({
+      search: (prev) => ({
+        ...prev,
+        status: next.length === statusOptions.length ? undefined : next,
+        page: undefined,
+      }),
+    });
   };
 
   const filteredCount = table.getFilteredRowModel().rows.length;
@@ -179,8 +190,7 @@ export function EventSubmissionsTable({ eventId, slug }: EventSubmissionsTablePr
           count={filteredCount}
           pageSize={PAGE_SIZE}
           // @ts-ignore - cssじゃないよ
-          page={table.getState().pagination.pageIndex + 1}
-          onPageChange={(e) => table.setPageIndex(e.page - 1)}
+          page={pageIndex + 1}
           ml="auto"
         >
           <ButtonGroup variant="outline" size="sm">
@@ -192,10 +202,28 @@ export function EventSubmissionsTable({ eventId, slug }: EventSubmissionsTablePr
             <Pagination.Items
               render={(page) =>
                 page.selected ? (
-                  <IconButton variant="solid">{page.value}</IconButton>
+                  <IconButton variant="solid" asChild>
+                    <Link
+                      to="/$slug/committee/submissions"
+                      params={{ slug }}
+                      search={{
+                        page: page.value === 1 ? undefined : page.value,
+                      }}
+                    >
+                      {page.value}
+                    </Link>
+                  </IconButton>
                 ) : (
-                  <IconButton variant="outline" colorPalette="gray">
-                    {page.value}
+                  <IconButton variant="outline" colorPalette="gray" asChild>
+                    <Link
+                      to="/$slug/committee/submissions"
+                      params={{ slug }}
+                      search={{
+                        page: page.value === 1 ? undefined : page.value,
+                      }}
+                    >
+                      {page.value}
+                    </Link>
                   </IconButton>
                 )
               }

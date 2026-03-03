@@ -1,10 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
 import { Container, Flex, Stack } from "styled-system/jsx";
 import { Heading } from "@/components/ui";
 import { generateLoadEventSubmissionsQueryOptions } from "@/features/project/actions/queries";
 import { EventSubmissionsTable } from "@/features/project/components";
+import { submissionStatusSchema } from "@/domain/project/schema";
+
+const searchSchema = z.object({
+  status: z.array(submissionStatusSchema).optional(),
+  page: z.number().int().positive().optional(),
+});
 
 export const Route = createFileRoute("/_authenticated/$slug/committee/submissions")({
+  validateSearch: searchSchema,
   loader: async ({ context }) => {
     const event = context.activeEvent;
     await context.queryClient.ensureQueryData(generateLoadEventSubmissionsQueryOptions(event.id));
