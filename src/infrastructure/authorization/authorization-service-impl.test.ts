@@ -547,20 +547,6 @@ describe("AuthorizationServiceImpl", () => {
       });
     });
 
-    describe("user:search", () => {
-      it("should allow any authenticated user", () => {
-        const actor = createActor(cast<UserId>("user_1"));
-        const eventId = cast<EventId>("event_1");
-        const resource = eventResource(eventId);
-        const result = authService.isAllowed(actor, resource, "user:search");
-
-        expect(Result.isSuccess(result)).toBe(true);
-        if (Result.isSuccess(result)) {
-          expect(result.value).toBe(true);
-        }
-      });
-    });
-
     describe("user:list_for_event", () => {
       it("should allow committee members", () => {
         const eventId = cast<EventId>("event_1");

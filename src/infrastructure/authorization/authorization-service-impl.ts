@@ -151,10 +151,6 @@ export class AuthorizationServiceImpl implements AuthorizationService {
           reason: "委員会メンバーのみが企画提出一覧を閲覧できます",
         });
 
-      case "user:search":
-        // Anyone authenticated can search users (search mode determined by role in query layer)
-        return Result.succeed({ allowed: true });
-
       default:
         return Result.succeed({ allowed: false, reason: "不明なアクション" });
     }

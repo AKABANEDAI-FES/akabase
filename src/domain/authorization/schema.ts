@@ -189,7 +189,6 @@ export const actionSchema = z.enum([
   "user:update_role",
   "user:list",
   "user:list_for_event",
-  "user:search",
 
   // Event actions (for submissions)
   "event:list_submissions",
