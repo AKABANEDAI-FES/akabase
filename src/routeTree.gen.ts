@@ -18,6 +18,7 @@ import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminEventsRouteImport } from './routes/admin/events'
 import { Route as PublicLoginRouteImport } from './routes/_public/login'
 import { Route as AuthenticatedSlugRouteImport } from './routes/_authenticated/$slug'
+import { Route as AuthenticatedSlugIndexRouteImport } from './routes/_authenticated/$slug/index'
 import { Route as ApiStorageSplatRouteImport } from './routes/api.storage.$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api.auth.$'
 import { Route as AdminEventsEventIdRouteImport } from './routes/admin/events_.$eventId'
@@ -94,6 +95,11 @@ const AuthenticatedSlugRoute = AuthenticatedSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedSlugIndexRoute = AuthenticatedSlugIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedSlugRoute,
 } as any)
 const ApiStorageSplatRoute = ApiStorageSplatRouteImport.update({
   id: '/api/storage/$',
@@ -307,6 +313,7 @@ export interface FileRoutesByFullPath {
   '/admin/events/$eventId': typeof AdminEventsEventIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/storage/$': typeof ApiStorageSplatRoute
+  '/$slug/': typeof AuthenticatedSlugIndexRoute
   '/$slug/committee/deadlines': typeof AuthenticatedSlugCommitteeDeadlinesRouteWithChildren
   '/$slug/committee/members': typeof AuthenticatedSlugCommitteeMembersRoute
   '/$slug/committee/organizations': typeof AuthenticatedSlugCommitteeOrganizationsRouteWithChildren
@@ -338,7 +345,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/$slug': typeof AuthenticatedSlugRouteWithChildren
   '/login': typeof PublicLoginRoute
   '/admin/events': typeof AdminEventsRouteWithChildren
   '/admin/users': typeof AdminUsersRoute
@@ -347,6 +353,7 @@ export interface FileRoutesByTo {
   '/admin/events/new': typeof AdminEventsNewRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/storage/$': typeof ApiStorageSplatRoute
+  '/$slug': typeof AuthenticatedSlugIndexRoute
   '/$slug/committee/deadlines': typeof AuthenticatedSlugCommitteeDeadlinesRouteWithChildren
   '/$slug/committee/members': typeof AuthenticatedSlugCommitteeMembersRoute
   '/$slug/committee/organizations': typeof AuthenticatedSlugCommitteeOrganizationsRouteWithChildren
@@ -390,6 +397,7 @@ export interface FileRoutesById {
   '/admin/events_/$eventId': typeof AdminEventsEventIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/storage/$': typeof ApiStorageSplatRoute
+  '/_authenticated/$slug/': typeof AuthenticatedSlugIndexRoute
   '/_authenticated/$slug/committee/deadlines': typeof AuthenticatedSlugCommitteeDeadlinesRouteWithChildren
   '/_authenticated/$slug/committee/members': typeof AuthenticatedSlugCommitteeMembersRoute
   '/_authenticated/$slug/committee/organizations': typeof AuthenticatedSlugCommitteeOrganizationsRouteWithChildren
@@ -434,6 +442,7 @@ export interface FileRouteTypes {
     | '/admin/events/$eventId'
     | '/api/auth/$'
     | '/api/storage/$'
+    | '/$slug/'
     | '/$slug/committee/deadlines'
     | '/$slug/committee/members'
     | '/$slug/committee/organizations'
@@ -465,7 +474,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/$slug'
     | '/login'
     | '/admin/events'
     | '/admin/users'
@@ -474,6 +482,7 @@ export interface FileRouteTypes {
     | '/admin/events/new'
     | '/api/auth/$'
     | '/api/storage/$'
+    | '/$slug'
     | '/$slug/committee/deadlines'
     | '/$slug/committee/members'
     | '/$slug/committee/organizations'
@@ -516,6 +525,7 @@ export interface FileRouteTypes {
     | '/admin/events_/$eventId'
     | '/api/auth/$'
     | '/api/storage/$'
+    | '/_authenticated/$slug/'
     | '/_authenticated/$slug/committee/deadlines'
     | '/_authenticated/$slug/committee/members'
     | '/_authenticated/$slug/committee/organizations'
@@ -619,6 +629,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$slug'
       preLoaderRoute: typeof AuthenticatedSlugRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/$slug/': {
+      id: '/_authenticated/$slug/'
+      path: '/'
+      fullPath: '/$slug/'
+      preLoaderRoute: typeof AuthenticatedSlugIndexRouteImport
+      parentRoute: typeof AuthenticatedSlugRoute
     }
     '/api/storage/$': {
       id: '/api/storage/$'
@@ -1038,6 +1055,7 @@ const AuthenticatedSlugOrgsOrgIdRouteWithChildren =
 
 interface AuthenticatedSlugRouteChildren {
   AuthenticatedSlugCommitteeRoute: typeof AuthenticatedSlugCommitteeRouteWithChildren
+  AuthenticatedSlugIndexRoute: typeof AuthenticatedSlugIndexRoute
   AuthenticatedSlugOrgsOrgIdRoute: typeof AuthenticatedSlugOrgsOrgIdRouteWithChildren
   AuthenticatedSlugOrgsOrgIdProjectsProjectIdEditRoute: typeof AuthenticatedSlugOrgsOrgIdProjectsProjectIdEditRoute
   AuthenticatedSlugOrgsOrgIdProjectsProjectIdSubmissionsRoute: typeof AuthenticatedSlugOrgsOrgIdProjectsProjectIdSubmissionsRoute
@@ -1047,6 +1065,7 @@ interface AuthenticatedSlugRouteChildren {
 
 const AuthenticatedSlugRouteChildren: AuthenticatedSlugRouteChildren = {
   AuthenticatedSlugCommitteeRoute: AuthenticatedSlugCommitteeRouteWithChildren,
+  AuthenticatedSlugIndexRoute: AuthenticatedSlugIndexRoute,
   AuthenticatedSlugOrgsOrgIdRoute: AuthenticatedSlugOrgsOrgIdRouteWithChildren,
   AuthenticatedSlugOrgsOrgIdProjectsProjectIdEditRoute:
     AuthenticatedSlugOrgsOrgIdProjectsProjectIdEditRoute,

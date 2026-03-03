@@ -8,6 +8,8 @@ import { getProjectPublished } from "@/application/query/project/get-project-pub
 import { listSubmissions } from "@/application/query/project/list-submissions";
 import { listEventSubmissions } from "@/application/query/project/list-event-submissions";
 import { getSubmissionDetail } from "@/application/query/project/get-submission-detail";
+import { getSubmissionStats } from "@/application/query/project/get-submission-stats";
+import { listRecentActivities } from "@/application/query/project/list-recent-activities";
 import { resolveActor } from "@/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/session-server";
 import {
@@ -282,5 +284,56 @@ export function generateLoadSubmissionDetailQueryOptions(eventId: string, submis
   return queryOptions({
     queryKey: generateLoadSubmissionDetailCacheKey(eventId, submissionId),
     queryFn: () => loadSubmissionDetailFn({ data: { eventId, submissionId } }),
+  });
+}
+
+/**
+ * Server function to load submission statistics for an event (committee only)
+ */
+export const loadSubmissionStatsFn = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
+  .inputValidator(z.object({ eventId: eventIdSchema }))
+  .handler(async ({ data, context }) => {
+    const actor = await resolveActor(dependencies, {
+      userId: cast<UserId>(context.session.user.id),
+      eventIds: [data.eventId],
+    });
+
+    return await getSubmissionStats(dependencies, data.eventId, actor);
+  });
+
+export function generateLoadSubmissionStatsCacheKey(eventId: string) {
+  return ["submission-stats", "for-event", eventId];
+}
+
+export function generateLoadSubmissionStatsQueryOptions(eventId: string) {
+  return queryOptions({
+    queryKey: generateLoadSubmissionStatsCacheKey(eventId),
+    queryFn: () => loadSubmissionStatsFn({ data: { eventId } }),
+  });
+}
+
+/**
+ * Server function to load recent activities for user's organizations
+ */
+export const loadRecentActivitiesFn = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
+  .inputValidator(z.object({ eventId: eventIdSchema }))
+  .handler(async ({ data, context }) => {
+    const actor = await resolveActor(dependencies, {
+      userId: cast<UserId>(context.session.user.id),
+    });
+
+    return await listRecentActivities(dependencies, data.eventId, actor);
+  });
+
+export function generateLoadRecentActivitiesCacheKey(eventId: string) {
+  return ["recent-activities", "for-event", eventId];
+}
+
+export function generateLoadRecentActivitiesQueryOptions(eventId: string) {
+  return queryOptions({
+    queryKey: generateLoadRecentActivitiesCacheKey(eventId),
+    queryFn: () => loadRecentActivitiesFn({ data: { eventId } }),
   });
 }

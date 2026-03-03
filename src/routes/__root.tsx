@@ -11,6 +11,7 @@ import { getSessionFn } from "@/libs/session-server";
 import type { SessionData } from "@/libs/session-server";
 import { Toaster } from "@/components/ui";
 import type { Event } from "@/domain/event/schema";
+import { LocaleProvider } from "@ark-ui/react/locale";
 
 interface MyRouterContext {
   queryClient: QueryClient;
@@ -56,21 +57,23 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        {children}
-        <Toaster />
-        <TanStackDevtools
-          config={{
-            position: "bottom-right",
-          }}
-          plugins={[
-            {
-              name: "Tanstack Router",
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-            TanStackQueryDevtools,
-          ]}
-        />
-        <Scripts />
+        <LocaleProvider locale="ja">
+          {children}
+          <Toaster />
+          <TanStackDevtools
+            config={{
+              position: "bottom-right",
+            }}
+            plugins={[
+              {
+                name: "Tanstack Router",
+                render: <TanStackRouterDevtoolsPanel />,
+              },
+              TanStackQueryDevtools,
+            ]}
+          />
+          <Scripts />
+        </LocaleProvider>
       </body>
     </html>
   );

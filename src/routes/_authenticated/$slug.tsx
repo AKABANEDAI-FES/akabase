@@ -4,6 +4,7 @@ import {
   Building2Icon,
   CalendarClockIcon,
   FileClockIcon,
+  HomeIcon,
   MapPinIcon,
   TagIcon,
   UsersIcon,
@@ -46,6 +47,12 @@ function SlugLayout() {
 
   return (
     <SidebarLayout title={event.name}>
+      <NavLink>
+        <Link to="/$slug" params={{ slug }} activeOptions={{ exact: true }}>
+          <HomeIcon />
+          ホーム
+        </Link>
+      </NavLink>
       {isCommitteeMember && (
         <NavSection label="委員会管理">
           <NavLink>

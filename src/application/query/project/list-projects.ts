@@ -1,11 +1,12 @@
 import { z } from "zod";
-import { projects } from "@/db/schema";
+import { projectSubmissions, projects } from "@/db/schema";
 import { and, desc, eq } from "drizzle-orm";
 import { eventIdSchema, orgIdSchema, placeIdSchema, projectIdSchema } from "@/domain/shared/ids";
 import type { EventId, OrgId } from "@/domain/shared/ids";
 import type { Actor } from "@/domain/authorization/schema";
 import type { Dependencies } from "@/infrastructure/di";
 import { organizationResource } from "@/domain/authorization/logic";
+import { submissionStatusSchema } from "@/domain/project/schema";
 import { QueryException } from "../shared";
 import { Result } from "@praha/byethrow";
 
@@ -20,6 +21,7 @@ export const projectListItemSchema = z.object({
   placeId: placeIdSchema.nullable(),
   placeName: z.string().nullable(),
   logoImageId: z.string().nullable(),
+  latestSubmissionStatus: submissionStatusSchema.nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
@@ -58,10 +60,19 @@ export async function listProjects(
     const rows = await deps.db.query.projects.findMany({
       where: and(eq(projects.orgId, orgId), eq(projects.eventId, eventId)),
       orderBy: [desc(projects.createdAt)],
-      with: { place: true },
+      with: {
+        place: true,
+        submissions: {
+          limit: 1,
+          orderBy: [desc(projectSubmissions.submittedAt)],
+          columns: {
+            status: true,
+          },
+        },
+      },
     });
 
-    const items: ProjectListItem[] = rows.map((row) =>
+    return rows.map((row) =>
       projectListItemSchema.parse({
         id: row.id,
         eventId: row.eventId,
@@ -70,12 +81,11 @@ export async function listProjects(
         placeId: row.placeId,
         placeName: row.place?.name ?? null,
         logoImageId: row.logoImageId,
+        latestSubmissionStatus: row.submissions[0]?.status ?? null,
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
       }),
     );
-
-    return items;
   } catch (error) {
     throw new QueryException("DATABASE_ERROR", "企画一覧の取得に失敗しました。", error);
   }

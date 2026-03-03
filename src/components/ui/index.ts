@@ -24,6 +24,14 @@ export * as Popover from "./popover";
 export * as ScrollArea from "./scroll-area";
 export * as SegmentGroup from "./segment-group";
 export * as Select from "./select";
+export {
+  Skeleton,
+  SkeletonCircle,
+  SkeletonText,
+  type SkeletonCircleProps,
+  type SkeletonProps,
+  type SkeletonTextProps,
+} from "./skeleton";
 export { Span, type SpanProps } from "./span";
 export { Spinner, type SpinnerProps } from "./spinner";
 export * as Table from "./table";
