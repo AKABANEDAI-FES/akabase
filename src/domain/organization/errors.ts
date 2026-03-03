@@ -2,6 +2,7 @@ import type { BaseError, DomainErrorCodeOf } from "../shared/errors";
 import { createError } from "../shared/errors";
 
 export const ORGANIZATION_ERROR_CODE = {
+  USER_NOT_FOUND: "USER_NOT_FOUND",
   USER_ALREADY_MEMBER: "USER_ALREADY_MEMBER",
   USER_NOT_MEMBER: "USER_NOT_MEMBER",
   NOT_MANAGER: "NOT_MANAGER",

@@ -1,7 +1,7 @@
 import { Result } from "@praha/byethrow";
 import { gen } from "@/libs/result";
 import { generateId } from "@/libs/id";
-import type { EventId, OrgId, UserId } from "@/domain/shared/ids";
+import type { EventId, OrgId } from "@/domain/shared/ids";
 import type { OrganizationError } from "@/domain/organization/errors";
 import { ORGANIZATION_ERROR_CODE, organizationError } from "@/domain/organization/errors";
 import type { EventError } from "@/domain/event/errors";
@@ -15,7 +15,7 @@ import type { Dependencies } from "@/infrastructure/di";
 export type AddOrganizationMemberInput = {
   eventId: EventId;
   orgId: OrgId;
-  userId: UserId;
+  email: string;
   role: OrgMemberRole;
   actor: Actor;
 };
@@ -37,11 +37,28 @@ export type AddOrganizationMemberError = OrganizationError | EventError | Author
 export async function addOrganizationMember(
   deps: Pick<
     Dependencies,
-    "organizationRepo" | "authService" | "organizationDomainService" | "eventDomainService"
+    | "organizationRepo"
+    | "userRepo"
+    | "authService"
+    | "organizationDomainService"
+    | "eventDomainService"
   >,
   input: AddOrganizationMemberInput,
 ): Result.ResultAsync<AddOrganizationMemberOutput, AddOrganizationMemberError> {
   return gen(async function* ($) {
+    // Resolve email to user
+    const user = await deps.userRepo.findByEmail(input.email);
+    if (!user) {
+      return yield* $(
+        Result.fail(
+          organizationError(
+            ORGANIZATION_ERROR_CODE.USER_NOT_FOUND,
+            "指定されたメールアドレスのユーザーが見つかりません。",
+          ),
+        ),
+      );
+    }
+
     // Fetch org (scoped by eventId)
     const org = await deps.organizationRepo.findById(input.eventId, input.orgId);
 
@@ -64,14 +81,14 @@ export async function addOrganizationMember(
     yield* $(await deps.eventDomainService.resolveModifiableEvent(input.eventId));
 
     // Check domain invariant: user not already a member
-    yield* $(await deps.organizationDomainService.ensureCanAddMember(input.orgId, input.userId));
+    yield* $(await deps.organizationDomainService.ensureCanAddMember(input.orgId, user.id));
 
     // Create and persist member
     const member = yield* $(
       createOrgMemberEntity({
         id: generateId(),
         orgId: input.orgId,
-        userId: input.userId,
+        userId: user.id,
         role: input.role,
       }),
     );

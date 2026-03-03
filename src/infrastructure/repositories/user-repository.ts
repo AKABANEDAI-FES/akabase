@@ -43,6 +43,33 @@ export class UserRepositoryImpl implements UserRepository {
     }
   }
 
+  async findByEmail(email: string): Promise<User | null> {
+    try {
+      const row = await this.db.query.user.findFirst({
+        where: eq(userTable.email, email),
+      });
+
+      if (!row) {
+        return null;
+      }
+
+      const user: User = {
+        id: cast<UserId>(row.id),
+        name: row.name,
+        email: row.email,
+        emailVerified: row.emailVerified ?? false,
+        image: row.image ?? null,
+        role: (row.role as "admin" | "user") ?? null,
+        createdAt: new Date(row.createdAt),
+        updatedAt: new Date(row.updatedAt),
+      };
+
+      return user;
+    } catch (error) {
+      throw new RepositoryException("DATABASE_ERROR", "ユーザーの取得に失敗しました", error);
+    }
+  }
+
   async listAll(): Promise<User[]> {
     try {
       const rows = await this.db.query.user.findMany({

@@ -20,6 +20,15 @@ export interface UserRepository {
   findById(userId: UserId): Promise<User | null>;
 
   /**
+   * Find user by email
+   *
+   * @param email - Email address to search for
+   * @returns User if found, null otherwise
+   * @throws {RepositoryException} on database errors
+   */
+  findByEmail(email: string): Promise<User | null>;
+
+  /**
    * List all users
    * Used for admin user management
    *

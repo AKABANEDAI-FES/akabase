@@ -1,8 +1,10 @@
-import { startTransition, useState } from "react";
+import { useState } from "react";
 import { revalidateLogic, useForm } from "@tanstack/react-form";
+import { useQuery } from "@tanstack/react-query";
 import { Result } from "@praha/byethrow";
 import { Portal } from "@ark-ui/react/portal";
-import { createListCollection, useAsyncList } from "@ark-ui/react/collection";
+import { createListCollection, useListCollection } from "@ark-ui/react/collection";
+import { useFilter } from "@ark-ui/react/locale";
 import {
   Button,
   CloseButton,
@@ -11,7 +13,6 @@ import {
   Field,
   Select,
   Spinner,
-  Text,
   toaster,
 } from "@/components/ui";
 import { Stack } from "styled-system/jsx";
@@ -19,11 +20,10 @@ import {
   addOrganizationMemberInputSchema,
   useAddOrganizationMemberMutation,
 } from "@/features/organization/actions/mutations";
-import { searchUsersByEmailFn } from "@/features/organization/actions/queries";
+import { generateLoadUsersForEventQueryOptions } from "@/features/user/actions/queries";
 import { ORG_ROLES, ORG_ROLE_LABELS } from "@/domain/authorization/schema";
 import type { OrgMemberRole } from "@/domain/organization/schema";
 import type { ComboboxInputValueChangeDetails, ComboboxValueChangeDetails } from "@ark-ui/react";
-import type { UserSearchResult } from "@/application/query/user/search-users-by-email";
 import { nl2br } from "@/libs/text";
 import { ORGANIZATION_ERROR_CODE } from "@/domain/organization/errors";
 import type { EventId, OrgId } from "@/domain/shared/ids";
@@ -77,25 +77,25 @@ function AddMemberDialogContent({
 }) {
   const { mutateAsync } = useAddOrganizationMemberMutation();
 
-  const list = useAsyncList<UserSearchResult>({
-    load: async ({ signal, filterText: query }) => {
-      if (!query) {
-        return { items: [] };
-      }
-      const items = await searchUsersByEmailFn({ data: { query, eventId }, signal });
-      return { items };
-    },
-  });
+  const { data: users = [], isLoading } = useQuery(generateLoadUsersForEventQueryOptions(eventId));
 
-  const collection = createListCollection({
-    items: list.items,
-    itemToString: (item) => `${item.name} (${item.email})`,
-    itemToValue: (item) => item.id,
+  const userItems = users.map((u) => ({
+    label: `${u.name} (${u.email})`,
+    value: u.email,
+    name: u.name,
+  }));
+
+  const { contains } = useFilter({ sensitivity: "base" });
+
+  const { collection, filter } = useListCollection({
+    initialItems: userItems,
+    limit: 10,
+    filter: contains,
   });
 
   const form = useForm({
     defaultValues: {
-      userId: null as string | null,
+      email: null as string | null,
       role: "manager" as OrgMemberRole,
     },
     validators: {
@@ -104,17 +104,20 @@ function AddMemberDialogContent({
         const data = addOrganizationMemberInputSchema.parse({
           eventId,
           orgId,
-          userId: value.userId,
+          email: value.email,
           role: value.role,
         });
         try {
           const result = await mutateAsync({ data });
 
           if (Result.isFailure(result)) {
-            if (result.error.code === ORGANIZATION_ERROR_CODE.USER_ALREADY_MEMBER) {
+            if (
+              result.error.code === ORGANIZATION_ERROR_CODE.USER_ALREADY_MEMBER ||
+              result.error.code === ORGANIZATION_ERROR_CODE.USER_NOT_FOUND
+            ) {
               return {
                 fields: {
-                  userId: { message: result.error.message },
+                  email: { message: result.error.message },
                 },
               };
             }
@@ -144,7 +147,7 @@ function AddMemberDialogContent({
       modeAfterSubmission: "change",
     }),
     onSubmit: async () => {
-      const selectedUser = list.items.find((u) => u.id === form.getFieldValue("userId"));
+      const selectedUser = users.find((u) => u.email === form.getFieldValue("email"));
       toaster.create({
         type: "success",
         title: "メンバーを追加しました",
@@ -156,15 +159,11 @@ function AddMemberDialogContent({
   });
 
   const handleInputChange = (details: ComboboxInputValueChangeDetails) => {
-    if (details.reason === "input-change") {
-      startTransition(() => {
-        list.setFilterText(details.inputValue);
-      });
-    }
+    filter(details.inputValue);
   };
 
   const handleValueChange = (details: ComboboxValueChangeDetails) => {
-    form.setFieldValue("userId", details.value[0] ?? null);
+    form.setFieldValue("email", details.value[0] ?? null);
   };
 
   return (
@@ -182,7 +181,7 @@ function AddMemberDialogContent({
         </Dialog.Header>
         <Dialog.Body>
           <Stack gap="4" w="full">
-            <form.Field name="userId">
+            <form.Field name="email">
               {(field) => (
                 <Field.Root invalid={!field.state.meta.isValid}>
                   <Combobox.Root
@@ -201,21 +200,17 @@ function AddMemberDialogContent({
                     </Combobox.Control>
                     <Combobox.Positioner>
                       <Combobox.Content>
-                        {list.loading ? (
+                        {isLoading ? (
                           <Combobox.Empty gap="2">
                             <Spinner size="sm" />
-                            ユーザーを検索中...
+                            ユーザーを読み込み中...
                           </Combobox.Empty>
-                        ) : list.error ? (
-                          <Combobox.Empty>
-                            <Text color="red.default">{list.error.message}</Text>
-                          </Combobox.Empty>
-                        ) : list.items.length === 0 ? (
+                        ) : collection.items.length === 0 ? (
                           <Combobox.Empty>ユーザーが見つかりません</Combobox.Empty>
                         ) : null}
                         {collection.items.map((item) => (
-                          <Combobox.Item item={item} key={item.id}>
-                            {`${item.name} (${item.email})`}
+                          <Combobox.Item item={item} key={item.value}>
+                            {item.label}
                             <Combobox.ItemIndicator />
                           </Combobox.Item>
                         ))}

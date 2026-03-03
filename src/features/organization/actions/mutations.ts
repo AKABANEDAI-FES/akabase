@@ -178,7 +178,9 @@ export function useDeleteOrganizationMutation() {
 export const addOrganizationMemberInputSchema = z.object({
   eventId: eventIdSchema,
   orgId: orgIdSchema,
-  userId: userIdSchema,
+  email: z
+    .email({ error: "メールアドレスを入力してください" })
+    .endsWith("@toyo.jp", { error: "東洋大学のメールアドレスを入力してください" }),
   role: orgMemberRoleSchema,
 });
 
@@ -199,7 +201,7 @@ export const addOrganizationMemberFn = createServerFn({ method: "POST" })
         await addOrganizationMember(dependencies, {
           eventId: data.eventId,
           orgId: data.orgId,
-          userId: data.userId,
+          email: data.email,
           role: data.role,
           actor,
         }),
