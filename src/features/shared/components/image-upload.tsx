@@ -218,7 +218,6 @@ const previewImageStyle = css({
   width: "100%",
   height: "100%",
   objectFit: "contain",
-  padding: "3",
 });
 
 const hoverOverlayStyle = css({
