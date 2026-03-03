@@ -19,18 +19,19 @@ function createConfirm() {
   };
 
   const confirm = (options: ConfirmOptions) => {
-    const { promise, resolve: r } = Promise.withResolvers<boolean>();
-
-    const resolve = (value: boolean) => {
-      queue.shift();
+    return new Promise<boolean>((resolve) => {
+      const id = crypto.randomUUID();
+      queue.push({
+        ...options,
+        id,
+        resolve: (value: boolean) => {
+          queue.shift();
+          emit();
+          resolve(value);
+        },
+      });
       emit();
-      r(value);
-    };
-
-    queue.push({ ...options, resolve, id: crypto.randomUUID() });
-    emit();
-
-    return promise;
+    });
   };
 
   const subscribe = (cb: () => void) => {
@@ -46,10 +47,15 @@ function createConfirm() {
 const { confirm, subscribe, getSnapshot } = createConfirm();
 
 export function ConfirmHost() {
-  const resultRef = useRef<boolean>(false);
   const confirm = useSyncExternalStore(subscribe, getSnapshot, () => null);
 
   if (!confirm) return null;
+
+  return <ConfirmDialog key={confirm.id} confirm={confirm} />;
+}
+
+function ConfirmDialog({ confirm }: { confirm: QueueItem }) {
+  const resultRef = useRef<boolean>(false);
 
   return (
     <Dialog.Root
