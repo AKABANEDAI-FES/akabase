@@ -12,6 +12,7 @@ import type { SessionData } from "@/libs/session-server";
 import { Toaster } from "@/components/ui";
 import type { Event } from "@/domain/event/schema";
 import { LocaleProvider } from "@ark-ui/react/locale";
+import { ConfirmHost } from "@/components/confirm";
 
 interface MyRouterContext {
   queryClient: QueryClient;
@@ -60,6 +61,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <LocaleProvider locale="ja">
           {children}
           <Toaster />
+          <ConfirmHost />
           <TanStackDevtools
             config={{
               position: "bottom-right",
