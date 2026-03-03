@@ -86,7 +86,7 @@ function SlugHomePage() {
 
         <DeadlineSection eventId={event.id} />
 
-        <RecentActivitySection eventId={event.id} />
+        <RecentActivitySection slug={slug} eventId={event.id} />
 
         <MyOrganizationsSection slug={slug} eventId={event.id} />
       </Stack>
@@ -213,7 +213,7 @@ function DeadlineSection({ eventId }: { eventId: string }) {
   );
 }
 
-function RecentActivitySection({ eventId }: { eventId: string }) {
+function RecentActivitySection({ slug, eventId }: { slug: string; eventId: string }) {
   const { data: activities } = useSuspenseQuery(generateLoadRecentActivitiesQueryOptions(eventId));
 
   return (
@@ -225,7 +225,18 @@ function RecentActivitySection({ eventId }: { eventId: string }) {
           <Card.Body>
             <Stack gap="3">
               {activities.map((activity) => (
-                <Flex key={activity.actionId} justify="space-between" align="center" gap="4">
+                <Link
+                  key={activity.actionId}
+                  to="/$slug/committee/submissions/$submissionId"
+                  params={{ slug, submissionId: activity.submissionId }}
+                  className={css({
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: "4",
+                    textDecoration: "none",
+                  })}
+                >
                   <Stack gap="0.5" minW="0">
                     <HStack gap="2">
                       <SubmissionStatusBadge status={activity.actionType} />
@@ -240,7 +251,7 @@ function RecentActivitySection({ eventId }: { eventId: string }) {
                   <Text textStyle="xs" color="fg.muted" flexShrink={0}>
                     <Format.RelativeTime value={activity.actionAt} style="short" />
                   </Text>
-                </Flex>
+                </Link>
               ))}
             </Stack>
           </Card.Body>
@@ -281,7 +292,7 @@ function MyOrganizationsSection({ slug, eventId }: { slug: string; eventId: stri
             </Card.Header>
             <Card.Body>
               <Suspense fallback={<ProjectListSkeleton />}>
-                <ProjectList eventId={eventId} orgId={org.id} />
+                <ProjectList slug={slug} eventId={eventId} orgId={org.id} />
               </Suspense>
             </Card.Body>
           </Card.Root>
@@ -291,7 +302,7 @@ function MyOrganizationsSection({ slug, eventId }: { slug: string; eventId: stri
   );
 }
 
-function ProjectList({ eventId, orgId }: { eventId: string; orgId: string }) {
+function ProjectList({ slug, eventId, orgId }: { slug: string; eventId: string; orgId: string }) {
   const { data: projects } = useSuspenseQuery(generateLoadProjectsQueryOptions(eventId, orgId));
 
   if (projects.length === 0) {
@@ -305,7 +316,17 @@ function ProjectList({ eventId, orgId }: { eventId: string; orgId: string }) {
   return (
     <Stack gap="4">
       {projects.map((project) => (
-        <Flex key={project.id} justify="space-between" align="center">
+        <Link
+          key={project.id}
+          to="/$slug/orgs/$orgId/projects/$projectId"
+          params={{ slug, orgId, projectId: project.id }}
+          className={css({
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            textDecoration: "none",
+          })}
+        >
           <HStack gap="2">
             <FileTextIcon
               className={css({
@@ -324,7 +345,7 @@ function ProjectList({ eventId, orgId }: { eventId: string; orgId: string }) {
               未提出
             </Badge>
           )}
-        </Flex>
+        </Link>
       ))}
     </Stack>
   );
