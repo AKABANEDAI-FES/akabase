@@ -1,32 +1,25 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { revalidateLogic, useForm } from "@tanstack/react-form";
-import { useQuery } from "@tanstack/react-query";
 import { Result } from "@praha/byethrow";
 import { Portal } from "@ark-ui/react/portal";
-import { createListCollection, useListCollection } from "@ark-ui/react/collection";
-import { useFilter } from "@ark-ui/react/locale";
-import {
-  Button,
-  CloseButton,
-  Combobox,
-  Dialog,
-  Field,
-  Select,
-  Spinner,
-  toaster,
-} from "@/components/ui";
+import { createListCollection } from "@ark-ui/react/collection";
+import { Button, CloseButton, Dialog, Field, Select, toaster } from "@/components/ui";
 import { Stack } from "styled-system/jsx";
 import {
   addOrganizationMemberInputSchema,
   useAddOrganizationMemberMutation,
 } from "@/features/organization/actions/mutations";
-import { generateLoadUsersForEventQueryOptions } from "@/features/user/actions/queries";
 import { ORG_ROLES, ORG_ROLE_LABELS } from "@/domain/authorization/schema";
 import type { OrgMemberRole } from "@/domain/organization/schema";
-import type { ComboboxInputValueChangeDetails, ComboboxValueChangeDetails } from "@ark-ui/react";
 import { nl2br } from "@/libs/text";
 import { ORGANIZATION_ERROR_CODE } from "@/domain/organization/errors";
 import type { EventId, OrgId } from "@/domain/shared/ids";
+import type { AddOrganizationMemberOutput } from "@/application/command/organization/add-organization-member";
+
+export type EmailFieldProps = {
+  value: string | null;
+  onChange: (email: string | null) => void;
+};
 
 const roleCollection = createListCollection({
   items: ORG_ROLES.map((role) => ({
@@ -40,9 +33,16 @@ interface AddMemberDialogProps {
   eventId: EventId;
   defaultOpen?: boolean;
   onClose?: () => void;
+  renderEmailField: (props: EmailFieldProps) => React.ReactNode;
 }
 
-export function AddMemberDialog({ orgId, eventId, defaultOpen, onClose }: AddMemberDialogProps) {
+export function AddMemberDialog({
+  orgId,
+  eventId,
+  defaultOpen,
+  onClose,
+  renderEmailField,
+}: AddMemberDialogProps) {
   const [open, setOpen] = useState(defaultOpen ?? false);
 
   return (
@@ -59,6 +59,7 @@ export function AddMemberDialog({ orgId, eventId, defaultOpen, onClose }: AddMem
             orgId={orgId}
             eventId={eventId}
             onSuccess={() => setOpen(false)}
+            renderEmailField={renderEmailField}
           />
         </Dialog.Positioner>
       </Portal>
@@ -70,28 +71,15 @@ function AddMemberDialogContent({
   orgId,
   eventId,
   onSuccess,
+  renderEmailField: EmailField,
 }: {
   orgId: OrgId;
   eventId: EventId;
   onSuccess: () => void;
+  renderEmailField: (props: EmailFieldProps) => React.ReactNode;
 }) {
   const { mutateAsync } = useAddOrganizationMemberMutation();
-
-  const { data: users = [], isLoading } = useQuery(generateLoadUsersForEventQueryOptions(eventId));
-
-  const userItems = users.map((u) => ({
-    label: `${u.name} (${u.email})`,
-    value: u.email,
-    name: u.name,
-  }));
-
-  const { contains } = useFilter({ sensitivity: "base" });
-
-  const { collection, filter } = useListCollection({
-    initialItems: userItems,
-    limit: 10,
-    filter: contains,
-  });
+  const resultRef = useRef<AddOrganizationMemberOutput | null>(null);
 
   const form = useForm({
     defaultValues: {
@@ -108,6 +96,7 @@ function AddMemberDialogContent({
           role: value.role,
         });
         try {
+          resultRef.current = null;
           const result = await mutateAsync({ data });
 
           if (Result.isFailure(result)) {
@@ -130,6 +119,7 @@ function AddMemberDialogContent({
             return {};
           }
 
+          resultRef.current = result.value;
           return undefined;
         } catch (error) {
           console.error("Failed to add member:", error);
@@ -147,24 +137,18 @@ function AddMemberDialogContent({
       modeAfterSubmission: "change",
     }),
     onSubmit: async () => {
-      const selectedUser = users.find((u) => u.email === form.getFieldValue("email"));
-      toaster.create({
-        type: "success",
-        title: "メンバーを追加しました",
-        description: selectedUser ? `「${selectedUser.name}」を追加しました` : undefined,
-      });
+      if (resultRef.current) {
+        const { user } = resultRef.current;
+        toaster.create({
+          type: "success",
+          title: "メンバーを追加しました",
+          description: `「${user.name}」を追加しました`,
+        });
+      }
 
       onSuccess();
     },
   });
-
-  const handleInputChange = (details: ComboboxInputValueChangeDetails) => {
-    filter(details.inputValue);
-  };
-
-  const handleValueChange = (details: ComboboxValueChangeDetails) => {
-    form.setFieldValue("email", details.value[0] ?? null);
-  };
 
   return (
     <Dialog.Content asChild>
@@ -184,39 +168,10 @@ function AddMemberDialogContent({
             <form.Field name="email">
               {(field) => (
                 <Field.Root invalid={!field.state.meta.isValid}>
-                  <Combobox.Root
-                    collection={collection}
-                    onInputValueChange={handleInputChange}
-                    onValueChange={handleValueChange}
-                    value={field.state.value ? [field.state.value] : []}
-                  >
-                    <Combobox.Label>ユーザー検索</Combobox.Label>
-                    <Combobox.Control>
-                      <Combobox.Input placeholder="example@toyo.jp" />
-                      <Combobox.IndicatorGroup>
-                        <Combobox.ClearTrigger />
-                        <Combobox.Trigger />
-                      </Combobox.IndicatorGroup>
-                    </Combobox.Control>
-                    <Combobox.Positioner>
-                      <Combobox.Content>
-                        {isLoading ? (
-                          <Combobox.Empty gap="2">
-                            <Spinner size="sm" />
-                            ユーザーを読み込み中...
-                          </Combobox.Empty>
-                        ) : collection.items.length === 0 ? (
-                          <Combobox.Empty>ユーザーが見つかりません</Combobox.Empty>
-                        ) : null}
-                        {collection.items.map((item) => (
-                          <Combobox.Item item={item} key={item.value}>
-                            {item.label}
-                            <Combobox.ItemIndicator />
-                          </Combobox.Item>
-                        ))}
-                      </Combobox.Content>
-                    </Combobox.Positioner>
-                  </Combobox.Root>
+                  <EmailField
+                    value={field.state.value ?? ""}
+                    onChange={(email) => field.handleChange(email)}
+                  />
                   {!field.state.meta.isValid && (
                     <Field.ErrorText>
                       {nl2br(

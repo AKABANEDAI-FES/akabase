@@ -11,6 +11,7 @@ import { organizationResource } from "@/domain/authorization/logic";
 import { createOrgMemberEntity } from "@/domain/organization/logic";
 import type { OrgMemberRole } from "@/domain/organization/schema";
 import type { Dependencies } from "@/infrastructure/di";
+import type { User } from "@/domain/user/schema";
 
 export type AddOrganizationMemberInput = {
   eventId: EventId;
@@ -23,6 +24,7 @@ export type AddOrganizationMemberInput = {
 export type AddOrganizationMemberOutput = {
   orgId: OrgId;
   eventId: EventId;
+  user: User;
 };
 
 export type AddOrganizationMemberError = OrganizationError | EventError | AuthorizationError;
@@ -95,6 +97,6 @@ export async function addOrganizationMember(
 
     await deps.organizationRepo.saveMember(member);
 
-    return { orgId: org.id, eventId: org.eventId };
+    return { orgId: org.id, eventId: org.eventId, user };
   });
 }

@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { AddMemberDialog } from "@/features/organization/components/add-member-dialog";
+import { EmailInput } from "@/features/organization/components/email-input";
 import { generateLoadOrganizationDetailQueryOptions } from "@/features/organization/actions";
 import { cast } from "@/domain/shared/ids";
 import type { OrgId } from "@/domain/shared/ids";
@@ -38,6 +39,7 @@ function AddMemberPage() {
       eventId={event.id}
       defaultOpen={true}
       onClose={handleClose}
+      renderEmailField={(props) => <EmailInput {...props} />}
     />
   );
 }
