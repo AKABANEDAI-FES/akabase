@@ -117,7 +117,7 @@ function ActionHistoryItem({
         </Text>
         {message && (
           <Card.Root variant="subtle" mt="1" size="sm">
-            <Card.Body py="2" px="3">
+            <Card.Body>
               <Text textStyle="sm" whiteSpace="pre-wrap">
                 {message.message}
               </Text>
@@ -158,7 +158,7 @@ function StandaloneMessageItem({ message }: { message: SubmissionDetail["message
           {message.userName}
         </Text>
         <Card.Root variant="subtle" mt="1" size="sm">
-          <Card.Body py="2" px="3">
+          <Card.Body>
             <Text textStyle="sm" whiteSpace="pre-wrap">
               {message.message}
             </Text>
