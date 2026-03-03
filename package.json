@@ -16,7 +16,7 @@
     "migration": "drizzle-kit generate",
     "migrate": "wrangler d1 migrations apply archive --local",
     "seed": "wrangler d1 execute archive --local --file=./scripts/seed.sql",
-    "seed:large": "npx tsx scripts/seed-large.ts",
+    "seed:large": "pnpm dlx tsx scripts/seed-large.ts",
     "deploy": "pnpm run build && wrangler deploy"
   },
   "dependencies": {
