@@ -46,6 +46,7 @@ function DeadlinesManagementPage() {
         <DeadlineManagementTable
           deadlines={deadlines}
           eventId={event.id}
+          slug={slug}
           canUpdate={permissions.canManageDeadlines}
           canDelete={permissions.canManageDeadlines}
         />

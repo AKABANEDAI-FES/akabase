@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { IconButton, Table } from "@/components/ui";
 import { Flex } from "styled-system/jsx";
 import { PencilIcon, Trash2Icon } from "lucide-react";
@@ -5,13 +6,13 @@ import type { EventId } from "@/domain/shared/ids";
 import type { DeadlineListItem } from "@/application/query/event/list-deadlines";
 import { DEADLINE_FIELD_LABELS } from "@/domain/event/schema";
 import type { DeadlineFieldKey } from "@/domain/event/schema";
-import { EditDeadlineDialog } from "./edit-deadline-dialog";
 import { DeleteDeadlineDialog } from "./delete-deadline-dialog";
 import { FormatDate } from "@/libs/date";
 
 interface DeadlineManagementTableProps {
   deadlines: DeadlineListItem[];
   eventId: EventId;
+  slug: string;
   canUpdate?: boolean;
   canDelete?: boolean;
 }
@@ -22,6 +23,7 @@ interface DeadlineManagementTableProps {
 export function DeadlineManagementTable({
   deadlines,
   eventId,
+  slug,
   canUpdate,
   canDelete,
 }: DeadlineManagementTableProps) {
@@ -84,11 +86,14 @@ export function DeadlineManagementTable({
                   <Table.Cell>
                     <Flex gap="2">
                       {canUpdate && (
-                        <EditDeadlineDialog eventId={eventId} deadline={deadline}>
-                          <IconButton aria-label="編集" variant="plain" size="sm">
+                        <IconButton aria-label="編集" variant="plain" size="sm" asChild>
+                          <Link
+                            to="/$slug/committee/deadlines/$deadlineId/edit"
+                            params={{ slug, deadlineId: deadline.id }}
+                          >
                             <PencilIcon />
-                          </IconButton>
-                        </EditDeadlineDialog>
+                          </Link>
+                        </IconButton>
                       )}
                       {canDelete && (
                         <DeleteDeadlineDialog eventId={eventId} deadline={deadline}>

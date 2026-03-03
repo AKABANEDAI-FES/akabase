@@ -1,7 +1,6 @@
-import type { ReactNode } from "react";
+import { useState } from "react";
 import { revalidateLogic, useForm } from "@tanstack/react-form";
 import { Result } from "@praha/byethrow";
-import { useDialogContext } from "@ark-ui/react/dialog";
 import { Button, CloseButton, Dialog, Field, Input, toaster } from "@/components/ui";
 import { Portal } from "@ark-ui/react/portal";
 import { Stack } from "styled-system/jsx";
@@ -19,31 +18,17 @@ import { nl2br } from "@/libs/text";
 interface EditDeadlineDialogProps {
   eventId: EventId;
   deadline: DeadlineListItem;
-  children: ReactNode;
+  defaultOpen?: boolean;
+  onClose?: () => void;
 }
 
-export function EditDeadlineDialog({ eventId, deadline, children }: EditDeadlineDialogProps) {
-  return (
-    <Dialog.Root size="md">
-      <Dialog.Trigger asChild>{children}</Dialog.Trigger>
-      <Portal>
-        <Dialog.Backdrop />
-        <Dialog.Positioner>
-          <EditDeadlineDialogContent eventId={eventId} deadline={deadline} />
-        </Dialog.Positioner>
-      </Portal>
-    </Dialog.Root>
-  );
-}
-
-function EditDeadlineDialogContent({
+export function EditDeadlineDialog({
   eventId,
   deadline,
-}: {
-  eventId: EventId;
-  deadline: DeadlineListItem;
-}) {
-  const dialog = useDialogContext();
+  defaultOpen,
+  onClose,
+}: EditDeadlineDialogProps) {
+  const [open, setOpen] = useState(defaultOpen ?? false);
   const { mutateAsync } = useUpdateDeadlineMutation();
 
   const form = useForm({
@@ -97,115 +82,130 @@ function EditDeadlineDialogContent({
         title: "締切を更新しました",
         description: `「${fieldLabel}」の締切を更新しました`,
       });
-      dialog.setOpen(false);
+      setOpen(false);
     },
   });
 
   return (
-    <Dialog.Content asChild>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          form.handleSubmit();
-        }}
-      >
-        <Dialog.Header>
-          <Dialog.Title>締切を編集</Dialog.Title>
-          <Dialog.Description>締切情報を編集します</Dialog.Description>
-        </Dialog.Header>
-        <Dialog.Body>
-          <Stack gap="4" w="full">
-            <Field.Root>
-              <Field.Label>フィールド</Field.Label>
-              <Input
-                value={
-                  DEADLINE_FIELD_LABELS[deadline.fieldKey as DeadlineFieldKey] || deadline.fieldKey
-                }
-                disabled
-              />
-              <Field.HelperText>フィールドは作成後に変更できません</Field.HelperText>
-            </Field.Root>
+    <Dialog.Root
+      open={open}
+      onOpenChange={({ open }) => setOpen(open)}
+      onExitComplete={onClose}
+      size="md"
+    >
+      <Portal>
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content asChild>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                form.handleSubmit();
+              }}
+            >
+              <Dialog.Header>
+                <Dialog.Title>締切を編集</Dialog.Title>
+                <Dialog.Description>締切情報を編集します</Dialog.Description>
+              </Dialog.Header>
+              <Dialog.Body>
+                <Stack gap="4" w="full">
+                  <Field.Root>
+                    <Field.Label>フィールド</Field.Label>
+                    <Input
+                      value={
+                        DEADLINE_FIELD_LABELS[deadline.fieldKey as DeadlineFieldKey] ||
+                        deadline.fieldKey
+                      }
+                      disabled
+                    />
+                    <Field.HelperText>フィールドは作成後に変更できません</Field.HelperText>
+                  </Field.Root>
 
-            <form.Field name="startAt">
-              {(field) => (
-                <Field.Root invalid={!field.state.meta.isValid}>
-                  <Field.Label htmlFor={field.name}>開始日時</Field.Label>
-                  <Input
-                    type="datetime-local"
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value ? toDatetimeLocalValue(field.state.value) : ""}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      field.handleChange(value ? new Date(value) : null);
-                    }}
-                  />
-                  <Field.HelperText>開始日時を削除する場合は空欄にしてください</Field.HelperText>
-                  {!field.state.meta.isValid && field.state.meta.errors.length > 0 && (
-                    <Field.ErrorText>
-                      {nl2br(
-                        field.state.meta.errors
-                          .map((error) => error?.message)
-                          .filter((msg) => msg != null)
-                          .join("\n"),
-                      )}
-                    </Field.ErrorText>
-                  )}
-                </Field.Root>
-              )}
-            </form.Field>
+                  <form.Field name="startAt">
+                    {(field) => (
+                      <Field.Root invalid={!field.state.meta.isValid}>
+                        <Field.Label htmlFor={field.name}>開始日時</Field.Label>
+                        <Input
+                          type="datetime-local"
+                          id={field.name}
+                          name={field.name}
+                          value={field.state.value ? toDatetimeLocalValue(field.state.value) : ""}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            field.handleChange(value ? new Date(value) : null);
+                          }}
+                        />
+                        <Field.HelperText>
+                          開始日時を削除する場合は空欄にしてください
+                        </Field.HelperText>
+                        {!field.state.meta.isValid && field.state.meta.errors.length > 0 && (
+                          <Field.ErrorText>
+                            {nl2br(
+                              field.state.meta.errors
+                                .map((error) => error?.message)
+                                .filter((msg) => msg != null)
+                                .join("\n"),
+                            )}
+                          </Field.ErrorText>
+                        )}
+                      </Field.Root>
+                    )}
+                  </form.Field>
 
-            <form.Field name="deadlineAt">
-              {(field) => (
-                <Field.Root invalid={!field.state.meta.isValid}>
-                  <Field.Label htmlFor={field.name}>
-                    終了日時 <Field.RequiredIndicator />
-                  </Field.Label>
-                  <Input
-                    type="datetime-local"
-                    id={field.name}
-                    name={field.name}
-                    value={toDatetimeLocalValue(field.state.value)}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(new Date(e.target.value))}
-                  />
-                  {!field.state.meta.isValid && field.state.meta.errors.length > 0 && (
-                    <Field.ErrorText>
-                      {nl2br(
-                        field.state.meta.errors
-                          .map((error) => error?.message)
-                          .filter((msg) => msg != null)
-                          .join("\n"),
-                      )}
-                    </Field.ErrorText>
+                  <form.Field name="deadlineAt">
+                    {(field) => (
+                      <Field.Root invalid={!field.state.meta.isValid}>
+                        <Field.Label htmlFor={field.name}>
+                          終了日時 <Field.RequiredIndicator />
+                        </Field.Label>
+                        <Input
+                          type="datetime-local"
+                          id={field.name}
+                          name={field.name}
+                          value={toDatetimeLocalValue(field.state.value)}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(new Date(e.target.value))}
+                        />
+                        {!field.state.meta.isValid && field.state.meta.errors.length > 0 && (
+                          <Field.ErrorText>
+                            {nl2br(
+                              field.state.meta.errors
+                                .map((error) => error?.message)
+                                .filter((msg) => msg != null)
+                                .join("\n"),
+                            )}
+                          </Field.ErrorText>
+                        )}
+                      </Field.Root>
+                    )}
+                  </form.Field>
+                </Stack>
+              </Dialog.Body>
+              <Dialog.Footer>
+                <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+                  {([canSubmit, isSubmitting]) => (
+                    <>
+                      <Dialog.ActionTrigger asChild>
+                        <Button type="button" variant="outline" disabled={isSubmitting}>
+                          キャンセル
+                        </Button>
+                      </Dialog.ActionTrigger>
+                      <Button type="submit" loading={isSubmitting} disabled={!canSubmit}>
+                        更新
+                      </Button>
+                    </>
                   )}
-                </Field.Root>
-              )}
-            </form.Field>
-          </Stack>
-        </Dialog.Body>
-        <Dialog.Footer>
-          <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-            {([canSubmit, isSubmitting]) => (
-              <>
-                <Dialog.ActionTrigger asChild>
-                  <Button type="button" variant="outline" disabled={isSubmitting}>
-                    キャンセル
-                  </Button>
-                </Dialog.ActionTrigger>
-                <Button type="submit" loading={isSubmitting} disabled={!canSubmit}>
-                  更新
-                </Button>
-              </>
-            )}
-          </form.Subscribe>
-        </Dialog.Footer>
-        <Dialog.CloseTrigger asChild>
-          <CloseButton />
-        </Dialog.CloseTrigger>
-      </form>
-    </Dialog.Content>
+                </form.Subscribe>
+              </Dialog.Footer>
+              <Dialog.CloseTrigger asChild>
+                <CloseButton />
+              </Dialog.CloseTrigger>
+            </form>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Portal>
+    </Dialog.Root>
   );
 }

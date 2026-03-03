@@ -1,15 +1,16 @@
+import { Link } from "@tanstack/react-router";
 import { IconButton, Table } from "@/components/ui";
 import { Flex } from "styled-system/jsx";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import type { EventId } from "@/domain/shared/ids";
 import type { TagListItem } from "@/application/query/event/list-tags";
-import { EditTagDialog } from "./edit-tag-dialog";
 import { DeleteTagDialog } from "./delete-tag-dialog";
 import { FormatDate } from "@/libs/date";
 
 interface TagManagementTableProps {
   tags: TagListItem[];
   eventId: EventId;
+  slug: string;
   canUpdate?: boolean;
   canDelete?: boolean;
 }
@@ -20,6 +21,7 @@ interface TagManagementTableProps {
 export function TagManagementTable({
   tags,
   eventId,
+  slug,
   canUpdate,
   canDelete,
 }: TagManagementTableProps) {
@@ -49,11 +51,14 @@ export function TagManagementTable({
                   <Table.Cell>
                     <Flex gap="2">
                       {canUpdate && (
-                        <EditTagDialog eventId={eventId} tag={tag}>
-                          <IconButton aria-label="編集" variant="plain" size="sm">
+                        <IconButton aria-label="編集" variant="plain" size="sm" asChild>
+                          <Link
+                            to="/$slug/committee/tags/$tagId/edit"
+                            params={{ slug, tagId: tag.id }}
+                          >
                             <PencilIcon />
-                          </IconButton>
-                        </EditTagDialog>
+                          </Link>
+                        </IconButton>
                       )}
                       {canDelete && (
                         <DeleteTagDialog eventId={eventId} tag={tag}>

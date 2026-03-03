@@ -47,6 +47,7 @@ function PlacesManagementPage() {
           <PlaceManagementTable
             places={places}
             eventId={event.id}
+            slug={slug}
             canUpdate={permissions.canManagePlaces}
             canDelete={permissions.canManagePlaces}
           />

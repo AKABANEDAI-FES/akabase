@@ -1,16 +1,17 @@
 import { useMemo } from "react";
+import { Link } from "@tanstack/react-router";
 import { IconButton, Table } from "@/components/ui";
 import { Flex } from "styled-system/jsx";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import type { EventId } from "@/domain/shared/ids";
 import type { PlaceListItem } from "@/application/query/event/list-places";
 import { DeletePlaceDialog } from "./delete-place-dialog";
-import { EditPlaceDialog } from "./edit-place-dialog";
 import { FormatDate } from "@/libs/date";
 
 interface PlaceManagementTableProps {
   places: PlaceListItem[];
   eventId: EventId;
+  slug: string;
   canUpdate?: boolean;
   canDelete?: boolean;
 }
@@ -57,6 +58,7 @@ function buildPlaceHierarchy(places: PlaceListItem[]) {
 export function PlaceManagementTable({
   places,
   eventId,
+  slug,
   canUpdate,
   canDelete,
 }: PlaceManagementTableProps) {
@@ -89,11 +91,14 @@ export function PlaceManagementTable({
                   <Table.Cell>
                     <Flex gap="2">
                       {canUpdate && (
-                        <EditPlaceDialog eventId={eventId} place={place}>
-                          <IconButton aria-label="編集" variant="plain" size="sm">
+                        <IconButton aria-label="編集" variant="plain" size="sm" asChild>
+                          <Link
+                            to="/$slug/committee/places/$placeId/edit"
+                            params={{ slug, placeId: place.id }}
+                          >
                             <PencilIcon />
-                          </IconButton>
-                        </EditPlaceDialog>
+                          </Link>
+                        </IconButton>
                       )}
                       {canDelete && (
                         <DeletePlaceDialog eventId={eventId} place={place}>

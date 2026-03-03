@@ -46,6 +46,7 @@ function TagsManagementPage() {
         <TagManagementTable
           tags={tags}
           eventId={event.id}
+          slug={slug}
           canUpdate={permissions.canManageTags}
           canDelete={permissions.canManageTags}
         />
