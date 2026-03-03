@@ -24,6 +24,7 @@ import { generateLoadMyOrganizationsQueryOptions } from "@/features/organization
 import { DEADLINE_FIELD_LABELS } from "@/domain/event/schema";
 import type { DeadlineFieldKey } from "@/domain/event/schema";
 import { Suspense } from "react";
+import type { SubmissionStatus } from "@/domain/project/schema";
 
 export const Route = createFileRoute("/_authenticated/$slug/")({
   loader: async ({ context }) => {
@@ -138,26 +139,38 @@ function CommitteeSection({ slug, eventId }: { slug: string; eventId: string }) 
       }
     >
       <Grid columns={{ base: 2, md: 4 }} gap="4">
-        <StatCard label="未審査" value={stats.submitted} />
-        <StatCard label="承認済" value={stats.approved} />
-        <StatCard label="差戻し" value={stats.returned} />
-        <StatCard label="取下げ" value={stats.withdrawn} />
+        <StatCard slug={slug} status="submitted" label="未審査" value={stats.submitted} />
+        <StatCard slug={slug} status="approved" label="承認済" value={stats.approved} />
+        <StatCard slug={slug} status="returned" label="差戻し" value={stats.returned} />
+        <StatCard slug={slug} status="withdrawn" label="取下げ" value={stats.withdrawn} />
       </Grid>
     </SectionLayout>
   );
 }
 
-function StatCard({ label, value }: { label: string; value: number }) {
+function StatCard({
+  slug,
+  status,
+  label,
+  value,
+}: {
+  slug: string;
+  status: SubmissionStatus;
+  label: string;
+  value: number;
+}) {
   return (
     <Card.Root>
-      <Card.Header>
-        <Card.Description>{label}</Card.Description>
-      </Card.Header>
-      <Card.Body>
-        <Text textStyle="2xl" fontWeight="bold">
-          {value}
-        </Text>
-      </Card.Body>
+      <Link to="/$slug/committee/submissions" params={{ slug }} search={{ status: [status] }}>
+        <Card.Header>
+          <Card.Description>{label}</Card.Description>
+        </Card.Header>
+        <Card.Body>
+          <Text textStyle="2xl" fontWeight="bold">
+            {value}
+          </Text>
+        </Card.Body>
+      </Link>
     </Card.Root>
   );
 }
