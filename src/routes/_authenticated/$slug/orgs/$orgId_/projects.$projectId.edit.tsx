@@ -1,4 +1,4 @@
-import { ClientOnly, Link, createFileRoute } from "@tanstack/react-router";
+import { ClientOnly, Link, createFileRoute, useBlocker } from "@tanstack/react-router";
 import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { Container, Flex, Stack } from "styled-system/jsx";
 import { Alert, Badge, Button, Field, Heading, Select, Textarea, toaster } from "@/components/ui";
@@ -23,6 +23,7 @@ import type { OrgId, ProjectId } from "@/domain/shared/ids";
 import { cast } from "@/domain/shared/ids";
 import z from "zod";
 import { getBlockedFieldKeys } from "@/domain/event/logic";
+import { confirm } from "@/components/confirm";
 
 const hasReachedMax = <T,>(value: T[]) => value.length >= PROJECT_MAX_TAGS;
 
@@ -134,13 +135,33 @@ function ProjectEditPage() {
     },
   });
 
-  const selectedTags = useStore(form.store, (state) => state.values.tags);
+  const [selectedTags, isDefaultValue] = useStore(form.store, (state) => [
+    state.values.tags,
+    state.isDefaultValue,
+  ]);
+
   const tagsCollection = createListCollection({
     items: tags.map((tag) => ({
       label: tag.name,
       value: tag.id,
       disabled: hasReachedMax(selectedTags) && !selectedTags.includes(tag.id),
     })),
+  });
+
+  useBlocker({
+    shouldBlockFn: async () => {
+      if (isDefaultValue) return false;
+
+      const result = await confirm({
+        title: "変更が保存されていません。",
+        description: "このページから移動すると、保存されていない変更は失われます。よろしいですか？",
+        cancelText: "このページに留まる",
+        confirmText: "移動する",
+      });
+
+      return !result;
+    },
+    enableBeforeUnload: !isDefaultValue,
   });
 
   return (
