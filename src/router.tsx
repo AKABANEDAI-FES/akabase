@@ -1,7 +1,11 @@
-import { createRouteMask, createRouter } from "@tanstack/react-router";
+import type { ErrorComponentProps } from "@tanstack/react-router";
+import { Link, createRouteMask, createRouter } from "@tanstack/react-router";
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
 import * as TanstackQuery from "./integrations/tanstack-query/root-provider";
 import type { SessionData } from "./libs/session-server";
+import { Grid, VStack } from "styled-system/jsx";
+import { RotateCcwIcon, SearchXIcon, TriangleAlertIcon } from "lucide-react";
+import { Button, Heading, Icon, Text } from "./components/ui";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
@@ -107,9 +111,58 @@ export const getRouter = () => {
       addOrgMemberForOrgModalMask,
     ],
     defaultPreload: "intent",
+    defaultNotFoundComponent: NotFound,
+    defaultErrorComponent: ErrorComponent,
   });
 
   setupRouterSsrQueryIntegration({ router, queryClient: rqContext.queryClient });
 
   return router;
 };
+
+function NotFound() {
+  return (
+    <Grid placeItems="center" minH="100svh" bg="bg.canvas">
+      <VStack gap="4" px="4" alignItems="center">
+        <Icon size="lg">
+          <SearchXIcon />
+        </Icon>
+        <VStack gap="1" textAlign="center">
+          <Heading as="h1" textStyle="xl">
+            ページが見つかりません
+          </Heading>
+          <Text textStyle="sm" color="fg.muted">
+            お探しのページは存在しないか、移動した可能性があります
+          </Text>
+        </VStack>
+        <Button asChild mt="2">
+          <Link to="/">ホームに戻る</Link>
+        </Button>
+      </VStack>
+    </Grid>
+  );
+}
+
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
+  return (
+    <Grid placeItems="center" minH="100svh" bg="bg.canvas">
+      <VStack gap="4" px="4" alignItems="center">
+        <Icon size="lg" color="fg.error">
+          <TriangleAlertIcon />
+        </Icon>
+        <VStack gap="1" textAlign="center">
+          <Heading as="h1" textStyle="xl">
+            エラーが発生しました
+          </Heading>
+          <Text textStyle="sm" color="fg.muted">
+            {error.message || "予期しないエラーが発生しました"}
+          </Text>
+        </VStack>
+        <Button onClick={reset} mt="2">
+          <RotateCcwIcon />
+          再試行
+        </Button>
+      </VStack>
+    </Grid>
+  );
+}
