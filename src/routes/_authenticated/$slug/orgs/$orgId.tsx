@@ -3,6 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Container, Stack } from "styled-system/jsx";
 import { Heading, SegmentGroup } from "@/components/ui";
 import { generateLoadOrganizationDetailQueryOptions } from "@/features/organization/actions/queries";
+import { handleNotFoundError } from "@/libs/error";
 
 export const Route = createFileRoute("/_authenticated/$slug/orgs/$orgId")({
   loader: async ({ params, context }) => {
@@ -12,6 +13,7 @@ export const Route = createFileRoute("/_authenticated/$slug/orgs/$orgId")({
     );
   },
   component: OrganizationLayoutPage,
+  onError: handleNotFoundError,
 });
 
 function OrganizationLayoutPage() {

@@ -24,6 +24,7 @@ import { cast } from "@/domain/shared/ids";
 import z from "zod";
 import { getBlockedFieldKeys } from "@/domain/event/logic";
 import { confirm } from "@/components/confirm";
+import { handleNotFoundError } from "@/libs/error";
 
 const hasReachedMax = <T,>(value: T[]) => value.length >= PROJECT_MAX_TAGS;
 
@@ -43,6 +44,7 @@ export const Route = createFileRoute("/_authenticated/$slug/orgs/$orgId_/project
       ]);
     },
     component: ProjectEditPage,
+    onError: handleNotFoundError,
   },
 );
 

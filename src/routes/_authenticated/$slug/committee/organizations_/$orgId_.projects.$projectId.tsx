@@ -10,6 +10,7 @@ import { ProjectBasicInfoForm, ProjectPublishedDataForm } from "@/features/proje
 import { generateLoadTagsQueryOptions } from "@/features/event/actions/queries/tag";
 import { generateLoadPlacesQueryOptions } from "@/features/event/actions/queries/place";
 import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions/queries";
+import { handleNotFoundError } from "@/libs/error";
 
 export const Route = createFileRoute(
   "/_authenticated/$slug/committee/organizations_/$orgId_/projects/$projectId",
@@ -29,6 +30,7 @@ export const Route = createFileRoute(
     ]);
   },
   component: CommitteeProjectEditPage,
+  onError: handleNotFoundError,
 });
 
 function CommitteeProjectEditPage() {

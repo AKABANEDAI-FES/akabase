@@ -10,6 +10,7 @@ import { cast, eventIdSchema, orgIdSchema } from "@/domain/shared/ids";
 import type { UserId } from "@/domain/shared/ids";
 import { queryOptions } from "@tanstack/react-query";
 import { dependencies } from "@/infrastructure/di";
+import { NotFoundError } from "@/libs/error";
 
 /**
  * Server function to load organizations for an event
@@ -46,7 +47,7 @@ export const loadOrganizationDetailFn = createServerFn({ method: "GET" })
 
     const organization = await getOrganizationDetail(dependencies, data.eventId, data.orgId, actor);
     if (!organization) {
-      throw new Error("出展団体が見つかりませんでした");
+      throw new NotFoundError("出展団体が見つかりませんでした");
     }
     return organization;
   });

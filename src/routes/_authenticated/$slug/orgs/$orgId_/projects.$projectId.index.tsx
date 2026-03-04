@@ -9,6 +9,7 @@ import {
 } from "@/features/project/actions/queries";
 import { ProjectPublishedDataCard } from "@/features/project/components";
 import { cast } from "@/domain/shared/ids";
+import { handleNotFoundError } from "@/libs/error";
 import type { OrgId, ProjectId } from "@/domain/shared/ids";
 
 export const Route = createFileRoute("/_authenticated/$slug/orgs/$orgId_/projects/$projectId/")({
@@ -24,6 +25,7 @@ export const Route = createFileRoute("/_authenticated/$slug/orgs/$orgId_/project
     ]);
   },
   component: ProjectDetailPage,
+  onError: handleNotFoundError,
 });
 
 function ProjectDetailPage() {

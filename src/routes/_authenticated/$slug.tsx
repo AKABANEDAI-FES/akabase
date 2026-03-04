@@ -13,6 +13,7 @@ import { NavLink, NavSection, SidebarLayout } from "@/components/sidebar-layout"
 import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions/queries";
 import { generateCheckCommitteeRoleQueryOptions } from "@/features/authorization/actions";
 import { generateLoadMyOrganizationsQueryOptions } from "@/features/organization/actions/queries";
+import { handleNotFoundError } from "@/libs/error";
 
 export const Route = createFileRoute("/_authenticated/$slug")({
   beforeLoad: async ({ params, context }) => {
@@ -34,6 +35,7 @@ export const Route = createFileRoute("/_authenticated/$slug")({
     ]);
   },
   component: SlugLayout,
+  onError: handleNotFoundError,
 });
 
 function SlugLayout() {

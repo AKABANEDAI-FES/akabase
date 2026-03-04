@@ -22,6 +22,7 @@ import {
 import type { UserId } from "@/domain/shared/ids";
 import { queryOptions } from "@tanstack/react-query";
 import { dependencies } from "@/infrastructure/di";
+import { NotFoundError } from "@/libs/error";
 
 /**
  * Server function to load places for an event
@@ -91,7 +92,7 @@ export const loadDraftFn = createServerFn({ method: "GET" })
     const draft = await getDraft(dependencies, data.eventId, data.orgId, data.projectId, actor);
 
     if (!draft) {
-      throw new Error("プロジェクトのドラフトが見つかりません。");
+      throw new NotFoundError("プロジェクトのドラフトが見つかりません。");
     }
 
     return draft;
@@ -133,7 +134,7 @@ export const loadProjectDetailFn = createServerFn({ method: "GET" })
     );
 
     if (!project) {
-      throw new Error("プロジェクトが見つかりません。");
+      throw new NotFoundError("プロジェクトが見つかりません。");
     }
 
     return project;
@@ -277,7 +278,7 @@ export const loadSubmissionDetailFn = createServerFn({ method: "GET" })
 
     const detail = await getSubmissionDetail(dependencies, data.eventId, data.submissionId, actor);
     if (!detail) {
-      throw new Error("提出が見つかりません。");
+      throw new NotFoundError("提出が見つかりません。");
     }
     return detail;
   });

@@ -11,6 +11,7 @@ import {
   SubmissionStatusBadge,
 } from "@/features/project/components";
 import { generateLoadSubmissionDetailQueryOptions } from "@/features/project/actions/queries";
+import { handleNotFoundError } from "@/libs/error";
 
 export const Route = createFileRoute("/_authenticated/$slug/committee/submissions_/$submissionId")({
   loader: async ({ params, context }) => {
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/_authenticated/$slug/committee/submission
     );
   },
   component: SubmissionDetailPage,
+  onError: handleNotFoundError,
 });
 
 function SubmissionDetailPage() {

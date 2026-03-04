@@ -8,6 +8,7 @@ import { getRecentActiveEvent } from "@/application/query/event/get-recent-activ
 import { getEventBySlug } from "@/application/query/event/get-event-by-slug";
 import { queryOptions } from "@tanstack/react-query";
 import { dependencies } from "@/infrastructure/di";
+import { NotFoundError } from "@/libs/error";
 
 export const loadEventsFn = createServerFn({ method: "GET" }).handler(async () => {
   return await listEvents(dependencies);
@@ -67,7 +68,7 @@ export const loadEventBySlugFn = createServerFn({ method: "GET" })
     const event = await getEventBySlug(dependencies, data.slug);
 
     if (!event) {
-      throw new Error("イベントが見つかりませんでした。");
+      throw new NotFoundError("イベントが見つかりませんでした。");
     }
 
     return event;

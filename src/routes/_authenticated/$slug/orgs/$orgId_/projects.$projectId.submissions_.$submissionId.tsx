@@ -14,6 +14,7 @@ import { generateCheckOrganizationPermissionsQueryOptions } from "@/features/aut
 import { cast } from "@/domain/shared/ids";
 import type { OrgId } from "@/domain/shared/ids";
 import { generateLoadSubmissionDetailQueryOptions } from "@/features/project/actions";
+import { handleNotFoundError } from "@/libs/error";
 
 export const Route = createFileRoute(
   "/_authenticated/$slug/orgs/$orgId_/projects/$projectId/submissions_/$submissionId",
@@ -30,6 +31,7 @@ export const Route = createFileRoute(
     ]);
   },
   component: OrgSubmissionDetailPage,
+  onError: handleNotFoundError,
 });
 
 function OrgSubmissionDetailPage() {
