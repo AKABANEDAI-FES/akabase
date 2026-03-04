@@ -196,6 +196,7 @@ export function CreateProjectDialog({
                     {(field) => (
                       <LogoUploadField
                         onLogoChange={(logoImageId) => field.handleChange(logoImageId)}
+                        scope={{ type: "pending" }}
                       />
                     )}
                   </form.Field>

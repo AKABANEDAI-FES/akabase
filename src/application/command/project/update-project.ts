@@ -9,6 +9,7 @@ import type { Actor } from "@/domain/authorization/schema";
 import { projectResource } from "@/domain/authorization/logic";
 import { updateProjectEntity } from "@/domain/project/logic";
 import type { Dependencies } from "@/infrastructure/di";
+import { migrateImageScope } from "@/application/command/shared/migrate-image-scope";
 
 /**
  * Input for updating a project
@@ -51,7 +52,10 @@ export type UpdateProjectError = ProjectError | EventError | AuthorizationError;
  * @returns Result with project ID or error
  */
 export async function updateProject(
-  deps: Pick<Dependencies, "projectRepo" | "authService" | "eventDomainService">,
+  deps: Pick<
+    Dependencies,
+    "projectRepo" | "authService" | "eventDomainService" | "db" | "storageService"
+  >,
   input: UpdateProjectInput,
 ): Result.ResultAsync<UpdateProjectOutput, UpdateProjectError> {
   return gen(async function* ($) {
@@ -82,6 +86,15 @@ export async function updateProject(
 
     // Save updated project
     await deps.projectRepo.saveProject(updatedProject);
+
+    // Migrate pending image scope to project scope
+    if (input.logoImageId) {
+      await migrateImageScope(deps, input.logoImageId, {
+        type: "project",
+        eventId: project.eventId,
+        projectId: input.projectId,
+      });
+    }
 
     return { projectId: input.projectId, eventId: project.eventId, orgId: project.orgId };
   });

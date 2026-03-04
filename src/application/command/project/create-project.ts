@@ -9,6 +9,7 @@ import type { Actor } from "@/domain/authorization/schema";
 import { projectResource } from "@/domain/authorization/logic";
 import { createProjectDraftEntity, createProjectEntity } from "@/domain/project/logic";
 import type { Dependencies } from "@/infrastructure/di";
+import { migrateImageScope } from "@/application/command/shared/migrate-image-scope";
 
 /**
  * Input for creating a new project
@@ -51,7 +52,10 @@ export type CreateProjectError = ProjectError | EventError | AuthorizationError;
  * @returns Result with project ID or error
  */
 export async function createProject(
-  deps: Pick<Dependencies, "projectRepo" | "authService" | "eventDomainService">,
+  deps: Pick<
+    Dependencies,
+    "projectRepo" | "authService" | "eventDomainService" | "db" | "storageService"
+  >,
   input: CreateProjectInput,
 ): Result.ResultAsync<CreateProjectOutput, CreateProjectError> {
   return gen(async function* ($) {
@@ -88,6 +92,15 @@ export async function createProject(
     // Save project and draft
     await deps.projectRepo.saveProject(project);
     await deps.projectRepo.saveDraft(draft);
+
+    // Migrate pending image scope to project scope
+    if (input.logoImageId) {
+      await migrateImageScope(deps, input.logoImageId, {
+        type: "project",
+        eventId: input.eventId,
+        projectId,
+      });
+    }
 
     return { orgId: project.orgId, projectId: project.id, eventId: project.eventId };
   });

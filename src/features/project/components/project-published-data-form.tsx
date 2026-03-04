@@ -232,6 +232,7 @@ export function ProjectPublishedDataForm({
                   invalid={!field.state.meta.isValid}
                   placeholder="企画のWeb用コンテンツを入力してください"
                   disabled={!published}
+                  imageScope={{ type: "project", eventId, projectId }}
                 />
               </ClientOnly>
               {!field.state.meta.isValid && (

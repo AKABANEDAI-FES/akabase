@@ -183,6 +183,7 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
             <LogoUploadField
               currentLogoUrl={project.logoUrl}
               onLogoChange={(logoImageId) => field.handleChange(logoImageId)}
+              scope={{ type: "pending" }}
             />
           )}
         </form.Field>

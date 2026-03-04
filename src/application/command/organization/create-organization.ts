@@ -9,6 +9,7 @@ import type { Actor } from "@/domain/authorization/schema";
 import { organizationResource } from "@/domain/authorization/logic";
 import { createOrganizationEntity } from "@/domain/organization/logic";
 import type { Dependencies } from "@/infrastructure/di";
+import { migrateImageScope } from "@/application/command/shared/migrate-image-scope";
 
 /**
  * Input for creating a new organization
@@ -48,7 +49,10 @@ export type CreateOrganizationError = OrganizationError | EventError | Authoriza
  * @returns Result with organization ID or error
  */
 export async function createOrganization(
-  deps: Pick<Dependencies, "organizationRepo" | "authService" | "eventDomainService">,
+  deps: Pick<
+    Dependencies,
+    "organizationRepo" | "authService" | "eventDomainService" | "db" | "storageService"
+  >,
   input: CreateOrganizationInput,
 ): Result.ResultAsync<CreateOrganizationOutput, CreateOrganizationError> {
   return gen(async function* ($) {
@@ -75,6 +79,15 @@ export async function createOrganization(
 
     // Save organization to database
     await deps.organizationRepo.saveOrganization(organization);
+
+    // Migrate pending image scope to organization scope
+    if (input.logoImageId) {
+      await migrateImageScope(deps, input.logoImageId, {
+        type: "organization",
+        eventId: input.eventId,
+        orgId: organizationId,
+      });
+    }
 
     return { organizationId: organization.id, eventId: organization.eventId };
   });

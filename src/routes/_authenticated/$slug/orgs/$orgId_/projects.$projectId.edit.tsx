@@ -353,6 +353,7 @@ function ProjectEditPage() {
                         invalid={!field.state.meta.isValid}
                         placeholder="企画のWeb用コンテンツを入力してください"
                         disabled={isBlocked}
+                        imageScope={{ type: "project", eventId: event.id, projectId }}
                       />
                     </ClientOnly>
                     {!field.state.meta.isValid && (
