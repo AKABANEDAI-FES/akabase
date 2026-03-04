@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Spinner, toaster } from "@/components/ui";
 import { css, cx } from "styled-system/css";
-import { ImagePlusIcon, Trash2Icon, UploadCloudIcon } from "lucide-react";
+import { UploadCloudIcon, XIcon } from "lucide-react";
 import { useUploadImageMutation } from "../actions/mutations";
 import type { AllowedImageType, ImageScope } from "@/domain/shared/storage";
 import {
@@ -77,7 +77,7 @@ export function ImageUpload({ currentImageUrl, onImageChange, disabled, scope }:
   );
 
   const handleClick = () => {
-    if (isDisabled) return;
+    if (isDisabled || hasImage) return;
     inputRef.current?.click();
   };
 
@@ -118,9 +118,9 @@ export function ImageUpload({ currentImageUrl, onImageChange, disabled, scope }:
             handleClick();
           }
         }}
-        role="button"
-        tabIndex={isDisabled ? -1 : 0}
-        aria-label="画像をアップロード"
+        role={hasImage ? undefined : "button"}
+        tabIndex={isDisabled || hasImage ? -1 : 0}
+        aria-label={hasImage ? undefined : "画像をアップロード"}
       >
         <input
           ref={inputRef}
@@ -136,10 +136,16 @@ export function ImageUpload({ currentImageUrl, onImageChange, disabled, scope }:
         {hasImage ? (
           <>
             <img src={previewUrl} alt="プレビュー" className={previewImageStyle} />
-            <div className={hoverOverlayStyle}>
-              <ImagePlusIcon size={20} />
-              <span className={overlayTextStyle}>変更</span>
-            </div>
+            {!isDisabled && (
+              <button
+                type="button"
+                onClick={handleRemove}
+                className={clearButtonStyle}
+                aria-label="画像をクリア"
+              >
+                <XIcon size={14} />
+              </button>
+            )}
           </>
         ) : (
           <div className={placeholderStyle}>
@@ -154,18 +160,6 @@ export function ImageUpload({ currentImageUrl, onImageChange, disabled, scope }:
           </div>
         )}
       </div>
-
-      {hasImage && !isDisabled && (
-        <button
-          type="button"
-          onClick={handleRemove}
-          className={removeButtonStyle}
-          aria-label="画像を削除"
-        >
-          <Trash2Icon size={14} />
-          <span>削除</span>
-        </button>
-      )}
     </div>
   );
 }
@@ -201,6 +195,7 @@ const uploadAreaStyle = css({
 const hasImageStyle = css({
   borderStyle: "solid",
   bg: "gray.surface.bg",
+  cursor: "default",
   _hover: {
     bg: "gray.surface.bg",
   },
@@ -224,42 +219,24 @@ const previewImageStyle = css({
   objectFit: "contain",
 });
 
-const hoverOverlayStyle = css({
+const clearButtonStyle = css({
   position: "absolute",
-  inset: 0,
+  top: "1",
+  right: "1",
   display: "flex",
-  flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
-  gap: "1",
-  bg: "transparent",
-  color: "transparent",
-  transition: "colors",
-  borderRadius: "l3",
-  ".group:hover &, [role=button]:hover &": {
-    bg: "black.a7",
-    color: "white",
-  },
-});
-
-const overlayTextStyle = css({
-  fontSize: "xs",
-  fontWeight: "medium",
-});
-
-const removeButtonStyle = css({
-  display: "inline-flex",
-  alignItems: "center",
-  gap: "1",
-  textStyle: "xs",
-  color: "fg.muted",
-  cursor: "pointer",
-  transition: "colors",
-  bg: "transparent",
+  width: "6",
+  height: "6",
+  borderRadius: "full",
+  bg: "black.a9",
+  color: "white",
   border: "none",
-  padding: "0",
+  cursor: "pointer",
+  transition: "backgrounds",
+  zIndex: 1,
   _hover: {
-    color: "fg.error",
+    bg: "black.a11",
   },
 });
 
