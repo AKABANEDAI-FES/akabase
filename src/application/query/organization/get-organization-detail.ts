@@ -31,8 +31,8 @@ export type OrganizationDetail = z.infer<typeof organizationDetailSchema>;
  * @param eventId - Event ID
  * @param orgId - Organization ID
  * @param actor - Actor (authenticated user with permissions)
- * @returns Organization detail or null if not found
- * @throws {QueryException} When database operation fails or authorization is denied
+ * @returns Organization detail or null if not found / not authorized
+ * @throws {QueryException} When database operation fails
  */
 export async function getOrganizationDetail(
   deps: Pick<Dependencies, "db" | "authService">,
@@ -47,7 +47,7 @@ export async function getOrganizationDetail(
     "organization:read",
   );
   if (Result.isFailure(authResult)) {
-    throw new QueryException("VALIDATION_ERROR", authResult.error.message, authResult.error);
+    return null;
   }
 
   try {

@@ -35,8 +35,8 @@ export type ProjectDetail = z.infer<typeof projectDetailSchema>;
  * @param orgId - Organization ID
  * @param projectId - Project ID
  * @param actor - Actor (authenticated user with permissions)
- * @returns Project detail or null if not found
- * @throws {QueryException} When database operation fails or authorization is denied
+ * @returns Project detail or null if not found / not authorized
+ * @throws {QueryException} When database operation fails
  */
 export async function getProjectDetail(
   deps: Pick<Dependencies, "db" | "authService" | "storageService">,
@@ -52,7 +52,7 @@ export async function getProjectDetail(
     "project:read",
   );
   if (Result.isFailure(authResult)) {
-    throw new QueryException("VALIDATION_ERROR", authResult.error.message, authResult.error);
+    return null;
   }
 
   try {

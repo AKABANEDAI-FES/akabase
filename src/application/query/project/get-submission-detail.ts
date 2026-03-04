@@ -106,7 +106,7 @@ export async function getSubmissionDetail(
       "project:read",
     );
     if (Result.isFailure(authResult)) {
-      throw new QueryException("VALIDATION_ERROR", authResult.error.message, authResult.error);
+      return null;
     }
 
     return submissionDetailSchema.parse({
@@ -139,7 +139,6 @@ export async function getSubmissionDetail(
       })),
     });
   } catch (error) {
-    if (error instanceof QueryException) throw error;
     throw new QueryException("DATABASE_ERROR", "提出詳細の取得に失敗しました。", error);
   }
 }

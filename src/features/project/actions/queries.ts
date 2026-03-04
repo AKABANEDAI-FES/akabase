@@ -88,7 +88,13 @@ export const loadDraftFn = createServerFn({ method: "GET" })
     });
 
     // Query with authorization check
-    return await getDraft(dependencies, data.eventId, data.orgId, data.projectId, actor);
+    const draft = await getDraft(dependencies, data.eventId, data.orgId, data.projectId, actor);
+
+    if (!draft) {
+      throw new Error("プロジェクトのドラフトが見つかりません。");
+    }
+
+    return draft;
   });
 
 export function generateLoadDraftCacheKey(eventId: string, orgId: string, projectId: string) {

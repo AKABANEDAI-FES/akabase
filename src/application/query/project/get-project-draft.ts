@@ -16,8 +16,8 @@ export const draftDetailSchema = z.object({
   projectId: projectIdSchema,
   pamphletText: projectDraftSchema.shape.pamphletText,
   webContentJson: projectDraftSchema.shape.webContentJson,
-  updatedAt: z.date(),
-  updatedBy: userIdSchema,
+  updatedAt: z.date().nullable(),
+  updatedBy: userIdSchema.nullable(),
   tags: tagSchema.pick({ id: true, name: true }).array(),
 });
 
@@ -31,8 +31,8 @@ export type DraftDetail = z.infer<typeof draftDetailSchema>;
  * @param deps - Dependencies (authService)
  * @param projectId - Project ID
  * @param actor - Actor (authenticated user with permissions)
- * @returns Draft detail or null if not found
- * @throws {QueryException} When database operation fails or authorization is denied
+ * @returns Draft detail or null if not found / not authorized
+ * @throws {QueryException} When database operation fails
  */
 export async function getDraft(
   deps: Pick<Dependencies, "db" | "authService">,
@@ -48,7 +48,7 @@ export async function getDraft(
     "project:read",
   );
   if (Result.isFailure(authResult)) {
-    throw new QueryException("VALIDATION_ERROR", authResult.error.message, authResult.error);
+    return null;
   }
 
   try {
@@ -69,7 +69,15 @@ export async function getDraft(
     });
 
     if (!project?.draft) {
-      return null;
+      const draft = draftDetailSchema.parse({
+        projectId,
+        pamphletText: "",
+        webContentJson: null,
+        updatedAt: null,
+        updatedBy: null,
+        tags: [],
+      });
+      return draft;
     }
 
     const draftRow = project.draft;
