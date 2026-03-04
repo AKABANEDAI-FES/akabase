@@ -8,15 +8,17 @@ import { TextAlignButton } from "./text-align-button";
 import { ImageUploadButton } from "./image-upload-button";
 import { LinkButton } from "./link-button";
 import { ToolbarSeparator } from "./toolbar-separator";
+import type { ImageScope } from "@/domain/shared/storage";
 import { Maximize2Icon, Minimize2Icon } from "lucide-react";
 
 type Props = {
   maximized?: boolean;
   toggleMaximize?: () => void;
   className?: string;
+  imageScope: ImageScope;
 };
 
-export function Toolbar({ className, maximized, toggleMaximize }: Props) {
+export function Toolbar({ className, maximized, toggleMaximize, imageScope }: Props) {
   return (
     <Grid className={className} gap="0" gridTemplateColumns="minmax(0, 1fr) auto 1fr">
       <ScrollArea.Root overflowX="auto" size="xs" gridColumnStart="2">
@@ -53,7 +55,7 @@ export function Toolbar({ className, maximized, toggleMaximize }: Props) {
               <ToolbarSeparator />
 
               <ToolbarGroup>
-                <ImageUploadButton />
+                <ImageUploadButton scope={imageScope} />
                 <LinkButton />
               </ToolbarGroup>
 

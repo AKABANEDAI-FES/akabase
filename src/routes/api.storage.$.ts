@@ -1,4 +1,5 @@
 import { uploadImage } from "@/application/command/shared/upload-image";
+import type { ImageScope } from "@/domain/shared/storage";
 import { dependencies } from "@/infrastructure/di";
 import { authMiddleware } from "@/libs/session-server";
 import { Result } from "@praha/byethrow";
@@ -45,12 +46,31 @@ export const Route = createFileRoute("/api/storage/$")({
           });
         }
 
+        const scopeJson = formData.get("scope") as string | null;
+        if (!scopeJson) {
+          return new Response(JSON.stringify({ message: "Scope is required" }), {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
+        let scope: ImageScope;
+        try {
+          scope = JSON.parse(scopeJson) as ImageScope;
+        } catch {
+          return new Response(JSON.stringify({ message: "Invalid scope" }), {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+
         const arrayBuffer = await file.arrayBuffer();
 
         const result = await uploadImage(dependencies, {
           file: arrayBuffer,
           contentType: file.type,
           userId: context.session.user.id,
+          scope,
         });
         if (Result.isFailure(result)) {
           return new Response(JSON.stringify({ message: result.error.message }), {

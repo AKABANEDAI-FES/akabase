@@ -3,7 +3,7 @@ import { Spinner, toaster } from "@/components/ui";
 import { css, cx } from "styled-system/css";
 import { ImagePlusIcon, Trash2Icon, UploadCloudIcon } from "lucide-react";
 import { useUploadImageMutation } from "../actions/mutations";
-import type { AllowedImageType } from "@/domain/shared/storage";
+import type { AllowedImageType, ImageScope } from "@/domain/shared/storage";
 import {
   ALLOWED_IMAGE_TYPES,
   MAX_FILE_SIZE,
@@ -14,11 +14,12 @@ interface ImageUploadProps {
   currentImageUrl?: string | null;
   onImageChange: (imageId: string | null) => void;
   disabled?: boolean;
+  scope: ImageScope;
 }
 
 const ACCEPT = ALLOWED_IMAGE_TYPES.join(",");
 
-export function ImageUpload({ currentImageUrl, onImageChange, disabled }: ImageUploadProps) {
+export function ImageUpload({ currentImageUrl, onImageChange, disabled, scope }: ImageUploadProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentImageUrl ?? null);
   const inputRef = useRef<HTMLInputElement>(null);
   const uploadMutation = useUploadImageMutation();
@@ -49,27 +50,30 @@ export function ImageUpload({ currentImageUrl, onImageChange, disabled }: ImageU
       const objectUrl = URL.createObjectURL(file);
       setPreviewUrl(objectUrl);
 
-      uploadMutation.mutate(file, {
-        onSuccess: (result) => {
-          onImageChange(result.imageId);
-          toaster.create({
-            type: "success",
-            title: "アップロード完了",
-            description: "画像をアップロードしました",
-          });
+      uploadMutation.mutate(
+        { file, scope },
+        {
+          onSuccess: (result) => {
+            onImageChange(result.imageId);
+            toaster.create({
+              type: "success",
+              title: "アップロード完了",
+              description: "画像をアップロードしました",
+            });
+          },
+          onError: (error) => {
+            URL.revokeObjectURL(objectUrl);
+            setPreviewUrl(currentImageUrl ?? null);
+            toaster.create({
+              type: "error",
+              title: "アップロードエラー",
+              description: error.message,
+            });
+          },
         },
-        onError: (error) => {
-          URL.revokeObjectURL(objectUrl);
-          setPreviewUrl(currentImageUrl ?? null);
-          toaster.create({
-            type: "error",
-            title: "アップロードエラー",
-            description: error.message,
-          });
-        },
-      });
+      );
     },
-    [uploadMutation, onImageChange, currentImageUrl],
+    [uploadMutation, onImageChange, currentImageUrl, scope],
   );
 
   const handleClick = () => {

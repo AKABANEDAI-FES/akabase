@@ -1,8 +1,7 @@
 import { Result } from "@praha/byethrow";
-import { db } from "@/db";
 import { images } from "@/db/schema";
 import type { Dependencies } from "@/infrastructure/di";
-import type { AllowedImageType, StorageError } from "@/domain/shared/storage";
+import type { AllowedImageType, ImageScope, StorageError } from "@/domain/shared/storage";
 import {
   ALLOWED_IMAGE_TYPES,
   MAX_FILE_SIZE,
@@ -18,6 +17,7 @@ export type UploadImageInput = {
   file: ArrayBuffer;
   contentType: string;
   userId: string;
+  scope: ImageScope;
 };
 
 /**
@@ -38,7 +38,7 @@ export type UploadImageOutput = {
 };
 
 export async function uploadImage(
-  deps: Pick<Dependencies, "storageService">,
+  deps: Pick<Dependencies, "storageService" | "db">,
   input: UploadImageInput,
 ): Promise<Result.Result<UploadImageOutput, StorageError>> {
   // Validate file size
@@ -59,6 +59,7 @@ export async function uploadImage(
   // Upload to R2
   const uploadResult = await deps.storageService.uploadImage(input.file, {
     contentType: input.contentType,
+    scope: input.scope,
   });
   if (Result.isFailure(uploadResult)) {
     return uploadResult;
@@ -68,11 +69,12 @@ export async function uploadImage(
 
   // Save metadata to DB
   try {
-    await db.insert(images).values({
+    await deps.db.insert(images).values({
       id,
       objectKey,
       contentType: input.contentType,
       size,
+      scopeType: input.scope.type,
       uploadedBy: input.userId,
     });
   } catch (error) {

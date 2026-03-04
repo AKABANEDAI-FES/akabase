@@ -5,6 +5,7 @@ import { editorExtensions } from "./extensions";
 import { richTextEditor } from "styled-system/recipes";
 import { Placeholder } from "@tiptap/extensions";
 import { Dialog } from "@/components/ui";
+import type { ImageScope } from "@/domain/shared/storage";
 import { Portal } from "@ark-ui/react";
 import { Box } from "styled-system/jsx";
 import { InPortal, OutPortal, createHtmlPortalNode } from "react-reverse-portal";
@@ -16,6 +17,7 @@ export interface RichTextEditorProps {
   invalid?: boolean;
   disabled?: boolean;
   placeholder?: string;
+  imageScope: ImageScope;
 }
 
 /**
@@ -29,6 +31,7 @@ export function RichTextEditor({
   placeholder,
   invalid = false,
   disabled = false,
+  imageScope,
 }: RichTextEditorProps) {
   const [isMaximized, setIsMaximized] = useState(false);
   const editor = useEditor({
@@ -85,6 +88,7 @@ export function RichTextEditor({
             className={classes.toolbar}
             maximized={isMaximized}
             toggleMaximize={() => setIsMaximized((prev) => !prev)}
+            imageScope={imageScope}
           />
           <div className={classes.content}>
             <EditorContent editor={editor} />
