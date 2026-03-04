@@ -25,6 +25,7 @@ import { DEADLINE_FIELD_LABELS } from "@/domain/event/schema";
 import type { DeadlineFieldKey } from "@/domain/event/schema";
 import { Suspense } from "react";
 import type { SubmissionStatus } from "@/domain/project/schema";
+import { FormatDate } from "@/libs/date";
 
 export const Route = createFileRoute("/_authenticated/$slug/")({
   loader: async ({ context }) => {
@@ -49,15 +50,6 @@ export const Route = createFileRoute("/_authenticated/$slug/")({
 });
 
 // --- Helper ---
-
-function formatDeadline(date: Date): string {
-  return new Intl.DateTimeFormat("ja-JP", {
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
-}
 
 function getDaysRemaining(date: Date): number {
   const now = new Date();
@@ -201,7 +193,15 @@ function DeadlineSection({ eventId }: { eventId: string }) {
                           deadline.fieldKey}
                       </Text>
                       <Text textStyle="xs" color="fg.muted">
-                        {formatDeadline(deadline.deadlineAt)}
+                        <FormatDate
+                          value={deadline.deadlineAt}
+                          option={{
+                            month: "long",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          }}
+                        />
                       </Text>
                     </Stack>
                     {isPast ? (
