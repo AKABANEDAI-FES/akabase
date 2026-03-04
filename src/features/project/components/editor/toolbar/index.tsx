@@ -18,15 +18,11 @@ type Props = {
 
 export function Toolbar({ className, maximized, toggleMaximize }: Props) {
   return (
-    <Grid className={className} gridTemplateColumns="1fr auto">
-      <ScrollArea.Root gap="2" overflowX="auto" size="xs">
+    <Grid className={className} gap="0" gridTemplateColumns="minmax(0, 1fr) auto 1fr">
+      <ScrollArea.Root overflowX="auto" size="xs" gridColumnStart="2">
         <ScrollArea.Viewport>
           <ScrollArea.Content>
-            <Flex
-              data-maximized={maximized}
-              gap="2"
-              css={{ "&[data-maximized=true]": { justifyContent: "center" } }}
-            >
+            <Flex gap="2">
               <ToolbarGroup>
                 <UndoRedoButton action="undo" />
                 <UndoRedoButton action="redo" />
@@ -75,7 +71,7 @@ export function Toolbar({ className, maximized, toggleMaximize }: Props) {
         <ScrollArea.Scrollbar orientation="horizontal" />
         <ScrollArea.Corner />
       </ScrollArea.Root>
-      <Box>
+      <Box gridColumnStart="3" justifySelf="end" pl="2">
         {toggleMaximize && (
           <IconButton size="xs" variant="plain" colorPalette="gray" onClick={toggleMaximize}>
             {maximized ? <Minimize2Icon /> : <Maximize2Icon />}
