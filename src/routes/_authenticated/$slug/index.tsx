@@ -240,8 +240,13 @@ function RecentActivitySection({ slug, eventId }: { slug: string; eventId: strin
               {activities.map((activity) => (
                 <Link
                   key={activity.actionId}
-                  to="/$slug/committee/submissions/$submissionId"
-                  params={{ slug, submissionId: activity.submissionId }}
+                  to="/$slug/orgs/$orgId/projects/$projectId/submissions/$submissionId"
+                  params={{
+                    slug,
+                    orgId: activity.orgId,
+                    projectId: activity.projectId,
+                    submissionId: activity.submissionId,
+                  }}
                   className={css({
                     display: "flex",
                     justifyContent: "space-between",
