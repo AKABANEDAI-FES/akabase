@@ -4,6 +4,7 @@ import { Container, Stack } from "styled-system/jsx";
 import { Button, Heading, SegmentGroup } from "@/components/ui";
 import { ArrowLeftIcon } from "lucide-react";
 import { generateLoadOrganizationDetailQueryOptions } from "@/features/organization/actions";
+import { handleNotFoundError } from "@/libs/error";
 
 export const Route = createFileRoute("/_authenticated/$slug/committee/organizations_/$orgId")({
   loader: async ({ params, context }) => {
@@ -13,6 +14,7 @@ export const Route = createFileRoute("/_authenticated/$slug/committee/organizati
     );
   },
   component: EditOrganizationPage,
+  onError: handleNotFoundError,
 });
 
 function EditOrganizationPage() {
