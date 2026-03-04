@@ -6,16 +6,18 @@ import type {
   UploadImageResult,
   UploadOptions,
 } from "@/domain/shared/storage";
+import { buildObjectKeyPrefix } from "@/domain/shared/storage";
 
 export class MockStorageService implements StorageService {
   private uploadedFiles = new Map<string, { id: string; objectKey: string }>();
 
   async uploadImage(
     _file: ArrayBuffer,
-    _options: UploadOptions,
+    options: UploadOptions,
   ): Promise<Result.Result<UploadImageResult, StorageError>> {
     const id = generateId();
-    const objectKey = `${id}.jpg`;
+    const prefix = buildObjectKeyPrefix(options.scope);
+    const objectKey = `${prefix}/${id}.jpg`;
 
     this.uploadedFiles.set(objectKey, { id, objectKey });
 
@@ -24,6 +26,15 @@ export class MockStorageService implements StorageService {
 
   async deleteImage(key: string): Promise<Result.Result<void, StorageError>> {
     this.uploadedFiles.delete(key);
+    return Result.succeed(undefined);
+  }
+
+  async moveImage(fromKey: string, toKey: string): Promise<Result.Result<void, StorageError>> {
+    const file = this.uploadedFiles.get(fromKey);
+    if (file) {
+      this.uploadedFiles.delete(fromKey);
+      this.uploadedFiles.set(toKey, { ...file, objectKey: toKey });
+    }
     return Result.succeed(undefined);
   }
 

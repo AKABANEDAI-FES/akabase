@@ -1,0 +1,1 @@
+ALTER TABLE `images` ADD `scope_type` text DEFAULT 'pending' NOT NULL;

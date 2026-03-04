@@ -8,6 +8,7 @@ import { createError } from "./errors";
 export const STORAGE_ERROR_CODE = {
   UPLOAD_FAILED: "UPLOAD_FAILED",
   DELETE_FAILED: "DELETE_FAILED",
+  MOVE_FAILED: "MOVE_FAILED",
   FILE_TOO_LARGE: "FILE_TOO_LARGE",
   INVALID_FILE_TYPE: "INVALID_FILE_TYPE",
   INVALID_INPUT: "INVALID_INPUT",
@@ -59,6 +60,13 @@ export interface StorageService {
   deleteImage(key: string): Promise<Result.Result<void, StorageError>>;
 
   /**
+   * Move image in R2 (copy + delete)
+   * @param fromKey - Source R2 object key
+   * @param toKey - Destination R2 object key
+   */
+  moveImage(fromKey: string, toKey: string): Promise<Result.Result<void, StorageError>>;
+
+  /**
    * Get public URL for an image
    * @param key - R2 object key
    * @returns Full public URL
@@ -66,8 +74,39 @@ export interface StorageService {
   getPublicUrl(key: string): string;
 }
 
+/**
+ * Image scope for objectKey prefix classification
+ */
+export type ImageScope =
+  | { type: "system" }
+  | { type: "event"; eventId: string }
+  | { type: "organization"; eventId: string; orgId: string }
+  | { type: "project"; eventId: string; projectId: string }
+  | { type: "pending" };
+
+export type ImageScopeType = ImageScope["type"];
+
+/**
+ * Build objectKey prefix from scope
+ */
+export function buildObjectKeyPrefix(scope: ImageScope): string {
+  switch (scope.type) {
+    case "system":
+      return "system";
+    case "event":
+      return `events/${scope.eventId}`;
+    case "organization":
+      return `events/${scope.eventId}/orgs/${scope.orgId}`;
+    case "project":
+      return `events/${scope.eventId}/projects/${scope.projectId}`;
+    case "pending":
+      return "pending";
+  }
+}
+
 export type UploadOptions = {
   contentType: string;
+  scope: ImageScope;
 };
 
 /**
@@ -90,4 +129,5 @@ export const STORAGE_ERROR_MESSAGES = {
   FILE_TOO_LARGE: "ファイルサイズが大きすぎます。最大2MBまで対応しています。",
   UPLOAD_FAILED: "画像のアップロードに失敗しました。",
   DELETE_FAILED: "画像の削除に失敗しました。",
+  MOVE_FAILED: "画像の移動に失敗しました。",
 } as const;

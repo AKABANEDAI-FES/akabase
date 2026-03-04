@@ -7,7 +7,12 @@ import type {
   UploadImageResult,
   UploadOptions,
 } from "@/domain/shared/storage";
-import { STORAGE_ERROR_CODE, STORAGE_ERROR_MESSAGES, storageError } from "@/domain/shared/storage";
+import {
+  STORAGE_ERROR_CODE,
+  STORAGE_ERROR_MESSAGES,
+  buildObjectKeyPrefix,
+  storageError,
+} from "@/domain/shared/storage";
 
 /**
  * R2 Storage Service Implementation
@@ -23,7 +28,8 @@ export class StorageServiceImpl implements StorageService {
     try {
       const uniqueId = generateId();
       const extension = this.getExtensionFromContentType(options.contentType);
-      const objectKey = `${uniqueId}${extension}`;
+      const prefix = buildObjectKeyPrefix(options.scope);
+      const objectKey = `${prefix}/${uniqueId}${extension}`;
 
       await env.STORAGE.put(objectKey, file, {
         httpMetadata: {
@@ -58,6 +64,29 @@ export class StorageServiceImpl implements StorageService {
    */
   getPublicUrl(key: string): string {
     return `/api/storage/${key}`;
+  }
+
+  /**
+   * Move image in R2 (copy + delete)
+   */
+  async moveImage(fromKey: string, toKey: string): Promise<Result.Result<void, StorageError>> {
+    try {
+      const obj = await env.STORAGE.get(fromKey);
+      if (!obj) {
+        return Result.fail(
+          storageError(STORAGE_ERROR_CODE.MOVE_FAILED, STORAGE_ERROR_MESSAGES.MOVE_FAILED),
+        );
+      }
+      await env.STORAGE.put(toKey, await obj.arrayBuffer(), {
+        httpMetadata: obj.httpMetadata,
+      });
+      await env.STORAGE.delete(fromKey);
+      return Result.succeed(undefined);
+    } catch (error) {
+      return Result.fail(
+        storageError(STORAGE_ERROR_CODE.MOVE_FAILED, STORAGE_ERROR_MESSAGES.MOVE_FAILED, error),
+      );
+    }
   }
 
   /**

@@ -143,6 +143,11 @@ export const images = sqliteTable("images", {
   objectKey: text("object_key").notNull().unique(),
   contentType: text("content_type").notNull(),
   size: integer("size").notNull(),
+  scopeType: text("scope_type", {
+    enum: ["system", "event", "organization", "project", "pending"],
+  })
+    .notNull()
+    .default("pending"),
   uploadedBy: text("uploaded_by")
     .notNull()
     .references(() => user.id),
