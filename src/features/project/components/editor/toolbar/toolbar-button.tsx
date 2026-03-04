@@ -1,9 +1,11 @@
 import type { IconButtonProps } from "@/components/ui";
 import { IconButton, Tooltip } from "@/components/ui";
+import type { TooltipRootProps } from "@ark-ui/react";
 
 export type ToolbarButtonProps = IconButtonProps & {
   label: string;
   isActive?: boolean;
+  ids?: TooltipRootProps["ids"];
 };
 
 /**
@@ -17,7 +19,7 @@ export function ToolbarButton({
   ...props
 }: ToolbarButtonProps) {
   return (
-    <Tooltip content={label} disabled={disabled} positioning={{ placement: "top" }}>
+    <Tooltip content={label} disabled={disabled} positioning={{ placement: "top" }} ids={props.ids}>
       <IconButton
         aria-pressed={isActive}
         disabled={disabled}

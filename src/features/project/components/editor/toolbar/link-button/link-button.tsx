@@ -1,4 +1,4 @@
-import { memo, useCallback, useRef, useState } from "react";
+import { memo, useCallback, useId, useRef, useState } from "react";
 import { Link2Icon } from "lucide-react";
 import { Portal } from "@ark-ui/react/portal";
 import { useEditorState } from "@tiptap/react";
@@ -27,6 +27,7 @@ export const LinkButton = memo<LinkButtonProps>(({ editor: providedEditor }) => 
   const [text, setText] = useState("");
   const [url, setUrl] = useState("");
   const savedSelectionRef = useRef<SavedSelection | null>(null);
+  const triggerId = useId();
 
   const isDisabled = !editor || !editor.isEditable;
 
@@ -187,9 +188,19 @@ export const LinkButton = memo<LinkButtonProps>(({ editor: providedEditor }) => 
   );
 
   return (
-    <Popover.Root open={open} onOpenChange={handleOpenChange} positioning={{ placement: "bottom" }}>
+    <Popover.Root
+      open={open}
+      onOpenChange={handleOpenChange}
+      positioning={{ placement: "bottom" }}
+      ids={{ trigger: triggerId }}
+    >
       <Popover.Trigger asChild>
-        <ToolbarButton label="リンク" disabled={isDisabled} isActive={isLinkActive}>
+        <ToolbarButton
+          label="リンク"
+          disabled={isDisabled}
+          isActive={isLinkActive}
+          ids={{ trigger: triggerId }}
+        >
           <Link2Icon />
         </ToolbarButton>
       </Popover.Trigger>
