@@ -38,6 +38,7 @@ CREATE TABLE `images` (
 	`object_key` text NOT NULL,
 	`content_type` text NOT NULL,
 	`size` integer NOT NULL,
+	`scope_type` text DEFAULT 'pending' NOT NULL,
 	`uploaded_by` text NOT NULL,
 	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	FOREIGN KEY (`uploaded_by`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE no action

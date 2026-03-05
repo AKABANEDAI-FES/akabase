@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "fc408b51-ce7e-47ca-b8c0-c88256cc7b1f",
+  "id": "ba5fc6ab-85c9-4877-a969-94b795f4e09d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "committee_roles": {
@@ -250,6 +250,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "scope_type": {
+          "name": "scope_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'pending'"
         },
         "uploaded_by": {
           "name": "uploaded_by",

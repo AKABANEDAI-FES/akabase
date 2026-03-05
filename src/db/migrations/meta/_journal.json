@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1772224531581,
-      "tag": "0000_polite_hulk",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1772654122604,
-      "tag": "0001_reflective_magus",
+      "when": 1772727769155,
+      "tag": "0000_slippery_black_panther",
       "breakpoints": true
     }
   ]
