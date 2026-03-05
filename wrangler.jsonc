@@ -11,7 +11,7 @@
     {
       "binding": "DB",
       "database_name": "archive",
-      "database_id": "c780e01f-3f3b-4b78-8697-04065e5d07a5",
+      "database_id": "923a490d-aba7-4e8a-a8c1-1db9db656f3b",
       "preview_database_id": "DB",
       "migrations_dir": "src/db/migrations",
     },
