@@ -1,12 +1,11 @@
 import { APIError, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { env } from "cloudflare:workers";
-import { tanstackStartCookies } from "better-auth/tanstack-start";
 import { admin } from "better-auth/plugins/admin";
 import { db } from "@/db";
 
 export const auth = betterAuth({
-  plugins: [admin(), tanstackStartCookies()],
+  plugins: [admin()],
   database: drizzleAdapter(db, {
     provider: "sqlite",
   }),
