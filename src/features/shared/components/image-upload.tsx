@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Icon, IconButton, Spinner, Text, toaster } from "@/components/ui";
 import { css } from "styled-system/css";
-import { UploadCloudIcon, XIcon } from "lucide-react";
+import { PencilIcon, UploadCloudIcon, XIcon } from "lucide-react";
 import { useUploadImageMutation } from "../actions/mutations";
 import type { AllowedImageType, ImageScope } from "@/domain/shared/storage";
 import {
@@ -10,6 +10,7 @@ import {
   STORAGE_ERROR_MESSAGES,
 } from "@/domain/shared/storage";
 import { Box } from "styled-system/jsx";
+import { ProcessImageDialog } from "./process-image-dialog";
 
 interface ImageUploadProps {
   currentImageUrl?: string | null;
@@ -169,6 +170,11 @@ export function ImageUpload({ currentImageUrl, onImageChange, disabled, scope }:
           >
             <XIcon />
           </IconButton>
+          <ProcessImageDialog imageUrl={previewUrl} onProcessed={validateAndUpload}>
+            <IconButton type="button" aria-label="画像を編集" size="2xs" colorPalette="gray">
+              <PencilIcon />
+            </IconButton>
+          </ProcessImageDialog>
         </Box>
       )}
       {uploadMutation.isPending && (
