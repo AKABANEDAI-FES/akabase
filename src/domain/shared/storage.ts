@@ -1,6 +1,7 @@
 import type { Result } from "@praha/byethrow";
 import type { BaseError } from "./errors";
 import { createError } from "./errors";
+import z from "zod";
 
 /**
  * Storage Error Types
@@ -77,12 +78,23 @@ export interface StorageService {
 /**
  * Image scope for objectKey prefix classification
  */
-export type ImageScope =
-  | { type: "system" }
-  | { type: "event"; eventId: string }
-  | { type: "organization"; eventId: string; orgId: string }
-  | { type: "project"; eventId: string; projectId: string }
-  | { type: "pending" };
+export const imageScopeSchema = z.discriminatedUnion("type", [
+  z.object({ type: z.literal("system") }),
+  z.object({ type: z.literal("event"), eventId: z.string() }),
+  z.object({
+    type: z.literal("organization"),
+    eventId: z.string(),
+    orgId: z.string(),
+  }),
+  z.object({
+    type: z.literal("project"),
+    eventId: z.string(),
+    projectId: z.string(),
+  }),
+  z.object({ type: z.literal("pending") }),
+]);
+
+export type ImageScope = z.infer<typeof imageScopeSchema>;
 
 export type ImageScopeType = ImageScope["type"];
 
