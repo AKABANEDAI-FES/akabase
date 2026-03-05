@@ -129,16 +129,16 @@ export const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"] as 
 export type AllowedImageType = (typeof ALLOWED_IMAGE_TYPES)[number];
 
 /**
- * Max file size: 2MB
+ * Max file size: 300KB (in bytes)
  */
-export const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB in bytes
+export const MAX_FILE_SIZE = 300 * 1024; // 300KB in bytes
 
 /**
  * Storage error messages
  */
 export const STORAGE_ERROR_MESSAGES = {
   INVALID_FILE_TYPE: "無効なファイル形式です。JPG、PNG、WebPのみ対応しています。",
-  FILE_TOO_LARGE: "ファイルサイズが大きすぎます。最大2MBまで対応しています。",
+  FILE_TOO_LARGE: "ファイルサイズが大きすぎます。最大300KBまで対応しています。",
   UPLOAD_FAILED: "画像のアップロードに失敗しました。",
   DELETE_FAILED: "画像の削除に失敗しました。",
   MOVE_FAILED: "画像の移動に失敗しました。",

@@ -25,7 +25,7 @@ export type UploadImageInput = {
  *
  * Business rules:
  * - Allowed types: JPEG, PNG, WebP
- * - Max size: 2MB
+ * - Max size: 300KB
  * - Returns image ID (primary key in images table)
  *
  * @param deps - Dependencies (storageService)

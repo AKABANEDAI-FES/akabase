@@ -592,7 +592,9 @@ function FileSizeIndicator({
       </Flex>
       {exceedsMax && (
         <Text textStyle="xs" color="error">
-          ファイルサイズが最大2MBを超えています
+          ファイルサイズが
+          <Format.Byte value={MAX_FILE_SIZE} />
+          を超えています
         </Text>
       )}
     </Stack>

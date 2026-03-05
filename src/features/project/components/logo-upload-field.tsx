@@ -1,6 +1,8 @@
 import { Field } from "@/components/ui";
+import { MAX_FILE_SIZE } from "@/domain/shared/storage";
 import type { ImageScope } from "@/domain/shared/storage";
 import { ImageUpload } from "@/features/shared/components/image-upload";
+import { Format } from "@ark-ui/react";
 
 interface LogoUploadFieldProps {
   currentLogoUrl?: string | null;
@@ -24,7 +26,11 @@ export function LogoUploadField({
         disabled={disabled}
         scope={scope}
       />
-      <Field.HelperText>JPEG、PNG、WebP形式、最大2MBまで</Field.HelperText>
+      <Field.HelperText>
+        JPEG、PNG、WebP形式、最大
+        <Format.Byte value={MAX_FILE_SIZE} />
+        まで
+      </Field.HelperText>
     </Field.Root>
   );
 }
