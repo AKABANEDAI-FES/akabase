@@ -1,3 +1,4 @@
+import { apiClient } from "@/api/client";
 import type { AllowedImageType, ImageScope } from "@/domain/shared/storage";
 import {
   ALLOWED_IMAGE_TYPES,
@@ -15,19 +16,17 @@ export async function uploadImage({ file, scope }: { file: File; scope: ImageSco
     throw new Error(STORAGE_ERROR_MESSAGES.INVALID_FILE_TYPE);
   }
 
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("scope", JSON.stringify(scope));
-
-  const response = await fetch("/api/storage/upload", {
-    method: "POST",
-    body: formData,
+  const response = await apiClient.storage.upload.$post({
+    form: {
+      file,
+      scope: JSON.stringify(scope),
+    },
   });
   if (!response.ok) {
-    const errorData = await response.json<{ message?: string }>();
+    const errorData = await response.json();
     throw new Error(errorData.message || STORAGE_ERROR_MESSAGES.UPLOAD_FAILED);
   }
-  const resultData = await response.json<{ imageId: string; url: string }>();
+  const resultData = await response.json();
   return resultData;
 }
 
