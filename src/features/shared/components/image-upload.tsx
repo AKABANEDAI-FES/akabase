@@ -11,6 +11,7 @@ import {
 } from "@/domain/shared/storage";
 import { Box } from "styled-system/jsx";
 import { ProcessImageDialog } from "./process-image-dialog";
+import type { ProcessedImageResult } from "./process-image-dialog";
 
 interface ImageUploadProps {
   currentImageUrl?: string | null;
@@ -107,9 +108,9 @@ export function ImageUpload({ currentImageUrl, onImageChange, disabled, scope }:
     }
   };
 
-  const handlePendingProcessed = (file: File) => {
+  const handlePendingProcessed = (result: ProcessedImageResult) => {
     clearPendingFile();
-    validateAndUpload(file);
+    validateAndUpload(result.file);
   };
 
   const handlePendingDialogChange = (details: { open: boolean }) => {
@@ -197,7 +198,10 @@ export function ImageUpload({ currentImageUrl, onImageChange, disabled, scope }:
           >
             <XIcon />
           </IconButton>
-          <ProcessImageDialog imageUrl={previewUrl} onProcessed={validateAndUpload}>
+          <ProcessImageDialog
+            imageUrl={previewUrl}
+            onProcessed={(result) => validateAndUpload(result.file)}
+          >
             <IconButton type="button" aria-label="画像を編集" size="2xs" colorPalette="gray">
               <PencilIcon />
             </IconButton>

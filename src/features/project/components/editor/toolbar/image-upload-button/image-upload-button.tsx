@@ -4,6 +4,7 @@ import { useTiptapEditor } from "../../hooks/use-tiptap-editor";
 import { ToolbarButton } from "../toolbar-button";
 import { useUploadImageMutation } from "@/features/shared/actions/mutations";
 import { ProcessImageDialog } from "@/features/shared/components/process-image-dialog";
+import type { ProcessedImageResult } from "@/features/shared/components/process-image-dialog";
 import { toaster } from "@/components/ui";
 import type { AllowedImageType, ImageScope } from "@/domain/shared/storage";
 import {
@@ -29,7 +30,7 @@ export const ImageUploadButton = memo<ImageUploadButtonProps>(
     const [pendingFileUrl, setPendingFileUrl] = useState<string | null>(null);
 
     const uploadFile = useCallback(
-      (file: File) => {
+      (file: File, dimensions?: { width: number; height: number }) => {
         if (!editor) return;
 
         if (!ALLOWED_IMAGE_TYPES.includes(file.type as AllowedImageType)) {
@@ -45,7 +46,17 @@ export const ImageUploadButton = memo<ImageUploadButtonProps>(
           { file, scope },
           {
             onSuccess: (result) => {
-              editor.chain().focus().setImage({ src: result.url }).run();
+              editor
+                .chain()
+                .focus()
+                .insertContent({
+                  type: "image",
+                  attrs: {
+                    src: result.url,
+                    ...dimensions,
+                  },
+                })
+                .run();
             },
             onError: (error) => {
               toaster.create({
@@ -65,7 +76,7 @@ export const ImageUploadButton = memo<ImageUploadButtonProps>(
     }, []);
 
     const handleInputChange = useCallback(
-      (e: React.ChangeEvent<HTMLInputElement>) => {
+      async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (inputRef.current) inputRef.current.value = "";
         if (!file) return;
@@ -75,7 +86,10 @@ export const ImageUploadButton = memo<ImageUploadButtonProps>(
           return;
         }
 
-        uploadFile(file);
+        const bitmap = await createImageBitmap(file);
+        const dimensions = { width: bitmap.width, height: bitmap.height };
+        bitmap.close();
+        uploadFile(file, dimensions);
       },
       [uploadFile],
     );
@@ -87,9 +101,9 @@ export const ImageUploadButton = memo<ImageUploadButtonProps>(
       }
     };
 
-    const handlePendingProcessed = (file: File) => {
+    const handlePendingProcessed = (result: ProcessedImageResult) => {
       clearPendingFile();
-      uploadFile(file);
+      uploadFile(result.file, { width: result.width, height: result.height });
     };
 
     const handlePendingDialogChange = (details: { open: boolean }) => {

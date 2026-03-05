@@ -38,9 +38,15 @@ type OutputFormat = NonNullable<ProcessImageOptions["compress"]>["format"];
 type ResizeOption = NonNullable<ProcessImageOptions["resize"]>;
 type CompressOption = NonNullable<ProcessImageOptions["compress"]>;
 
+export type ProcessedImageResult = {
+  file: File;
+  width: number;
+  height: number;
+};
+
 type Props = {
   imageUrl: string;
-  onProcessed: (file: File) => void;
+  onProcessed: (result: ProcessedImageResult) => void;
   children?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (details: { open: boolean }) => void;
@@ -460,7 +466,7 @@ function ProcessImageDialogContent({
   onProcessed,
 }: {
   imageUrl: string;
-  onProcessed: (file: File) => void;
+  onProcessed: (result: ProcessedImageResult) => void;
 }) {
   const dialog = useDialogContext();
 
@@ -482,7 +488,11 @@ function ProcessImageDialogContent({
       const file = new File([processedImage.blob], `image.${compressOption?.format}`, {
         type: `image/${compressOption?.format}`,
       });
-      onProcessed(file);
+      onProcessed({
+        file,
+        width: processedImage.meta.width,
+        height: processedImage.meta.height,
+      });
       dialog.setOpen(false);
     } catch {
       toaster.create({

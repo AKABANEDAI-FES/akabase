@@ -1,8 +1,8 @@
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
-import Image from "@tiptap/extension-image";
 import type { Extensions } from "@tiptap/react";
 import TextAlign from "@tiptap/extension-text-align";
+import { CustomImage } from "./extensions/image";
 
 /**
  * Tiptap editor extensions configuration
@@ -33,8 +33,8 @@ export const editorExtensions: Extensions = [
     types: ["paragraph", "heading"], // Allow text alignment for paragraphs and headings
   }),
 
-  // Image extension for inline image uploads
-  Image.configure({
+  // Image extension for inline image uploads (with width/height support)
+  CustomImage.configure({
     inline: false,
     allowBase64: false,
   }),
