@@ -22,7 +22,11 @@ export function SubmissionOverviewTab({ submission }: SubmissionOverviewTabProps
         </Card.Header>
         <Card.Body>
           <Text whiteSpace="pre-wrap">
-            {submission.pamphletText || <Text color="fg.muted">(未入力)</Text>}
+            {submission.pamphletText || (
+              <Text as="span" color="fg.muted">
+                (未入力)
+              </Text>
+            )}
           </Text>
         </Card.Body>
       </Card.Root>
