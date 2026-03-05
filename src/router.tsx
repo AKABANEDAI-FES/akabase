@@ -111,6 +111,7 @@ export const getRouter = () => {
       addOrgMemberForOrgModalMask,
     ],
     defaultPreload: "intent",
+    defaultPreloadDelay: 250,
     defaultNotFoundComponent: NotFound,
     defaultErrorComponent: ErrorComponent,
   });
