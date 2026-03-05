@@ -70,7 +70,7 @@ export function CommitteeRoleSelect({
       }}
       disabled={disabled || isPending}
       size="sm"
-      positioning={{ sameWidth: true }}
+      positioning={{ placement: "bottom-end" }}
     >
       <Select.Control>
         <Select.Trigger>

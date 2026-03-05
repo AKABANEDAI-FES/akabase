@@ -70,7 +70,7 @@ export function OrgMemberRoleSelect({
       }}
       disabled={isPending}
       size="sm"
-      positioning={{ sameWidth: true }}
+      positioning={{ placement: "bottom-end" }}
     >
       <Select.Control>
         <Select.Trigger>
