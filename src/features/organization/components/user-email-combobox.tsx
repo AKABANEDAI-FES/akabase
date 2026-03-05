@@ -6,6 +6,7 @@ import { generateLoadUsersForEventQueryOptions } from "@/features/user/actions/q
 import type { ComboboxInputValueChangeDetails, ComboboxValueChangeDetails } from "@ark-ui/react";
 import type { EventId } from "@/domain/shared/ids";
 import type { EmailFieldProps } from "./add-member-dialog";
+import { useEffect } from "react";
 
 interface UserEmailComboboxProps extends EmailFieldProps {
   eventId: EventId;
@@ -22,11 +23,15 @@ export function UserEmailCombobox({ eventId, value, onChange }: UserEmailCombobo
 
   const { contains } = useFilter({ sensitivity: "base" });
 
-  const { collection, filter } = useListCollection({
+  const { collection, filter, set } = useListCollection({
     initialItems: userItems,
     limit: 10,
     filter: contains,
   });
+
+  useEffect(() => {
+    set(userItems);
+  }, [userItems, set]);
 
   const handleInputChange = (details: ComboboxInputValueChangeDetails) => {
     filter(details.inputValue);
