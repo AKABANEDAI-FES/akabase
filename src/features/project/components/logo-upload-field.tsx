@@ -28,7 +28,7 @@ export function LogoUploadField({
       />
       <Field.HelperText>
         JPEG、PNG、WebP形式、最大
-        <Format.Byte value={MAX_FILE_SIZE} />
+        <Format.Byte value={MAX_FILE_SIZE} unitSystem="binary" />
         まで
       </Field.HelperText>
     </Field.Root>

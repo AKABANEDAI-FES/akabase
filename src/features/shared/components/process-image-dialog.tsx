@@ -576,14 +576,18 @@ function FileSizeIndicator({
     <Stack gap="0.5" flex="1" alignItems="flex-end">
       <Flex textStyle="xs" color="fg.muted" alignItems="center" gap="1">
         <Box whiteSpace="nowrap">
-          {original ? <Format.Byte value={original.size} /> : <SkeletonText noOfLines={1} w="8" />}
+          {original ? (
+            <Format.Byte value={original.size} unitSystem="binary" />
+          ) : (
+            <SkeletonText noOfLines={1} w="8" />
+          )}
         </Box>
         <Icon size="2xs">
           <ArrowRightIcon />
         </Icon>
         <Flex gap="1" whiteSpace="nowrap">
           {processed ? (
-            <Format.Byte value={processed.size} />
+            <Format.Byte value={processed.size} unitSystem="binary" />
           ) : (
             <SkeletonText w="16" noOfLines={1} />
           )}
@@ -593,7 +597,7 @@ function FileSizeIndicator({
       {exceedsMax && (
         <Text textStyle="xs" color="error">
           ファイルサイズが
-          <Format.Byte value={MAX_FILE_SIZE} />
+          <Format.Byte value={MAX_FILE_SIZE} unitSystem="binary" />
           を超えています
         </Text>
       )}
