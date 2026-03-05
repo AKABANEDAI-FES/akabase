@@ -23,6 +23,7 @@ const ACCEPT = ALLOWED_IMAGE_TYPES.join(",");
 
 export function ImageUpload({ currentImageUrl, onImageChange, disabled, scope }: ImageUploadProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentImageUrl ?? null);
+  const [pendingFileUrl, setPendingFileUrl] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const uploadMutation = useUploadImageMutation();
 
@@ -85,8 +86,34 @@ export function ImageUpload({ currentImageUrl, onImageChange, disabled, scope }:
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) validateAndUpload(file);
     if (inputRef.current) inputRef.current.value = "";
+    if (!file) return;
+
+    const needsProcessing =
+      file.size > MAX_FILE_SIZE || !ALLOWED_IMAGE_TYPES.includes(file.type as AllowedImageType);
+
+    if (needsProcessing) {
+      setPendingFileUrl(URL.createObjectURL(file));
+      return;
+    }
+
+    validateAndUpload(file);
+  };
+
+  const clearPendingFile = () => {
+    if (pendingFileUrl) {
+      URL.revokeObjectURL(pendingFileUrl);
+      setPendingFileUrl(null);
+    }
+  };
+
+  const handlePendingProcessed = (file: File) => {
+    clearPendingFile();
+    validateAndUpload(file);
+  };
+
+  const handlePendingDialogChange = (details: { open: boolean }) => {
+    if (!details.open) clearPendingFile();
   };
 
   const handleRemove = () => {
@@ -188,6 +215,14 @@ export function ImageUpload({ currentImageUrl, onImageChange, disabled, scope }:
         >
           <Spinner size="lg" color="gray.1" />
         </Box>
+      )}
+      {pendingFileUrl && (
+        <ProcessImageDialog
+          imageUrl={pendingFileUrl}
+          onProcessed={handlePendingProcessed}
+          open={!!pendingFileUrl}
+          onOpenChange={handlePendingDialogChange}
+        />
       )}
     </Box>
   );

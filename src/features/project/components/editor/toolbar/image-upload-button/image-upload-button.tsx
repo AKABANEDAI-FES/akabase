@@ -1,8 +1,9 @@
-import { memo, useCallback, useRef } from "react";
+import { memo, useCallback, useRef, useState } from "react";
 import { ImageIcon, LoaderCircleIcon } from "lucide-react";
 import { useTiptapEditor } from "../../hooks/use-tiptap-editor";
 import { ToolbarButton } from "../toolbar-button";
 import { useUploadImageMutation } from "@/features/shared/actions/mutations";
+import { ProcessImageDialog } from "@/features/shared/components/process-image-dialog";
 import { toaster } from "@/components/ui";
 import type { AllowedImageType, ImageScope } from "@/domain/shared/storage";
 import {
@@ -25,19 +26,11 @@ export const ImageUploadButton = memo<ImageUploadButtonProps>(
     const { editor } = useTiptapEditor(providedEditor);
     const inputRef = useRef<HTMLInputElement>(null);
     const uploadMutation = useUploadImageMutation();
+    const [pendingFileUrl, setPendingFileUrl] = useState<string | null>(null);
 
-    const handleUpload = useCallback(
+    const uploadFile = useCallback(
       (file: File) => {
         if (!editor) return;
-
-        if (file.size > MAX_FILE_SIZE) {
-          toaster.create({
-            type: "error",
-            title: "ファイルサイズエラー",
-            description: STORAGE_ERROR_MESSAGES.FILE_TOO_LARGE,
-          });
-          return;
-        }
 
         if (!ALLOWED_IMAGE_TYPES.includes(file.type as AllowedImageType)) {
           toaster.create({
@@ -74,11 +67,34 @@ export const ImageUploadButton = memo<ImageUploadButtonProps>(
     const handleInputChange = useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file) handleUpload(file);
         if (inputRef.current) inputRef.current.value = "";
+        if (!file) return;
+
+        if (file.size > MAX_FILE_SIZE) {
+          setPendingFileUrl(URL.createObjectURL(file));
+          return;
+        }
+
+        uploadFile(file);
       },
-      [handleUpload],
+      [uploadFile],
     );
+
+    const clearPendingFile = () => {
+      if (pendingFileUrl) {
+        URL.revokeObjectURL(pendingFileUrl);
+        setPendingFileUrl(null);
+      }
+    };
+
+    const handlePendingProcessed = (file: File) => {
+      clearPendingFile();
+      uploadFile(file);
+    };
+
+    const handlePendingDialogChange = (details: { open: boolean }) => {
+      if (!details.open) clearPendingFile();
+    };
 
     const isDisabled = !editor || !editor.isEditable || uploadMutation.isPending;
 
@@ -96,6 +112,14 @@ export const ImageUploadButton = memo<ImageUploadButtonProps>(
           tabIndex={-1}
           aria-hidden="true"
         />
+        {pendingFileUrl && (
+          <ProcessImageDialog
+            imageUrl={pendingFileUrl}
+            onProcessed={handlePendingProcessed}
+            open={!!pendingFileUrl}
+            onOpenChange={handlePendingDialogChange}
+          />
+        )}
       </>
     );
   },
