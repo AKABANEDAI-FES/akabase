@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Spinner, toaster } from "@/components/ui";
-import { css, cx } from "styled-system/css";
+import { Icon, IconButton, Spinner, Text, toaster } from "@/components/ui";
+import { css } from "styled-system/css";
 import { UploadCloudIcon, XIcon } from "lucide-react";
 import { useUploadImageMutation } from "../actions/mutations";
 import type { AllowedImageType, ImageScope } from "@/domain/shared/storage";
@@ -9,6 +9,7 @@ import {
   MAX_FILE_SIZE,
   STORAGE_ERROR_MESSAGES,
 } from "@/domain/shared/storage";
+import { Box } from "styled-system/jsx";
 
 interface ImageUploadProps {
   currentImageUrl?: string | null;
@@ -87,10 +88,8 @@ export function ImageUpload({ currentImageUrl, onImageChange, disabled, scope }:
     if (inputRef.current) inputRef.current.value = "";
   };
 
-  const handleRemove = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleRemove = () => {
     if (isDisabled) return;
-    // Revoke blob URL before removing
     if (previewUrl?.startsWith("blob:")) {
       URL.revokeObjectURL(previewUrl);
     }
@@ -108,164 +107,82 @@ export function ImageUpload({ currentImageUrl, onImageChange, disabled, scope }:
   }, [previewUrl]);
 
   return (
-    <div className={wrapperStyle}>
-      <div
-        className={cx(uploadAreaStyle, hasImage && hasImageStyle, isDisabled && disabledStyle)}
-        onClick={handleClick}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            handleClick();
-          }
-        }}
-        role={hasImage ? undefined : "button"}
-        tabIndex={isDisabled || hasImage ? -1 : 0}
-        aria-label={hasImage ? undefined : "画像をアップロード"}
-      >
-        <input
-          ref={inputRef}
-          type="file"
-          accept={ACCEPT}
-          onChange={handleInputChange}
-          className={hiddenInputStyle}
-          disabled={isDisabled}
-          aria-hidden="true"
-          tabIndex={-1}
+    <Box display="inline-grid" position="relative" boxSize="36" rounded="l3" overflow="hidden">
+      <input
+        ref={inputRef}
+        type="file"
+        accept={ACCEPT}
+        onChange={handleInputChange}
+        className={css({ display: "none" })}
+        disabled={isDisabled}
+        aria-hidden="true"
+        tabIndex={-1}
+      />
+      {hasImage ? (
+        <img
+          src={previewUrl ?? undefined}
+          alt="プレビュー"
+          className={css({
+            boxSize: "full",
+            objectFit: "contain",
+          })}
         />
-
-        {hasImage ? (
-          <>
-            <img src={previewUrl} alt="プレビュー" className={previewImageStyle} />
-            {!isDisabled && (
-              <button
-                type="button"
-                onClick={handleRemove}
-                className={clearButtonStyle}
-                aria-label="画像をクリア"
-              >
-                <XIcon size={14} />
-              </button>
-            )}
-          </>
-        ) : (
-          <div className={placeholderStyle}>
-            <UploadCloudIcon size={28} className={placeholderIconStyle} />
-            <span className={placeholderTextStyle}>クリックして選択</span>
-          </div>
-        )}
-
-        {uploadMutation.isPending && (
-          <div className={loadingOverlayStyle}>
-            <Spinner size="lg" />
-          </div>
-        )}
-      </div>
-    </div>
+      ) : (
+        <button
+          type="button"
+          className={css({
+            display: "grid",
+            placeItems: "center",
+            placeContent: "center",
+            gap: "1.5",
+            boxSize: "full",
+            borderWidth: "1px",
+            borderStyle: "dashed",
+            borderColor: "gray.surface.border",
+            rounded: "l3",
+            bg: "gray.surface.bg",
+            cursor: "pointer",
+            transition: "colors",
+            _hover: {
+              bg: "gray.surface.bg.hover",
+            },
+          })}
+          onClick={handleClick}
+          disabled={isDisabled}
+        >
+          <Icon boxSize="8" color="fg.muted">
+            <UploadCloudIcon />
+          </Icon>
+          <Text as="span" textStyle="xs" color="fg.muted">
+            クリックして選択
+          </Text>
+        </button>
+      )}
+      {hasImage && !isDisabled && (
+        <Box position="absolute" top="1" right="1" display="grid" gap="1" zIndex="1">
+          <IconButton
+            type="button"
+            onClick={handleRemove}
+            aria-label="画像をクリア"
+            size="2xs"
+            colorPalette="gray"
+          >
+            <XIcon />
+          </IconButton>
+        </Box>
+      )}
+      {uploadMutation.isPending && (
+        <Box
+          position="absolute"
+          inset="0"
+          display="grid"
+          placeItems="center"
+          bg="gray.a9"
+          zIndex="10"
+        >
+          <Spinner size="lg" color="gray.1" />
+        </Box>
+      )}
+    </Box>
   );
 }
-
-const wrapperStyle = css({
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "flex-start",
-  gap: "1.5",
-});
-
-const uploadAreaStyle = css({
-  position: "relative",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "36",
-  height: "36",
-  borderRadius: "l3",
-  borderWidth: "1px",
-  borderStyle: "dashed",
-  borderColor: "gray.surface.border",
-  cursor: "pointer",
-  overflow: "hidden",
-  transition: "backgrounds",
-  bg: "gray.surface.bg",
-  _hover: {
-    bg: "gray.surface.bg.hover",
-  },
-  focusVisibleRing: "outside",
-});
-
-const hasImageStyle = css({
-  borderStyle: "solid",
-  bg: "gray.surface.bg",
-  cursor: "default",
-  _hover: {
-    bg: "gray.surface.bg",
-  },
-});
-
-const disabledStyle = css({
-  layerStyle: "disabled",
-  cursor: "not-allowed",
-  _hover: {
-    bg: "gray.surface.bg",
-  },
-});
-
-const hiddenInputStyle = css({
-  srOnly: true,
-});
-
-const previewImageStyle = css({
-  width: "100%",
-  height: "100%",
-  objectFit: "contain",
-});
-
-const clearButtonStyle = css({
-  position: "absolute",
-  top: "1",
-  right: "1",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "6",
-  height: "6",
-  borderRadius: "full",
-  bg: "black.a9",
-  color: "white",
-  border: "none",
-  cursor: "pointer",
-  transition: "backgrounds",
-  zIndex: 1,
-  _hover: {
-    bg: "black.a11",
-  },
-});
-
-const placeholderStyle = css({
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  gap: "1.5",
-  padding: "4",
-  textAlign: "center",
-});
-
-const placeholderIconStyle = css({
-  color: "fg.subtle",
-});
-
-const placeholderTextStyle = css({
-  fontSize: "xs",
-  color: "fg.muted",
-  lineHeight: "tight",
-});
-
-const loadingOverlayStyle = css({
-  position: "absolute",
-  inset: 0,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  bg: "white.a9",
-  borderRadius: "l3",
-  zIndex: 10,
-});
