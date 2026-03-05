@@ -1,3 +1,5 @@
+import { numberInput } from "./number-input";
+import { slider } from "./slider";
 import { skeleton } from "./skeleton";
 import { drawer } from "./drawer";
 import { scrollArea } from "./scroll-area";
@@ -65,5 +67,7 @@ export const recipes = {
   scrollArea,
   drawer,
   skeleton,
+  slider,
+  numberInput,
 };
 export const slotRecipes = {};

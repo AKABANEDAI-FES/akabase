@@ -19,6 +19,7 @@ export { IconButton, type IconButtonProps } from "./icon-button";
 export { Input, type InputProps } from "./input";
 export { Loader, type LoaderProps } from "./loader";
 export * as Menu from "./menu";
+export * as NumberInput from "./number-input";
 export * as Pagination from "./pagination";
 export * as Popover from "./popover";
 export * as ScrollArea from "./scroll-area";
@@ -32,6 +33,7 @@ export {
   type SkeletonProps,
   type SkeletonTextProps,
 } from "./skeleton";
+export * as Slider from "./slider";
 export { Span, type SpanProps } from "./span";
 export { Spinner, type SpinnerProps } from "./spinner";
 export * as Table from "./table";
