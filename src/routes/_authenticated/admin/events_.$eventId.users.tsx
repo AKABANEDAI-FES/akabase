@@ -5,7 +5,7 @@ import { EventUsersTable } from "@/features/user/components";
 import type { EventId } from "@/domain/shared/ids";
 import { cast } from "@/domain/shared/ids";
 
-export const Route = createFileRoute("/admin/events_/$eventId/users")({
+export const Route = createFileRoute("/_authenticated/admin/events_/$eventId/users")({
   loader: async ({ params, context }) => {
     const eventId = params.eventId;
     await context.queryClient.ensureQueryData(generateLoadUsersForEventQueryOptions(eventId));

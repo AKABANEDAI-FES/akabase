@@ -7,7 +7,7 @@ import { generateLoadEventsQueryOptions } from "@/features/event/actions";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { FormatDate } from "@/libs/date";
 
-export const Route = createFileRoute("/admin/events")({
+export const Route = createFileRoute("/_authenticated/admin/events")({
   loader: async ({ context }) =>
     context.queryClient.ensureQueryData(generateLoadEventsQueryOptions()),
   component: EventListPage,

@@ -3,25 +3,10 @@ import { Stack } from "styled-system/jsx";
 import { CalendarIcon, UsersIcon } from "lucide-react";
 import { NavLink, SidebarLayout } from "@/components/sidebar-layout";
 
-/**
- * Admin route guard and layout
- * Ensures only users with admin role can access /admin routes
- * Provides navigation menu for admin pages
- */
-export const Route = createFileRoute("/admin")({
-  beforeLoad: async ({ context, location }) => {
-    // Check if user is authenticated
-    if (!context.session) {
-      throw redirect({
-        to: "/login",
-        search: {
-          redirect: location.href,
-        },
-      });
-    }
-
+export const Route = createFileRoute("/_authenticated/admin")({
+  beforeLoad: async ({ context }) => {
     // Check if user has admin role
-    if (context.session.user.role !== "admin") {
+    if (context.session?.user.role !== "admin") {
       throw redirect({
         to: "/",
       });

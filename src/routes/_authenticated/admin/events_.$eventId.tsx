@@ -5,7 +5,7 @@ import { Button, Heading, SegmentGroup } from "@/components/ui";
 import { Container, Stack } from "styled-system/jsx";
 import { ArrowLeftIcon } from "lucide-react";
 
-export const Route = createFileRoute("/admin/events_/$eventId")({
+export const Route = createFileRoute("/_authenticated/admin/events_/$eventId")({
   loader: async ({ params, context }) =>
     context.queryClient.ensureQueryData(generateLoadEventDetailQueryOptions(params.eventId)),
   component: RouteComponent,

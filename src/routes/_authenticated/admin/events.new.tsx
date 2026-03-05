@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { CreateEventDialog } from "@/features/event/components";
 
-export const Route = createFileRoute("/admin/events/new")({
+export const Route = createFileRoute("/_authenticated/admin/events/new")({
   component: CreateEventPage,
 });
 

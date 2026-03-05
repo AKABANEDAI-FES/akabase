@@ -7,7 +7,7 @@ import { generateLoadEventDetailQueryOptions } from "@/features/event/actions";
 import { Stack } from "styled-system/jsx";
 import { UpdateEventForm } from "@/features/event/components/update-event-form";
 
-export const Route = createFileRoute("/admin/events_/$eventId/")({
+export const Route = createFileRoute("/_authenticated/admin/events_/$eventId/")({
   component: EditEventPage,
 });
 

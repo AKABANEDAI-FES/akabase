@@ -6,7 +6,7 @@ import { Code, Heading, Table } from "@/components/ui";
 import { Container, Flex, Stack } from "styled-system/jsx";
 import { FormatDate } from "@/libs/date";
 
-export const Route = createFileRoute("/admin/users")({
+export const Route = createFileRoute("/_authenticated/admin/users")({
   loader: async ({ context }) =>
     context.queryClient.ensureQueryData(generateLoadUsersWithRolesQueryOptions()),
   component: UserListPage,

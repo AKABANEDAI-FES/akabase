@@ -4,7 +4,7 @@ import { CalendarDaysIcon, CalendarOffIcon } from "lucide-react";
 import { css } from "styled-system/css";
 import { Grid } from "styled-system/jsx";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/")({
   beforeLoad: async ({ context }) => {
     const recentActiveEvent = await context.queryClient.ensureQueryData(
       generateLoadRecentActiveEventQueryOptions(),
