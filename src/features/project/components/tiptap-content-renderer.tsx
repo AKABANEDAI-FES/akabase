@@ -1,9 +1,10 @@
 import { generateHTML } from "@tiptap/core";
-import { useMemo } from "react";
+import { useSyncExternalStore } from "react";
 import { Box } from "styled-system/jsx";
 import { richTextEditor } from "styled-system/recipes";
 import { editorExtensions } from "./editor/extensions";
 import { cx } from "styled-system/css";
+import { Spinner } from "@/components/ui";
 
 interface TipTapContentRendererProps {
   content: unknown | null;
@@ -15,26 +16,37 @@ interface TipTapContentRendererProps {
  * Uses the same extensions as the editor to ensure consistent rendering
  */
 export function TipTapContentRenderer({ content, className }: TipTapContentRendererProps) {
-  const html = useMemo(() => {
-    if (!content) return null;
-
-    try {
-      return generateHTML(content, editorExtensions);
-    } catch (error) {
-      console.error("Failed to render TipTap content:", error);
-      return null;
-    }
-  }, [content]);
+  const Generator = useContentGenerator();
 
   const classes = richTextEditor();
 
-  if (!html) {
-    return <Box color="fg.muted">未設定</Box>;
-  }
-
   return (
     <Box className={cx(classes.content, className)}>
-      <div className="ProseMirror" dangerouslySetInnerHTML={{ __html: html }} />
+      <Generator content={content} />
     </Box>
+  );
+}
+
+type ContentGenerator = ({ content }: { content: unknown | null }) => React.ReactNode;
+const noop = () => () => {};
+const GenerateNode: ContentGenerator = ({ content }) => {
+  if (!content) return <Box color="fg.muted">未設定</Box>;
+  try {
+    const html = generateHTML(content, editorExtensions);
+    return <Box className="ProseMirror" dangerouslySetInnerHTML={{ __html: html }} />;
+  } catch (error) {
+    console.error("Failed to render TipTap content:", error);
+    return <Box color="error">コンテンツの表示に失敗しました</Box>;
+  }
+};
+const PlaceholderNode = () => {
+  return <Spinner mx="auto" size="lg" />;
+};
+
+function useContentGenerator() {
+  return useSyncExternalStore<ContentGenerator>(
+    noop,
+    () => GenerateNode,
+    () => PlaceholderNode,
   );
 }
