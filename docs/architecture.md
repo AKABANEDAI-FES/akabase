@@ -712,8 +712,6 @@ export const projectSubmissionSchema = z.object({
   webContentJson: z.json().nullable(),
   submittedAt: z.date(),
   submittedBy: userIdSchema,
-  decidedAt: z.date().nullable(),
-  decidedBy: userIdSchema.nullable(),
 });
 export type ProjectSubmission = z.infer<typeof projectSubmissionSchema>;
 
@@ -1195,7 +1193,7 @@ export function projectResource(
    → 権限がなければ AuthorizationError を返す
 ```
 
-詳細は [docs/design/admin.md](./design/admin.md) を参照。
+詳細は `src/domain/authorization/` を参照。
 
 ---
 
@@ -1262,15 +1260,9 @@ describe("createEvent", () => {
 
 ## 参考資料
 
-### 内部ドキュメント
+### プロジェクト内
 
-- [要件定義書](./requirements.md)
-- [基本設計書](./design.md)
-- [管理者権限設計書](./design/admin.md)
-- [CLAUDE.md](../CLAUDE.md)
-
-### データベース
-
+- [README](../README.md)
 - [スキーマ定義](../src/db/schema.ts)
 - [認証スキーマ](../src/db/auth-schema.ts)
 
