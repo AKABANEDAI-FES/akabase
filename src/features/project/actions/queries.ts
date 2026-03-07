@@ -10,6 +10,7 @@ import { listEventSubmissions } from "@/application/query/project/list-event-sub
 import { getSubmissionDetail } from "@/application/query/project/get-submission-detail";
 import { getSubmissionStats } from "@/application/query/project/get-submission-stats";
 import { listRecentActivities } from "@/application/query/project/list-recent-activities";
+import { listEventPublishedData } from "@/application/query/project/list-event-published-data";
 import { resolveActor } from "@/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/session-server";
 import {
@@ -342,5 +343,31 @@ export function generateLoadRecentActivitiesQueryOptions(eventId: string) {
   return queryOptions({
     queryKey: generateLoadRecentActivitiesCacheKey(eventId),
     queryFn: () => loadRecentActivitiesFn({ data: { eventId } }),
+  });
+}
+
+/**
+ * Server function to load all published data for an event (for export)
+ */
+export const loadEventPublishedDataFn = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
+  .inputValidator(z.object({ eventId: eventIdSchema }))
+  .handler(async ({ data, context }) => {
+    const actor = await resolveActor(dependencies, {
+      userId: cast<UserId>(context.session.user.id),
+      eventIds: [data.eventId],
+    });
+
+    return await listEventPublishedData(dependencies, data.eventId, actor);
+  });
+
+export function generateLoadEventPublishedDataCacheKey(eventId: string) {
+  return ["published-data", "for-event", eventId];
+}
+
+export function generateLoadEventPublishedDataQueryOptions(eventId: string) {
+  return queryOptions({
+    queryKey: generateLoadEventPublishedDataCacheKey(eventId),
+    queryFn: () => loadEventPublishedDataFn({ data: { eventId } }),
   });
 }

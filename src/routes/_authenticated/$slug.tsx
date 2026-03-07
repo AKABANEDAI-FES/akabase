@@ -3,6 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import {
   Building2Icon,
   CalendarClockIcon,
+  DownloadIcon,
   FileClockIcon,
   HomeIcon,
   MapPinIcon,
@@ -91,6 +92,12 @@ function SlugLayout() {
             <Link to="/$slug/committee/submissions" params={{ slug }}>
               <FileClockIcon />
               提出一覧
+            </Link>
+          </NavLink>
+          <NavLink>
+            <Link to="/$slug/committee/export" params={{ slug }}>
+              <DownloadIcon />
+              データエクスポート
             </Link>
           </NavLink>
         </NavSection>
