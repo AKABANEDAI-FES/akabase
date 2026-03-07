@@ -87,11 +87,9 @@ export async function listEventPublishedData(
           pamphletText: row.published!.pamphletText,
           placeId: row.placeId,
           placeName: row.place?.name ?? null,
-          logoUrl: row.logoImage
-            ? deps.storageService.getPublicUrl(row.logoImage.objectKey)
-            : null,
+          logoUrl: row.logoImage ? deps.storageService.getPublicUrl(row.logoImage.objectKey) : null,
           tags: row
-            .published!.tags.sort((a, b) => a.tag.displayOrder - b.tag.displayOrder)
+            .published.tags.sort((a, b) => a.tag.displayOrder - b.tag.displayOrder)
             .map((t) => t.tag.name),
         }),
       );
