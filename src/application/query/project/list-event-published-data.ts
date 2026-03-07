@@ -19,6 +19,7 @@ export const eventPublishedDataItemSchema = z.object({
   pamphletText: z.string(),
   placeId: placeIdSchema.nullable(),
   placeName: z.string().nullable(),
+  logoUrl: z.string().nullable(),
   tags: z.array(z.string()),
 });
 
@@ -36,7 +37,7 @@ export type EventPublishedDataItem = z.infer<typeof eventPublishedDataItemSchema
  * @throws {QueryException} When database operation fails or authorization is denied
  */
 export async function listEventPublishedData(
-  deps: Pick<Dependencies, "db" | "authService">,
+  deps: Pick<Dependencies, "db" | "authService" | "storageService">,
   eventId: EventId,
   actor: Actor,
 ): Promise<EventPublishedDataItem[]> {
@@ -58,6 +59,9 @@ export async function listEventPublishedData(
         },
         place: {
           columns: { name: true },
+        },
+        logoImage: {
+          columns: { objectKey: true },
         },
         published: {
           with: {
@@ -83,6 +87,9 @@ export async function listEventPublishedData(
           pamphletText: row.published!.pamphletText,
           placeId: row.placeId,
           placeName: row.place?.name ?? null,
+          logoUrl: row.logoImage
+            ? deps.storageService.getPublicUrl(row.logoImage.objectKey)
+            : null,
           tags: row
             .published!.tags.sort((a, b) => a.tag.displayOrder - b.tag.displayOrder)
             .map((t) => t.tag.name),

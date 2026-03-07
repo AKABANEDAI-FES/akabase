@@ -10,7 +10,7 @@ import {
 import type { ColumnFiltersState } from "@tanstack/react-table";
 import { DownloadTrigger } from "@ark-ui/react/download-trigger";
 import { Portal } from "@ark-ui/react/portal";
-import { DownloadIcon, ListFilterIcon } from "lucide-react";
+import { BracesIcon, ListFilterIcon, SheetIcon, TableIcon } from "lucide-react";
 import { Flex, Stack } from "styled-system/jsx";
 import { Button, Checkbox, IconButton, Popover, Table, Text } from "@/components/ui";
 import { generateLoadEventPublishedDataQueryOptions } from "@/features/project/actions/queries";
@@ -18,6 +18,7 @@ import { generateLoadPlacesQueryOptions } from "@/features/event/actions/queries
 import type { EventPublishedDataItem } from "@/application/query/project/list-event-published-data";
 import type { PlaceListItem } from "@/application/query/event/list-places";
 import type { EventId } from "@/domain/shared/ids";
+import { createImageObject, processImage } from "@/libs/image";
 
 // --- Place hierarchy helpers ---
 
@@ -55,6 +56,14 @@ function getLeafNodeIds(node: PlaceTreeNode): string[] {
 const columnHelper = createColumnHelper<EventPublishedDataItem>();
 
 const columns = [
+  columnHelper.accessor("logoUrl", {
+    header: "ロゴ",
+    cell: (info) => {
+      const url = info.getValue();
+      if (!url) return "—";
+      return <img src={url} alt="" width={256} height={256} style={{ objectFit: "contain" }} />;
+    },
+  }),
   columnHelper.accessor("projectName", {
     header: "企画名",
     cell: (info) => info.getValue(),
@@ -85,18 +94,49 @@ const columns = [
 
 // --- CSV/JSON/Excel download helpers ---
 
+async function fetchImageBuffer(url: string): Promise<Uint8Array | null> {
+  try {
+    const res = await createImageObject(url);
+    let buffer: ArrayBuffer;
+    if (res.meta.type === "image/webp") {
+      // Convert WebP to PNG for better compatibility in Excel
+      const processed = await processImage(res, { compress: { format: "png", quality: 1 } });
+      buffer = await processed.blob.arrayBuffer();
+    } else {
+      buffer = await res.blob.arrayBuffer();
+    }
+    return new Uint8Array(buffer);
+  } catch {
+    return null;
+  }
+}
+
+const LOGO_COL = 5;
+const LOGO_SIZE_PX = 128;
+
 async function toExcel(data: EventPublishedDataItem[]): Promise<Blob> {
-  const { default: xlsxInit, Format, Workbook } = await import("wasm-xlsxwriter/web");
+  const {
+    default: xlsxInit,
+    Format,
+    Workbook,
+    Image: XlsxImage,
+  } = await import("wasm-xlsxwriter/web");
   await xlsxInit();
+
+  // Fetch all logo images in parallel
+  const imageBuffers = await Promise.all(
+    data.map((item) => (item.logoUrl ? fetchImageBuffer(item.logoUrl) : Promise.resolve(null))),
+  );
 
   const workbook = new Workbook();
   const worksheet = workbook.addWorksheet();
   const boldFormat = new Format().setBold();
 
-  const headers = ["企画名", "出展団体名", "パンフレットテキスト", "場所", "タグ"];
+  const headers = ["企画名", "出展団体名", "パンフレットテキスト", "場所", "タグ", "ロゴ"];
   for (let col = 0; col < headers.length; col++) {
     worksheet.writeWithFormat(0, col, headers[col], boldFormat);
   }
+  worksheet.setColumnWidthPixels(LOGO_COL, LOGO_SIZE_PX + 8);
 
   for (let row = 0; row < data.length; row++) {
     const item = data[row];
@@ -105,13 +145,24 @@ async function toExcel(data: EventPublishedDataItem[]): Promise<Blob> {
     worksheet.write(row + 1, 2, item.pamphletText);
     worksheet.write(row + 1, 3, item.placeName ?? "");
     worksheet.write(row + 1, 4, item.tags.join(", "));
+
+    const buf = imageBuffers[row];
+    if (buf) {
+      const image = new XlsxImage(buf).setScaleToSize(LOGO_SIZE_PX, LOGO_SIZE_PX, true);
+      worksheet.setRowHeightPixels(row + 1, LOGO_SIZE_PX + 4);
+      worksheet.insertImageFitToCell(row + 1, LOGO_COL, image, true);
+    }
   }
 
-  const buf = workbook.saveToBufferSync();
-  const array = new Uint8Array(buf);
+  const resultBuf = workbook.saveToBufferSync();
+  const array = new Uint8Array(resultBuf);
   return new Blob([array], {
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   });
+}
+
+function toAbsoluteUrl(path: string): string {
+  return `${window.location.origin}${path}`;
 }
 
 function escapeCSVField(value: string): string {
@@ -122,13 +173,14 @@ function escapeCSVField(value: string): string {
 }
 
 function toCSV(data: EventPublishedDataItem[]): string {
-  const header = ["企画名", "出展団体名", "パンフレットテキスト", "場所", "タグ"];
+  const header = ["企画名", "出展団体名", "パンフレットテキスト", "場所", "タグ", "ロゴURL"];
   const rows = data.map((item) => [
     escapeCSVField(item.projectName),
     escapeCSVField(item.orgName),
     escapeCSVField(item.pamphletText),
     escapeCSVField(item.placeName ?? ""),
     escapeCSVField(item.tags.join(", ")),
+    escapeCSVField(item.logoUrl ? toAbsoluteUrl(item.logoUrl) : ""),
   ]);
   return [header.map(escapeCSVField).join(","), ...rows.map((r) => r.join(","))].join("\n");
 }
@@ -278,7 +330,7 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
           asChild
         >
           <Button size="sm" variant="outline" disabled={filteredData.length === 0}>
-            <DownloadIcon />
+            <TableIcon />
             CSV
           </Button>
         </DownloadTrigger>
@@ -289,20 +341,23 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
           asChild
         >
           <Button size="sm" variant="outline" disabled={filteredData.length === 0}>
-            <DownloadIcon />
+            <SheetIcon />
             Excel
           </Button>
         </DownloadTrigger>
         <DownloadTrigger
           data={() =>
             JSON.stringify(
-              filteredData.map(({ projectName, orgName, pamphletText, placeName, tags }) => ({
-                projectName,
-                orgName,
-                pamphletText,
-                placeName,
-                tags,
-              })),
+              filteredData.map(
+                ({ projectName, orgName, pamphletText, placeName, tags, logoUrl }) => ({
+                  projectName,
+                  orgName,
+                  pamphletText,
+                  placeName,
+                  tags,
+                  logoUrl: logoUrl ? toAbsoluteUrl(logoUrl) : null,
+                }),
+              ),
               null,
               2,
             )
@@ -312,7 +367,7 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
           asChild
         >
           <Button size="sm" variant="outline" disabled={filteredData.length === 0}>
-            <DownloadIcon />
+            <BracesIcon />
             JSON
           </Button>
         </DownloadTrigger>
