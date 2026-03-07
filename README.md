@@ -14,18 +14,18 @@
 
 ## 技術スタック
 
-| カテゴリ | 技術 |
-|---|---|
-| フロントエンド | React 19 + TanStack Start (SSR) |
-| UI コンポーネント | Park UI (Ark UI + Panda CSS) |
-| バックエンド | Cloudflare Workers |
-| データベース | Cloudflare D1 (SQLite) + Drizzle ORM |
-| ストレージ | Cloudflare R2 |
-| 認証 | Better Auth (Google OIDC, @toyo.jp 制限) |
-| ルーティング | TanStack Router (ファイルベース) |
-| サーバー状態 | TanStack Query |
-| テスト | Vitest |
-| Lint / Format | oxlint + oxfmt |
+| カテゴリ          | 技術                                     |
+| ----------------- | ---------------------------------------- |
+| フロントエンド    | React 19 + TanStack Start (SSR)          |
+| UI コンポーネント | Park UI (Ark UI + Panda CSS)             |
+| バックエンド      | Cloudflare Workers                       |
+| データベース      | Cloudflare D1 (SQLite) + Drizzle ORM     |
+| ストレージ        | Cloudflare R2                            |
+| 認証              | Better Auth (Google OIDC, @toyo.jp 制限) |
+| ルーティング      | TanStack Router (ファイルベース)         |
+| サーバー状態      | TanStack Query                           |
+| テスト            | Vitest                                   |
+| Lint / Format     | oxlint + oxfmt                           |
 
 ## セットアップ
 
