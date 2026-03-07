@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { listPlaces } from "@/application/query/event/list-places";
 import { listProjects } from "@/application/query/project/list-projects";
 import { getDraft } from "@/application/query/project/get-project-draft";
 import { getProjectDetail } from "@/application/query/project/get-project-detail";
@@ -24,27 +23,6 @@ import type { UserId } from "@/domain/shared/ids";
 import { queryOptions } from "@tanstack/react-query";
 import { dependencies } from "@/infrastructure/di";
 import { NotFoundError } from "@/libs/error";
-
-/**
- * Server function to load places for an event
- */
-export const loadPlacesFn = createServerFn({ method: "GET" })
-  .middleware([authMiddleware])
-  .inputValidator(z.object({ eventId: eventIdSchema }))
-  .handler(async ({ data }) => {
-    return await listPlaces(dependencies, data.eventId);
-  });
-
-export function generateLoadPlacesCacheKey(eventId: string) {
-  return ["places", "for-event", eventId];
-}
-
-export function generateLoadPlacesQueryOptions(eventId: string) {
-  return queryOptions({
-    queryKey: generateLoadPlacesCacheKey(eventId),
-    queryFn: () => loadPlacesFn({ data: { eventId } }),
-  });
-}
 
 /**
  * Server function to load projects for an organization

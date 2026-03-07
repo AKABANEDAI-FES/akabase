@@ -1,6 +1,6 @@
 import { createFileRoute, redirect, useNavigate, useRouter } from "@tanstack/react-router";
 import { CreateProjectDialog } from "@/features/project/components";
-import { generateLoadPlacesQueryOptions } from "@/features/project/actions";
+import { generateLoadPlacesQueryOptions } from "@/features/event/actions/queries/place";
 import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions";
 import { cast } from "@/domain/shared/ids";
 import type { OrgId } from "@/domain/shared/ids";

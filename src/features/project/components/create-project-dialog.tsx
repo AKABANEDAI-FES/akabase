@@ -2,11 +2,8 @@ import { revalidateLogic, useForm } from "@tanstack/react-form";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createListCollection } from "@ark-ui/react/collection";
 import { Result } from "@praha/byethrow";
-import {
-  createProjectInputSchema,
-  generateLoadPlacesQueryOptions,
-  useCreateProjectMutation,
-} from "@/features/project/actions";
+import { createProjectInputSchema, useCreateProjectMutation } from "@/features/project/actions";
+import { generateLoadPlacesQueryOptions } from "@/features/event/actions/queries/place";
 import { Button, CloseButton, Dialog, Field, Input, Select, toaster } from "@/components/ui";
 import { Portal } from "@ark-ui/react/portal";
 import { Stack } from "styled-system/jsx";
