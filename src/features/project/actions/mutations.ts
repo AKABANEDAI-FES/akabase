@@ -73,8 +73,8 @@ export function useCreateProjectMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createProjectFn,
-    onSuccess: Result.inspect(({ orgId, eventId }) => {
-      queryClient.invalidateQueries({
+    onSuccess: Result.inspect(async ({ orgId, eventId }) => {
+      await queryClient.invalidateQueries({
         queryKey: generateLoadProjectsCacheKey(eventId, orgId),
       });
     }),
@@ -124,8 +124,8 @@ export function useUpdateProjectDraftMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updateProjectDraftFn,
-    onSuccess: Result.inspect(({ projectId, eventId, orgId }) => {
-      queryClient.invalidateQueries({
+    onSuccess: Result.inspect(async ({ projectId, eventId, orgId }) => {
+      await queryClient.invalidateQueries({
         queryKey: generateLoadDraftCacheKey(eventId, orgId, projectId),
       });
     }),
@@ -169,23 +169,21 @@ export function useSubmitProjectMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: submitProjectFn,
-    onSuccess: Result.inspect(({ projectId, eventId, orgId, submissionId }) => {
-      // Invalidate draft cache
-      queryClient.invalidateQueries({
-        queryKey: generateLoadDraftCacheKey(eventId, orgId, projectId),
-      });
-      // Invalidate project-specific submissions cache
-      queryClient.invalidateQueries({
-        queryKey: generateLoadSubmissionsCacheKey(eventId, orgId, projectId),
-      });
-      // Invalidate event-wide submissions cache
-      queryClient.invalidateQueries({
-        queryKey: generateLoadEventSubmissionsCacheKey(eventId),
-      });
-      // Invalidate submission detail cache (org view)
-      queryClient.invalidateQueries({
-        queryKey: generateLoadSubmissionDetailCacheKey(eventId, submissionId),
-      });
+    onSuccess: Result.inspect(async ({ projectId, eventId, orgId, submissionId }) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: generateLoadDraftCacheKey(eventId, orgId, projectId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadSubmissionsCacheKey(eventId, orgId, projectId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadEventSubmissionsCacheKey(eventId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadSubmissionDetailCacheKey(eventId, submissionId),
+        }),
+      ]);
     }),
   });
 }
@@ -226,15 +224,15 @@ export function useApproveProjectMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: approveProjectFn,
-    onSuccess: Result.inspect(({ submissionId, eventId }) => {
-      // Invalidate submission detail cache
-      queryClient.invalidateQueries({
-        queryKey: generateLoadSubmissionDetailCacheKey(eventId, submissionId),
-      });
-      // Invalidate event-wide submissions cache
-      queryClient.invalidateQueries({
-        queryKey: generateLoadEventSubmissionsCacheKey(eventId),
-      });
+    onSuccess: Result.inspect(async ({ submissionId, eventId }) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: generateLoadSubmissionDetailCacheKey(eventId, submissionId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadEventSubmissionsCacheKey(eventId),
+        }),
+      ]);
     }),
   });
 }
@@ -280,23 +278,21 @@ export function useReturnProjectMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: returnProjectFn,
-    onSuccess: Result.inspect(({ projectId, eventId, orgId, submissionId }) => {
-      // Invalidate submission detail cache
-      queryClient.invalidateQueries({
-        queryKey: generateLoadSubmissionDetailCacheKey(eventId, submissionId),
-      });
-      // Invalidate project-specific submissions cache
-      queryClient.invalidateQueries({
-        queryKey: generateLoadSubmissionsCacheKey(eventId, orgId, projectId),
-      });
-      // Invalidate event-wide submissions cache
-      queryClient.invalidateQueries({
-        queryKey: generateLoadEventSubmissionsCacheKey(eventId),
-      });
-      // Invalidate draft cache (returned submissions can be edited again)
-      queryClient.invalidateQueries({
-        queryKey: generateLoadDraftCacheKey(eventId, orgId, projectId),
-      });
+    onSuccess: Result.inspect(async ({ projectId, eventId, orgId, submissionId }) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: generateLoadSubmissionDetailCacheKey(eventId, submissionId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadSubmissionsCacheKey(eventId, orgId, projectId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadEventSubmissionsCacheKey(eventId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadDraftCacheKey(eventId, orgId, projectId),
+        }),
+      ]);
     }),
   });
 }
@@ -342,19 +338,18 @@ export function useWithdrawSubmissionMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: withdrawSubmissionFn,
-    onSuccess: Result.inspect(({ projectId, eventId, orgId, submissionId }) => {
-      // Invalidate submission detail cache (committee view)
-      queryClient.invalidateQueries({
-        queryKey: generateLoadSubmissionDetailCacheKey(eventId, submissionId),
-      });
-      // Invalidate project-specific submissions cache
-      queryClient.invalidateQueries({
-        queryKey: generateLoadSubmissionsCacheKey(eventId, orgId, projectId),
-      });
-      // Invalidate event-wide submissions cache
-      queryClient.invalidateQueries({
-        queryKey: generateLoadEventSubmissionsCacheKey(eventId),
-      });
+    onSuccess: Result.inspect(async ({ projectId, eventId, orgId, submissionId }) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: generateLoadSubmissionDetailCacheKey(eventId, submissionId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadSubmissionsCacheKey(eventId, orgId, projectId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadEventSubmissionsCacheKey(eventId),
+        }),
+      ]);
     }),
   });
 }
@@ -392,17 +387,18 @@ export function useUpdateProjectMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updateProjectFn,
-    onSuccess: Result.inspect(({ projectId, eventId, orgId }) => {
-      // Invalidate project caches
-      queryClient.invalidateQueries({
-        queryKey: ["projects", projectId],
-      });
-      queryClient.invalidateQueries({
-        queryKey: generateLoadProjectsCacheKey(eventId, orgId),
-      });
-      queryClient.invalidateQueries({
-        queryKey: generateLoadProjectDetailCacheKey(eventId, orgId, projectId),
-      });
+    onSuccess: Result.inspect(async ({ projectId, eventId, orgId }) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["projects", projectId],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadProjectsCacheKey(eventId, orgId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadProjectDetailCacheKey(eventId, orgId, projectId),
+        }),
+      ]);
     }),
   });
 }
@@ -440,20 +436,21 @@ export function useUpdatePublishedMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updatePublishedFn,
-    onSuccess: Result.inspect(({ projectId, eventId, orgId }) => {
-      // Invalidate published and project caches
-      queryClient.invalidateQueries({
-        queryKey: ["projects", projectId, "published"],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["projects", projectId],
-      });
-      queryClient.invalidateQueries({
-        queryKey: generateLoadProjectsCacheKey(eventId, orgId),
-      });
-      queryClient.invalidateQueries({
-        queryKey: generateLoadProjectPublishedCacheKey(eventId, orgId, projectId),
-      });
+    onSuccess: Result.inspect(async ({ projectId, eventId, orgId }) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["projects", projectId, "published"],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["projects", projectId],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadProjectsCacheKey(eventId, orgId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadProjectPublishedCacheKey(eventId, orgId, projectId),
+        }),
+      ]);
     }),
   });
 }

@@ -44,9 +44,9 @@ export function useUpdateCommitteeRoleMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updateCommitteeRoleFn,
-    onSuccess: (result, variables) => {
-      Result.inspect(() => {
-        queryClient.invalidateQueries({
+    onSuccess: async (result, variables) => {
+      await Result.inspect(async () => {
+        await queryClient.invalidateQueries({
           queryKey: generateLoadUsersForEventCacheKey(variables.data.eventId),
         });
       })(result);
@@ -83,8 +83,8 @@ export function useUpdateGlobalRoleMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updateGlobalRoleFn,
-    onSuccess: Result.inspect(() => {
-      queryClient.invalidateQueries({ queryKey: generateLoadUsersWithRolesCacheKey() });
+    onSuccess: Result.inspect(async () => {
+      await queryClient.invalidateQueries({ queryKey: generateLoadUsersWithRolesCacheKey() });
     }),
   });
 }

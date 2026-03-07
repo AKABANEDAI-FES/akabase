@@ -62,13 +62,15 @@ export function useCreateOrganizationMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createOrganizationFn,
-    onSuccess: Result.inspect(({ eventId }) => {
-      queryClient.invalidateQueries({
-        queryKey: generateLoadOrganizationsCacheKey(eventId),
-      });
-      queryClient.invalidateQueries({
-        queryKey: generateLoadMyOrganizationsCacheKey(eventId),
-      });
+    onSuccess: Result.inspect(async ({ eventId }) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: generateLoadOrganizationsCacheKey(eventId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadMyOrganizationsCacheKey(eventId),
+        }),
+      ]);
     }),
   });
 }
@@ -112,16 +114,18 @@ export function useUpdateOrganizationMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updateOrganizationFn,
-    onSuccess: Result.inspect(({ organizationId, eventId }) => {
-      queryClient.invalidateQueries({
-        queryKey: generateLoadOrganizationDetailCacheKey(eventId, organizationId),
-      });
-      queryClient.invalidateQueries({
-        queryKey: generateLoadOrganizationsCacheKey(eventId),
-      });
-      queryClient.invalidateQueries({
-        queryKey: generateLoadMyOrganizationsCacheKey(eventId),
-      });
+    onSuccess: Result.inspect(async ({ organizationId, eventId }) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: generateLoadOrganizationDetailCacheKey(eventId, organizationId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadOrganizationsCacheKey(eventId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadMyOrganizationsCacheKey(eventId),
+        }),
+      ]);
     }),
   });
 }
@@ -161,13 +165,15 @@ export function useDeleteOrganizationMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: deleteOrganizationFn,
-    onSuccess: Result.inspect(({ eventId }) => {
-      queryClient.invalidateQueries({
-        queryKey: generateLoadOrganizationsCacheKey(eventId),
-      });
-      queryClient.invalidateQueries({
-        queryKey: generateLoadMyOrganizationsCacheKey(eventId),
-      });
+    onSuccess: Result.inspect(async ({ eventId }) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: generateLoadOrganizationsCacheKey(eventId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadMyOrganizationsCacheKey(eventId),
+        }),
+      ]);
     }),
   });
 }
@@ -213,13 +219,15 @@ export function useAddOrganizationMemberMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: addOrganizationMemberFn,
-    onSuccess: Result.inspect(({ orgId, eventId }) => {
-      queryClient.invalidateQueries({
-        queryKey: generateLoadOrganizationMembersCacheKey(eventId, orgId),
-      });
-      queryClient.invalidateQueries({
-        queryKey: generateLoadMyOrganizationsCacheKey(eventId),
-      });
+    onSuccess: Result.inspect(async ({ orgId, eventId }) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: generateLoadOrganizationMembersCacheKey(eventId, orgId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadMyOrganizationsCacheKey(eventId),
+        }),
+      ]);
     }),
   });
 }
@@ -261,13 +269,15 @@ export function useRemoveOrganizationMemberMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: removeOrganizationMemberFn,
-    onSuccess: Result.inspect(({ orgId, eventId }) => {
-      queryClient.invalidateQueries({
-        queryKey: generateLoadOrganizationMembersCacheKey(eventId, orgId),
-      });
-      queryClient.invalidateQueries({
-        queryKey: generateLoadMyOrganizationsCacheKey(eventId),
-      });
+    onSuccess: Result.inspect(async ({ orgId, eventId }) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: generateLoadOrganizationMembersCacheKey(eventId, orgId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadMyOrganizationsCacheKey(eventId),
+        }),
+      ]);
     }),
   });
 }
@@ -311,13 +321,15 @@ export function useUpdateOrganizationMemberRoleMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updateOrganizationMemberRoleFn,
-    onSuccess: Result.inspect(({ orgId, eventId }) => {
-      queryClient.invalidateQueries({
-        queryKey: generateLoadOrganizationMembersCacheKey(eventId, orgId),
-      });
-      queryClient.invalidateQueries({
-        queryKey: generateLoadMyOrganizationsCacheKey(eventId),
-      });
+    onSuccess: Result.inspect(async ({ orgId, eventId }) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: generateLoadOrganizationMembersCacheKey(eventId, orgId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadMyOrganizationsCacheKey(eventId),
+        }),
+      ]);
     }),
   });
 }

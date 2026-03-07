@@ -47,8 +47,8 @@ export function useCreateEventMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createEventFn,
-    onSuccess: Result.inspect(() => {
-      queryClient.invalidateQueries({ queryKey: generateLoadEventsCacheKey() });
+    onSuccess: Result.inspect(async () => {
+      await queryClient.invalidateQueries({ queryKey: generateLoadEventsCacheKey() });
     }),
   });
 }
@@ -87,9 +87,11 @@ export function useUpdateEventMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updateEventFn,
-    onSuccess: Result.inspect(({ eventId }) => {
-      queryClient.invalidateQueries({ queryKey: generateLoadEventsCacheKey() });
-      queryClient.invalidateQueries({ queryKey: generateLoadEventDetailCacheKey(eventId) });
+    onSuccess: Result.inspect(async ({ eventId }) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: generateLoadEventsCacheKey() }),
+        queryClient.invalidateQueries({ queryKey: generateLoadEventDetailCacheKey(eventId) }),
+      ]);
     }),
   });
 }
@@ -121,8 +123,8 @@ export function useArchiveEventMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: archiveEventFn,
-    onSuccess: Result.inspect(() => {
-      queryClient.invalidateQueries({ queryKey: generateLoadEventsCacheKey() });
+    onSuccess: Result.inspect(async () => {
+      await queryClient.invalidateQueries({ queryKey: generateLoadEventsCacheKey() });
     }),
   });
 }
@@ -154,8 +156,8 @@ export function useActivateEventMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: activateEventFn,
-    onSuccess: Result.inspect(() => {
-      queryClient.invalidateQueries({ queryKey: generateLoadEventsCacheKey() });
+    onSuccess: Result.inspect(async () => {
+      await queryClient.invalidateQueries({ queryKey: generateLoadEventsCacheKey() });
     }),
   });
 }

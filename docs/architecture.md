@@ -935,8 +935,8 @@ export function useCreateTagMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createTagFn,
-    onSuccess: Result.inspect(({ eventId }) => {
-      queryClient.invalidateQueries({ queryKey: generateLoadTagsCacheKey(eventId) });
+    onSuccess: Result.inspect(async ({ eventId }) => {
+      await queryClient.invalidateQueries({ queryKey: generateLoadTagsCacheKey(eventId) });
     }),
   });
 }
@@ -945,19 +945,18 @@ export function useCreateTagMutation() {
 **`Result.inspect` の使い方**:
 
 ```typescript
-// Pattern 1: Result の値を使う
-onSuccess: Result.inspect(({ eventId }) => {
-  queryClient.invalidateQueries({ queryKey: generateLoadTagsCacheKey(eventId) });
+// Pattern 1: Result の値を使う（単一の invalidate）
+onSuccess: Result.inspect(async ({ eventId }) => {
+  await queryClient.invalidateQueries({ queryKey: generateLoadTagsCacheKey(eventId) });
 });
 
-// Pattern 2: variables から値を取得する場合
-onSuccess: (result, variables) => {
-  Result.inspect(() => {
-    queryClient.invalidateQueries({
-      queryKey: generateLoadUsersCacheKey(variables.data.eventId),
-    });
-  })(result);
-};
+// Pattern 2: 複数の invalidate は Promise.all で並列実行
+onSuccess: Result.inspect(async ({ eventId }) => {
+  await Promise.all([
+    queryClient.invalidateQueries({ queryKey: generateLoadEventsCacheKey() }),
+    queryClient.invalidateQueries({ queryKey: generateLoadEventDetailCacheKey(eventId) }),
+  ]);
+});
 ```
 
 ### Route 統合パターン

@@ -55,8 +55,8 @@ export function useCreatePlaceMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createPlaceFn,
-    onSuccess: Result.inspect(({ eventId }) => {
-      queryClient.invalidateQueries({
+    onSuccess: Result.inspect(async ({ eventId }) => {
+      await queryClient.invalidateQueries({
         queryKey: generateLoadPlacesCacheKey(eventId),
       });
     }),
@@ -105,8 +105,8 @@ export function useUpdatePlaceMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updatePlaceFn,
-    onSuccess: Result.inspect(({ eventId }) => {
-      queryClient.invalidateQueries({
+    onSuccess: Result.inspect(async ({ eventId }) => {
+      await queryClient.invalidateQueries({
         queryKey: generateLoadPlacesCacheKey(eventId),
       });
     }),
@@ -152,8 +152,8 @@ export function useDeletePlaceMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: deletePlaceFn,
-    onSuccess: Result.inspect(({ eventId }) => {
-      queryClient.invalidateQueries({
+    onSuccess: Result.inspect(async ({ eventId }) => {
+      await queryClient.invalidateQueries({
         queryKey: generateLoadPlacesCacheKey(eventId),
       });
     }),

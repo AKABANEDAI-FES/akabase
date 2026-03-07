@@ -57,8 +57,8 @@ export function useCreateDeadlineMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createDeadlineFn,
-    onSuccess: Result.inspect(({ eventId }) => {
-      queryClient.invalidateQueries({
+    onSuccess: Result.inspect(async ({ eventId }) => {
+      await queryClient.invalidateQueries({
         queryKey: generateLoadDeadlinesCacheKey(eventId),
       });
     }),
@@ -109,8 +109,8 @@ export function useUpdateDeadlineMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updateDeadlineFn,
-    onSuccess: Result.inspect(({ eventId }) => {
-      queryClient.invalidateQueries({
+    onSuccess: Result.inspect(async ({ eventId }) => {
+      await queryClient.invalidateQueries({
         queryKey: generateLoadDeadlinesCacheKey(eventId),
       });
     }),
@@ -156,8 +156,8 @@ export function useDeleteDeadlineMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: deleteDeadlineFn,
-    onSuccess: Result.inspect(({ eventId }) => {
-      queryClient.invalidateQueries({
+    onSuccess: Result.inspect(async ({ eventId }) => {
+      await queryClient.invalidateQueries({
         queryKey: generateLoadDeadlinesCacheKey(eventId),
       });
     }),

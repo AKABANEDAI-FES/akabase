@@ -54,8 +54,8 @@ export function useCreateTagMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createTagFn,
-    onSuccess: Result.inspect(({ eventId }) => {
-      queryClient.invalidateQueries({
+    onSuccess: Result.inspect(async ({ eventId }) => {
+      await queryClient.invalidateQueries({
         queryKey: generateLoadTagsCacheKey(eventId),
       });
     }),
@@ -103,8 +103,8 @@ export function useUpdateTagMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: updateTagFn,
-    onSuccess: Result.inspect(({ eventId }) => {
-      queryClient.invalidateQueries({
+    onSuccess: Result.inspect(async ({ eventId }) => {
+      await queryClient.invalidateQueries({
         queryKey: generateLoadTagsCacheKey(eventId),
       });
     }),
@@ -150,8 +150,8 @@ export function useDeleteTagMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: deleteTagFn,
-    onSuccess: Result.inspect(({ eventId }) => {
-      queryClient.invalidateQueries({
+    onSuccess: Result.inspect(async ({ eventId }) => {
+      await queryClient.invalidateQueries({
         queryKey: generateLoadTagsCacheKey(eventId),
       });
     }),
@@ -196,8 +196,8 @@ export function useReorderTagsMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: reorderTagsFn,
-    onSuccess: Result.inspect(({ eventId }) => {
-      queryClient.invalidateQueries({
+    onSuccess: Result.inspect(async ({ eventId }) => {
+      await queryClient.invalidateQueries({
         queryKey: generateLoadTagsCacheKey(eventId),
       });
     }),
