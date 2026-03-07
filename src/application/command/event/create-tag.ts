@@ -48,6 +48,9 @@ export async function createTag(
     // Check tag name uniqueness within event
     yield* $(await deps.eventDomainService.ensureTagNameUnique(input.eventId, input.name));
 
+    // Get next display order
+    const maxDisplayOrder = await deps.eventRepo.getMaxTagDisplayOrder(input.eventId);
+
     // Create tag entity
     const tagId = generateId<TagId>();
     const tag = yield* $(
@@ -55,6 +58,7 @@ export async function createTag(
         id: tagId,
         eventId: input.eventId,
         name: input.name,
+        displayOrder: maxDisplayOrder + 1,
       }),
     );
 

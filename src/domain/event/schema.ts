@@ -52,6 +52,7 @@ export const tagSchema = z.object({
     .string()
     .min(TAG_NAME_MIN_LENGTH, "タグ名を入力してください")
     .max(TAG_NAME_MAX_LENGTH, "タグ名は100文字以内で入力してください"),
+  displayOrder: z.number().int().min(0),
   createdAt: z.date(),
 });
 

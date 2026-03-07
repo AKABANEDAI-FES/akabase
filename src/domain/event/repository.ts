@@ -59,10 +59,26 @@ export interface EventRepository {
   saveTag(tag: Tag): Promise<void>;
 
   /**
+   * Batch update tag display orders atomically
+   * @throws {RepositoryException} on database errors
+   */
+  updateTagDisplayOrders(
+    eventId: EventId,
+    tagOrders: Array<{ tagId: TagId; displayOrder: number }>,
+  ): Promise<void>;
+
+  /**
    * Delete tag (scoped by eventId)
    * @throws {RepositoryException} on database errors
    */
   deleteTag(eventId: EventId, tagId: TagId): Promise<void>;
+
+  /**
+   * Get the maximum displayOrder value for tags in an event
+   * Returns -1 if no tags exist
+   * @throws {RepositoryException} on database errors
+   */
+  getMaxTagDisplayOrder(eventId: EventId): Promise<number>;
 
   /**
    * Save place (insert or update)

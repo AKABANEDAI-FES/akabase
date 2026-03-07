@@ -1,6 +1,7 @@
 import type { Database } from "@/db";
 import { deadlines, events, places, tags } from "@/db/schema";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, max } from "drizzle-orm";
+import type { BatchItem } from "drizzle-orm/batch";
 import { deadlineSchema, eventSchema, placeSchema, tagSchema } from "@/domain/event/schema";
 import type { Deadline, Event, Place, Tag } from "@/domain/event/schema";
 import type { DeadlineId, EventId, PlaceId, TagId } from "@/domain/shared/ids";
@@ -128,6 +129,7 @@ export class EventRepositoryImpl implements EventRepository {
           id: row.id,
           eventId: row.eventId,
           name: row.name,
+          displayOrder: row.displayOrder,
           createdAt: new Date(row.createdAt),
         }),
       );
@@ -146,6 +148,7 @@ export class EventRepositoryImpl implements EventRepository {
           id: tag.id,
           eventId: tag.eventId,
           name: tag.name,
+          displayOrder: tag.displayOrder,
           createdAt: tag.createdAt,
         })
         .onConflictDoUpdate({
@@ -153,11 +156,43 @@ export class EventRepositoryImpl implements EventRepository {
           set: {
             // Immutable fields excluded: id, eventId, createdAt
             name: tag.name,
+            displayOrder: tag.displayOrder,
           },
           where: eq(tags.eventId, tag.eventId),
         });
     } catch (error) {
       throw new RepositoryException("DATABASE_ERROR", "Failed to save tag", error);
+    }
+  }
+
+  async getMaxTagDisplayOrder(eventId: EventId): Promise<number> {
+    try {
+      const result = await this.db
+        .select({ maxOrder: max(tags.displayOrder) })
+        .from(tags)
+        .where(eq(tags.eventId, eventId));
+
+      return result[0]?.maxOrder ?? -1;
+    } catch (error) {
+      throw new RepositoryException("DATABASE_ERROR", "Failed to get max tag display order", error);
+    }
+  }
+
+  async updateTagDisplayOrders(
+    eventId: EventId,
+    tagOrders: Array<{ tagId: TagId; displayOrder: number }>,
+  ): Promise<void> {
+    if (tagOrders.length === 0) return;
+    try {
+      const queries: Array<BatchItem<"sqlite">> = tagOrders.map((order) =>
+        this.db
+          .update(tags)
+          .set({ displayOrder: order.displayOrder })
+          .where(and(eq(tags.id, order.tagId), eq(tags.eventId, eventId))),
+      );
+      await this.db.batch(queries as [BatchItem<"sqlite">, ...Array<BatchItem<"sqlite">>]);
+    } catch (error) {
+      throw new RepositoryException("DATABASE_ERROR", "Failed to update tag display orders", error);
     }
   }
 

@@ -13,6 +13,7 @@ export const tagListItemSchema = z.object({
   id: tagIdSchema,
   eventId: eventIdSchema,
   name: z.string(),
+  displayOrder: z.number().int(),
   createdAt: z.date(),
 });
 
@@ -31,7 +32,7 @@ export async function listTags(
   try {
     const rows = await deps.db.query.tags.findMany({
       where: eq(tags.eventId, eventId),
-      orderBy: [asc(tags.name)], // Alphabetical order
+      orderBy: [asc(tags.displayOrder)],
     });
 
     const tagList: TagListItem[] = rows.map((row) =>
@@ -39,6 +40,7 @@ export async function listTags(
         id: row.id,
         eventId: row.eventId,
         name: row.name,
+        displayOrder: row.displayOrder,
         createdAt: new Date(row.createdAt),
       }),
     );

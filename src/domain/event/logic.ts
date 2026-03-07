@@ -88,12 +88,14 @@ export function createTagEntity(input: {
   id: TagId;
   eventId: EventId;
   name: string;
+  displayOrder: number;
   now?: Date;
 }): Result.Result<Tag, EventError> {
   const data = {
     id: input.id,
     eventId: input.eventId,
     name: input.name,
+    displayOrder: input.displayOrder,
     createdAt: input.now ?? new Date(),
   };
 
