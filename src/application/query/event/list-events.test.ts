@@ -4,10 +4,10 @@ import { listEvents } from "./list-events";
 import { events } from "@/db/schema";
 
 describe("listEvents", () => {
-  let testDb: ReturnType<typeof createTestDb>;
+  let testDb: Awaited<ReturnType<typeof createTestDb>>;
 
-  beforeEach(() => {
-    testDb = createTestDb();
+  beforeEach(async () => {
+    testDb = await createTestDb();
   });
 
   afterEach(() => {

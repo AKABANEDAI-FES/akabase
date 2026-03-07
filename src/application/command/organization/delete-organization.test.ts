@@ -10,13 +10,13 @@ import type { EventId, OrgId } from "@/domain/shared/ids";
 import { cast } from "@/domain/shared/ids";
 
 describe("deleteOrganization", () => {
-  let testDb: ReturnType<typeof createTestDb>;
+  let testDb: Awaited<ReturnType<typeof createTestDb>>;
   let deps: ReturnType<typeof createTestDependencies>;
   let eventId: EventId;
   let orgId: OrgId;
 
   beforeEach(async () => {
-    testDb = createTestDb();
+    testDb = await createTestDb();
     deps = createTestDependencies(testDb.db);
 
     const eventResult = await createEvent(deps, {

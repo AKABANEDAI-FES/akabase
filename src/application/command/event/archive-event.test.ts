@@ -7,11 +7,11 @@ import { createEvent } from "./create-event";
 import { archiveEvent } from "./archive-event";
 
 describe("archiveEvent", () => {
-  let testDb: ReturnType<typeof createTestDb>;
+  let testDb: Awaited<ReturnType<typeof createTestDb>>;
   let deps: ReturnType<typeof createTestDependencies>;
 
-  beforeEach(() => {
-    testDb = createTestDb();
+  beforeEach(async () => {
+    testDb = await createTestDb();
     deps = createTestDependencies(testDb.db);
   });
 

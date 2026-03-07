@@ -7,12 +7,12 @@ import { cast } from "@/domain/shared/ids";
 import { createUserActor } from "@/test/test-helpers";
 
 describe("listMyOrganizations", () => {
-  let testDb: ReturnType<typeof createTestDb>;
+  let testDb: Awaited<ReturnType<typeof createTestDb>>;
   const eventId = cast<EventId>("event-1");
   const userId = cast<UserId>("user-1");
 
   beforeEach(async () => {
-    testDb = createTestDb();
+    testDb = await createTestDb();
 
     // ユーザーを作成
     await testDb.db.insert(userTable).values({

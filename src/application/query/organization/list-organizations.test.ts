@@ -6,11 +6,11 @@ import type { EventId } from "@/domain/shared/ids";
 import { cast } from "@/domain/shared/ids";
 
 describe("listOrganizations", () => {
-  let testDb: ReturnType<typeof createTestDb>;
+  let testDb: Awaited<ReturnType<typeof createTestDb>>;
   const eventId = cast<EventId>("event-1");
 
   beforeEach(async () => {
-    testDb = createTestDb();
+    testDb = await createTestDb();
 
     // イベントを作成
     await testDb.db.insert(events).values({

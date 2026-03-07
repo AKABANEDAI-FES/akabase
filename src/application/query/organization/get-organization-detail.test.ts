@@ -8,13 +8,13 @@ import { cast } from "@/domain/shared/ids";
 import { createAdminActor, createUserActor } from "@/test/test-helpers";
 
 describe("getOrganizationDetail", () => {
-  let testDb: ReturnType<typeof createTestDb>;
+  let testDb: Awaited<ReturnType<typeof createTestDb>>;
   let deps: ReturnType<typeof createTestDependencies>;
   const eventId = cast<EventId>("event-1");
   const orgId = cast<OrgId>("org-1");
 
   beforeEach(async () => {
-    testDb = createTestDb();
+    testDb = await createTestDb();
     deps = createTestDependencies(testDb.db);
 
     // イベントを作成

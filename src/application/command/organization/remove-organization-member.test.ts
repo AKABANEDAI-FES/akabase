@@ -12,7 +12,7 @@ import type { EventId, OrgId, UserId } from "@/domain/shared/ids";
 import { cast } from "@/domain/shared/ids";
 
 describe("removeOrganizationMember", () => {
-  let testDb: ReturnType<typeof createTestDb>;
+  let testDb: Awaited<ReturnType<typeof createTestDb>>;
   let deps: ReturnType<typeof createTestDependencies>;
   let eventId: EventId;
   let orgId: OrgId;
@@ -20,7 +20,7 @@ describe("removeOrganizationMember", () => {
   const testUserEmail = "member@toyo.jp";
 
   beforeEach(async () => {
-    testDb = createTestDb();
+    testDb = await createTestDb();
     deps = createTestDependencies(testDb.db);
 
     const eventResult = await createEvent(deps, {

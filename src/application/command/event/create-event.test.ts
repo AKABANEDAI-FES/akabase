@@ -6,11 +6,11 @@ import { createAdminActor, createUserActor } from "@/test/test-helpers";
 import { createEvent } from "./create-event";
 
 describe("createEvent", () => {
-  let testDb: ReturnType<typeof createTestDb>;
+  let testDb: Awaited<ReturnType<typeof createTestDb>>;
   let deps: ReturnType<typeof createTestDependencies>;
 
-  beforeEach(() => {
-    testDb = createTestDb();
+  beforeEach(async () => {
+    testDb = await createTestDb();
     deps = createTestDependencies(testDb.db);
   });
 

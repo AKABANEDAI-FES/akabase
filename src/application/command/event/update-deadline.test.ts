@@ -10,11 +10,11 @@ import { createDeadline } from "./create-deadline";
 import { updateDeadline } from "./update-deadline";
 
 describe("updateDeadline", () => {
-  let testDb: ReturnType<typeof createTestDb>;
+  let testDb: Awaited<ReturnType<typeof createTestDb>>;
   let deps: ReturnType<typeof createTestDependencies>;
 
-  beforeEach(() => {
-    testDb = createTestDb();
+  beforeEach(async () => {
+    testDb = await createTestDb();
     deps = createTestDependencies(testDb.db);
   });
 

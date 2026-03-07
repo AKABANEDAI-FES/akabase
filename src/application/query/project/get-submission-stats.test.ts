@@ -8,13 +8,13 @@ import { cast } from "@/domain/shared/ids";
 import type { EventId } from "@/domain/shared/ids";
 
 describe("getSubmissionStats", () => {
-  let testDb: ReturnType<typeof createTestDb>;
+  let testDb: Awaited<ReturnType<typeof createTestDb>>;
   let deps: ReturnType<typeof createTestDependencies>;
   const now = new Date();
   const eventId = cast<EventId>("event-1");
 
   beforeEach(async () => {
-    testDb = createTestDb();
+    testDb = await createTestDb();
     deps = createTestDependencies(testDb.db);
 
     await testDb.db.insert(user).values({

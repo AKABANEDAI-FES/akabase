@@ -11,7 +11,7 @@ import type { EventId, OrgId, UserId } from "@/domain/shared/ids";
 import { cast } from "@/domain/shared/ids";
 
 describe("addOrganizationMember", () => {
-  let testDb: ReturnType<typeof createTestDb>;
+  let testDb: Awaited<ReturnType<typeof createTestDb>>;
   let deps: ReturnType<typeof createTestDependencies>;
   let eventId: EventId;
   let orgId: OrgId;
@@ -19,7 +19,7 @@ describe("addOrganizationMember", () => {
   const testUserEmail = "member@toyo.jp";
 
   beforeEach(async () => {
-    testDb = createTestDb();
+    testDb = await createTestDb();
     deps = createTestDependencies(testDb.db);
 
     // イベントを作成

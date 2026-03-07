@@ -9,12 +9,12 @@ import type { EventId } from "@/domain/shared/ids";
 import { cast } from "@/domain/shared/ids";
 
 describe("createOrganization", () => {
-  let testDb: ReturnType<typeof createTestDb>;
+  let testDb: Awaited<ReturnType<typeof createTestDb>>;
   let deps: ReturnType<typeof createTestDependencies>;
   let eventId: EventId;
 
   beforeEach(async () => {
-    testDb = createTestDb();
+    testDb = await createTestDb();
     deps = createTestDependencies(testDb.db);
 
     // イベントを事前作成

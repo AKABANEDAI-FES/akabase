@@ -1,27 +1,21 @@
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
+import { createClient } from "@libsql/client";
+import { drizzle } from "drizzle-orm/libsql";
 import type { Database as D1Database } from "@/db";
 import * as schema from "@/db/schema";
-import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import { migrate } from "drizzle-orm/libsql/migrator";
 
-export function createTestDb() {
-  const sqlite = new Database(":memory:");
-  const db = drizzle(sqlite, { schema });
+export async function createTestDb() {
+  const client = createClient({ url: ":memory:" });
+  const db = drizzle(client, { schema });
 
-  const migrationsDir = join(process.cwd(), "src/db/migrations");
-  const files = readdirSync(migrationsDir)
-    .filter((f) => f.endsWith(".sql"))
-    .sort();
+  const migrationsFolder = join(process.cwd(), "src/db/migrations");
 
-  for (const file of files) {
-    const sql = readFileSync(join(migrationsDir, file), "utf-8");
-    sqlite.exec(sql);
-  }
+  await migrate(db, { migrationsFolder });
 
   return {
     db: db as unknown as D1Database,
-    sqlite,
-    cleanup: () => sqlite.close(),
+    client,
+    cleanup: () => client.close(),
   };
 }

@@ -9,11 +9,11 @@ import { archiveEvent } from "./archive-event";
 import { createPlace } from "./create-place";
 
 describe("createPlace", () => {
-  let testDb: ReturnType<typeof createTestDb>;
+  let testDb: Awaited<ReturnType<typeof createTestDb>>;
   let deps: ReturnType<typeof createTestDependencies>;
 
-  beforeEach(() => {
-    testDb = createTestDb();
+  beforeEach(async () => {
+    testDb = await createTestDb();
     deps = createTestDependencies(testDb.db);
   });
 
