@@ -5,10 +5,11 @@ import { dependencies } from "@/infrastructure/di";
 import { createTag } from "@/application/command/event/create-tag";
 import { updateTag } from "@/application/command/event/update-tag";
 import { deleteTag } from "@/application/command/event/delete-tag";
+import { reorderTags } from "@/application/command/event/reorder-tags";
 import { resolveActor } from "@/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/session-server";
 import { cast, eventIdSchema, tagIdSchema } from "@/domain/shared/ids";
-import type { UserId } from "@/domain/shared/ids";
+import type { TagId, UserId } from "@/domain/shared/ids";
 import { tagSchema } from "@/domain/event/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { generateLoadTagsCacheKey } from "../queries/tag";
@@ -149,6 +150,52 @@ export function useDeleteTagMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: deleteTagFn,
+    onSuccess: Result.inspect(({ eventId }) => {
+      queryClient.invalidateQueries({
+        queryKey: generateLoadTagsCacheKey(eventId),
+      });
+    }),
+  });
+}
+
+/**
+ * Reorder tags input validation schema
+ */
+export const reorderTagsInputSchema = z.object({
+  eventId: eventIdSchema,
+  tagIds: z.array(tagIdSchema),
+});
+
+/**
+ * Server function to reorder tags
+ */
+export const reorderTagsFn = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .inputValidator(reorderTagsInputSchema)
+  .handler(async ({ data, context }) => {
+    return await gen(async function* ($) {
+      const actor = await resolveActor(dependencies, {
+        userId: cast<UserId>(context.session.user.id),
+        eventIds: [data.eventId],
+      });
+
+      return yield* $(
+        await reorderTags(dependencies, {
+          eventId: data.eventId,
+          tagIds: data.tagIds as TagId[],
+          actor,
+        }),
+      );
+    });
+  });
+
+/**
+ * Hook to use reorder tags mutation
+ */
+export function useReorderTagsMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: reorderTagsFn,
     onSuccess: Result.inspect(({ eventId }) => {
       queryClient.invalidateQueries({
         queryKey: generateLoadTagsCacheKey(eventId),
