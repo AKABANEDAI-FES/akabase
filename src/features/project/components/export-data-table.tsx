@@ -83,7 +83,36 @@ const columns = [
   }),
 ];
 
-// --- CSV/JSON download helpers ---
+// --- CSV/JSON/Excel download helpers ---
+
+async function toExcel(data: EventPublishedDataItem[]): Promise<Blob> {
+  const { default: xlsxInit, Format, Workbook } = await import("wasm-xlsxwriter/web");
+  await xlsxInit();
+
+  const workbook = new Workbook();
+  const worksheet = workbook.addWorksheet();
+  const boldFormat = new Format().setBold();
+
+  const headers = ["企画名", "出展団体名", "パンフレットテキスト", "場所", "タグ"];
+  for (let col = 0; col < headers.length; col++) {
+    worksheet.writeWithFormat(0, col, headers[col], boldFormat);
+  }
+
+  for (let row = 0; row < data.length; row++) {
+    const item = data[row];
+    worksheet.write(row + 1, 0, item.projectName);
+    worksheet.write(row + 1, 1, item.orgName);
+    worksheet.write(row + 1, 2, item.pamphletText);
+    worksheet.write(row + 1, 3, item.placeName ?? "");
+    worksheet.write(row + 1, 4, item.tags.join(", "));
+  }
+
+  const buf = workbook.saveToBufferSync();
+  const array = new Uint8Array(buf);
+  return new Blob([array], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+}
 
 function escapeCSVField(value: string): string {
   if (value.includes(",") || value.includes('"') || value.includes("\n")) {
@@ -251,6 +280,17 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
           <Button size="sm" variant="outline" disabled={filteredData.length === 0}>
             <DownloadIcon />
             CSV
+          </Button>
+        </DownloadTrigger>
+        <DownloadTrigger
+          data={() => toExcel(filteredData)}
+          fileName={`${slug}-published-data.xlsx`}
+          mimeType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          asChild
+        >
+          <Button size="sm" variant="outline" disabled={filteredData.length === 0}>
+            <DownloadIcon />
+            Excel
           </Button>
         </DownloadTrigger>
         <DownloadTrigger

@@ -116,6 +116,9 @@ importers:
       vite-tsconfig-paths:
         specifier: ^6.0.2
         version: 6.1.0(typescript@5.9.3)(vite@8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.25.12)(jiti@2.6.1)(tsx@4.21.0))
+      wasm-xlsxwriter:
+        specifier: ^0.12.2
+        version: 0.12.2
       zod:
         specifier: ^4.3.6
         version: 4.3.6
@@ -5040,6 +5043,9 @@ packages:
   w3c-xmlserializer@5.0.0:
     resolution: {integrity: sha512-o8qghlI8NZHU1lLPrpi2+Uq7abh4GGPpYANlalzWxyWteJOCsr/P+oPBA49TOLu5FTZO4d3F9MnWJfiMo4BkmA==}
     engines: {node: '>=18'}
+
+  wasm-xlsxwriter@0.12.2:
+    resolution: {integrity: sha512-lq8r8nQe0fKPg0Fels/yCXVv9SsOYJzt/uss85p34zA7RuhUXCm1Whe/njHmXn/lyq0cHMxncK2UPDFPTYDG2Q==}
 
   web-streams-polyfill@3.3.3:
     resolution: {integrity: sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw==}
@@ -10386,6 +10392,8 @@ snapshots:
   w3c-xmlserializer@5.0.0:
     dependencies:
       xml-name-validator: 5.0.0
+
+  wasm-xlsxwriter@0.12.2: {}
 
   web-streams-polyfill@3.3.3: {}
 
