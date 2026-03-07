@@ -267,7 +267,10 @@ function ProjectEditPage() {
                       collection={tagsCollection}
                       value={field.state.value}
                       onValueChange={({ value }) => {
-                        field.handleChange(value);
+                        const tagOrder = new Map<string, number>(tags.map((t, i) => [t.id, i]));
+                        field.handleChange(
+                          value.toSorted((a, b) => (tagOrder.get(a) ?? 0) - (tagOrder.get(b) ?? 0)),
+                        );
                       }}
                       positioning={{ sameWidth: true }}
                       multiple

@@ -121,7 +121,9 @@ export async function getSubmissionDetail(
       projectName: submission.project.name,
       orgId: submission.project.organization.id,
       orgName: submission.project.organization.name,
-      tags: submission.tags.map((t) => ({ id: t.tag.id, name: t.tag.name })),
+      tags: submission.tags
+        .sort((a, b) => a.tag.displayOrder - b.tag.displayOrder)
+        .map((t) => ({ id: t.tag.id, name: t.tag.name })),
       actions: submission.actions.map((a) => ({
         id: a.id,
         actionType: a.actionType,

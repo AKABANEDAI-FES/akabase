@@ -88,7 +88,9 @@ export async function getDraft(
       webContentJson: draftRow.webContentJson,
       updatedAt: draftRow.updatedAt,
       updatedBy: draftRow.updatedBy,
-      tags: draftRow.tags.map((t) => ({ id: t.tag.id, name: t.tag.name })),
+      tags: draftRow.tags
+        .sort((a, b) => a.tag.displayOrder - b.tag.displayOrder)
+        .map((t) => ({ id: t.tag.id, name: t.tag.name })),
     });
 
     return draft;

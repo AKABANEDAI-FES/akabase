@@ -81,7 +81,9 @@ export async function getProjectPublished(
       pamphletText: publishedRow.pamphletText,
       webContentJson: publishedRow.webContentJson,
       publishedAt: publishedRow.publishedAt,
-      tags: publishedRow.tags.map((t) => ({ id: t.tag.id, name: t.tag.name })),
+      tags: publishedRow.tags
+        .sort((a, b) => a.tag.displayOrder - b.tag.displayOrder)
+        .map((t) => ({ id: t.tag.id, name: t.tag.name })),
     });
 
     return published;
