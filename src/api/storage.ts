@@ -1,4 +1,4 @@
-import { env } from "cloudflare:workers";
+import { env, waitUntil } from "cloudflare:workers";
 import { dependencies } from "@/infrastructure/di";
 import { uploadImage } from "@/application/command/shared/upload-image";
 import { authMiddleware, factory } from "./libs";
@@ -14,17 +14,29 @@ const getStorageHandler = factory.createHandlers(async (c) => {
     return c.notFound();
   }
 
+  const cache = await caches.open("storage");
+  const cacheKey = c.req.raw;
+
+  const cachedResponse = await cache.match(cacheKey);
+  if (cachedResponse) {
+    return cachedResponse;
+  }
+
   const object = await env.STORAGE.get(path);
   if (!object) {
     return c.notFound();
   }
 
-  return new Response(object.body, {
+  const response = new Response(object.body, {
     headers: {
       "Content-Type": object.httpMetadata?.contentType ?? "application/octet-stream",
       "Cache-Control": "public, max-age=31536000, immutable",
     },
   });
+
+  waitUntil(cache.put(cacheKey, response.clone()));
+
+  return response;
 });
 
 const uploadStorageFormSchema = z.object({
