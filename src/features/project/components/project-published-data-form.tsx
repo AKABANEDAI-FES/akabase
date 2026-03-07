@@ -1,5 +1,5 @@
 import { ClientOnly } from "@tanstack/react-router";
-import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Flex, Stack } from "styled-system/jsx";
 import { Alert, Button, Field, Select, Textarea, toaster } from "@/components/ui";
 import { SaveIcon } from "lucide-react";
@@ -33,7 +33,6 @@ export function ProjectPublishedDataForm({
   eventId,
   orgId,
 }: ProjectPublishedDataFormProps) {
-  const queryClient = useQueryClient();
   const { mutateAsync: updatePublishedMutate } = useUpdatePublishedMutation();
 
   const { data: published } = useSuspenseQuery(
@@ -110,15 +109,7 @@ export function ProjectPublishedDataForm({
       modeAfterSubmission: "change",
     }),
     onSubmit: async () => {
-      const updatedPublished = await queryClient.fetchQuery(
-        generateLoadProjectPublishedQueryOptions(eventId, orgId, projectId),
-      );
-      form.reset({
-        pamphletText: updatedPublished?.pamphletText ?? "",
-        webContentJson: updatedPublished?.webContentJson ?? null,
-        tags: updatedPublished?.tags.map((tag) => tag.id) ?? [],
-      });
-
+      form.reset();
       toaster.create({
         type: "success",
         title: "保存しました",

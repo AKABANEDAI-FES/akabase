@@ -1,4 +1,4 @@
-import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Flex, Stack } from "styled-system/jsx";
 import { Button, Field, Input, Select, toaster } from "@/components/ui";
 import { SaveIcon } from "lucide-react";
@@ -25,7 +25,6 @@ type ProjectBasicInfoFormProps = {
 };
 
 export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasicInfoFormProps) {
-  const queryClient = useQueryClient();
   const { mutateAsync: updateProjectMutate } = useUpdateProjectMutation();
 
   const { data: project } = useSuspenseQuery(
@@ -91,15 +90,7 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
       modeAfterSubmission: "change",
     }),
     onSubmit: async () => {
-      const updatedProject = await queryClient.fetchQuery(
-        generateLoadProjectDetailQueryOptions(eventId, orgId, projectId),
-      );
-      form.reset({
-        name: updatedProject.name,
-        placeId: updatedProject.placeId,
-        logoImageId: updatedProject.logoImageId,
-      });
-
+      form.reset();
       toaster.create({
         type: "success",
         title: "保存しました",

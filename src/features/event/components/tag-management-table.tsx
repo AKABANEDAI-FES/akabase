@@ -164,9 +164,8 @@ export function TagManagementTable({
         },
       });
 
-      await queryClient.invalidateQueries(generateLoadTagsQueryOptions(eventId));
-
       if (Result.isFailure(result)) {
+        await queryClient.invalidateQueries(generateLoadTagsQueryOptions(eventId));
         toaster.create({
           type: "error",
           title: "エラー",

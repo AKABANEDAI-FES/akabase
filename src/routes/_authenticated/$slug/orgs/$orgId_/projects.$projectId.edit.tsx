@@ -1,5 +1,5 @@
 import { ClientOnly, Link, createFileRoute, useBlocker } from "@tanstack/react-router";
-import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Container, Flex, Stack } from "styled-system/jsx";
 import { Alert, Badge, Button, Field, Heading, Select, Textarea, toaster } from "@/components/ui";
 import { ArrowLeftIcon, SaveIcon, SendIcon } from "lucide-react";
@@ -52,7 +52,6 @@ function ProjectEditPage() {
   const { slug, orgId, projectId } = Route.useParams();
   const { activeEvent: event } = Route.useRouteContext();
 
-  const queryClient = useQueryClient();
   const { data: draft } = useSuspenseQuery(
     generateLoadDraftQueryOptions(event.id, orgId, projectId),
   );
@@ -121,14 +120,7 @@ function ProjectEditPage() {
       modeAfterSubmission: "change",
     }),
     onSubmit: async () => {
-      const draft = await queryClient.fetchQuery(
-        generateLoadDraftQueryOptions(event.id, orgId, projectId),
-      );
-      form.reset({
-        pamphletText: draft?.pamphletText ?? "",
-        tags: draft?.tags.map((tag) => tag.id) ?? [],
-        webContentJson: draft?.webContentJson ?? null,
-      });
+      form.reset();
       toaster.create({
         type: "success",
         title: "保存しました",
