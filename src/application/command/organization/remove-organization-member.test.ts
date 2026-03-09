@@ -158,6 +158,6 @@ describe("removeOrganizationMember", () => {
 
     const members = await deps.organizationRepo.findMembers(orgId);
     expect(members).toHaveLength(1);
-    expect(members[0].role).toBe("manager");
+    expect(members[0]!.role).toBe("manager");
   });
 });

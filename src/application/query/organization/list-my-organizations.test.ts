@@ -69,9 +69,9 @@ describe("listMyOrganizations", () => {
     const result = await listMyOrganizations({ db: testDb.db }, eventId, actor);
 
     expect(result).toHaveLength(1);
-    expect(result[0].id).toBe("org-1");
-    expect(result[0].name).toBe("My Organization");
-    expect(result[0].role).toBe("manager");
+    expect(result[0]!.id).toBe("org-1");
+    expect(result[0]!.name).toBe("My Organization");
+    expect(result[0]!.role).toBe("manager");
   });
 
   it("他のイベントの出展団体は含まれない", async () => {
@@ -114,8 +114,8 @@ describe("listMyOrganizations", () => {
     const result = await listMyOrganizations({ db: testDb.db }, eventId, actor);
 
     expect(result).toHaveLength(1);
-    expect(result[0].name).toBe("Org in 2025");
-    expect(result[0].role).toBe("editor");
+    expect(result[0]!.name).toBe("Org in 2025");
+    expect(result[0]!.role).toBe("editor");
   });
 
   it("複数の出展団体に所属している場合に全て返す", async () => {

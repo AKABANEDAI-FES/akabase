@@ -88,8 +88,8 @@ export async function listEventPublishedData(
           placeId: row.placeId,
           placeName: row.place?.name ?? null,
           logoUrl: row.logoImage ? deps.storageService.getPublicUrl(row.logoImage.objectKey) : null,
-          tags: row
-            .published.tags.sort((a, b) => a.tag.displayOrder - b.tag.displayOrder)
+          tags: row.published.tags
+            .sort((a, b) => a.tag.displayOrder - b.tag.displayOrder)
             .map((t) => t.tag.name),
         }),
       );

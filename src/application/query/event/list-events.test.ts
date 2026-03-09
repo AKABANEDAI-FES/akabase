@@ -44,14 +44,14 @@ describe("listEvents", () => {
     const result = await listEvents({ db: testDb.db });
 
     expect(result).toHaveLength(2);
-    expect(result[0].id).toBe("event-2");
-    expect(result[0].name).toBe("Event 2025");
-    expect(result[0].slug).toBe("2025");
-    expect(result[0].status).toBe("active");
+    expect(result[0]!.id).toBe("event-2");
+    expect(result[0]!.name).toBe("Event 2025");
+    expect(result[0]!.slug).toBe("2025");
+    expect(result[0]!.status).toBe("active");
 
-    expect(result[1].id).toBe("event-1");
-    expect(result[1].name).toBe("Event 2024");
-    expect(result[1].status).toBe("archived");
+    expect(result[1]!.id).toBe("event-1");
+    expect(result[1]!.name).toBe("Event 2024");
+    expect(result[1]!.status).toBe("archived");
   });
 
   it("createdAtがDate型にパースされる", async () => {
@@ -68,8 +68,8 @@ describe("listEvents", () => {
     const result = await listEvents({ db: testDb.db });
 
     expect(result).toHaveLength(1);
-    expect(result[0].createdAt).toBeInstanceOf(Date);
-    expect(Math.abs(result[0].createdAt.getTime() - now.getTime())).toBeLessThan(1000);
+    expect(result[0]!.createdAt).toBeInstanceOf(Date);
+    expect(Math.abs(result[0]!.createdAt.getTime() - now.getTime())).toBeLessThan(1000);
   });
 
   it("DTOにはupdatedAtが含まれない", async () => {
@@ -86,7 +86,7 @@ describe("listEvents", () => {
     const result = await listEvents({ db: testDb.db });
 
     expect(result).toHaveLength(1);
-    expect(Object.keys(result[0])).toEqual(
+    expect(Object.keys(result[0]!)).toEqual(
       expect.arrayContaining(["id", "name", "slug", "status", "createdAt"]),
     );
     expect(result[0]).not.toHaveProperty("updatedAt");

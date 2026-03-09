@@ -9,6 +9,7 @@ import crypto from "node:crypto";
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import * as schema from "../src/db/schema";
+import { zip } from "es-toolkit/array";
 
 // ---------------------------------------------------------------------------
 // DB接続（drizzle.config.ts と同じ方式）
@@ -47,7 +48,7 @@ function dateAfter(base: Date, hoursLater: number): Date {
 }
 
 function pick<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
+  return arr[Math.floor(Math.random() * arr.length)]!;
 }
 
 function pickN<T>(arr: T[], n: number): T[] {
@@ -527,8 +528,8 @@ async function main() {
     tagIds.push(id);
   }
   await db.insert(schema.tags).values(
-    TAG_NAMES.map((name, i) => ({
-      id: tagIds[i],
+    zip(TAG_NAMES, tagIds).map(([name, id]) => ({
+      id: id,
       eventId,
       name,
       createdAt: baseTime,
@@ -554,16 +555,15 @@ async function main() {
     parentId: string;
     createdAt: Date;
   }> = [];
-  for (let bi = 0; bi < BUILDINGS.length; bi++) {
-    const building = BUILDINGS[bi];
+  for (const [bi, building] of BUILDINGS.entries()) {
     const parentId = `place_building_${bi + 1}`;
-    for (let ri = 0; ri < building.rooms.length; ri++) {
+    for (const [ri, room] of building.rooms.entries()) {
       const id = `place_${bi + 1}_room_${ri + 1}`;
       allPlaceIds.push(id);
       roomInserts.push({
         id,
         eventId,
-        name: building.rooms[ri],
+        name: room,
         parentId,
         createdAt: baseTime,
       });
@@ -608,7 +608,7 @@ async function main() {
       id: `committee_${String(i + 1).padStart(3, "0")}`,
       eventId,
       userId: u.id,
-      role: committeeRoleMap[i],
+      role: committeeRoleMap[i] ?? "member",
       createdAt: baseTime,
     })),
   );
@@ -650,7 +650,7 @@ async function main() {
     orgInserts.push({
       id: orgId,
       eventId,
-      name: ORG_TEMPLATES[i % ORG_TEMPLATES.length],
+      name: ORG_TEMPLATES[i % ORG_TEMPLATES.length]!,
       description: `${ORG_TEMPLATES[i % ORG_TEMPLATES.length]}の活動紹介`,
       logoImageId: null,
       createdAt: baseTime,
@@ -660,7 +660,7 @@ async function main() {
     // メンバー割り当て（2〜4人）
     const memberCount = 2 + Math.floor(Math.random() * 3);
     for (let m = 0; m < memberCount; m++) {
-      const userId = memberPool[memberIdx % memberPool.length].id;
+      const userId = memberPool[memberIdx % memberPool.length]!.id;
       memberIdx++;
       orgMemberInserts.push({
         id: `orgmem_${String(orgMemberInserts.length + 1).padStart(4, "0")}`,
@@ -703,15 +703,15 @@ async function main() {
 
   // まず各団体に最低1つ
   for (let i = 0; i < 100 && stateIdx < 200; i++) {
-    projectAssignments.push({ orgIdx: i, state: stateDistribution[stateIdx++] });
-    orgProjectCounts[i]++;
+    projectAssignments.push({ orgIdx: i, state: stateDistribution[stateIdx++]! });
+    orgProjectCounts[i]!++;
   }
   // 残り100件をランダムに割当
   while (stateIdx < 200) {
     const orgIdx = Math.floor(Math.random() * 100);
-    if (orgProjectCounts[orgIdx] < 3) {
-      projectAssignments.push({ orgIdx, state: stateDistribution[stateIdx++] });
-      orgProjectCounts[orgIdx]++;
+    if (orgProjectCounts[orgIdx]! < 3) {
+      projectAssignments.push({ orgIdx, state: stateDistribution[stateIdx++]! });
+      orgProjectCounts[orgIdx]!++;
     }
   }
 
@@ -781,17 +781,17 @@ async function main() {
   }> = [];
 
   for (let pi = 0; pi < projectAssignments.length; pi++) {
-    const { orgIdx, state } = projectAssignments[pi];
+    const { orgIdx, state } = projectAssignments[pi]!;
     const padded = String(pi + 1).padStart(3, "0");
     const projectId = `proj_${padded}`;
-    const orgId = orgIds[orgIdx];
-    const template = PROJECT_TEMPLATES[pi % PROJECT_TEMPLATES.length];
+    const orgId = orgIds[orgIdx]!;
+    const template = PROJECT_TEMPLATES[pi % PROJECT_TEMPLATES.length]!;
     const createdAt = randomDate(30);
     const placeId = pick(allPlaceIds);
 
     // 団体のメンバーからsubmittedBy等を取得
     const orgMems = orgMemberInserts.filter((m) => m.orgId === orgId);
-    const managerUserId = orgMems.find((m) => m.role === "manager")?.userId ?? orgMems[0].userId;
+    const managerUserId = orgMems.find((m) => m.role === "manager")?.userId ?? orgMems[0]!.userId;
 
     // タグ（1〜3個ランダム）
     const projectTags = pickN(tagIds, 1 + Math.floor(Math.random() * 3));

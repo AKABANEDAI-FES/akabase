@@ -57,10 +57,10 @@ describe("listOrganizations", () => {
     const result = await listOrganizations({ db: testDb.db }, eventId);
 
     expect(result).toHaveLength(2);
-    expect(result[0].id).toBe("org-2");
-    expect(result[0].name).toBe("Organization B");
-    expect(result[1].id).toBe("org-1");
-    expect(result[1].name).toBe("Organization A");
+    expect(result[0]!.id).toBe("org-2");
+    expect(result[0]!.name).toBe("Organization B");
+    expect(result[1]!.id).toBe("org-1");
+    expect(result[1]!.name).toBe("Organization A");
   });
 
   it("他のイベントの出展団体は含まれない", async () => {
@@ -97,7 +97,7 @@ describe("listOrganizations", () => {
     const result = await listOrganizations({ db: testDb.db }, eventId);
 
     expect(result).toHaveLength(1);
-    expect(result[0].name).toBe("Organization for 2025");
+    expect(result[0]!.name).toBe("Organization for 2025");
   });
 
   it("DTOにcreatedAtとupdatedAtが含まれる", async () => {
@@ -114,8 +114,8 @@ describe("listOrganizations", () => {
     const result = await listOrganizations({ db: testDb.db }, eventId);
 
     expect(result).toHaveLength(1);
-    expect(result[0].createdAt).toBeInstanceOf(Date);
-    expect(result[0].updatedAt).toBeInstanceOf(Date);
-    expect(result[0].logoImageId).toBeNull();
+    expect(result[0]!.createdAt).toBeInstanceOf(Date);
+    expect(result[0]!.updatedAt).toBeInstanceOf(Date);
+    expect(result[0]!.logoImageId).toBeNull();
   });
 });

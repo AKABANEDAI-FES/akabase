@@ -149,8 +149,8 @@ describe("listOrganizationMembers", () => {
     );
 
     expect(result).toHaveLength(1);
-    expect(result[0].createdAt).toBeInstanceOf(Date);
-    expect(result[0].id).toBeDefined();
-    expect(result[0].userId).toBe("user-1");
+    expect(result[0]!.createdAt).toBeInstanceOf(Date);
+    expect(result[0]!.id).toBeDefined();
+    expect(result[0]!.userId).toBe("user-1");
   });
 });

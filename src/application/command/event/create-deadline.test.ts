@@ -50,7 +50,7 @@ describe("createDeadline", () => {
 
       const deadlines = await deps.eventRepo.findDeadlines(eventId);
       expect(deadlines).toHaveLength(1);
-      expect(deadlines[0].fieldKey).toBe("pamphlet_text");
+      expect(deadlines[0]!.fieldKey).toBe("pamphlet_text");
     }
   });
 
@@ -70,8 +70,8 @@ describe("createDeadline", () => {
     if (Result.isSuccess(result)) {
       const deadlines = await deps.eventRepo.findDeadlines(eventId);
       expect(deadlines).toHaveLength(1);
-      expect(deadlines[0].startAt).toEqual(new Date("2025-06-01"));
-      expect(deadlines[0].deadlineAt).toEqual(new Date("2025-12-31"));
+      expect(deadlines[0]!.startAt).toEqual(new Date("2025-06-01"));
+      expect(deadlines[0]!.deadlineAt).toEqual(new Date("2025-12-31"));
     }
   });
 

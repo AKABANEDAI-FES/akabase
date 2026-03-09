@@ -46,8 +46,8 @@ describe("createPlace", () => {
 
       const places = await deps.eventRepo.findPlaces(eventId);
       expect(places).toHaveLength(1);
-      expect(places[0].name).toBe("メインステージ");
-      expect(places[0].parentId).toBeNull();
+      expect(places[0]!.name).toBe("メインステージ");
+      expect(places[0]!.parentId).toBeNull();
     }
   });
 

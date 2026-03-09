@@ -45,7 +45,7 @@ describe("createTag", () => {
 
       const tags = await deps.eventRepo.findTags(eventId);
       expect(tags).toHaveLength(1);
-      expect(tags[0].name).toBe("飲食");
+      expect(tags[0]!.name).toBe("飲食");
     }
   });
 

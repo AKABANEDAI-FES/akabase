@@ -76,8 +76,8 @@ describe("addOrganizationMember", () => {
 
       const members = await deps.organizationRepo.findMembers(orgId);
       expect(members).toHaveLength(1);
-      expect(members[0].userId).toBe(testUserId);
-      expect(members[0].role).toBe("editor");
+      expect(members[0]!.userId).toBe(testUserId);
+      expect(members[0]!.role).toBe("editor");
     }
   });
 
@@ -95,7 +95,7 @@ describe("addOrganizationMember", () => {
     expect(Result.isSuccess(result)).toBe(true);
     if (Result.isSuccess(result)) {
       const members = await deps.organizationRepo.findMembers(orgId);
-      expect(members[0].role).toBe("manager");
+      expect(members[0]!.role).toBe("manager");
     }
   });
 

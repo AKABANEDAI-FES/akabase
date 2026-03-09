@@ -135,7 +135,9 @@ export function CreateDeadlineDialog({ eventId, defaultOpen, onClose }: CreateDe
                         <Select.Root
                           collection={fieldKeyCollection}
                           value={field.state.value ? [field.state.value] : []}
-                          onValueChange={({ value }) => field.handleChange(value[0])}
+                          onValueChange={({ value }) =>
+                            field.handleChange(value[0] ?? field.state.value)
+                          }
                         >
                           <Select.Control>
                             <Select.Trigger>

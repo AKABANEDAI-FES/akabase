@@ -138,8 +138,7 @@ async function toExcel(data: EventPublishedDataItem[]): Promise<Blob> {
   }
   worksheet.setColumnWidthPixels(LOGO_COL, LOGO_SIZE_PX + 8);
 
-  for (let row = 0; row < data.length; row++) {
-    const item = data[row];
+  for (const [row, item] of data.entries()) {
     worksheet.write(row + 1, 0, item.projectName);
     worksheet.write(row + 1, 1, item.orgName);
     worksheet.write(row + 1, 2, item.pamphletText);

@@ -50,9 +50,9 @@ describe("reorderTags", () => {
 
     const tags = await deps.eventRepo.findTags(eventId);
     const sorted = [...tags].sort((a, b) => a.displayOrder - b.displayOrder);
-    expect(sorted[0].name).toBe("ステージ");
-    expect(sorted[1].name).toBe("展示");
-    expect(sorted[2].name).toBe("飲食");
+    expect(sorted[0]!.name).toBe("ステージ");
+    expect(sorted[1]!.name).toBe("展示");
+    expect(sorted[2]!.name).toBe("飲食");
   });
 
   it("管理者以外はタグの並び順を変更できない", async () => {
