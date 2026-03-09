@@ -12,11 +12,5 @@ count.txt
 .vinxi
 todos.json
 
-## Panda
-packages/styled-system/*
-packages/styled-system-studio
-!packages/styled-system/package.json
-!packages/styled-system/panda.config.ts
-
 ## Wrangler
 .dev.vars
