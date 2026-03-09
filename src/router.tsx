@@ -3,7 +3,7 @@ import { Link, createRouteMask, createRouter } from "@tanstack/react-router";
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
 import * as TanstackQuery from "./integrations/tanstack-query/root-provider";
 import type { SessionData } from "./libs/session-server";
-import { Grid, VStack } from "styled-system/jsx";
+import { Grid, VStack } from "@archive/styled-system/jsx";
 import { RotateCcwIcon, SearchXIcon, TriangleAlertIcon } from "lucide-react";
 import { Button, Heading, Icon, Text } from "./components/ui";
 

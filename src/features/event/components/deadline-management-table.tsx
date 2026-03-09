@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { IconButton, Table } from "@/components/ui";
-import { Flex } from "styled-system/jsx";
+import { Flex } from "@archive/styled-system/jsx";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import type { EventId } from "@/domain/shared/ids";
 import type { DeadlineListItem } from "@/application/query/event/list-deadlines";

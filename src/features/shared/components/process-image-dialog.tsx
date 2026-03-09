@@ -20,8 +20,8 @@ import { createListCollection } from "@ark-ui/react/collection";
 import type { ImageObject, ProcessImageOptions } from "@/libs/image";
 import { createImageObject, processImage } from "@/libs/image";
 import { MAX_FILE_SIZE } from "@/domain/shared/storage";
-import { css } from "styled-system/css";
-import { Box, Flex, Grid, Stack } from "styled-system/jsx";
+import { css } from "@archive/styled-system/css";
+import { Box, Flex, Grid, Stack } from "@archive/styled-system/jsx";
 import { ArrowRightIcon, GripVerticalIcon, Link2Icon, Unlink2Icon } from "lucide-react";
 import { Format } from "@ark-ui/react";
 

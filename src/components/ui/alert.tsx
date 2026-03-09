@@ -3,8 +3,8 @@ import { ark } from "@ark-ui/react/factory";
 import { InfoIcon } from "lucide-react";
 import { forwardRef } from "react";
 import type { ComponentProps } from "react";
-import { createStyleContext } from "styled-system/jsx";
-import { alert } from "styled-system/recipes";
+import { createStyleContext } from "@archive/styled-system/jsx";
+import { alert } from "@archive/styled-system/recipes";
 
 const { withProvider, withContext } = createStyleContext(alert);
 

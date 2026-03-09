@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Flex } from "styled-system/jsx";
+import { Flex } from "@archive/styled-system/jsx";
 import { XCircleIcon } from "lucide-react";
 import { Button, Card, Text } from "@/components/ui";
 import type { SubmissionDetail } from "@/application/query/project/get-submission-detail";

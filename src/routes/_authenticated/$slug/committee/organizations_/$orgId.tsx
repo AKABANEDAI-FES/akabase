@@ -1,6 +1,6 @@
 import { Link, Outlet, createFileRoute, useLocation } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Container, Stack } from "styled-system/jsx";
+import { Container, Stack } from "@archive/styled-system/jsx";
 import { Button, Heading, SegmentGroup } from "@/components/ui";
 import { ArrowLeftIcon } from "lucide-react";
 import { generateLoadOrganizationDetailQueryOptions } from "@/features/organization/actions";

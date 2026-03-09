@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Stack } from "styled-system/jsx";
+import { Stack } from "@archive/styled-system/jsx";
 import { Trash2Icon } from "lucide-react";
 import { generateLoadOrganizationDetailQueryOptions } from "@/features/organization/actions";
 import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions";

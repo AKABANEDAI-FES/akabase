@@ -6,7 +6,7 @@ import { createProjectInputSchema, useCreateProjectMutation } from "@/features/p
 import { generateLoadPlacesQueryOptions } from "@/features/event/actions/queries/place";
 import { Button, CloseButton, Dialog, Field, Input, Select, toaster } from "@/components/ui";
 import { Portal } from "@ark-ui/react/portal";
-import { Stack } from "styled-system/jsx";
+import { Stack } from "@archive/styled-system/jsx";
 import { useState } from "react";
 import { nl2br } from "@/libs/text";
 import type { EventId, OrgId } from "@/domain/shared/ids";

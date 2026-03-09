@@ -4,7 +4,7 @@ import { Result } from "@praha/byethrow";
 import { Portal } from "@ark-ui/react/portal";
 import { createListCollection } from "@ark-ui/react/collection";
 import { Button, CloseButton, Dialog, Field, Select, toaster } from "@/components/ui";
-import { Stack } from "styled-system/jsx";
+import { Stack } from "@archive/styled-system/jsx";
 import {
   addOrganizationMemberInputSchema,
   useAddOrganizationMemberMutation,

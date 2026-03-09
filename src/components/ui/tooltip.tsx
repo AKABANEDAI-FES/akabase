@@ -3,8 +3,8 @@ import { Portal } from "@ark-ui/react/portal";
 import { Tooltip as ArkTooltip } from "@ark-ui/react/tooltip";
 import { forwardRef } from "react";
 import type { ComponentProps } from "react";
-import { createStyleContext } from "styled-system/jsx";
-import { tooltip } from "styled-system/recipes";
+import { createStyleContext } from "@archive/styled-system/jsx";
+import { tooltip } from "@archive/styled-system/recipes";
 
 const { withRootProvider, withContext } = createStyleContext(tooltip);
 

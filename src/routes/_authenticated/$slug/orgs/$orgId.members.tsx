@@ -1,6 +1,6 @@
 import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Flex, Stack } from "styled-system/jsx";
+import { Flex, Stack } from "@archive/styled-system/jsx";
 import { Button, Heading } from "@/components/ui";
 import { PlusIcon } from "lucide-react";
 import { generateLoadOrganizationMembersQueryOptions } from "@/features/organization/actions/queries";

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Container, Flex, Stack } from "styled-system/jsx";
+import { Container, Flex, Stack } from "@archive/styled-system/jsx";
 import { ArrowLeftIcon } from "lucide-react";
 import { Button, Heading, Tabs, Text } from "@/components/ui";
 import {

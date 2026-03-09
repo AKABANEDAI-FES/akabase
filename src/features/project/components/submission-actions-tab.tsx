@@ -1,4 +1,4 @@
-import { Flex } from "styled-system/jsx";
+import { Flex } from "@archive/styled-system/jsx";
 import { CheckCircleIcon, UndoIcon } from "lucide-react";
 import { Button, Card } from "@/components/ui";
 import type { SubmissionDetail } from "@/application/query/project/get-submission-detail";

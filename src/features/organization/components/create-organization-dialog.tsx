@@ -6,7 +6,7 @@ import {
 } from "@/features/organization/actions";
 import { Button, CloseButton, Dialog, Field, Input, Textarea, toaster } from "@/components/ui";
 import { Portal } from "@ark-ui/react/portal";
-import { Stack } from "styled-system/jsx";
+import { Stack } from "@archive/styled-system/jsx";
 import { useState } from "react";
 import { nl2br } from "@/libs/text";
 import type { EventId } from "@/domain/shared/ids";

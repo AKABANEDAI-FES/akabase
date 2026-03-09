@@ -3,9 +3,9 @@ import { Menu, useMenuItemContext } from "@ark-ui/react/menu";
 import { CheckIcon, ChevronDownIcon } from "lucide-react";
 import { forwardRef } from "react";
 import type { ComponentProps } from "react";
-import { createStyleContext } from "styled-system/jsx";
-import type { HTMLStyledProps } from "styled-system/jsx";
-import { menu } from "styled-system/recipes";
+import { createStyleContext } from "@archive/styled-system/jsx";
+import type { HTMLStyledProps } from "@archive/styled-system/jsx";
+import { menu } from "@archive/styled-system/recipes";
 
 const { withRootProvider, withContext } = createStyleContext(menu);
 

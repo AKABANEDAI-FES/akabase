@@ -1,9 +1,9 @@
 import { generateHTML } from "@tiptap/core";
 import { useSyncExternalStore } from "react";
-import { Box } from "styled-system/jsx";
-import { richTextEditor } from "styled-system/recipes";
+import { Box } from "@archive/styled-system/jsx";
+import { richTextEditor } from "@archive/styled-system/recipes";
 import { editorExtensions } from "./editor/extensions";
-import { cx } from "styled-system/css";
+import { cx } from "@archive/styled-system/css";
 import { Spinner } from "@/components/ui";
 
 interface TipTapContentRendererProps {

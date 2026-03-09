@@ -5,7 +5,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createListCollection } from "@ark-ui/react/collection";
 import { Button, CloseButton, Dialog, Field, Input, Select, toaster } from "@/components/ui";
 import { Portal } from "@ark-ui/react/portal";
-import { Stack } from "styled-system/jsx";
+import { Stack } from "@archive/styled-system/jsx";
 import type { EventId } from "@/domain/shared/ids";
 import {
   DEADLINE_FIELD_KEYS,

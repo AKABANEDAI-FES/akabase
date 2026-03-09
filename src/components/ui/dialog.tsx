@@ -3,8 +3,8 @@ import { Dialog, useDialogContext } from "@ark-ui/react/dialog";
 import { ark } from "@ark-ui/react/factory";
 import { forwardRef } from "react";
 import type { ComponentProps } from "react";
-import { createStyleContext, styled } from "styled-system/jsx";
-import { dialog } from "styled-system/recipes";
+import { createStyleContext, styled } from "@archive/styled-system/jsx";
+import { dialog } from "@archive/styled-system/recipes";
 
 const { withRootProvider, withContext } = createStyleContext(dialog);
 

@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Stack } from "styled-system/jsx";
+import { Stack } from "@archive/styled-system/jsx";
 import { Text } from "@/components/ui";
-import { css } from "styled-system/css";
+import { css } from "@archive/styled-system/css";
 import { generateLoadProjectsQueryOptions } from "@/features/project/actions/queries";
 import type { EventId, OrgId } from "@/domain/shared/ids";
 import { FormatDate } from "@/libs/date";

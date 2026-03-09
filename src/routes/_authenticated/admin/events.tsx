@@ -1,7 +1,7 @@
 import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 import { EventStatusBadge } from "@/features/event/components";
 import { Button, Code, Heading, Table } from "@/components/ui";
-import { Container, Flex, Stack } from "styled-system/jsx";
+import { Container, Flex, Stack } from "@archive/styled-system/jsx";
 import { PencilIcon, PlusIcon } from "lucide-react";
 import { generateLoadEventsQueryOptions } from "@/features/event/actions";
 import { useSuspenseQuery } from "@tanstack/react-query";

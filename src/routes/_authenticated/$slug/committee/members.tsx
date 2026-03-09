@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Heading } from "@/components/ui";
-import { Container, Stack } from "styled-system/jsx";
+import { Container, Stack } from "@archive/styled-system/jsx";
 import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions";
 import { generateLoadUsersForEventQueryOptions } from "@/features/user/actions";
 import { EventUsersTable } from "@/features/user/components";

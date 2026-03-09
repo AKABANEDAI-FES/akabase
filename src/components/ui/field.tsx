@@ -1,8 +1,8 @@
 "use client";
 import { Field } from "@ark-ui/react/field";
 import type { ComponentProps } from "react";
-import { createStyleContext } from "styled-system/jsx";
-import { field } from "styled-system/recipes";
+import { createStyleContext } from "@archive/styled-system/jsx";
+import { field } from "@archive/styled-system/recipes";
 
 const { withProvider, withContext } = createStyleContext(field);
 

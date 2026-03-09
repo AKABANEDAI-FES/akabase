@@ -1,6 +1,6 @@
 import { ClientOnly, Link, createFileRoute, useBlocker } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Container, Flex, Stack } from "styled-system/jsx";
+import { Container, Flex, Stack } from "@archive/styled-system/jsx";
 import { Alert, Badge, Button, Field, Heading, Select, Textarea, toaster } from "@/components/ui";
 import { ArrowLeftIcon, SaveIcon, SendIcon } from "lucide-react";
 import { revalidateLogic, useForm, useStore } from "@tanstack/react-form";

@@ -10,8 +10,8 @@ import {
 } from "lucide-react";
 import { Format } from "@ark-ui/react/format";
 import { Badge, Button, Card, Heading, Skeleton, Text } from "@/components/ui";
-import { css } from "styled-system/css";
-import { Container, Flex, Grid, HStack, Stack } from "styled-system/jsx";
+import { css } from "@archive/styled-system/css";
+import { Container, Flex, Grid, HStack, Stack } from "@archive/styled-system/jsx";
 import { SubmissionStatusBadge } from "@/features/project/components";
 import { generateCheckCommitteeRoleQueryOptions } from "@/features/authorization/actions";
 import { generateLoadDeadlinesQueryOptions } from "@/features/event/actions/queries/deadline";

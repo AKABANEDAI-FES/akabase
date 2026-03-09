@@ -1,6 +1,6 @@
 import { ClientOnly } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Flex, Stack } from "styled-system/jsx";
+import { Flex, Stack } from "@archive/styled-system/jsx";
 import { Alert, Button, Field, Select, Textarea, toaster } from "@/components/ui";
 import { SaveIcon } from "lucide-react";
 import { revalidateLogic, useForm } from "@tanstack/react-form";

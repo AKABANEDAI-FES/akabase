@@ -2,7 +2,7 @@ import { Link, Outlet, createFileRoute, useLocation } from "@tanstack/react-rout
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { generateLoadEventDetailQueryOptions } from "@/features/event/actions";
 import { Button, Heading, SegmentGroup } from "@/components/ui";
-import { Container, Stack } from "styled-system/jsx";
+import { Container, Stack } from "@archive/styled-system/jsx";
 import { ArrowLeftIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/events_/$eventId")({

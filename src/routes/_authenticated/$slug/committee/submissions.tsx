@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import { Container, Flex, Stack } from "styled-system/jsx";
+import { Container, Flex, Stack } from "@archive/styled-system/jsx";
 import { Heading } from "@/components/ui";
 import { generateLoadEventSubmissionsQueryOptions } from "@/features/project/actions/queries";
 import { EventSubmissionsTable } from "@/features/project/components";

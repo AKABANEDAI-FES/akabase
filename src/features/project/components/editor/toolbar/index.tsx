@@ -1,5 +1,5 @@
 import { ButtonGroup, IconButton, ScrollArea } from "@/components/ui";
-import { Box, Flex, Grid } from "styled-system/jsx";
+import { Box, Flex, Grid } from "@archive/styled-system/jsx";
 import { UndoRedoButton } from "./undo-redo-button";
 import { HeadingSelect } from "./heading-select";
 import { MarkButton } from "./mark-button";

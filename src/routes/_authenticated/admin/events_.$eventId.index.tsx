@@ -4,7 +4,7 @@ import { cast } from "@/domain/shared/ids";
 import type { EventId } from "@/domain/shared/ids";
 import { EventStatusAlert, EventStatusControls } from "@/features/event/components";
 import { generateLoadEventDetailQueryOptions } from "@/features/event/actions";
-import { Stack } from "styled-system/jsx";
+import { Stack } from "@archive/styled-system/jsx";
 import { UpdateEventForm } from "@/features/event/components/update-event-form";
 
 export const Route = createFileRoute("/_authenticated/admin/events_/$eventId/")({

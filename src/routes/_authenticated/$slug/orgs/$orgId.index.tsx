@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Stack } from "styled-system/jsx";
+import { Stack } from "@archive/styled-system/jsx";
 import { generateLoadOrganizationDetailQueryOptions } from "@/features/organization/actions/queries";
 import { generateLoadProjectsQueryOptions } from "@/features/project/actions/queries";
 import { OrgProjectsList } from "@/features/organization/components";

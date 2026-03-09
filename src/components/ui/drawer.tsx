@@ -2,8 +2,8 @@
 import { Dialog } from "@ark-ui/react/dialog";
 import { ark } from "@ark-ui/react/factory";
 import type { ComponentProps } from "react";
-import { createStyleContext } from "styled-system/jsx";
-import { drawer } from "styled-system/recipes";
+import { createStyleContext } from "@archive/styled-system/jsx";
+import { drawer } from "@archive/styled-system/recipes";
 
 const { withRootProvider, withContext } = createStyleContext(drawer);
 

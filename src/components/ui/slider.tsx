@@ -3,8 +3,8 @@ import { ark } from "@ark-ui/react/factory";
 import { Slider, useSliderContext } from "@ark-ui/react/slider";
 import { forwardRef } from "react";
 import type { ComponentProps } from "react";
-import { createStyleContext } from "styled-system/jsx";
-import { slider } from "styled-system/recipes";
+import { createStyleContext } from "@archive/styled-system/jsx";
+import { slider } from "@archive/styled-system/recipes";
 
 const { withProvider, withContext } = createStyleContext(slider);
 

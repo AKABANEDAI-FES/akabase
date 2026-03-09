@@ -2,7 +2,7 @@ import { useOptimistic, useTransition } from "react";
 import type { CSSProperties } from "react";
 import { Link } from "@tanstack/react-router";
 import { IconButton, Table, toaster } from "@/components/ui";
-import { Flex } from "styled-system/jsx";
+import { Flex } from "@archive/styled-system/jsx";
 import { GripVerticalIcon, PencilIcon, Trash2Icon } from "lucide-react";
 import { Result } from "@praha/byethrow";
 import type { EventId, TagId } from "@/domain/shared/ids";
@@ -28,7 +28,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { css } from "styled-system/css";
+import { css } from "@archive/styled-system/css";
 import { useQueryClient } from "@tanstack/react-query";
 import { generateLoadTagsQueryOptions } from "../actions";
 

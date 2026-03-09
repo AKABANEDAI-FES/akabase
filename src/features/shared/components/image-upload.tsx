@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Icon, IconButton, Spinner, Text, toaster } from "@/components/ui";
-import { css } from "styled-system/css";
+import { css } from "@archive/styled-system/css";
 import { PencilIcon, UploadCloudIcon, XIcon } from "lucide-react";
 import { useUploadImageMutation } from "../actions/mutations";
 import type { AllowedImageType, ImageScope } from "@/domain/shared/storage";
@@ -9,7 +9,7 @@ import {
   MAX_FILE_SIZE,
   STORAGE_ERROR_MESSAGES,
 } from "@/domain/shared/storage";
-import { Box } from "styled-system/jsx";
+import { Box } from "@archive/styled-system/jsx";
 import { ProcessImageDialog } from "./process-image-dialog";
 import type { ProcessedImageResult } from "./process-image-dialog";
 

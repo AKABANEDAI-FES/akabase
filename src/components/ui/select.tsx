@@ -5,10 +5,10 @@ import { Select, useSelectContext, useSelectItemContext } from "@ark-ui/react/se
 import { CheckIcon, ChevronsUpDownIcon, XIcon } from "lucide-react";
 import { forwardRef } from "react";
 import type { RefAttributes } from "react";
-import { createStyleContext } from "styled-system/jsx";
-import { select } from "styled-system/recipes";
-import type { SelectVariantProps } from "styled-system/recipes";
-import type { HTMLStyledProps } from "styled-system/types";
+import { createStyleContext } from "@archive/styled-system/jsx";
+import { select } from "@archive/styled-system/recipes";
+import type { SelectVariantProps } from "@archive/styled-system/recipes";
+import type { HTMLStyledProps } from "@archive/styled-system/types";
 
 const { withProvider, withContext } = createStyleContext(select);
 

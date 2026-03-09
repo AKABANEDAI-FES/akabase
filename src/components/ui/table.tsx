@@ -2,9 +2,9 @@
 import { ark } from "@ark-ui/react/factory";
 import type { ComponentProps } from "react";
 import { forwardRef } from "react";
-import { css } from "styled-system/css";
-import { createStyleContext } from "styled-system/jsx";
-import { table } from "styled-system/recipes";
+import { css } from "@archive/styled-system/css";
+import { createStyleContext } from "@archive/styled-system/jsx";
+import { table } from "@archive/styled-system/recipes";
 
 const { withProvider, withContext } = createStyleContext(table);
 

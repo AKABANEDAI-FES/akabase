@@ -22,7 +22,7 @@ import {
   Table,
   Text,
 } from "@/components/ui";
-import { Flex, Stack } from "styled-system/jsx";
+import { Flex, Stack } from "@archive/styled-system/jsx";
 import { SubmissionStatusBadge } from "./submission-status-badge";
 import { generateLoadEventSubmissionsQueryOptions } from "@/features/project/actions/queries";
 import { Route } from "@/routes/_authenticated/$slug/committee/submissions";

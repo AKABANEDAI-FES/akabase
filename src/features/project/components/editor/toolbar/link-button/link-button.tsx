@@ -4,7 +4,7 @@ import { Portal } from "@ark-ui/react/portal";
 import { useEditorState } from "@tiptap/react";
 import type { Editor } from "@tiptap/react";
 import { Button, Field, Input, Popover } from "@/components/ui";
-import { Flex, Stack } from "styled-system/jsx";
+import { Flex, Stack } from "@archive/styled-system/jsx";
 import { useTiptapEditor } from "../../hooks/use-tiptap-editor";
 import { ToolbarButton } from "../toolbar-button";
 

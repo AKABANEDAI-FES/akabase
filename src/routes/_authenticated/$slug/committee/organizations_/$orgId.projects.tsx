@@ -1,7 +1,7 @@
 import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Button, IconButton, Table } from "@/components/ui";
-import { Flex, Stack } from "styled-system/jsx";
+import { Flex, Stack } from "@archive/styled-system/jsx";
 import { PencilIcon, PlusIcon } from "lucide-react";
 import { generateLoadProjectsQueryOptions } from "@/features/project/actions";
 import { cast } from "@/domain/shared/ids";

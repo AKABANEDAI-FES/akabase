@@ -1,4 +1,4 @@
-import { Flex, Grid, HStack, Stack } from "styled-system/jsx";
+import { Flex, Grid, HStack, Stack } from "@archive/styled-system/jsx";
 import { TagIcon } from "lucide-react";
 import { Badge, Card, Text } from "@/components/ui";
 import type { SubmissionDetail } from "@/application/query/project/get-submission-detail";

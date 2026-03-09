@@ -3,10 +3,10 @@ import { Combobox, useComboboxItemContext } from "@ark-ui/react/combobox";
 import { ark } from "@ark-ui/react/factory";
 import { CheckIcon, ChevronsUpDownIcon, XIcon } from "lucide-react";
 import { forwardRef } from "react";
-import { createStyleContext } from "styled-system/jsx";
-import type { HTMLStyledProps } from "styled-system/jsx";
-import { combobox } from "styled-system/recipes";
-import type { ComboboxVariantProps } from "styled-system/recipes";
+import { createStyleContext } from "@archive/styled-system/jsx";
+import type { HTMLStyledProps } from "@archive/styled-system/jsx";
+import { combobox } from "@archive/styled-system/recipes";
+import type { ComboboxVariantProps } from "@archive/styled-system/recipes";
 
 const { withProvider, withContext } = createStyleContext(combobox);
 

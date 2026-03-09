@@ -2,12 +2,12 @@ import { EditorContent, EditorContext, useEditor } from "@tiptap/react";
 import { useEffect, useMemo, useState } from "react";
 import { Toolbar } from "./toolbar";
 import { editorExtensions } from "./extensions";
-import { richTextEditor } from "styled-system/recipes";
+import { richTextEditor } from "@archive/styled-system/recipes";
 import { Placeholder } from "@tiptap/extensions";
 import { Dialog } from "@/components/ui";
 import type { ImageScope } from "@/domain/shared/storage";
 import { Portal } from "@ark-ui/react";
-import { Box } from "styled-system/jsx";
+import { Box } from "@archive/styled-system/jsx";
 import { InPortal, OutPortal, createHtmlPortalNode } from "react-reverse-portal";
 
 export interface RichTextEditorProps {

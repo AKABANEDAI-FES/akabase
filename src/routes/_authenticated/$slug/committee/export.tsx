@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Container, Flex, Stack } from "styled-system/jsx";
+import { Container, Flex, Stack } from "@archive/styled-system/jsx";
 import { Heading } from "@/components/ui";
 import { generateLoadEventPublishedDataQueryOptions } from "@/features/project/actions/queries";
 import { generateLoadPlacesQueryOptions } from "@/features/event/actions/queries/place";

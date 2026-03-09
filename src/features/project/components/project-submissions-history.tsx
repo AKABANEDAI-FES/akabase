@@ -1,6 +1,6 @@
 import { Link, useParams } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Stack } from "styled-system/jsx";
+import { Stack } from "@archive/styled-system/jsx";
 import { Card, Text } from "@/components/ui";
 import { SubmissionStatusBadge } from "./submission-status-badge";
 import { SUBMISSION_ACTION_LABELS } from "@/domain/project/schema";

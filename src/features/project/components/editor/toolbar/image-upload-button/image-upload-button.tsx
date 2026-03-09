@@ -13,7 +13,7 @@ import {
   STORAGE_ERROR_MESSAGES,
 } from "@/domain/shared/storage";
 import type { Editor } from "@tiptap/react";
-import { css } from "styled-system/css";
+import { css } from "@archive/styled-system/css";
 
 const ACCEPT = ALLOWED_IMAGE_TYPES.join(",");
 

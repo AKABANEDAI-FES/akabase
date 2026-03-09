@@ -4,7 +4,7 @@ import { Result } from "@praha/byethrow";
 import { createListCollection } from "@ark-ui/react/collection";
 import { Button, CloseButton, Dialog, Field, Input, Select, toaster } from "@/components/ui";
 import { Portal } from "@ark-ui/react/portal";
-import { Stack } from "styled-system/jsx";
+import { Stack } from "@archive/styled-system/jsx";
 import type { EventId, PlaceId } from "@/domain/shared/ids";
 import type { PlaceListItem } from "@/application/query/event/list-places";
 import { createPlaceInputSchema, useCreatePlaceMutation } from "@/features/event/actions/mutations";

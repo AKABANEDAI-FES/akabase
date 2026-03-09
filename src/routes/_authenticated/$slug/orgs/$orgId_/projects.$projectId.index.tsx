@@ -1,6 +1,6 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Container, Flex, Stack } from "styled-system/jsx";
+import { Container, Flex, Stack } from "@archive/styled-system/jsx";
 import { Button, Heading, Text } from "@/components/ui";
 import { ArrowLeftIcon, EditIcon, HistoryIcon, MapPinIcon } from "lucide-react";
 import {

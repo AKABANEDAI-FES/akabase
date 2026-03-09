@@ -1,6 +1,6 @@
 import { Link, Outlet, createFileRoute, useLocation } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Container, Stack } from "styled-system/jsx";
+import { Container, Stack } from "@archive/styled-system/jsx";
 import { Heading, SegmentGroup } from "@/components/ui";
 import { generateLoadOrganizationDetailQueryOptions } from "@/features/organization/actions/queries";
 import { handleNotFoundError } from "@/libs/error";

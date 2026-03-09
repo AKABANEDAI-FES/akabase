@@ -3,7 +3,7 @@ import { Result } from "@praha/byethrow";
 import { createEventInputSchema, useCreateEventMutation } from "@/features/event/actions";
 import { Button, CloseButton, Dialog, Field, Input, toaster } from "@/components/ui";
 import { Portal } from "@ark-ui/react/portal";
-import { Stack } from "styled-system/jsx";
+import { Stack } from "@archive/styled-system/jsx";
 import { useState } from "react";
 import { nl2br } from "@/libs/text";
 import { EVENT_ERROR_CODE } from "@/domain/event/errors";

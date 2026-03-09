@@ -113,7 +113,8 @@ export default defineConfig({
   },
 
   // The output directory for your css system
-  outdir: "styled-system",
+  importMap: "@archive/styled-system",
+  outdir: "./packages/styled-system",
 
   globalCss: globalCss,
   conditions: conditions,

@@ -3,7 +3,7 @@ import { revalidateLogic, useForm } from "@tanstack/react-form";
 import { Result } from "@praha/byethrow";
 import { Button, CloseButton, Dialog, Field, Input, toaster } from "@/components/ui";
 import { Portal } from "@ark-ui/react/portal";
-import { Stack } from "styled-system/jsx";
+import { Stack } from "@archive/styled-system/jsx";
 import type { EventId } from "@/domain/shared/ids";
 import type { PlaceListItem } from "@/application/query/event/list-places";
 import { updatePlaceInputSchema, useUpdatePlaceMutation } from "@/features/event/actions/mutations";

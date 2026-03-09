@@ -3,7 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { generateLoadUsersWithRolesQueryOptions } from "@/features/user/actions";
 import { GlobalRoleSelect } from "@/features/user/components";
 import { Code, Heading, Table } from "@/components/ui";
-import { Container, Flex, Stack } from "styled-system/jsx";
+import { Container, Flex, Stack } from "@archive/styled-system/jsx";
 import { FormatDate } from "@/libs/date";
 
 export const Route = createFileRoute("/_authenticated/admin/users")({

@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Container, Stack } from "styled-system/jsx";
+import { Container, Stack } from "@archive/styled-system/jsx";
 import { Button, Heading, Tabs } from "@/components/ui";
 import { ArrowLeftIcon } from "lucide-react";
 import {

@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Flex, Stack } from "styled-system/jsx";
+import { Flex, Stack } from "@archive/styled-system/jsx";
 import { Badge, Card, Text } from "@/components/ui";
 import { generateLoadProjectPublishedQueryOptions } from "@/features/project/actions/queries";
 import type { EventId, OrgId, ProjectId } from "@/domain/shared/ids";

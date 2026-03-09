@@ -9,8 +9,8 @@ import {
 import { NodeSelection, TextSelection } from "@tiptap/pm/state";
 import type { Editor } from "@tiptap/react";
 import { useCallback, useEffect, useState } from "react";
-import { css } from "styled-system/css";
-import { HStack } from "styled-system/jsx";
+import { css } from "@archive/styled-system/css";
+import { HStack } from "@archive/styled-system/jsx";
 import { Menu } from "@/components/ui";
 import { useTiptapEditor } from "../../hooks/use-tiptap-editor";
 import { findNodePosition, isValidPosition } from "../../lib/tiptap-utils";

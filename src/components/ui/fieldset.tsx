@@ -2,8 +2,8 @@
 import { ark } from "@ark-ui/react/factory";
 import { Fieldset } from "@ark-ui/react/fieldset";
 import type { ComponentProps } from "react";
-import { createStyleContext } from "styled-system/jsx";
-import { fieldset } from "styled-system/recipes";
+import { createStyleContext } from "@archive/styled-system/jsx";
+import { fieldset } from "@archive/styled-system/recipes";
 
 const { withProvider, withContext } = createStyleContext(fieldset);
 

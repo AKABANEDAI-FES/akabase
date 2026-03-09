@@ -13,8 +13,10 @@ count.txt
 todos.json
 
 ## Panda
-styled-system
-styled-system-studio
+packages/styled-system/*
+packages/styled-system-studio
+!packages/styled-system/package.json
+!packages/styled-system/panda.config.ts
 
 ## Wrangler
 .dev.vars

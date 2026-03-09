@@ -1,9 +1,9 @@
 import { ark } from "@ark-ui/react/factory";
 import { forwardRef } from "react";
 import type { ComponentProps } from "react";
-import { Stack, styled } from "styled-system/jsx";
-import type { StackProps } from "styled-system/jsx";
-import { skeleton } from "styled-system/recipes";
+import { Stack, styled } from "@archive/styled-system/jsx";
+import type { StackProps } from "@archive/styled-system/jsx";
+import { skeleton } from "@archive/styled-system/recipes";
 
 export type SkeletonProps = ComponentProps<typeof Skeleton>;
 export const Skeleton = styled(ark.div, skeleton);

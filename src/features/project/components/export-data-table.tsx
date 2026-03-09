@@ -11,7 +11,7 @@ import type { ColumnFiltersState } from "@tanstack/react-table";
 import { DownloadTrigger } from "@ark-ui/react/download-trigger";
 import { Portal } from "@ark-ui/react/portal";
 import { BracesIcon, ListFilterIcon, SheetIcon, TableIcon } from "lucide-react";
-import { Flex, Stack } from "styled-system/jsx";
+import { Flex, Stack } from "@archive/styled-system/jsx";
 import { Button, Checkbox, IconButton, Popover, Table, Text } from "@/components/ui";
 import { generateLoadEventPublishedDataQueryOptions } from "@/features/project/actions/queries";
 import { generateLoadPlacesQueryOptions } from "@/features/event/actions/queries/place";
