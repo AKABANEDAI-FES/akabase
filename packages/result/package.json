@@ -1,0 +1,29 @@
+{
+  "name": "@archive/result",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.mts"
+    }
+  },
+  "scripts": {
+    "lint": "oxlint --type-aware --type-check",
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@archive/config": "workspace:*",
+    "oxlint": "^1.49.0",
+    "oxlint-tsgolint": "^0.16.0",
+    "tsdown": "^0.21.1",
+    "typescript": "^5.7.2",
+    "vitest": "^4.0.18"
+  },
+  "dependencies": {
+    "@praha/byethrow": "^0.10.0"
+  }
+}
