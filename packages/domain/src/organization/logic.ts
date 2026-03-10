@@ -5,7 +5,7 @@ import type { OrganizationError } from "./errors";
 import { ORGANIZATION_ERROR_CODE, organizationError } from "./errors";
 import { DOMAIN_ERROR_CODE } from "../shared/errors";
 import type { EventId } from "../event/schema";
-import type { ImageId } from "../shared/storage";
+import type { ImageId } from "../shared/image";
 import type { UserId } from "../user/schema";
 
 /**

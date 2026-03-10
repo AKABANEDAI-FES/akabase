@@ -23,6 +23,10 @@
     "./shared/*": {
       "import": "./dist/shared/*.mjs",
       "types": "./dist/shared/*.d.mts"
+    },
+    "./user/*": {
+      "import": "./dist/user/*.mjs",
+      "types": "./dist/user/*.d.mts"
     }
   },
   "scripts": {
@@ -37,6 +41,7 @@
   },
   "devDependencies": {
     "@archive/config": "workspace:*",
+    "@typescript/native-preview": "7.0.0-dev.20260310.1",
     "oxlint": "^1.49.0",
     "oxlint-tsgolint": "^0.16.0",
     "tsdown": "^0.21.1",

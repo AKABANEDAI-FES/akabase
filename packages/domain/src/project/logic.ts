@@ -24,7 +24,7 @@ import { PROJECT_ERROR_CODE, projectError } from "./errors";
 import { DOMAIN_ERROR_CODE } from "../shared/errors";
 import type { EventId, PlaceId, TagId } from "../event/schema";
 import type { OrgId } from "../organization/schema";
-import type { ImageId } from "../shared/storage";
+import type { ImageId } from "../shared/image";
 import type { UserId } from "../user/schema";
 
 /**

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { OrgId, OrgMember, Organization } from "./schema";
 import { cast } from "../shared/ids";
 import type { EventId } from "../event/schema";
-import type { ImageId } from "../shared/storage";
+import type { ImageId } from "../shared/image";
 import type { UserId } from "../user/schema";
 import { canAddMember, canRemoveMember, updateOrganizationEntity } from "./logic";
 

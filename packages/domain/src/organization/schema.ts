@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { eventIdSchema } from "../event/schema";
-import { imageIdSchema } from "../shared/storage";
+import { imageIdSchema } from "../shared/image";
 import { userIdSchema } from "../user/schema";
 
 export const orgIdSchema = z.string().brand<"OrgId">();
