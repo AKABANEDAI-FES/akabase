@@ -15,12 +15,17 @@
     "import/no-default-export": "off",
     "import/prefer-default-export": "off",
     "import/no-relative-parent-imports": "off",
+    "import/no-namespace": "off",
+    "import/exports-last": "off",
     "eslint/id-length": "off",
     "eslint/func-style": ["warn", "declaration", { "allowArrowFunctions": true }],
     "eslint/no-ternary": "off",
     "eslint/max-statements": ["warn", 20],
     "eslint/sort-keys": "off",
     "eslint/max-params": "off",
+    "eslint/no-shadow": "off",
+    "eslint/no-magic-numbers": "off",
+    "eslint/no-undefined": "off",
     "sort-imports": [
       "error",
       {
@@ -30,6 +35,8 @@
     "eslint/no-duplicate-imports": ["error", { "allowSeparateTypeImports": true }],
     "func-names": ["error", "as-needed", { "generators": "never" }],
     "typescript/consistent-type-definitions": ["warn", "type"],
+    "typescript/explicit-function-return-type": "off",
+    "typescript/explicit-module-boundary-types": "off",
     "unicorn/no-null": "off",
     "unicorn/no-array-method-this-argument": "off",
     "unicorn/filename-case": [
