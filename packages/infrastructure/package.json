@@ -12,13 +12,13 @@
       "import": "./dist/db/index.mjs",
       "types": "./dist/db/index.d.mts"
     },
-    "./repository/*": {
-      "import": "./dist/repository/*.mjs",
-      "types": "./dist/repository/*.d.mts"
+    "./repositories/*": {
+      "import": "./dist/repositories/*.mjs",
+      "types": "./dist/repositories/*.d.mts"
     },
-    "./service/*": {
-      "import": "./dist/service/*.mjs",
-      "types": "./dist/service/*.d.mts"
+    "./services/*": {
+      "import": "./dist/services/*.mjs",
+      "types": "./dist/services/*.d.mts"
     },
     "./storage/*": {
       "import": "./dist/storage/*.mjs",

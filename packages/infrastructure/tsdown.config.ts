@@ -4,8 +4,8 @@ export default defineConfig({
   entry: [
     "src/auth/index.ts",
     "src/db/index.ts",
-    "src/repository/*.ts",
-    "src/service/*.ts",
+    "src/repositories/*.ts",
+    "src/services/*.ts",
     "src/storage/*.ts",
   ],
   dts: {
