@@ -1,0 +1,56 @@
+/**
+ * Authorization service interface
+ */
+
+import type { Result } from "@archive/result";
+import type { Action, Actor, AuthorizationDecision, Resource } from "./schema";
+import type { AuthorizationError } from "./errors";
+
+/**
+ * Authorization service interface
+ * Core interface: isAllowed(actor, resource, action)
+ */
+export type AuthorizationService = {
+  /**
+   * Check if an actor is allowed to perform an action on a resource
+   *
+   * @param actor - The actor attempting the action
+   * @param resource - The resource being accessed
+   * @param action - The action being performed
+   * @returns Result with boolean indicating permission
+   */
+  isAllowed(
+    actor: Actor,
+    resource: Resource,
+    action: Action,
+  ): Result.Result<boolean, AuthorizationError>;
+
+  /**
+   * Check permission with detailed decision information
+   *
+   * @param actor - The actor attempting the action
+   * @param resource - The resource being accessed
+   * @param action - The action being performed
+   * @returns Result with authorization decision including reason
+   */
+  checkPermission(
+    actor: Actor,
+    resource: Resource,
+    action: Action,
+  ): Result.Result<AuthorizationDecision, AuthorizationError>;
+
+  /**
+   * Enforce authorization - returns success or error
+   * Use this in commands to fail fast if not authorized
+   *
+   * @param actor - The actor attempting the action
+   * @param resource - The resource being accessed
+   * @param action - The action being performed
+   * @returns Result with true if allowed, error if denied
+   */
+  enforce(
+    actor: Actor,
+    resource: Resource,
+    action: Action,
+  ): Result.Result<true, AuthorizationError>;
+};

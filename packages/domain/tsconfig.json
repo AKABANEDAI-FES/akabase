@@ -1,0 +1,6 @@
+{
+  "extends": "@archive/config/typescript/library.json",
+  "compilerOptions": {
+    "outDir": "dist"
+  }
+}

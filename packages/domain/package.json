@@ -1,0 +1,46 @@
+{
+  "name": "@archive/domain",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "exports": {
+    "./authorization/*": {
+      "import": "./dist/authorization/*.mjs",
+      "types": "./dist/authorization/*.d.mts"
+    },
+    "./event/*": {
+      "import": "./dist/event/*.mjs",
+      "types": "./dist/event/*.d.mts"
+    },
+    "./organization/*": {
+      "import": "./dist/organization/*.mjs",
+      "types": "./dist/organization/*.d.mts"
+    },
+    "./project/*": {
+      "import": "./dist/project/*.mjs",
+      "types": "./dist/project/*.d.mts"
+    },
+    "./shared/*": {
+      "import": "./dist/shared/*.mjs",
+      "types": "./dist/shared/*.d.mts"
+    }
+  },
+  "scripts": {
+    "lint": "oxlint --type-aware --type-check",
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@archive/result": "workspace:*",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@archive/config": "workspace:*",
+    "oxlint": "^1.49.0",
+    "oxlint-tsgolint": "^0.16.0",
+    "tsdown": "^0.21.1",
+    "typescript": "^5.7.2",
+    "vitest": "^4.0.18"
+  }
+}
