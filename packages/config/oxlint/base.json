@@ -1,6 +1,6 @@
 {
   "$schema": "../node_modules/oxlint/configuration_schema.json",
-  "plugins": ["typescript", "import", "unicorn", "oxc", "eslint", "promise"],
+  "plugins": ["typescript", "import", "unicorn", "eslint", "promise"],
   "categories": {
     "correctness": "error",
     "suspicious": "warn",
@@ -9,22 +9,39 @@
     "restriction": "error"
   },
   "rules": {
+    "no-eq-null": "off",
     "import/group-exports": "off",
     "import/no-named-export": "off",
     "import/no-default-export": "off",
     "import/prefer-default-export": "off",
+    "import/no-relative-parent-imports": "off",
     "eslint/id-length": "off",
     "eslint/func-style": ["warn", "declaration", { "allowArrowFunctions": true }],
     "eslint/no-ternary": "off",
     "eslint/max-statements": ["warn", 20],
     "eslint/sort-keys": "off",
+    "eslint/max-params": "off",
+    "sort-imports": [
+      "error",
+      {
+        "ignoreDeclarationSort": true
+      }
+    ],
+    "eslint/no-duplicate-imports": ["error", { "allowSeparateTypeImports": true }],
     "func-names": ["error", "as-needed", { "generators": "never" }],
     "typescript/consistent-type-definitions": ["warn", "type"],
-    "oxc/no-async-await": "off",
+    "unicorn/no-null": "off",
+    "unicorn/no-array-method-this-argument": "off",
+    "unicorn/filename-case": [
+      "error",
+      {
+        "case": "kebabCase"
+      }
+    ]
   },
   "overrides": [
     {
-      "plugins": ["typescript", "import", "unicorn", "oxc", "eslint", "promise", "vitest"],
+      "plugins": ["typescript", "import", "unicorn", "eslint", "promise", "vitest"],
       "files": ["**/*.test.ts", "**/*.spec.ts"],
       "rules": {
         "typescript/no-explicit-any": "off",
