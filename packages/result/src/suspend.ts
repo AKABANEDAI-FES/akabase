@@ -1,9 +1,7 @@
-import type { Result } from "@praha/byethrow";
+import type { Result, ResultAsync, ResultMaybeAsync } from "./result";
 
-export function suspend<T, E>(fn: () => Result.Result<T, E>): Result.Result<T, E>;
-export function suspend<T, E>(fn: () => Result.ResultAsync<T, E>): Result.ResultAsync<T, E>;
-export function suspend<T, E>(
-  fn: () => Result.ResultMaybeAsync<T, E>,
-): Result.ResultMaybeAsync<T, E> {
+export function suspend<T, E>(fn: () => Result<T, E>): Result<T, E>;
+export function suspend<T, E>(fn: () => ResultAsync<T, E>): ResultAsync<T, E>;
+export function suspend<T, E>(fn: () => ResultMaybeAsync<T, E>): ResultMaybeAsync<T, E> {
   return fn();
 }

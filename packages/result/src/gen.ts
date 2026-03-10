@@ -1,8 +1,9 @@
 // oxlint-disable typescript/no-explicit-any
-import { Result } from "@praha/byethrow";
+import { isSuccess, succeed } from "./result";
+import type { Failure, Result, ResultAsync, ResultMaybeAsync } from "./result";
 
-function* fromResult<T, E>(r: Result.Result<T, E>): Generator<Result.Failure<E>, T, unknown> {
-  if (Result.isSuccess(r)) {
+function* fromResult<T, E>(r: Result<T, E>): Generator<Failure<E>, T, unknown> {
+  if (isSuccess(r)) {
     return r.value;
   }
   yield r;
@@ -18,31 +19,29 @@ function isAsyncGen(x: unknown): x is AsyncGenerator<any> {
   return Boolean(x) && typeof (x as any)[Symbol.asyncIterator] === "function";
 }
 
-function runSync(it: Generator<Result.Failure<any>, any, unknown>): Result.Result<any, any> {
+function runSync(it: Generator<Failure<any>, any, unknown>): Result<any, any> {
   const { value, done } = it.next();
-  return done ? Result.succeed(value) : value;
+  return done ? succeed(value) : value;
 }
 
-async function runAsync(
-  it: AsyncGenerator<Result.Failure<any>, any, unknown>,
-): Promise<Result.Result<any, any>> {
+async function runAsync(it: AsyncGenerator<Failure<any>, any, unknown>): Promise<Result<any, any>> {
   const { value, done } = await it.next();
-  return done ? Result.succeed(value) : value;
+  return done ? succeed(value) : value;
 }
 
 type YieldOf<G> = G extends MaybeAsyncGenerator<infer Y, any, any> ? Y : never;
-type YieldedError<G> = YieldOf<G> extends Result.Failure<infer E> ? E : never;
+type YieldedError<G> = YieldOf<G> extends Failure<infer E> ? E : never;
 type ReturnOf<G> = G extends MaybeAsyncGenerator<any, infer R, any> ? R : never;
 
-export function gen<G extends Generator<Result.Failure<any>>>(
+export function gen<G extends Generator<Failure<any>>>(
   f: ($: typeof fromResult) => G,
-): Result.Result<ReturnOf<G>, YieldedError<G>>;
-export function gen<G extends AsyncGenerator<Result.Failure<any>>>(
+): Result<ReturnOf<G>, YieldedError<G>>;
+export function gen<G extends AsyncGenerator<Failure<any>>>(
   f: ($: typeof fromResult) => G,
-): Result.ResultAsync<ReturnOf<G>, YieldedError<G>>;
-export function gen<G extends MaybeAsyncGenerator<Result.Failure<any>, any, any>>(
+): ResultAsync<ReturnOf<G>, YieldedError<G>>;
+export function gen<G extends MaybeAsyncGenerator<Failure<any>, any, any>>(
   f: ($: typeof fromResult) => G,
-): Result.ResultMaybeAsync<ReturnOf<G>, YieldedError<G>> {
+): ResultMaybeAsync<ReturnOf<G>, YieldedError<G>> {
   const it = f(fromResult);
 
   if (isAsyncGen(it)) {
