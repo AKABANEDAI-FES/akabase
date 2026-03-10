@@ -1,0 +1,36 @@
+{
+  "$schema": "../node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "import", "unicorn", "oxc", "eslint", "promise"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "perf": "warn",
+    "style": "warn",
+    "restriction": "error"
+  },
+  "rules": {
+    "import/group-exports": "off",
+    "import/no-named-export": "off",
+    "import/no-default-export": "off",
+    "import/prefer-default-export": "off",
+    "eslint/id-length": "off",
+    "eslint/func-style": ["warn", "declaration", { "allowArrowFunctions": true }],
+    "eslint/no-ternary": "off",
+    "eslint/max-statements": ["warn", 20],
+    "eslint/sort-keys": "off",
+    "func-names": ["error", "as-needed", { "generators": "never" }],
+    "typescript/consistent-type-definitions": ["warn", "type"],
+    "oxc/no-async-await": "off",
+  },
+  "overrides": [
+    {
+      "plugins": ["typescript", "import", "unicorn", "oxc", "eslint", "promise", "vitest"],
+      "files": ["**/*.test.ts", "**/*.spec.ts"],
+      "rules": {
+        "typescript/no-explicit-any": "off",
+        "eslint/no-magic-numbers": "off",
+        "eslint/max-statements": "off"
+      }
+    }
+  ]
+}
