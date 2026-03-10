@@ -1,0 +1,51 @@
+{
+  "name": "@archive/infrastructure",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "exports": {
+    "./auth": {
+      "import": "./dist/auth/index.mjs",
+      "types": "./dist/auth/index.d.mts"
+    },
+    "./db": {
+      "import": "./dist/db/index.mjs",
+      "types": "./dist/db/index.d.mts"
+    },
+    "./repository/*": {
+      "import": "./dist/repository/*.mjs",
+      "types": "./dist/repository/*.d.mts"
+    },
+    "./service/*": {
+      "import": "./dist/service/*.mjs",
+      "types": "./dist/service/*.d.mts"
+    },
+    "./storage/*": {
+      "import": "./dist/storage/*.mjs",
+      "types": "./dist/storage/*.d.mts"
+    }
+  },
+  "scripts": {
+    "lint": "oxlint --type-aware --type-check",
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "cf-typegen": "wrangler types --include-env false",
+    "migration": "drizzle-kit generate"
+  },
+  "dependencies": {
+    "@archive/result": "workspace:*",
+    "@archive/domain": "workspace:*",
+    "drizzle-orm": "0.45.1"
+  },
+  "devDependencies": {
+    "@archive/config": "workspace:*",
+    "@typescript/native-preview": "7.0.0-dev.20260310.1",
+    "drizzle-kit": "0.31.9",
+    "oxlint": "^1.49.0",
+    "oxlint-tsgolint": "^0.16.0",
+    "tsdown": "^0.21.1",
+    "typescript": "^5.7.2",
+    "vitest": "^4.0.18",
+    "wrangler": "^4.69.0"
+  }
+}
