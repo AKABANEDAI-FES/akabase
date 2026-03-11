@@ -84,7 +84,7 @@ export class ImageRepositoryImpl implements ImageRepository {
     return `/api/storage/${key}`;
   }
 
-  async moveImage(fromKey: string, toKey: string): Promise<void> {
+  async moveImage(fromKey: string, newScope: ImageScope): Promise<void> {
     try {
       const obj = await this.bucket.get(fromKey);
       if (!obj) {
@@ -93,6 +93,7 @@ export class ImageRepositoryImpl implements ImageRepository {
           "移動元の画像が見つかりません。",
         );
       }
+      const toKey = buildObjectKeyPrefix(newScope);
       await this.bucket.put(toKey, await obj.arrayBuffer(), {
         httpMetadata: obj.httpMetadata,
       });

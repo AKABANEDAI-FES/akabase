@@ -202,6 +202,46 @@ importers:
         specifier: ^4.67.0
         version: 4.67.0
 
+  packages/application:
+    dependencies:
+      '@archive/domain':
+        specifier: workspace:*
+        version: link:../domain
+      '@archive/infrastructure':
+        specifier: workspace:*
+        version: link:../infrastructure
+      '@archive/result':
+        specifier: workspace:*
+        version: link:../result
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
+    devDependencies:
+      '@archive/config':
+        specifier: workspace:*
+        version: link:../config
+      '@libsql/client':
+        specifier: ^0.17.0
+        version: 0.17.0
+      '@typescript/native-preview':
+        specifier: 7.0.0-dev.20260310.1
+        version: 7.0.0-dev.20260310.1
+      oxlint:
+        specifier: ^1.49.0
+        version: 1.49.0(oxlint-tsgolint@0.16.0)
+      oxlint-tsgolint:
+        specifier: ^0.16.0
+        version: 0.16.0
+      tsdown:
+        specifier: ^0.21.1
+        version: 0.21.1(@typescript/native-preview@7.0.0-dev.20260310.1)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+      vitest:
+        specifier: ^4.0.18
+        version: 4.0.18(@types/node@22.19.10)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@28.1.0(@noble/hashes@2.0.1))(tsx@4.21.0)
+
   packages/config:
     devDependencies:
       oxlint:
@@ -8020,6 +8060,14 @@ snapshots:
     optionalDependencies:
       vite: 8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.25.12)(jiti@2.6.1)(tsx@4.21.0)
 
+  '@vitest/mocker@4.0.18(vite@8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0))':
+    dependencies:
+      '@vitest/spy': 4.0.18
+      estree-walker: 3.0.3
+      magic-string: 0.30.21
+    optionalDependencies:
+      vite: 8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)
+
   '@vitest/pretty-format@4.0.18':
     dependencies:
       tinyrainbow: 3.0.3
@@ -11062,7 +11110,7 @@ snapshots:
   vitest@4.0.18(@types/node@22.19.10)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@28.1.0(@noble/hashes@2.0.1))(tsx@4.21.0):
     dependencies:
       '@vitest/expect': 4.0.18
-      '@vitest/mocker': 4.0.18(vite@8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.25.12)(jiti@2.6.1)(tsx@4.21.0))
+      '@vitest/mocker': 4.0.18(vite@8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0))
       '@vitest/pretty-format': 4.0.18
       '@vitest/runner': 4.0.18
       '@vitest/snapshot': 4.0.18

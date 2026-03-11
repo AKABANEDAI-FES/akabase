@@ -111,7 +111,7 @@ export type ImageRepository = {
    * Move image (copy + delete)
    * @throws {RepositoryException} on storage errors
    */
-  moveImage(fromKey: string, toKey: string): Promise<void>;
+  moveImage(fromKey: string, newScope: ImageScope): Promise<void>;
 
   /**
    * Get public URL for an image

@@ -1,0 +1,28 @@
+{
+  "name": "@archive/application",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "lint": "oxlint --type-aware --type-check",
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@archive/domain": "workspace:*",
+    "@archive/infrastructure": "workspace:*",
+    "@archive/result": "workspace:*",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@archive/config": "workspace:*",
+    "@libsql/client": "^0.17.0",
+    "@typescript/native-preview": "7.0.0-dev.20260310.1",
+    "oxlint": "^1.49.0",
+    "oxlint-tsgolint": "^0.16.0",
+    "tsdown": "^0.21.1",
+    "typescript": "^5.7.2",
+    "vitest": "^4.0.18"
+  }
+}
