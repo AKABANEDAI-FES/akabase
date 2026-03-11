@@ -8,6 +8,15 @@
     "style": "warn",
     "restriction": "error"
   },
+  "ignorePatterns": [
+    "**/.nx/**",
+    "**/.svelte-kit/**",
+    "**/build/**",
+    "**/coverage/**",
+    "**/dist/**",
+    "**/snap/**",
+    "**/vite.config.*.timestamp-*.*"
+  ],
   "rules": {
     "no-eq-null": "off",
     "import/group-exports": "off",
@@ -26,6 +35,9 @@
     "eslint/no-shadow": "off",
     "eslint/no-magic-numbers": "off",
     "eslint/no-undefined": "off",
+    "eslint/capitalized-comments": "off",
+    "eslint/no-use-before-define": "off",
+    "eslint/no-nested-ternary": "off",
     "sort-imports": [
       "error",
       {
@@ -39,6 +51,7 @@
     "typescript/explicit-module-boundary-types": "off",
     "unicorn/no-null": "off",
     "unicorn/no-array-method-this-argument": "off",
+    "unicorn/no-nested-ternary": "off",
     "unicorn/filename-case": [
       "error",
       {

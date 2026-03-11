@@ -1,0 +1,42 @@
+"use client";
+import { Dialog, useDialogContext } from "@ark-ui/react/dialog";
+import { ark } from "@ark-ui/react/factory";
+import { forwardRef } from "react";
+import type { ComponentProps } from "react";
+import { createStyleContext, styled } from "@archive/styled-system/jsx";
+import { dialog } from "@archive/styled-system/recipes";
+import type { HTMLStyledProps } from "@archive/styled-system/types";
+import type { PolymorphicProps } from "@ark-ui/react/factory";
+
+const { withRootProvider, withContext } = createStyleContext(dialog);
+
+export type RootProps = ComponentProps<typeof Root>;
+export const Root = withRootProvider(Dialog.Root, {
+  defaultProps: { unmountOnExit: true, lazyMount: true },
+});
+export const RootProvider = withRootProvider(Dialog.RootProvider, {
+  defaultProps: { unmountOnExit: true, lazyMount: true },
+});
+export const Backdrop = withContext(Dialog.Backdrop, "backdrop");
+export const CloseTrigger = withContext(Dialog.CloseTrigger, "closeTrigger");
+export const Content = withContext(Dialog.Content, "content");
+export const Description = withContext(Dialog.Description, "description");
+export const Positioner = withContext(Dialog.Positioner, "positioner");
+export const Title = withContext(Dialog.Title, "title");
+export const Trigger = withContext(Dialog.Trigger, "trigger");
+export const Body = withContext(ark.div, "body");
+export const Header = withContext(ark.div, "header");
+export const Footer = withContext(ark.div, "footer");
+
+const StyledButton = styled(ark.button);
+
+type ActionTriggerProps = HTMLStyledProps<"button"> & PolymorphicProps;
+
+export const ActionTrigger = forwardRef<HTMLButtonElement, ActionTriggerProps>(
+  function ActionTrigger(props, ref) {
+    const dialog = useDialogContext();
+    return <StyledButton {...props} ref={ref} onClick={() => dialog.setOpen(false)} />;
+  },
+);
+
+export { DialogContext as Context } from "@ark-ui/react/dialog";

@@ -1,0 +1,16 @@
+{
+  "$schema": "../node_modules/oxlint/configuration_schema.json",
+  "extends": ["./base.json"],
+  "overrides": [
+    {
+      "files": ["**/*.{js,ts,tsx}"],
+      "plugins": ["typescript", "import", "unicorn", "eslint", "promise", "react", "react-perf"]
+    },
+    {
+      "files": ["**/*.{tsx,jsx}"],
+      "rules": {
+        "typescript/promise-function-async": "off"
+      }
+    }
+  ]
+}
