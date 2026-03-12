@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "postinstall": "pnpm -F @archive/ui build",
     "dev": "turbo run dev",
     "build": "turbo run build",
     "test": "turbo run test",
