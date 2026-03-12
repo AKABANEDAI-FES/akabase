@@ -7,7 +7,7 @@ import { Result } from "@archive/result";
 import type { EventId, PlaceId } from "@archive/domain/event/schema";
 import type { OrgId } from "@archive/domain/organization/schema";
 import type { ProjectId } from "@archive/domain/project/schema";
-import type { ImageId } from "@archive/domain/shared/image";
+import type { ImageId, ImageRepository } from "@archive/domain/shared/image";
 import type { ProjectError } from "@archive/domain/project/errors";
 import { PROJECT_ERROR_CODE, projectError } from "@archive/domain/project/errors";
 import type { EventError } from "@archive/domain/event/errors";
@@ -18,6 +18,7 @@ import { updateProjectEntity } from "@archive/domain/project/logic";
 import type { ProjectRepository } from "@archive/domain/project/repository";
 import type { AuthorizationService } from "@archive/domain/authorization/service";
 import type { EventDomainService } from "@archive/domain/event/service";
+import { migrateImageScope } from "../shared/migrate-image-scope";
 
 export type UpdateProjectInput = {
   projectId: ProjectId;
@@ -42,6 +43,7 @@ export async function updateProject(
     projectRepo: ProjectRepository;
     authService: AuthorizationService;
     eventDomainService: EventDomainService;
+    imageRepo: ImageRepository;
   },
   input: UpdateProjectInput,
 ): Result.ResultAsync<UpdateProjectOutput, UpdateProjectError> {
@@ -68,6 +70,15 @@ export async function updateProject(
     );
 
     await deps.projectRepo.saveProject(updatedProject);
+
+    // Migrate pending image scope to project scope
+    if (input.logoImageId) {
+      await migrateImageScope(deps, input.logoImageId, {
+        type: "project",
+        eventId: project.eventId,
+        projectId: input.projectId,
+      });
+    }
 
     return { projectId: input.projectId, eventId: project.eventId, orgId: project.orgId };
   });

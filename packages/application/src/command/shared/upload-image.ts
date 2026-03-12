@@ -6,20 +6,22 @@
 import { Result } from "@archive/result";
 import { ValidatedImage } from "@archive/domain/shared/image";
 import type {
+  ImageId,
   ImageRepository,
   ImageScope,
   ImageValidationError,
 } from "@archive/domain/shared/image";
+import type { UserId } from "@archive/domain/user/schema";
 
 export type UploadImageInput = {
   file: ArrayBuffer;
   contentType: string;
-  userId: string;
+  userId: UserId;
   scope: ImageScope;
 };
 
 export type UploadImageOutput = {
-  imageId: string;
+  imageId: ImageId;
   objectKey: string;
 };
 
@@ -35,7 +37,7 @@ export async function uploadImage(
   }
 
   const image = validationResult.value;
-  const { id, objectKey } = await deps.imageRepo.uploadImage(image, input.scope);
+  const { id, objectKey } = await deps.imageRepo.uploadImage(image, input.scope, input.userId);
 
   return Result.succeed({ imageId: id, objectKey });
 }

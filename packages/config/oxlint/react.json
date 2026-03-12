@@ -4,7 +4,10 @@
   "overrides": [
     {
       "files": ["**/*.{js,ts,tsx}"],
-      "plugins": ["typescript", "import", "unicorn", "eslint", "promise", "react", "react-perf"]
+      "plugins": ["typescript", "import", "unicorn", "eslint", "promise", "react", "react-perf"],
+      "rules": {
+        "no-console": ["warn", { "allow": ["warn", "error", "info", "debug"] }]
+      }
     },
     {
       "files": ["**/*.{tsx,jsx}"],

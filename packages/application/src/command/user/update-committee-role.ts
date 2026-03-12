@@ -28,6 +28,7 @@ export type UpdateCommitteeRoleInput = {
 };
 
 export type UpdateCommitteeRoleOutput = {
+  eventId: EventId;
   success: true;
 };
 
@@ -71,6 +72,6 @@ export async function updateCommitteeRole(
 
     await deps.userRepo.saveCommitteeRoleAssignment(assignment);
 
-    return { success: true as const };
+    return { eventId: assignment.eventId, success: true as const };
   });
 }

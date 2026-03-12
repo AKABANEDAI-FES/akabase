@@ -26,10 +26,11 @@
     "tsdown": "^0.21.1",
     "typescript": "^5.7.2"
   },
-  "dependencies": {
-    "@ark-ui/react": "^5.32.0"
-  },
   "peerDependencies": {
-    "@archive/styled-system": "workspace:*"
+    "@archive/styled-system": "workspace:*",
+    "@ark-ui/react": "^5",
+    "lucide-react": "^0",
+    "react": "^19",
+    "react-dom": "^19"
   }
 }

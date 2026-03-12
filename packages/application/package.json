@@ -3,6 +3,52 @@
   "private": true,
   "type": "module",
   "version": "1.0.0",
+  "exports": {
+    "./command/event/*": {
+      "import": "./dist/command/event/*.mjs",
+      "types": "./dist/command/event/*.d.mts"
+    },
+    "./command/organization/*": {
+      "import": "./dist/command/organization/*.mjs",
+      "types": "./dist/command/organization/*.d.mts"
+    },
+    "./command/project/*": {
+      "import": "./dist/command/project/*.mjs",
+      "types": "./dist/command/project/*.d.mts"
+    },
+    "./command/shared/*": {
+      "import": "./dist/command/shared/*.mjs",
+      "types": "./dist/command/shared/*.d.mts"
+    },
+    "./command/user/*": {
+      "import": "./dist/command/user/*.mjs",
+      "types": "./dist/command/user/*.d.mts"
+    },
+    "./query/authorization/*": {
+      "import": "./dist/query/authorization/*.mjs",
+      "types": "./dist/query/authorization/*.d.mts"
+    },
+    "./query/event/*": {
+      "import": "./dist/query/event/*.mjs",
+      "types": "./dist/query/event/*.d.mts"
+    },
+    "./query/organization/*": {
+      "import": "./dist/query/organization/*.mjs",
+      "types": "./dist/query/organization/*.d.mts"
+    },
+    "./query/project/*": {
+      "import": "./dist/query/project/*.mjs",
+      "types": "./dist/query/project/*.d.mts"
+    },
+    "./query/user/*": {
+      "import": "./dist/query/user/*.mjs",
+      "types": "./dist/query/user/*.d.mts"
+    },
+    "./query/shared": {
+      "import": "./dist/query/shared.mjs",
+      "types": "./dist/query/shared.d.mts"
+    }
+  },
   "scripts": {
     "lint": "oxlint --type-aware --type-check",
     "build": "tsdown",

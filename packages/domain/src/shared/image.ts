@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { BaseError } from "./errors";
 import { createError } from "./errors";
 import { Result } from "@archive/result";
+import type { UserId } from "../user/schema";
 
 /**
  * Image ID
@@ -90,16 +91,16 @@ export class ValidatedImage {
 }
 
 export type UploadImageResult = {
-  id: string;
+  id: ImageId;
   objectKey: string;
 };
 
 export type ImageRepository = {
   /**
-   * Upload image
+   * Upload image to storage and save metadata to DB
    * @throws {RepositoryException} on storage errors
    */
-  uploadImage(image: ValidatedImage, scope: ImageScope): Promise<UploadImageResult>;
+  uploadImage(image: ValidatedImage, scope: ImageScope, userId: UserId): Promise<UploadImageResult>;
 
   /**
    * Delete image by key
@@ -108,10 +109,12 @@ export type ImageRepository = {
   deleteImage(key: string): Promise<void>;
 
   /**
-   * Move image (copy + delete)
+   * Migrate a pending image to its correct scope
+   * Looks up image by ID, moves in R2, updates DB (objectKey, scopeType)
+   * Skips if image is not pending (already migrated)
    * @throws {RepositoryException} on storage errors
    */
-  moveImage(fromKey: string, newScope: ImageScope): Promise<void>;
+  migrateScope(imageId: ImageId, newScope: ImageScope): Promise<void>;
 
   /**
    * Get public URL for an image
