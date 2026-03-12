@@ -233,7 +233,7 @@ export class EventRepositoryImpl implements EventRepository {
           .where(and(eq(schema.tags.id, order.tagId), eq(schema.tags.eventId, eventId))),
       );
       // oxlint-disable-next-line typescript/no-unsafe-type-assertion
-      await this.db.batch(queries as [BatchItem<"sqlite">, ...Array<BatchItem<"sqlite">>]);
+      await this.db.batch(queries as [BatchItem<"sqlite">, ...BatchItem<"sqlite">[]]);
     } catch (error) {
       throw new RepositoryException(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,

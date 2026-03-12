@@ -63,7 +63,7 @@
   },
   "devDependencies": {
     "@archive/config": "workspace:*",
-    "@cloudflare/vitest-pool-workers": "catalog:test",
+    "@libsql/client": "catalog:test",
     "@pandacss/dev": "catalog:build",
     "@tanstack/devtools-vite": "catalog:build",
     "@types/node": "catalog:types",
@@ -73,12 +73,12 @@
     "babel-plugin-react-compiler": "catalog:build",
     "concurrently": "catalog:build",
     "drizzle-kit": "catalog:build",
+    "drizzle-orm": "catalog:backend",
     "oxlint": "catalog:lint",
     "oxlint-tsgolint": "catalog:lint",
     "typescript": "catalog:build",
     "vite": "catalog:build",
     "vitest": "catalog:test",
-    "web-vitals": "catalog:frontend",
     "wrangler": "catalog:build"
   }
 }

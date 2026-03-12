@@ -28,7 +28,7 @@ export type MarkerGroupProps = ComponentProps<typeof MarkerGroup>;
 export type ThumbProps = ComponentProps<typeof Thumb>;
 
 export type MarksProps = {
-  marks?: Array<number | { value: number; label: React.ReactNode }> | undefined;
+  marks?: (number | { value: number; label: React.ReactNode })[] | undefined;
 } & MarkerGroupProps;
 
 export const Marks = forwardRef<HTMLDivElement, MarksProps>(function Marks(props, ref) {

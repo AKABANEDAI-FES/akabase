@@ -4,7 +4,7 @@ import { uploadImage } from "@archive/application/command/shared/upload-image";
 import { authMiddleware, factory } from "./libs";
 import { z } from "zod";
 import { sValidator } from "@hono/standard-validator";
-import { Result } from "@praha/byethrow";
+import { Result } from "@archive/result";
 import { ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE, imageScopeSchema } from "@archive/domain/shared/image";
 import { cast } from "@archive/domain/shared/ids";
 import type { UserId } from "@archive/domain/user/schema";

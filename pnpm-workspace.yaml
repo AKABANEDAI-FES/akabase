@@ -46,7 +46,7 @@ catalogs:
     drizzle-zod: ^0.8.3
 
   build:
-    vite: ^7.1.7
+    vite: ^8.0.0
     "@vitejs/plugin-react": ^5.1.4
     vite-tsconfig-paths: ^6.0.2
     "@cloudflare/vite-plugin": ^1.25.2

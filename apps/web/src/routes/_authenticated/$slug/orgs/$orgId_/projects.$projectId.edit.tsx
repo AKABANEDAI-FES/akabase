@@ -11,7 +11,7 @@ import { Textarea } from "@archive/ui/components/textarea";
 import { toaster } from "@archive/ui/components/toast";
 import { ArrowLeftIcon, SaveIcon, SendIcon } from "lucide-react";
 import { revalidateLogic, useForm, useStore } from "@tanstack/react-form";
-import { Result } from "@praha/byethrow";
+import { Result } from "@archive/result";
 import { generateLoadDraftQueryOptions } from "@/features/project/actions/queries";
 import {
   updateProjectDraftInputSchema,

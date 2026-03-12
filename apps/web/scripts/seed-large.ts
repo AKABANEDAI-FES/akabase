@@ -1,14 +1,16 @@
-// oxlint-disable no-console
+// oxlint-disable-next-line unicorn/no-abusive-eslint-disable
+// oxlint-disable
 /**
  * 大規模シードデータ生成スクリプト
  *
  * 実運用テスト用のリアルなデータを生成します。
  * 使い方: pnpm seed:large
  */
+// oxlint-disable-next-line import/no-nodejs-modules
 import crypto from "node:crypto";
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
-import * as schema from "../src/db/schema";
+import { schema } from "@archive/infrastructure/db";
 import { zip } from "es-toolkit/array";
 
 // ---------------------------------------------------------------------------
@@ -453,6 +455,7 @@ const GENERAL_MESSAGES = [
 // ---------------------------------------------------------------------------
 // データ生成
 // ---------------------------------------------------------------------------
+// oxlint-disable-next-line complexity max-statements
 async function main() {
   console.log("大規模シードデータを生成します...");
   console.log(`DB: ${dbPath}`);
