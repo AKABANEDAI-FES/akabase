@@ -49,16 +49,16 @@ archive/
 
 ### パッケージ詳細
 
-| パッケージ | 説明 |
-| --- | --- |
-| `apps/web` | TanStack Start ベースのフルスタック Web アプリ。ルーティング、API、UI を統合 |
-| `packages/domain` | 純粋なドメインモデル。Zod スキーマ、ドメインロジック、リポジトリインターフェース |
-| `packages/application` | CQRS パターンのユースケース層。Command（書き込み）と Query（読み取り） |
-| `packages/infrastructure` | Drizzle ORM リポジトリ実装、Better Auth 設定、R2 ストレージ、ドメインサービス |
-| `packages/result` | `@praha/byethrow` ベースの Result 型ユーティリティ |
-| `packages/ui` | 再利用可能な React コンポーネントと Panda CSS プリセット |
-| `packages/styled-system` | Panda CSS の生成コード（トークン、レシピ、パターン） |
-| `packages/config` | TypeScript / oxlint の共通設定 |
+| パッケージ                | 説明                                                                             |
+| ------------------------- | -------------------------------------------------------------------------------- |
+| `apps/web`                | TanStack Start ベースのフルスタック Web アプリ。ルーティング、API、UI を統合     |
+| `packages/domain`         | 純粋なドメインモデル。Zod スキーマ、ドメインロジック、リポジトリインターフェース |
+| `packages/application`    | CQRS パターンのユースケース層。Command（書き込み）と Query（読み取り）           |
+| `packages/infrastructure` | Drizzle ORM リポジトリ実装、Better Auth 設定、R2 ストレージ、ドメインサービス    |
+| `packages/result`         | `@praha/byethrow` ベースの Result 型ユーティリティ                               |
+| `packages/ui`             | 再利用可能な React コンポーネントと Panda CSS プリセット                         |
+| `packages/styled-system`  | Panda CSS の生成コード（トークン、レシピ、パターン）                             |
+| `packages/config`         | TypeScript / oxlint の共通設定                                                   |
 
 ## セットアップ
 
