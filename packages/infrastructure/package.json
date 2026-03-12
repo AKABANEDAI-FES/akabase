@@ -28,7 +28,7 @@
   "scripts": {
     "lint": "oxlint --type-aware --type-check",
     "build": "tsdown",
-    "dev": "tsdown --watch",
+    "dev": "tsdown --no-clean --watch",
     "cf-typegen": "wrangler types --include-env false",
     "migration": "drizzle-kit generate"
   },

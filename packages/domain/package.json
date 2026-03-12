@@ -32,7 +32,7 @@
   "scripts": {
     "lint": "oxlint --type-aware --type-check",
     "build": "tsdown",
-    "dev": "tsdown --watch",
+    "dev": "tsdown --no-clean --watch",
     "test": "vitest run"
   },
   "dependencies": {
