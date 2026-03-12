@@ -17,13 +17,13 @@
   },
   "devDependencies": {
     "@archive/config": "workspace:*",
-    "oxlint": "^1.49.0",
-    "oxlint-tsgolint": "^0.16.0",
-    "tsdown": "^0.21.1",
-    "typescript": "^5.7.2",
-    "vitest": "^4.0.18"
+    "oxlint": "catalog:lint",
+    "oxlint-tsgolint": "catalog:lint",
+    "tsdown": "catalog:build",
+    "typescript": "catalog:build",
+    "vitest": "catalog:test"
   },
   "dependencies": {
-    "@praha/byethrow": "^0.10.0"
+    "@praha/byethrow": "catalog:"
   }
 }

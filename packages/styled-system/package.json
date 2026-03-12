@@ -37,9 +37,9 @@
     "./styles.css": "./styles.css"
   },
   "devDependencies": {
-    "@pandacss/dev": "^1.9.0",
-    "@types/react": "19.2.2",
-    "react": "^19.2.0"
+    "@pandacss/dev": "catalog:build",
+    "@types/react": "catalog:types",
+    "react": "catalog:frontend"
   },
   "peerDependencies": {
     "react": ">=19"

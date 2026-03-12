@@ -20,11 +20,11 @@
   },
   "devDependencies": {
     "@archive/config": "workspace:*",
-    "@pandacss/dev": "^1.9.0",
-    "oxlint": "^1.49.0",
-    "oxlint-tsgolint": "^0.16.0",
-    "tsdown": "^0.21.1",
-    "typescript": "^5.7.2"
+    "@pandacss/dev": "catalog:build",
+    "oxlint": "catalog:lint",
+    "oxlint-tsgolint": "catalog:lint",
+    "tsdown": "catalog:build",
+    "typescript": "catalog:build"
   },
   "peerDependencies": {
     "@archive/styled-system": "workspace:*",

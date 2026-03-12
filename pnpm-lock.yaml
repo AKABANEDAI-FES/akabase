@@ -4,6 +4,204 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  backend:
+    '@hono/standard-validator':
+      specifier: ^0.2.2
+      version: 0.2.2
+    better-auth:
+      specifier: ^1.4.18
+      version: 1.4.18
+    drizzle-orm:
+      specifier: 0.45.1
+      version: 0.45.1
+    drizzle-zod:
+      specifier: ^0.8.3
+      version: 0.8.3
+    hono:
+      specifier: ^4.12.5
+      version: 4.12.5
+  build:
+    '@cloudflare/vite-plugin':
+      specifier: ^1.25.2
+      version: 1.25.2
+    '@pandacss/dev':
+      specifier: ^1.9.0
+      version: 1.9.0
+    '@tanstack/devtools-vite':
+      specifier: ^0.5.1
+      version: 0.5.1
+    '@tanstack/router-plugin':
+      specifier: ^1.161.4
+      version: 1.161.4
+    '@typescript/native-preview':
+      specifier: 7.0.0-dev.20260310.1
+      version: 7.0.0-dev.20260310.1
+    '@vitejs/plugin-react':
+      specifier: ^5.1.4
+      version: 5.1.4
+    babel-plugin-react-compiler:
+      specifier: ^1.0.0
+      version: 1.0.0
+    concurrently:
+      specifier: ^9.2.1
+      version: 9.2.1
+    drizzle-kit:
+      specifier: 0.31.9
+      version: 0.31.9
+    tsdown:
+      specifier: ^0.21.1
+      version: 0.21.1
+    typescript:
+      specifier: ^5.7.2
+      version: 5.9.3
+    vite-tsconfig-paths:
+      specifier: ^6.0.2
+      version: 6.1.0
+    wrangler:
+      specifier: ^4.69.0
+      version: 4.69.0
+  default:
+    '@praha/byethrow':
+      specifier: ^0.10.0
+      version: 0.10.0
+    es-toolkit:
+      specifier: ^1.45.1
+      version: 1.45.1
+    zod:
+      specifier: ^4.3.6
+      version: 4.3.6
+  frontend:
+    '@ark-ui/react':
+      specifier: ^5.32.0
+      version: 5.32.0
+    '@dnd-kit/core':
+      specifier: ^6.3.1
+      version: 6.3.1
+    '@dnd-kit/modifiers':
+      specifier: ^9.0.0
+      version: 9.0.0
+    '@dnd-kit/sortable':
+      specifier: ^10.0.0
+      version: 10.0.0
+    '@dnd-kit/utilities':
+      specifier: ^3.2.2
+      version: 3.2.2
+    '@tanstack/react-devtools':
+      specifier: ^0.9.6
+      version: 0.9.6
+    '@tanstack/react-form':
+      specifier: ^1.28.3
+      version: 1.28.3
+    '@tanstack/react-query':
+      specifier: ^5.90.21
+      version: 5.90.21
+    '@tanstack/react-query-devtools':
+      specifier: ^5.91.3
+      version: 5.91.3
+    '@tanstack/react-router':
+      specifier: ^1.161.4
+      version: 1.161.4
+    '@tanstack/react-router-devtools':
+      specifier: ^1.161.4
+      version: 1.161.4
+    '@tanstack/react-router-ssr-query':
+      specifier: ^1.161.4
+      version: 1.161.4
+    '@tanstack/react-start':
+      specifier: ^1.161.4
+      version: 1.161.4
+    '@tanstack/react-table':
+      specifier: ^8.21.3
+      version: 8.21.3
+    '@tiptap/core':
+      specifier: ^3.20.0
+      version: 3.20.0
+    '@tiptap/extension-image':
+      specifier: ^3.20.0
+      version: 3.20.0
+    '@tiptap/extension-link':
+      specifier: ^3.20.0
+      version: 3.20.0
+    '@tiptap/extension-text-align':
+      specifier: ^3.20.0
+      version: 3.20.0
+    '@tiptap/extensions':
+      specifier: ^3.20.0
+      version: 3.20.0
+    '@tiptap/pm':
+      specifier: ^3.20.0
+      version: 3.20.0
+    '@tiptap/react':
+      specifier: ^3.20.0
+      version: 3.20.0
+    '@tiptap/starter-kit':
+      specifier: ^3.20.0
+      version: 3.20.0
+    lucide-react:
+      specifier: ^0.575.0
+      version: 0.575.0
+    react:
+      specifier: ^19.2.0
+      version: 19.2.4
+    react-dom:
+      specifier: ^19.2.0
+      version: 19.2.4
+    react-reverse-portal:
+      specifier: ^2.3.0
+      version: 2.3.0
+    wasm-xlsxwriter:
+      specifier: ^0.12.2
+      version: 0.12.2
+    web-vitals:
+      specifier: ^5.1.0
+      version: 5.1.0
+  lint:
+    '@stylistic/eslint-plugin':
+      specifier: ^5.8.0
+      version: 5.8.0
+    '@tanstack/eslint-config':
+      specifier: ^0.4.0
+      version: 0.4.0
+    oxfmt:
+      specifier: ^0.34.0
+      version: 0.34.0
+    oxlint:
+      specifier: ^1.49.0
+      version: 1.49.0
+    oxlint-tsgolint:
+      specifier: ^0.16.0
+      version: 0.16.0
+  test:
+    '@cloudflare/vitest-pool-workers':
+      specifier: ^0.12.18
+      version: 0.12.18
+    '@libsql/client':
+      specifier: ^0.17.0
+      version: 0.17.0
+    '@testing-library/dom':
+      specifier: ^10.4.1
+      version: 10.4.1
+    '@testing-library/react':
+      specifier: ^16.3.2
+      version: 16.3.2
+    jsdom:
+      specifier: ^28.1.0
+      version: 28.1.0
+    vitest:
+      specifier: ^4.0.18
+      version: 4.0.18
+  types:
+    '@types/node':
+      specifier: ^22.10.2
+      version: 22.19.10
+    '@types/react':
+      specifier: ^19.2.14
+      version: 19.2.14
+    '@types/react-dom':
+      specifier: ^19.2.3
+      version: 19.2.3
+
 overrides:
   vite: 8.0.0-beta.11
 
@@ -18,192 +216,192 @@ importers:
         specifier: workspace:*
         version: link:packages/ui
       '@ark-ui/react':
-        specifier: ^5.32.0
+        specifier: catalog:frontend
         version: 5.32.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@cloudflare/vite-plugin':
-        specifier: ^1.25.2
-        version: 1.25.2(vite@8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.25.12)(jiti@2.6.1)(tsx@4.21.0))(workerd@1.20260219.0)(wrangler@4.67.0)
+        specifier: catalog:build
+        version: 1.25.2(vite@8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.25.12)(jiti@2.6.1)(tsx@4.21.0))(workerd@1.20260305.0)(wrangler@4.69.0)
       '@dnd-kit/core':
-        specifier: ^6.3.1
+        specifier: catalog:frontend
         version: 6.3.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@dnd-kit/modifiers':
-        specifier: ^9.0.0
+        specifier: catalog:frontend
         version: 9.0.0(@dnd-kit/core@6.3.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
       '@dnd-kit/sortable':
-        specifier: ^10.0.0
+        specifier: catalog:frontend
         version: 10.0.0(@dnd-kit/core@6.3.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
       '@dnd-kit/utilities':
-        specifier: ^3.2.2
+        specifier: catalog:frontend
         version: 3.2.2(react@19.2.4)
       '@hono/standard-validator':
-        specifier: ^0.2.2
+        specifier: catalog:backend
         version: 0.2.2(@standard-schema/spec@1.1.0)(hono@4.12.5)
       '@praha/byethrow':
-        specifier: ^0.10.0
+        specifier: 'catalog:'
         version: 0.10.0(typescript@5.9.3)
       '@tanstack/react-devtools':
-        specifier: ^0.9.6
+        specifier: catalog:frontend
         version: 0.9.6(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(csstype@3.2.3)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(solid-js@1.9.11)
       '@tanstack/react-form':
-        specifier: ^1.28.3
+        specifier: catalog:frontend
         version: 1.28.3(@tanstack/react-start@1.161.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.25.12)(jiti@2.6.1)(tsx@4.21.0)))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@tanstack/react-query':
-        specifier: ^5.90.21
+        specifier: catalog:frontend
         version: 5.90.21(react@19.2.4)
       '@tanstack/react-query-devtools':
-        specifier: ^5.91.3
+        specifier: catalog:frontend
         version: 5.91.3(@tanstack/react-query@5.90.21(react@19.2.4))(react@19.2.4)
       '@tanstack/react-router':
-        specifier: ^1.161.4
+        specifier: catalog:frontend
         version: 1.161.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@tanstack/react-router-devtools':
-        specifier: ^1.161.4
+        specifier: catalog:frontend
         version: 1.161.4(@tanstack/react-router@1.161.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@tanstack/router-core@1.161.4)(csstype@3.2.3)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@tanstack/react-router-ssr-query':
-        specifier: ^1.161.4
+        specifier: catalog:frontend
         version: 1.161.4(@tanstack/query-core@5.90.20)(@tanstack/react-query@5.90.21(react@19.2.4))(@tanstack/react-router@1.161.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@tanstack/router-core@1.161.4)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@tanstack/react-start':
-        specifier: ^1.161.4
+        specifier: catalog:frontend
         version: 1.161.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.25.12)(jiti@2.6.1)(tsx@4.21.0))
       '@tanstack/react-table':
-        specifier: ^8.21.3
+        specifier: catalog:frontend
         version: 8.21.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@tanstack/router-plugin':
-        specifier: ^1.161.4
+        specifier: catalog:build
         version: 1.161.4(@tanstack/react-router@1.161.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(vite@8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.25.12)(jiti@2.6.1)(tsx@4.21.0))
       '@tiptap/core':
-        specifier: ^3.20.0
+        specifier: catalog:frontend
         version: 3.20.0(@tiptap/pm@3.20.0)
       '@tiptap/extension-image':
-        specifier: ^3.20.0
+        specifier: catalog:frontend
         version: 3.20.0(@tiptap/core@3.20.0(@tiptap/pm@3.20.0))
       '@tiptap/extension-link':
-        specifier: ^3.20.0
+        specifier: catalog:frontend
         version: 3.20.0(@tiptap/core@3.20.0(@tiptap/pm@3.20.0))(@tiptap/pm@3.20.0)
       '@tiptap/extension-text-align':
-        specifier: ^3.20.0
+        specifier: catalog:frontend
         version: 3.20.0(@tiptap/core@3.20.0(@tiptap/pm@3.20.0))
       '@tiptap/extensions':
-        specifier: ^3.20.0
+        specifier: catalog:frontend
         version: 3.20.0(@tiptap/core@3.20.0(@tiptap/pm@3.20.0))(@tiptap/pm@3.20.0)
       '@tiptap/pm':
-        specifier: ^3.20.0
+        specifier: catalog:frontend
         version: 3.20.0
       '@tiptap/react':
-        specifier: ^3.20.0
+        specifier: catalog:frontend
         version: 3.20.0(@floating-ui/dom@1.7.5)(@tiptap/core@3.20.0(@tiptap/pm@3.20.0))(@tiptap/pm@3.20.0)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@tiptap/starter-kit':
-        specifier: ^3.20.0
+        specifier: catalog:frontend
         version: 3.20.0
       better-auth:
-        specifier: ^1.4.18
+        specifier: catalog:backend
         version: 1.4.18(@tanstack/react-start@1.161.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.25.12)(jiti@2.6.1)(tsx@4.21.0)))(better-sqlite3@12.6.2)(drizzle-kit@0.31.9)(drizzle-orm@0.45.1(@libsql/client@0.17.0)(@types/better-sqlite3@7.6.13)(better-sqlite3@12.6.2)(kysely@0.28.11))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(solid-js@1.9.11)(vitest@4.0.18(@types/node@22.19.10)(esbuild@0.25.12)(jiti@2.6.1)(jsdom@28.1.0(@noble/hashes@2.0.1))(tsx@4.21.0))
       drizzle-orm:
-        specifier: 0.45.1
+        specifier: catalog:backend
         version: 0.45.1(@libsql/client@0.17.0)(@types/better-sqlite3@7.6.13)(better-sqlite3@12.6.2)(kysely@0.28.11)
       drizzle-zod:
-        specifier: ^0.8.3
+        specifier: catalog:backend
         version: 0.8.3(drizzle-orm@0.45.1(@libsql/client@0.17.0)(@types/better-sqlite3@7.6.13)(better-sqlite3@12.6.2)(kysely@0.28.11))(zod@4.3.6)
       es-toolkit:
-        specifier: ^1.45.1
+        specifier: 'catalog:'
         version: 1.45.1
       hono:
-        specifier: ^4.12.5
+        specifier: catalog:backend
         version: 4.12.5
       lucide-react:
-        specifier: ^0.575.0
+        specifier: catalog:frontend
         version: 0.575.0(react@19.2.4)
       react:
-        specifier: ^19.2.0
+        specifier: catalog:frontend
         version: 19.2.4
       react-dom:
-        specifier: ^19.2.0
+        specifier: catalog:frontend
         version: 19.2.4(react@19.2.4)
       react-reverse-portal:
-        specifier: ^2.3.0
+        specifier: catalog:frontend
         version: 2.3.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       vite-tsconfig-paths:
-        specifier: ^6.0.2
+        specifier: catalog:build
         version: 6.1.0(typescript@5.9.3)(vite@8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.25.12)(jiti@2.6.1)(tsx@4.21.0))
       wasm-xlsxwriter:
-        specifier: ^0.12.2
+        specifier: catalog:frontend
         version: 0.12.2
       zod:
-        specifier: ^4.3.6
+        specifier: 'catalog:'
         version: 4.3.6
     devDependencies:
       '@cloudflare/vitest-pool-workers':
-        specifier: ^0.12.18
+        specifier: catalog:test
         version: 0.12.18(@vitest/runner@4.0.18)(@vitest/snapshot@4.0.18)(vitest@4.0.18(@types/node@22.19.10)(esbuild@0.25.12)(jiti@2.6.1)(jsdom@28.1.0(@noble/hashes@2.0.1))(tsx@4.21.0))
       '@libsql/client':
-        specifier: ^0.17.0
+        specifier: catalog:test
         version: 0.17.0
       '@pandacss/dev':
-        specifier: ^1.9.0
+        specifier: catalog:build
         version: 1.9.0(jsdom@28.1.0(@noble/hashes@2.0.1))(typescript@5.9.3)
       '@stylistic/eslint-plugin':
-        specifier: ^5.8.0
+        specifier: catalog:lint
         version: 5.8.0(eslint@9.39.2(jiti@2.6.1))
       '@tanstack/devtools-vite':
-        specifier: ^0.5.1
+        specifier: catalog:build
         version: 0.5.1(vite@8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.25.12)(jiti@2.6.1)(tsx@4.21.0))
       '@tanstack/eslint-config':
-        specifier: ^0.4.0
+        specifier: catalog:lint
         version: 0.4.0(@typescript-eslint/utils@8.56.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
       '@testing-library/dom':
-        specifier: ^10.4.1
+        specifier: catalog:test
         version: 10.4.1
       '@testing-library/react':
-        specifier: ^16.3.2
+        specifier: catalog:test
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@types/node':
-        specifier: ^22.10.2
+        specifier: catalog:types
         version: 22.19.10
       '@types/react':
-        specifier: ^19.2.14
+        specifier: catalog:types
         version: 19.2.14
       '@types/react-dom':
-        specifier: ^19.2.3
+        specifier: catalog:types
         version: 19.2.3(@types/react@19.2.14)
       '@vitejs/plugin-react':
-        specifier: ^5.1.4
+        specifier: catalog:build
         version: 5.1.4(vite@8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.25.12)(jiti@2.6.1)(tsx@4.21.0))
       babel-plugin-react-compiler:
-        specifier: ^1.0.0
+        specifier: catalog:build
         version: 1.0.0
       concurrently:
-        specifier: ^9.2.1
+        specifier: catalog:build
         version: 9.2.1
       drizzle-kit:
-        specifier: 0.31.9
+        specifier: catalog:build
         version: 0.31.9
       jsdom:
-        specifier: ^28.1.0
+        specifier: catalog:test
         version: 28.1.0(@noble/hashes@2.0.1)
       oxfmt:
-        specifier: ^0.34.0
+        specifier: catalog:lint
         version: 0.34.0
       oxlint:
-        specifier: ^1.49.0
+        specifier: catalog:lint
         version: 1.49.0(oxlint-tsgolint@0.16.0)
       oxlint-tsgolint:
-        specifier: ^0.16.0
+        specifier: catalog:lint
         version: 0.16.0
       typescript:
-        specifier: ^5.7.2
+        specifier: catalog:build
         version: 5.9.3
       vite:
         specifier: 8.0.0-beta.11
         version: 8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.25.12)(jiti@2.6.1)(tsx@4.21.0)
       vitest:
-        specifier: ^4.0.18
+        specifier: catalog:test
         version: 4.0.18(@types/node@22.19.10)(esbuild@0.25.12)(jiti@2.6.1)(jsdom@28.1.0(@noble/hashes@2.0.1))(tsx@4.21.0)
       web-vitals:
-        specifier: ^5.1.0
+        specifier: catalog:frontend
         version: 5.1.0
       wrangler:
-        specifier: ^4.67.0
-        version: 4.67.0
+        specifier: catalog:build
+        version: 4.69.0
 
   apps/web:
     dependencies:
@@ -226,164 +424,164 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
       '@ark-ui/react':
-        specifier: ^5.32.0
+        specifier: catalog:frontend
         version: 5.32.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@cloudflare/vite-plugin':
-        specifier: ^1.25.2
+        specifier: catalog:build
         version: 1.25.2(vite@8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0))(workerd@1.20260305.0)(wrangler@4.69.0)
       '@dnd-kit/core':
-        specifier: ^6.3.1
+        specifier: catalog:frontend
         version: 6.3.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@dnd-kit/modifiers':
-        specifier: ^9.0.0
+        specifier: catalog:frontend
         version: 9.0.0(@dnd-kit/core@6.3.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
       '@dnd-kit/sortable':
-        specifier: ^10.0.0
+        specifier: catalog:frontend
         version: 10.0.0(@dnd-kit/core@6.3.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
       '@dnd-kit/utilities':
-        specifier: ^3.2.2
+        specifier: catalog:frontend
         version: 3.2.2(react@19.2.4)
       '@hono/standard-validator':
-        specifier: ^0.2.2
+        specifier: catalog:backend
         version: 0.2.2(@standard-schema/spec@1.1.0)(hono@4.12.5)
       '@tanstack/react-devtools':
-        specifier: ^0.9.6
+        specifier: catalog:frontend
         version: 0.9.6(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(csstype@3.2.3)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(solid-js@1.9.11)
       '@tanstack/react-form':
-        specifier: ^1.28.3
+        specifier: catalog:frontend
         version: 1.28.3(@tanstack/react-start@1.161.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@tanstack/react-query':
-        specifier: ^5.90.21
+        specifier: catalog:frontend
         version: 5.90.21(react@19.2.4)
       '@tanstack/react-query-devtools':
-        specifier: ^5.91.3
+        specifier: catalog:frontend
         version: 5.91.3(@tanstack/react-query@5.90.21(react@19.2.4))(react@19.2.4)
       '@tanstack/react-router':
-        specifier: ^1.161.4
+        specifier: catalog:frontend
         version: 1.161.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@tanstack/react-router-devtools':
-        specifier: ^1.161.4
+        specifier: catalog:frontend
         version: 1.161.4(@tanstack/react-router@1.161.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@tanstack/router-core@1.161.4)(csstype@3.2.3)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@tanstack/react-router-ssr-query':
-        specifier: ^1.161.4
+        specifier: catalog:frontend
         version: 1.161.4(@tanstack/query-core@5.90.20)(@tanstack/react-query@5.90.21(react@19.2.4))(@tanstack/react-router@1.161.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@tanstack/router-core@1.161.4)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@tanstack/react-start':
-        specifier: ^1.161.4
+        specifier: catalog:frontend
         version: 1.161.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0))
       '@tanstack/react-table':
-        specifier: ^8.21.3
+        specifier: catalog:frontend
         version: 8.21.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@tanstack/router-plugin':
-        specifier: ^1.161.4
+        specifier: catalog:build
         version: 1.161.4(@tanstack/react-router@1.161.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(vite@8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0))
       '@tiptap/core':
-        specifier: ^3.20.0
+        specifier: catalog:frontend
         version: 3.20.0(@tiptap/pm@3.20.0)
       '@tiptap/extension-image':
-        specifier: ^3.20.0
+        specifier: catalog:frontend
         version: 3.20.0(@tiptap/core@3.20.0(@tiptap/pm@3.20.0))
       '@tiptap/extension-link':
-        specifier: ^3.20.0
+        specifier: catalog:frontend
         version: 3.20.0(@tiptap/core@3.20.0(@tiptap/pm@3.20.0))(@tiptap/pm@3.20.0)
       '@tiptap/extension-text-align':
-        specifier: ^3.20.0
+        specifier: catalog:frontend
         version: 3.20.0(@tiptap/core@3.20.0(@tiptap/pm@3.20.0))
       '@tiptap/extensions':
-        specifier: ^3.20.0
+        specifier: catalog:frontend
         version: 3.20.0(@tiptap/core@3.20.0(@tiptap/pm@3.20.0))(@tiptap/pm@3.20.0)
       '@tiptap/pm':
-        specifier: ^3.20.0
+        specifier: catalog:frontend
         version: 3.20.0
       '@tiptap/react':
-        specifier: ^3.20.0
+        specifier: catalog:frontend
         version: 3.20.0(@floating-ui/dom@1.7.5)(@tiptap/core@3.20.0(@tiptap/pm@3.20.0))(@tiptap/pm@3.20.0)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@tiptap/starter-kit':
-        specifier: ^3.20.0
+        specifier: catalog:frontend
         version: 3.20.0
       better-auth:
-        specifier: ^1.4.18
+        specifier: catalog:backend
         version: 1.4.18(@tanstack/react-start@1.161.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)))(better-sqlite3@12.6.2)(drizzle-kit@0.31.9)(drizzle-orm@0.45.1(@libsql/client@0.17.0)(@types/better-sqlite3@7.6.13)(better-sqlite3@12.6.2)(kysely@0.28.11))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(solid-js@1.9.11)(vitest@4.0.18(@types/node@22.19.10)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@28.1.0(@noble/hashes@2.0.1))(tsx@4.21.0))
       es-toolkit:
-        specifier: ^1.45.1
+        specifier: 'catalog:'
         version: 1.45.1
       hono:
-        specifier: ^4.12.5
+        specifier: catalog:backend
         version: 4.12.5
       lucide-react:
-        specifier: ^0.575.0
+        specifier: catalog:frontend
         version: 0.575.0(react@19.2.4)
       react:
-        specifier: ^19.2.0
+        specifier: catalog:frontend
         version: 19.2.4
       react-dom:
-        specifier: ^19.2.0
+        specifier: catalog:frontend
         version: 19.2.4(react@19.2.4)
       react-reverse-portal:
-        specifier: ^2.3.0
+        specifier: catalog:frontend
         version: 2.3.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       vite-tsconfig-paths:
-        specifier: ^6.0.2
+        specifier: catalog:build
         version: 6.1.0(typescript@5.9.3)(vite@8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0))
       wasm-xlsxwriter:
-        specifier: ^0.12.2
+        specifier: catalog:frontend
         version: 0.12.2
       zod:
-        specifier: ^4.3.6
+        specifier: 'catalog:'
         version: 4.3.6
     devDependencies:
       '@archive/config':
         specifier: workspace:*
         version: link:../../packages/config
       '@cloudflare/vitest-pool-workers':
-        specifier: ^0.12.18
+        specifier: catalog:test
         version: 0.12.18(@vitest/runner@4.0.18)(@vitest/snapshot@4.0.18)(vitest@4.0.18(@types/node@22.19.10)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@28.1.0(@noble/hashes@2.0.1))(tsx@4.21.0))
       '@pandacss/dev':
-        specifier: ^1.9.0
+        specifier: catalog:build
         version: 1.9.0(jsdom@28.1.0(@noble/hashes@2.0.1))(typescript@5.9.3)
       '@tanstack/devtools-vite':
-        specifier: ^0.5.1
+        specifier: catalog:build
         version: 0.5.1(vite@8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0))
       '@types/node':
-        specifier: ^22.10.2
+        specifier: catalog:types
         version: 22.19.10
       '@types/react':
-        specifier: ^19.2.14
+        specifier: catalog:types
         version: 19.2.14
       '@types/react-dom':
-        specifier: ^19.2.3
+        specifier: catalog:types
         version: 19.2.3(@types/react@19.2.14)
       '@vitejs/plugin-react':
-        specifier: ^5.1.4
+        specifier: catalog:build
         version: 5.1.4(vite@8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0))
       babel-plugin-react-compiler:
-        specifier: ^1.0.0
+        specifier: catalog:build
         version: 1.0.0
       concurrently:
-        specifier: ^9.2.1
+        specifier: catalog:build
         version: 9.2.1
       drizzle-kit:
-        specifier: 0.31.9
+        specifier: catalog:build
         version: 0.31.9
       oxlint:
-        specifier: ^1.49.0
+        specifier: catalog:lint
         version: 1.49.0(oxlint-tsgolint@0.16.0)
       oxlint-tsgolint:
-        specifier: ^0.16.0
+        specifier: catalog:lint
         version: 0.16.0
       typescript:
-        specifier: ^5.7.2
+        specifier: catalog:build
         version: 5.9.3
       vite:
         specifier: 8.0.0-beta.11
         version: 8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)
       vitest:
-        specifier: ^4.0.18
+        specifier: catalog:test
         version: 4.0.18(@types/node@22.19.10)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@28.1.0(@noble/hashes@2.0.1))(tsx@4.21.0)
       web-vitals:
-        specifier: ^5.1.0
+        specifier: catalog:frontend
         version: 5.1.0
       wrangler:
-        specifier: ^4.67.0
+        specifier: catalog:build
         version: 4.69.0
 
   packages/application:
@@ -398,38 +596,41 @@ importers:
         specifier: workspace:*
         version: link:../result
       zod:
-        specifier: ^4.3.6
+        specifier: 'catalog:'
         version: 4.3.6
     devDependencies:
       '@archive/config':
         specifier: workspace:*
         version: link:../config
       '@libsql/client':
-        specifier: ^0.17.0
+        specifier: catalog:test
         version: 0.17.0
       '@typescript/native-preview':
-        specifier: 7.0.0-dev.20260310.1
+        specifier: catalog:build
         version: 7.0.0-dev.20260310.1
+      drizzle-orm:
+        specifier: catalog:backend
+        version: 0.45.1(@libsql/client@0.17.0)(@types/better-sqlite3@7.6.13)(better-sqlite3@12.6.2)(kysely@0.28.11)
       oxlint:
-        specifier: ^1.49.0
+        specifier: catalog:lint
         version: 1.49.0(oxlint-tsgolint@0.16.0)
       oxlint-tsgolint:
-        specifier: ^0.16.0
+        specifier: catalog:lint
         version: 0.16.0
       tsdown:
-        specifier: ^0.21.1
+        specifier: catalog:build
         version: 0.21.1(@typescript/native-preview@7.0.0-dev.20260310.1)(typescript@5.9.3)
       typescript:
-        specifier: ^5.7.2
+        specifier: catalog:build
         version: 5.9.3
       vitest:
-        specifier: ^4.0.18
+        specifier: catalog:test
         version: 4.0.18(@types/node@22.19.10)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@28.1.0(@noble/hashes@2.0.1))(tsx@4.21.0)
 
   packages/config:
     devDependencies:
       oxlint:
-        specifier: ^1.49.0
+        specifier: catalog:lint
         version: 1.49.0(oxlint-tsgolint@0.16.0)
 
   packages/domain:
@@ -438,29 +639,29 @@ importers:
         specifier: workspace:*
         version: link:../result
       zod:
-        specifier: ^4.3.6
+        specifier: 'catalog:'
         version: 4.3.6
     devDependencies:
       '@archive/config':
         specifier: workspace:*
         version: link:../config
       '@typescript/native-preview':
-        specifier: 7.0.0-dev.20260310.1
+        specifier: catalog:build
         version: 7.0.0-dev.20260310.1
       oxlint:
-        specifier: ^1.49.0
+        specifier: catalog:lint
         version: 1.49.0(oxlint-tsgolint@0.16.0)
       oxlint-tsgolint:
-        specifier: ^0.16.0
+        specifier: catalog:lint
         version: 0.16.0
       tsdown:
-        specifier: ^0.21.1
+        specifier: catalog:build
         version: 0.21.1(@typescript/native-preview@7.0.0-dev.20260310.1)(typescript@5.9.3)
       typescript:
-        specifier: ^5.7.2
+        specifier: catalog:build
         version: 5.9.3
       vitest:
-        specifier: ^4.0.18
+        specifier: catalog:test
         version: 4.0.18(@types/node@22.19.10)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@28.1.0(@noble/hashes@2.0.1))(tsx@4.21.0)
 
   packages/infrastructure:
@@ -472,75 +673,75 @@ importers:
         specifier: workspace:*
         version: link:../result
       drizzle-orm:
-        specifier: 0.45.1
+        specifier: catalog:backend
         version: 0.45.1(@libsql/client@0.17.0)(@types/better-sqlite3@7.6.13)(better-sqlite3@12.6.2)(kysely@0.28.11)
       zod:
-        specifier: ^4.3.6
+        specifier: 'catalog:'
         version: 4.3.6
     devDependencies:
       '@archive/config':
         specifier: workspace:*
         version: link:../config
       '@typescript/native-preview':
-        specifier: 7.0.0-dev.20260310.1
+        specifier: catalog:build
         version: 7.0.0-dev.20260310.1
       drizzle-kit:
-        specifier: 0.31.9
+        specifier: catalog:build
         version: 0.31.9
       oxlint:
-        specifier: ^1.49.0
+        specifier: catalog:lint
         version: 1.49.0(oxlint-tsgolint@0.16.0)
       oxlint-tsgolint:
-        specifier: ^0.16.0
+        specifier: catalog:lint
         version: 0.16.0
       tsdown:
-        specifier: ^0.21.1
+        specifier: catalog:build
         version: 0.21.1(@typescript/native-preview@7.0.0-dev.20260310.1)(typescript@5.9.3)
       typescript:
-        specifier: ^5.7.2
+        specifier: catalog:build
         version: 5.9.3
       vitest:
-        specifier: ^4.0.18
+        specifier: catalog:test
         version: 4.0.18(@types/node@22.19.10)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@28.1.0(@noble/hashes@2.0.1))(tsx@4.21.0)
       wrangler:
-        specifier: ^4.69.0
+        specifier: catalog:build
         version: 4.69.0
 
   packages/result:
     dependencies:
       '@praha/byethrow':
-        specifier: ^0.10.0
+        specifier: 'catalog:'
         version: 0.10.0(typescript@5.9.3)
     devDependencies:
       '@archive/config':
         specifier: workspace:*
         version: link:../config
       oxlint:
-        specifier: ^1.49.0
+        specifier: catalog:lint
         version: 1.49.0(oxlint-tsgolint@0.16.0)
       oxlint-tsgolint:
-        specifier: ^0.16.0
+        specifier: catalog:lint
         version: 0.16.0
       tsdown:
-        specifier: ^0.21.1
+        specifier: catalog:build
         version: 0.21.1(@typescript/native-preview@7.0.0-dev.20260310.1)(typescript@5.9.3)
       typescript:
-        specifier: ^5.7.2
+        specifier: catalog:build
         version: 5.9.3
       vitest:
-        specifier: ^4.0.18
+        specifier: catalog:test
         version: 4.0.18(@types/node@22.19.10)(esbuild@0.27.3)(jiti@2.6.1)(jsdom@28.1.0(@noble/hashes@2.0.1))(tsx@4.21.0)
 
   packages/styled-system:
     devDependencies:
       '@pandacss/dev':
-        specifier: ^1.9.0
+        specifier: catalog:build
         version: 1.9.0(jsdom@28.1.0(@noble/hashes@2.0.1))(typescript@5.9.3)
       '@types/react':
-        specifier: 19.2.2
-        version: 19.2.2
+        specifier: catalog:types
+        version: 19.2.14
       react:
-        specifier: ^19.2.0
+        specifier: catalog:frontend
         version: 19.2.4
 
   packages/ui:
@@ -565,19 +766,19 @@ importers:
         specifier: workspace:*
         version: link:../config
       '@pandacss/dev':
-        specifier: ^1.9.0
+        specifier: catalog:build
         version: 1.9.0(jsdom@28.1.0(@noble/hashes@2.0.1))(typescript@5.9.3)
       oxlint:
-        specifier: ^1.49.0
+        specifier: catalog:lint
         version: 1.49.0(oxlint-tsgolint@0.16.0)
       oxlint-tsgolint:
-        specifier: ^0.16.0
+        specifier: catalog:lint
         version: 0.16.0
       tsdown:
-        specifier: ^0.21.1
+        specifier: catalog:build
         version: 0.21.1(@typescript/native-preview@7.0.0-dev.20260310.1)(typescript@5.9.3)
       typescript:
-        specifier: ^5.7.2
+        specifier: catalog:build
         version: 5.9.3
 
 packages:
@@ -2842,9 +3043,6 @@ packages:
   '@types/react@19.2.14':
     resolution: {integrity: sha512-ilcTH/UniCkMdtexkoCN0bI7pMcJDvmQFPvuPvmEaYA/NSfFTAgdUSLAoVjaRJm7+6PvcM+q1zYOwS4wTYMF9w==}
 
-  '@types/react@19.2.2':
-    resolution: {integrity: sha512-6mDvHUFSjyT2B2yeNx2nUgMxh9LtOWvkhIU3uePn2I2oyNymUAX1NIsdgviM4CH+JSrp2D2hsMvJOkxY+0wNRA==}
-
   '@types/use-sync-external-store@0.0.6':
     resolution: {integrity: sha512-zFDAD+tlpf2r4asuHEj0XH6pY6i0g5NeAHPn+15wk3BV6JA69eERFXC1gyGThDkVa1zCyKr5jox1+2LbV/AMLg==}
 
@@ -2888,10 +3086,6 @@ packages:
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
       typescript: '>=4.8.4 <6.0.0'
-
-  '@typescript-eslint/types@8.54.0':
-    resolution: {integrity: sha512-PDUI9R1BVjqu7AUDsRBbKMtwmjWcn4J3le+5LpcFgWULN3LvHC5rkc9gCVxbrsrGmO1jfPybN5s6h4Jy+OnkAA==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   '@typescript-eslint/types@8.56.0':
     resolution: {integrity: sha512-DBsLPs3GsWhX5HylbP9HNG15U0bnwut55Lx12bHB9MpXxQ+R5GC8MwQe+N1UFXxAeQDvEsEDY6ZYwX03K7Z6HQ==}
@@ -4567,10 +4761,6 @@ packages:
   look-it-up@2.1.0:
     resolution: {integrity: sha512-nMoGWW2HurtuJf6XAL56FWTDCWLOTSsanrgwOyaR5Y4e3zfG5N/0cU5xWZSEU3tBxhQugRbV1xL9jb+ug7yZww==}
 
-  lru-cache@11.2.5:
-    resolution: {integrity: sha512-vFrFJkWtJvJnD5hg+hJvVE8Lh/TcMzKnTgCWmtBipwI5yLX/iX+5UB2tfuyODF5E7k9xEzMdYgGqaSb1c0c5Yw==}
-    engines: {node: 20 || >=22}
-
   lru-cache@11.2.6:
     resolution: {integrity: sha512-ESL2CrkS/2wTPfuend7Zhkzo2u0daGJ/A2VucJOgQ/C48S/zB8MMeMHSGKYpXhIjbPxfuezITkaBH1wqv00DDQ==}
     engines: {node: 20 || >=22}
@@ -5705,16 +5895,6 @@ packages:
     engines: {node: '>=16'}
     hasBin: true
 
-  wrangler@4.67.0:
-    resolution: {integrity: sha512-58OoVth7bqm0nqsRgcI67gHbpp0IfR1JIBqDY0XR1FzRu9Qkjn6v2iJAdFf82QcVBFhaMBYQi88WqYGswq5wlQ==}
-    engines: {node: '>=20.0.0'}
-    hasBin: true
-    peerDependencies:
-      '@cloudflare/workers-types': ^4.20260219.0
-    peerDependenciesMeta:
-      '@cloudflare/workers-types':
-        optional: true
-
   wrangler@4.69.0:
     resolution: {integrity: sha512-EmVfIM65I5b4ITHe3Y9R7zQyf4NUBQ1leStakMlWiVR9n6VlDwuEltyQI2l3i0JciDnWyR3uqe+T6C08ivniTQ==}
     engines: {node: '>=20.0.0'}
@@ -5887,7 +6067,7 @@ snapshots:
       '@csstools/css-color-parser': 4.0.1(@csstools/css-parser-algorithms@4.0.0(@csstools/css-tokenizer@4.0.0))(@csstools/css-tokenizer@4.0.0)
       '@csstools/css-parser-algorithms': 4.0.0(@csstools/css-tokenizer@4.0.0)
       '@csstools/css-tokenizer': 4.0.0
-      lru-cache: 11.2.5
+      lru-cache: 11.2.6
 
   '@asamuzakjp/dom-selector@6.8.1':
     dependencies:
@@ -6089,25 +6269,19 @@ snapshots:
 
   '@cloudflare/kv-asset-handler@0.4.2': {}
 
-  '@cloudflare/unenv-preset@2.14.0(unenv@2.0.0-rc.24)(workerd@1.20260219.0)':
-    dependencies:
-      unenv: 2.0.0-rc.24
-    optionalDependencies:
-      workerd: 1.20260219.0
-
   '@cloudflare/unenv-preset@2.14.0(unenv@2.0.0-rc.24)(workerd@1.20260305.0)':
     dependencies:
       unenv: 2.0.0-rc.24
     optionalDependencies:
       workerd: 1.20260305.0
 
-  '@cloudflare/vite-plugin@1.25.2(vite@8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.25.12)(jiti@2.6.1)(tsx@4.21.0))(workerd@1.20260219.0)(wrangler@4.67.0)':
+  '@cloudflare/vite-plugin@1.25.2(vite@8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.25.12)(jiti@2.6.1)(tsx@4.21.0))(workerd@1.20260305.0)(wrangler@4.69.0)':
     dependencies:
-      '@cloudflare/unenv-preset': 2.14.0(unenv@2.0.0-rc.24)(workerd@1.20260219.0)
+      '@cloudflare/unenv-preset': 2.14.0(unenv@2.0.0-rc.24)(workerd@1.20260305.0)
       miniflare: 4.20260219.0
       unenv: 2.0.0-rc.24
       vite: 8.0.0-beta.11(@types/node@22.19.10)(esbuild@0.25.12)(jiti@2.6.1)(tsx@4.21.0)
-      wrangler: 4.67.0
+      wrangler: 4.69.0
       ws: 8.18.0
     transitivePeerDependencies:
       - bufferutil
@@ -7343,7 +7517,7 @@ snapshots:
   '@stylistic/eslint-plugin@5.8.0(eslint@9.39.2(jiti@2.6.1))':
     dependencies:
       '@eslint-community/eslint-utils': 4.9.1(eslint@9.39.2(jiti@2.6.1))
-      '@typescript-eslint/types': 8.54.0
+      '@typescript-eslint/types': 8.56.0
       eslint: 9.39.2(jiti@2.6.1)
       eslint-visitor-keys: 4.2.1
       espree: 10.4.0
@@ -8089,10 +8263,6 @@ snapshots:
     dependencies:
       csstype: 3.2.3
 
-  '@types/react@19.2.2':
-    dependencies:
-      csstype: 3.2.3
-
   '@types/use-sync-external-store@0.0.6': {}
 
   '@types/ws@8.18.1':
@@ -8156,8 +8326,6 @@ snapshots:
       typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
-
-  '@typescript-eslint/types@8.54.0': {}
 
   '@typescript-eslint/types@8.56.0': {}
 
@@ -9327,7 +9495,7 @@ snapshots:
       '@asamuzakjp/css-color': 4.1.2
       '@csstools/css-syntax-patches-for-csstree': 1.0.26
       css-tree: 3.1.0
-      lru-cache: 11.2.5
+      lru-cache: 11.2.6
 
   csstype@3.2.3: {}
 
@@ -9579,7 +9747,7 @@ snapshots:
 
   eslint-plugin-import-x@4.16.1(@typescript-eslint/utils@8.56.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.2(jiti@2.6.1)):
     dependencies:
-      '@typescript-eslint/types': 8.54.0
+      '@typescript-eslint/types': 8.56.0
       comment-parser: 1.4.5
       debug: 4.4.3
       eslint: 9.39.2(jiti@2.6.1)
@@ -10148,8 +10316,6 @@ snapshots:
   lodash.truncate@4.4.2: {}
 
   look-it-up@2.1.0: {}
-
-  lru-cache@11.2.5: {}
 
   lru-cache@11.2.6: {}
 
@@ -11365,7 +11531,7 @@ snapshots:
       debug: 4.4.3
       eslint: 9.39.2(jiti@2.6.1)
       eslint-scope: 8.4.0
-      eslint-visitor-keys: 4.2.1
+      eslint-visitor-keys: 5.0.1
       espree: 10.4.0
       esquery: 1.7.0
       semver: 7.7.4
@@ -11439,22 +11605,6 @@ snapshots:
       '@cloudflare/workerd-linux-64': 1.20260305.0
       '@cloudflare/workerd-linux-arm64': 1.20260305.0
       '@cloudflare/workerd-windows-64': 1.20260305.0
-
-  wrangler@4.67.0:
-    dependencies:
-      '@cloudflare/kv-asset-handler': 0.4.2
-      '@cloudflare/unenv-preset': 2.14.0(unenv@2.0.0-rc.24)(workerd@1.20260219.0)
-      blake3-wasm: 2.1.5
-      esbuild: 0.27.3
-      miniflare: 4.20260219.0
-      path-to-regexp: 6.3.0
-      unenv: 2.0.0-rc.24
-      workerd: 1.20260219.0
-    optionalDependencies:
-      fsevents: 2.3.3
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
 
   wrangler@4.69.0:
     dependencies:

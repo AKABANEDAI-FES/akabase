@@ -35,18 +35,18 @@
   "dependencies": {
     "@archive/result": "workspace:*",
     "@archive/domain": "workspace:*",
-    "drizzle-orm": "0.45.1",
-    "zod": "^4.3.6"
+    "drizzle-orm": "catalog:backend",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@archive/config": "workspace:*",
-    "@typescript/native-preview": "7.0.0-dev.20260310.1",
-    "drizzle-kit": "0.31.9",
-    "oxlint": "^1.49.0",
-    "oxlint-tsgolint": "^0.16.0",
-    "tsdown": "^0.21.1",
-    "typescript": "^5.7.2",
-    "vitest": "^4.0.18",
-    "wrangler": "^4.69.0"
+    "@typescript/native-preview": "catalog:build",
+    "drizzle-kit": "catalog:build",
+    "oxlint": "catalog:lint",
+    "oxlint-tsgolint": "catalog:lint",
+    "tsdown": "catalog:build",
+    "typescript": "catalog:build",
+    "vitest": "catalog:test",
+    "wrangler": "catalog:build"
   }
 }
