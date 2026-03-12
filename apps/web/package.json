@@ -66,7 +66,6 @@
     "@types/react-dom": "catalog:types",
     "@vitejs/plugin-react": "catalog:build",
     "babel-plugin-react-compiler": "catalog:build",
-    "concurrently": "catalog:build",
     "drizzle-kit": "catalog:build",
     "drizzle-orm": "catalog:backend",
     "oxlint": "catalog:lint",
@@ -74,6 +73,7 @@
     "typescript": "catalog:build",
     "vite": "catalog:build",
     "vitest": "catalog:test",
+    "vite-tsconfig-paths": "catalog:build",
     "wrangler": "catalog:build"
   }
 }
