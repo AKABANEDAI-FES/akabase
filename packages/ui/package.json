@@ -16,6 +16,7 @@
   "scripts": {
     "lint": "oxlint --type-aware --type-check",
     "build": "tsdown",
+    "build:preset": "tsdown --no-clean src/panda-preset.ts",
     "dev": "tsdown --no-clean --watch"
   },
   "devDependencies": {
