@@ -1,24 +1,28 @@
 {
-  "name": "archive",
+  "name": "web",
   "private": true,
   "type": "module",
   "scripts": {
+    "prepare": "panda codegen",
     "dev": "vite dev",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "lint": "oxlint",
+    "lint": "oxlint --type-aware --type-check",
     "format": "oxfmt",
-    "check": "concurrently 'oxlint' 'oxfmt --check'",
-    "check:fix": "concurrently 'oxlint --fix' 'oxfmt --write'",
+    "check": "concurrently 'oxlint --type-aware --type-check' 'oxfmt --check'",
+    "check:fix": "concurrently 'oxlint --type-aware --type-check --fix' 'oxfmt --write'",
     "cf-typegen": "wrangler types",
-    "migration": "drizzle-kit generate",
     "migrate": "wrangler d1 migrations apply archive --local",
     "seed": "wrangler d1 execute archive --local --file=./scripts/seed.sql",
     "seed:large": "pnpm dlx tsx scripts/seed-large.ts",
     "deploy": "pnpm run build && wrangler deploy"
   },
   "dependencies": {
+    "@archive/application": "workspace:*",
+    "@archive/domain": "workspace:*",
+    "@archive/infrastructure": "workspace:*",
+    "@archive/result": "workspace:*",
     "@archive/styled-system": "workspace:*",
     "@archive/ui": "workspace:*",
     "@ark-ui/react": "^5.32.0",
@@ -28,7 +32,6 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@hono/standard-validator": "^0.2.2",
-    "@praha/byethrow": "^0.10.0",
     "@tanstack/react-devtools": "^0.9.6",
     "@tanstack/react-form": "^1.28.3",
     "@tanstack/react-query": "^5.90.21",
@@ -48,8 +51,6 @@
     "@tiptap/react": "^3.20.0",
     "@tiptap/starter-kit": "^3.20.0",
     "better-auth": "^1.4.18",
-    "drizzle-orm": "0.45.1",
-    "drizzle-zod": "^0.8.3",
     "es-toolkit": "^1.45.1",
     "hono": "^4.12.5",
     "lucide-react": "^0.575.0",
@@ -61,14 +62,10 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@archive/config": "workspace:*",
     "@cloudflare/vitest-pool-workers": "^0.12.18",
-    "@libsql/client": "^0.17.0",
     "@pandacss/dev": "^1.9.0",
-    "@stylistic/eslint-plugin": "^5.8.0",
     "@tanstack/devtools-vite": "^0.5.1",
-    "@tanstack/eslint-config": "^0.4.0",
-    "@testing-library/dom": "^10.4.1",
-    "@testing-library/react": "^16.3.2",
     "@types/node": "^22.10.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
@@ -76,8 +73,6 @@
     "babel-plugin-react-compiler": "^1.0.0",
     "concurrently": "^9.2.1",
     "drizzle-kit": "0.31.9",
-    "jsdom": "^28.1.0",
-    "oxfmt": "^0.34.0",
     "oxlint": "^1.49.0",
     "oxlint-tsgolint": "^0.16.0",
     "typescript": "^5.7.2",
@@ -85,16 +80,5 @@
     "vitest": "^4.0.18",
     "web-vitals": "^5.1.0",
     "wrangler": "^4.67.0"
-  },
-  "pnpm": {
-    "overrides": {
-      "vite": "8.0.0-beta.11"
-    },
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "sharp",
-      "unrs-resolver",
-      "workerd"
-    ]
   }
 }

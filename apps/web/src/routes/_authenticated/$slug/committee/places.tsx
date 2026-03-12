@@ -1,0 +1,60 @@
+import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { Button } from "@archive/ui/components/button";
+import { Heading } from "@archive/ui/components/heading";
+import { Container, Flex, Stack } from "@archive/styled-system/jsx";
+import { PlusIcon } from "lucide-react";
+import { generateLoadPlacesQueryOptions } from "@/features/event/actions/queries/place";
+import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions/queries";
+import { PlaceManagementTable } from "@/features/event/components/place-management-table";
+
+export const Route = createFileRoute("/_authenticated/$slug/committee/places")({
+  loader: async ({ context }) => {
+    const event = context.activeEvent;
+    await Promise.all([
+      context.queryClient.ensureQueryData(generateLoadPlacesQueryOptions(event.id)),
+      context.queryClient.ensureQueryData(generateCheckCommitteePermissionsQueryOptions(event.id)),
+    ]);
+  },
+  component: PlacesManagementPage,
+});
+
+function PlacesManagementPage() {
+  const { slug } = Route.useParams();
+  const { activeEvent: event } = Route.useRouteContext();
+  const { data: places } = useSuspenseQuery(generateLoadPlacesQueryOptions(event.id));
+  const { data: permissions } = useSuspenseQuery(
+    generateCheckCommitteePermissionsQueryOptions(event.id),
+  );
+
+  return (
+    <>
+      <Container maxW="6xl" py="8">
+        <Stack gap="6">
+          <Flex justify="space-between" align="center">
+            <Heading as="h1" textStyle="2xl" fontWeight="bold">
+              場所管理
+            </Heading>
+            {permissions.canManagePlaces && (
+              <Button asChild>
+                <Link to="/$slug/committee/places/new" params={{ slug }}>
+                  <PlusIcon />
+                  場所を追加
+                </Link>
+              </Button>
+            )}
+          </Flex>
+
+          <PlaceManagementTable
+            places={places}
+            eventId={event.id}
+            slug={slug}
+            canUpdate={permissions.canManagePlaces}
+            canDelete={permissions.canManagePlaces}
+          />
+        </Stack>
+      </Container>
+      <Outlet />
+    </>
+  );
+}
