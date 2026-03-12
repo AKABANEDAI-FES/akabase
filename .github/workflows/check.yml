@@ -27,5 +27,8 @@ jobs:
       - name: Format check
         run: pnpm exec oxfmt --check
 
+      - name: Build packages
+        run: pnpm build -F="@archive/*"
+
       - name: Lint
         run: pnpm lint
