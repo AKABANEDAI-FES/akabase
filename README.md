@@ -10,7 +10,7 @@
 - 委員会による承認・差戻し・フィードバック
 - 年度（イベント）単位のデータ管理とアーカイブ
 - タグ・場所・締切のマスタ管理
-- 公開データの CSV/JSON 出力
+- 公開データの CSV/XLSX/JSON 出力
 
 ## 技術スタック
 
@@ -26,13 +26,46 @@
 | サーバー状態      | TanStack Query                           |
 | テスト            | Vitest                                   |
 | Lint / Format     | oxlint + oxfmt                           |
+| ビルド            | Vite, tsdown, Turborepo                  |
+| パッケージ管理    | pnpm workspaces                          |
+
+## モノレポ構成
+
+```
+archive/
+├── apps/
+│   └── web/                     # メイン Web アプリケーション
+├── packages/
+│   ├── domain/                  # ドメイン層（スキーマ、ロジック、エラー定義）
+│   ├── application/             # アプリケーション層（Command / Query）
+│   ├── infrastructure/          # インフラ層（DB、リポジトリ、認証、ストレージ）
+│   ├── result/                  # Result 型（関数型エラーハンドリング）
+│   ├── ui/                      # UI コンポーネント + Panda CSS プリセット
+│   ├── styled-system/           # Panda CSS 生成出力
+│   └── config/                  # 共通設定（TypeScript, oxlint）
+└── docs/
+    └── architecture.md          # アーキテクチャ設計書
+```
+
+### パッケージ詳細
+
+| パッケージ | 説明 |
+| --- | --- |
+| `apps/web` | TanStack Start ベースのフルスタック Web アプリ。ルーティング、API、UI を統合 |
+| `packages/domain` | 純粋なドメインモデル。Zod スキーマ、ドメインロジック、リポジトリインターフェース |
+| `packages/application` | CQRS パターンのユースケース層。Command（書き込み）と Query（読み取り） |
+| `packages/infrastructure` | Drizzle ORM リポジトリ実装、Better Auth 設定、R2 ストレージ、ドメインサービス |
+| `packages/result` | `@praha/byethrow` ベースの Result 型ユーティリティ |
+| `packages/ui` | 再利用可能な React コンポーネントと Panda CSS プリセット |
+| `packages/styled-system` | Panda CSS の生成コード（トークン、レシピ、パターン） |
+| `packages/config` | TypeScript / oxlint の共通設定 |
 
 ## セットアップ
 
 ### 前提条件
 
 - Node.js 22+
-- pnpm
+- pnpm 10+
 
 ### インストール
 
@@ -42,7 +75,7 @@ pnpm install
 
 ### 環境変数
 
-`.dev.vars` を作成し、以下を設定:
+`apps/web/.dev.vars` を作成し、以下を設定:
 
 ```
 BETTER_AUTH_SECRET=<認証用シークレット>
@@ -54,8 +87,8 @@ GOOGLE_CLIENT_SECRET=<Google OAuth クライアントシークレット>
 ### データベース初期化
 
 ```bash
-pnpm migrate    # マイグレーション適用
-pnpm seed       # 初期データ投入（任意）
+pnpm --filter web migrate    # マイグレーション適用
+pnpm --filter web seed       # 初期データ投入（任意）
 ```
 
 ### 開発サーバー起動
@@ -66,58 +99,36 @@ pnpm dev
 
 ## コマンド一覧
 
-### 開発
+### ルート（モノレポ全体）
 
 ```bash
-pnpm dev              # 開発サーバー起動
-pnpm build            # プロダクションビルド（tsc + vite build）
-pnpm preview          # ビルド結果のプレビュー
-pnpm deploy           # ビルド + Cloudflare へデプロイ
+pnpm dev              # 全パッケージの開発サーバー起動（Turborepo）
+pnpm build            # 全パッケージのビルド（Turborepo）
+pnpm test             # 全パッケージのテスト実行（Turborepo）
+pnpm lint             # 全パッケージの Lint（Turborepo）
+pnpm check            # フォーマットチェック + Lint
+pnpm check:fix        # フォーマット自動修正 + Lint 自動修正
 ```
 
-### データベース
+### Web アプリ（apps/web）
 
 ```bash
-pnpm migration        # スキーマからマイグレーション生成（drizzle-kit generate）
-pnpm migrate          # ローカル D1 にマイグレーション適用
-pnpm seed             # 初期データ投入
-pnpm cf-typegen       # Cloudflare バインディングの型生成
+pnpm --filter web dev         # 開発サーバー起動
+pnpm --filter web build       # プロダクションビルド
+pnpm --filter web deploy      # ビルド + Cloudflare へデプロイ
+pnpm --filter web prepare     # Panda CSS コード生成
 ```
 
-### コード品質
+### データベース（apps/web）
 
 ```bash
-pnpm test             # テスト実行（Vitest）
-pnpm lint             # Lint（oxlint）
-pnpm format           # フォーマット（oxfmt）
-pnpm check            # Lint + フォーマットチェック
-pnpm check:fix        # Lint + フォーマット自動修正
+pnpm --filter web migrate     # ローカル D1 にマイグレーション適用
+pnpm --filter web seed        # 初期データ投入
+pnpm --filter web cf-typegen  # Cloudflare バインディングの型生成
 ```
 
-### スタイル
-
-```bash
-pnpm prepare          # Panda CSS コード生成（dev/build 前に自動実行）
-```
-
-## ディレクトリ構成
-
-```
-src/
-├── domain/              # ドメイン層（スキーマ、ロジック、エラー定義）
-├── application/
-│   ├── command/         # 書き込み操作（ユースケース）
-│   └── query/           # 読み取り操作（DTO + クエリ関数）
-├── infrastructure/      # リポジトリ実装、DI、ドメインサービス実装
-├── features/            # 機能別モジュール（TanStack Query 統合、UI コンポーネント）
-├── routes/              # TanStack Router ファイルベースルーティング
-├── components/ui/       # 共通 UI コンポーネント（Park UI）
-├── db/                  # Drizzle スキーマ、マイグレーション
-├── libs/                # 共通ユーティリティ（認証、Result 型、ID 生成）
-├── theme/               # Panda CSS テーマ設定
-└── test/                # テストユーティリティ
-```
+> DB スキーマ変更時は `packages/infrastructure/src/db/schema.ts` を編集後、`drizzle-kit generate` でマイグレーション生成。
 
 ## ドキュメント
 
-アーキテクチャの詳細（DDD設計、CQRSパターン、型システム、エラーハンドリング、実装パターン等）は [docs/architecture.md](docs/architecture.md) を参照。
+アーキテクチャの詳細（DDD 設計、CQRS パターン、型システム、エラーハンドリング、実装パターン等）は [docs/architecture.md](docs/architecture.md) を参照。
