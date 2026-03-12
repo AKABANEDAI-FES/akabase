@@ -1,0 +1,80 @@
+{
+  "$schema": "../node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "import", "unicorn", "eslint", "promise"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "perf": "warn",
+    "style": "warn",
+    "restriction": "error"
+  },
+  "ignorePatterns": [
+    "**/.nx/**",
+    "**/.svelte-kit/**",
+    "**/build/**",
+    "**/coverage/**",
+    "**/dist/**",
+    "**/snap/**",
+    "**/vite.config.*.timestamp-*.*"
+  ],
+  "rules": {
+    "no-eq-null": "off",
+    "import/group-exports": "off",
+    "import/no-named-export": "off",
+    "import/no-default-export": "off",
+    "import/prefer-default-export": "off",
+    "import/no-relative-parent-imports": "off",
+    "import/no-namespace": "off",
+    "import/exports-last": "off",
+    "eslint/id-length": "off",
+    "eslint/func-style": ["warn", "declaration", { "allowArrowFunctions": true }],
+    "eslint/no-ternary": "off",
+    "eslint/max-statements": ["warn", 20],
+    "eslint/sort-keys": "off",
+    "eslint/max-params": "off",
+    "eslint/no-shadow": "off",
+    "eslint/no-magic-numbers": "off",
+    "eslint/no-undefined": "off",
+    "eslint/capitalized-comments": "off",
+    "eslint/no-use-before-define": "off",
+    "eslint/no-nested-ternary": "off",
+    "eslint/arrow-body-style": "off",
+    "eslint/new-cap": "off",
+    "eslint/no-continue": "off",
+    "sort-imports": [
+      "error",
+      {
+        "ignoreDeclarationSort": true
+      }
+    ],
+    "eslint/no-duplicate-imports": ["error", { "allowSeparateTypeImports": true }],
+    "func-names": ["error", "as-needed", { "generators": "never" }],
+    "typescript/consistent-type-definitions": ["warn", "type"],
+    "typescript/explicit-function-return-type": "off",
+    "typescript/explicit-module-boundary-types": "off",
+    "unicorn/no-null": "off",
+    "unicorn/no-array-method-this-argument": "off",
+    "unicorn/no-nested-ternary": "off",
+    "unicorn/filename-case": [
+      "error",
+      {
+        "case": "kebabCase"
+      }
+    ],
+    "promise/prefer-await-to-callbacks": "off"
+  },
+  "overrides": [
+    {
+      "plugins": ["typescript", "import", "unicorn", "eslint", "promise", "vitest"],
+      "files": ["**/*.test.ts", "**/*.spec.ts"],
+      "rules": {
+        "typescript/no-explicit-any": "off",
+        "typescript/no-unsafe-type-assertion": "off",
+        "typescript/no-non-null-assertion": "off",
+        "eslint/no-magic-numbers": "off",
+        "eslint/max-statements": "off",
+        "eslint/init-declarations": "off"
+      }
+    }
+  ]
+}

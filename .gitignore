@@ -12,9 +12,8 @@ count.txt
 .vinxi
 todos.json
 
-## Panda
-styled-system
-styled-system-studio
-
 ## Wrangler
 .dev.vars
+
+## Turborepo
+.turbo

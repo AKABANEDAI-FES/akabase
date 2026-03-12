@@ -1,0 +1,13 @@
+import { authRoute } from "./auth";
+import { depsMiddleware, factory } from "./libs";
+import { storageRoute } from "./storage";
+
+const api = factory
+  .createApp()
+  .use("*", depsMiddleware)
+  .route("/auth", authRoute)
+  .route("/storage", storageRoute);
+
+export const app = factory.createApp().route("/api", api);
+
+export type ApiType = typeof api;

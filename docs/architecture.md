@@ -4,9 +4,9 @@
 
 1. [概要](#概要)
 2. [アーキテクチャ原則](#アーキテクチャ原則)
-3. [全体構成](#全体構成)
-4. [CQRS パターン](#cqrs-パターン)
-5. [ディレクトリ構造](#ディレクトリ構造)
+3. [モノレポ構成](#モノレポ構成)
+4. [全体構成](#全体構成)
+5. [CQRS パターン](#cqrs-パターン)
 6. [レイヤー設計](#レイヤー設計)
 7. [ドメインサービス](#ドメインサービス)
 8. [型システム設計](#型システム設計)
@@ -34,6 +34,7 @@
 - **Styling**: Panda CSS + Park UI
 - **Type Safety**: TypeScript + Zod
 - **Error Handling**: `@praha/byethrow` (Result型)
+- **Build**: Turborepo + pnpm workspaces
 
 ### 設計方針
 
@@ -42,6 +43,7 @@
 - **Functional Programming**: 純粋関数とイミュータブルなデータ構造
 - **Type Safety**: Zod スキーマによるランタイムバリデーション + Brand型
 - **Result型**: 例外を使わない安全なエラーハンドリング
+- **Monorepo**: DDD レイヤーをパッケージとして分離し、依存方向を強制
 
 ---
 
@@ -49,12 +51,12 @@
 
 ### 1. レイヤー分離
 
-各レイヤーは明確な責務を持ち、下位レイヤーへの依存のみ許可します。
+各レイヤーは独立したパッケージとして分離され、下位レイヤーへの依存のみ許可します。
 
 ```
-Presentation → Application (Command/Query) → Domain
-                     ↓
-               Infrastructure
+apps/web (Presentation) → @archive/application (Command/Query) → @archive/domain
+                                      ↓
+                          @archive/infrastructure
 ```
 
 **CQRS パターン**: Application層をCommand（書き込み）とQuery（読み取り）に分離し、それぞれ異なる最適化を行います。
@@ -123,13 +125,157 @@ export function canSubmit(project: Project): Result.Result<true, ProjectError> {
 
 ---
 
+## モノレポ構成
+
+pnpm workspaces + Turborepo によるモノレポ構成で、DDD の各レイヤーを独立したパッケージとして管理します。
+
+```
+archive/
+├── apps/
+│   └── web/                         # Presentation層（TanStack Start + Cloudflare Workers）
+├── packages/
+│   ├── domain/                      # Domain層（スキーマ、ロジック、エラー、サービスIF）
+│   ├── application/                 # Application層（Command / Query, CQRS）
+│   ├── infrastructure/              # Infrastructure層（DB、リポジトリ、認証、ストレージ）
+│   ├── result/                      # Result型ユーティリティ
+│   ├── ui/                          # UI コンポーネント + Panda CSS プリセット
+│   ├── styled-system/               # Panda CSS 生成出力
+│   └── config/                      # 共通設定（TypeScript, oxlint）
+└── docs/
+    └── architecture.md
+```
+
+### パッケージ依存関係
+
+```
+apps/web
+  ├── @archive/application
+  │     ├── @archive/domain
+  │     │     └── @archive/result
+  │     └── @archive/infrastructure
+  │           ├── @archive/domain
+  │           └── @archive/result
+  ├── @archive/ui
+  │     └── @archive/styled-system
+  └── @archive/infrastructure (直接参照: DB初期化、DI)
+```
+
+### インポートパターン
+
+- **パッケージ間**: `@archive/*` (例: `import { Project } from "@archive/domain/project/schema"`)
+- **apps/web 内部**: `@/` エイリアス (例: `import { getSessionFn } from "@/libs/auth"`)
+
+---
+
+### パッケージ別ディレクトリ構造
+
+#### packages/domain（Domain層）
+
+```
+packages/domain/src/
+├── authorization/              # 認可ドメイン
+│   ├── schema.ts               # Actor, Resource, Action 型定義
+│   ├── logic.ts                # 権限判定ロジック + リソース生成ヘルパー
+│   ├── errors.ts               # エラー型
+│   └── service.ts              # AuthorizationService IF
+├── event/                      # イベントドメイン
+│   ├── schema.ts               # Event, Tag, Place, Deadline スキーマ
+│   ├── logic.ts                # ドメインロジック
+│   ├── errors.ts               # エラー型
+│   ├── repository.ts           # Repository IF
+│   └── service.ts              # EventDomainService IF
+├── organization/               # 団体ドメイン
+│   ├── schema.ts               # Organization, OrgMember スキーマ
+│   ├── logic.ts                # ドメインロジック
+│   ├── errors.ts               # エラー型
+│   ├── repository.ts           # Repository IF
+│   └── service.ts              # OrganizationDomainService IF
+├── project/                    # 企画ドメイン
+│   ├── schema.ts               # Project, Draft, Submission, Published スキーマ
+│   ├── logic.ts                # ドメインロジック
+│   ├── errors.ts               # エラー型
+│   └── repository.ts           # Repository IF
+├── user/                       # ユーザードメイン
+│   ├── schema.ts               # User スキーマ
+│   ├── logic.ts                # ドメインロジック
+│   ├── errors.ts               # エラー型
+│   └── repository.ts           # Repository IF
+└── shared/                     # 共通定義
+    ├── ids.ts                  # Brand型ID（全集約共通）
+    ├── errors.ts               # 共通エラー型 + DomainErrorCodeOf
+    ├── repository.ts           # RepositoryError 型
+    └── storage.ts              # StorageService IF
+```
+
+#### packages/application（Application層）
+
+```
+packages/application/src/
+├── command/                     # Command側（書き込み）
+│   ├── event/                  # イベント管理コマンド
+│   ├── organization/           # 団体管理コマンド
+│   ├── project/                # 企画管理コマンド
+│   ├── user/                   # ユーザー管理コマンド
+│   └── shared/                 # 共通コマンドユーティリティ
+├── query/                      # Query側（読み取り）
+│   ├── authorization/          # 認可情報クエリ
+│   ├── event/                  # イベント関連クエリ
+│   ├── organization/           # 団体関連クエリ
+│   ├── project/                # 企画関連クエリ
+│   ├── user/                   # ユーザー関連クエリ
+│   └── shared.ts               # 共通クエリユーティリティ
+└── test/                       # テストヘルパー
+```
+
+#### packages/infrastructure（Infrastructure層）
+
+```
+packages/infrastructure/src/
+├── auth/                       # Better Auth 設定
+├── db/                         # データベース
+│   ├── schema.ts               # Drizzle スキーマ
+│   ├── auth-schema.ts          # Better Auth スキーマ
+│   ├── index.ts                # DB クライアント
+│   └── migrations/             # SQLマイグレーション
+├── repositories/               # Repository 実装（集約ごと）
+├── services/                   # ドメインサービス実装
+└── storage/                    # StorageService 実装（R2）
+```
+
+#### apps/web（Presentation層）
+
+```
+apps/web/src/
+├── api/                        # HTTP API（Hono）
+├── features/                   # 機能別モジュール（TanStack Query 統合）
+│   ├── <feature>/
+│   │   ├── actions/            # Server Functions + Query Options + Mutation Hooks
+│   │   └── components/         # 機能固有の UI コンポーネント
+│   └── ...
+├── routes/                     # TanStack Router（ファイルベースルーティング）
+│   ├── __root.tsx              # ルートレイアウト
+│   ├── _authenticated/         # 認証済みルート
+│   │   └── $slug/              # イベントスコープ
+│   │       ├── committee/      # 実行委員向けページ
+│   │       └── orgs/           # 団体向けページ
+│   ├── _public/                # 公開ルート
+│   └── admin/                  # 管理画面
+├── components/                 # 共通 UI コンポーネント
+├── libs/                       # ユーティリティ（認証、DB初期化、DI、日付等）
+├── integrations/               # TanStack Query devtools
+├── router.tsx                  # Router 設定
+└── server.ts                   # Cloudflare Workers エントリーポイント
+```
+
+---
+
 ## 全体構成
 
 ### レイヤーアーキテクチャ
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│         Presentation Layer (React + TanStack)       │
+│      Presentation Layer (apps/web)                   │
 │  ┌──────────────┐  ┌──────────────┐                │
 │  │   routes/    │  │  features/   │                │
 │  │ - loader     │  │ - components │                │
@@ -144,8 +290,9 @@ export function canSubmit(project: Project): Result.Result<true, ProjectError> {
          ▼                           ▼
 ┌──────────────────┐        ┌──────────────────┐
 │  Query Service   │        │  Command (UC)    │
-│  application/    │        │  application/    │
-│    query/        │        │    command/      │
+│  @archive/       │        │  @archive/       │
+│  application     │        │  application     │
+│    /query        │        │    /command       │
 │                  │        │                  │
 │  - DTO定義       │        │  - Use Cases     │
 │  - JOIN可能      │        │  - DI受け取り    │
@@ -158,7 +305,7 @@ export function canSubmit(project: Project): Result.Result<true, ProjectError> {
          │                           ▼
          │                  ┌──────────────────┐
          │                  │  Domain Layer    │
-         │                  │  domain/         │
+         │                  │  @archive/domain │
          │                  │  - schema.ts     │
          │                  │  - logic.ts      │
          │                  │  - service.ts    │
@@ -167,15 +314,14 @@ export function canSubmit(project: Project): Result.Result<true, ProjectError> {
          │                           │
          └───────────┬───────────────┘
                      ▼
-         ┌─────────────────────────┐
-         │  Infrastructure Layer   │
-         │  infrastructure/        │
-         │  - repositories/        │
-         │  - domain-services/     │
-         │  - authorization/       │
-         │  - storage/             │
-         │  - di.ts                │
-         └─────────────────────────┘
+         ┌──────────────────────────────┐
+         │  Infrastructure Layer        │
+         │  @archive/infrastructure     │
+         │  - repositories/             │
+         │  - services/                 │
+         │  - auth/                     │
+         │  - storage/                  │
+         └──────────────────────────────┘
                      │
                      ▼
               ┌─────────────┐
@@ -194,16 +340,16 @@ export function canSubmit(project: Project): Result.Result<true, ProjectError> {
 
 ### 設計原則
 
-| 側面             | Command (書き込み)             | Query (読み取り)           |
-| ---------------- | ------------------------------ | -------------------------- |
-| **目的**         | ビジネスロジック実行、状態変更 | データ表示                 |
-| **レイヤー**     | `application/command/`         | `application/query/`       |
-| **使用場所**     | Server Function (POST)         | Server Function (GET)      |
-| **データソース** | Repository (集約単位)          | 直接DB (JOIN可能)          |
-| **戻り値**       | 集約モデル（Domain型）         | DTO（表示用型）            |
-| **制約**         | 集約の不変条件を守る           | 制約なし（読み取り専用）   |
-| **最適化**       | トランザクション、整合性       | パフォーマンス、キャッシュ |
-| **スキーマ**     | Domain schemaを使用            | zod schemaでDTO定義        |
+| 側面             | Command (書き込み)              | Query (読み取り)              |
+| ---------------- | ------------------------------- | ----------------------------- |
+| **目的**         | ビジネスロジック実行、状態変更  | データ表示                    |
+| **パッケージ**   | `@archive/application` command/ | `@archive/application` query/ |
+| **使用場所**     | Server Function (POST)          | Server Function (GET)         |
+| **データソース** | Repository (集約単位)           | 直接DB (JOIN可能)             |
+| **戻り値**       | 集約モデル（Domain型）          | DTO（表示用型）               |
+| **制約**         | 集約の不変条件を守る            | 制約なし（読み取り専用）      |
+| **最適化**       | トランザクション、整合性        | パフォーマンス、キャッシュ    |
+| **スキーマ**     | Domain schemaを使用             | zod schemaでDTO定義           |
 
 ### DTO定義規則
 
@@ -217,113 +363,9 @@ Queryでは、ドメインモデルとは別にDTO（Data Transfer Object）を�
 
 ---
 
-## ディレクトリ構造
-
-```
-src/
-├── application/                  # Application層（CQRS）
-│   ├── command/                  # Command側（書き込み）
-│   │   ├── event/               # イベント管理コマンド
-│   │   ├── organization/        # 団体管理コマンド
-│   │   ├── project/             # 企画管理コマンド
-│   │   └── user/                # ユーザー管理コマンド
-│   │
-│   └── query/                   # Query側（読み取り）
-│       ├── authorization/       # 認可情報クエリ
-│       ├── event/               # イベント関連クエリ
-│       ├── organization/        # 団体関連クエリ
-│       ├── project/             # 企画関連クエリ
-│       └── user/                # ユーザー関連クエリ
-│
-├── domain/                      # Domain層（純粋関数 + 型 + サービスIF）
-│   ├── authorization/           # 認可ドメイン
-│   │   ├── schema.ts            # Actor, Resource, Action 型定義
-│   │   ├── logic.ts             # 権限判定ロジック + リソース生成ヘルパー
-│   │   ├── errors.ts            # エラー型
-│   │   └── service.ts           # AuthorizationService IF
-│   ├── event/                   # イベントドメイン
-│   │   ├── schema.ts            # Event, Tag, Place, Deadline スキーマ
-│   │   ├── logic.ts             # ドメインロジック
-│   │   ├── errors.ts            # エラー型
-│   │   ├── repository.ts        # Repository IF
-│   │   └── service.ts           # EventDomainService IF
-│   ├── organization/            # 団体ドメイン
-│   │   ├── schema.ts            # Organization, OrgMember スキーマ
-│   │   ├── logic.ts             # ドメインロジック
-│   │   ├── errors.ts            # エラー型
-│   │   ├── repository.ts        # Repository IF
-│   │   └── service.ts           # OrganizationDomainService IF
-│   ├── project/                 # 企画ドメイン
-│   │   ├── schema.ts            # Project, Draft, Submission, Published スキーマ
-│   │   ├── logic.ts             # ドメインロジック
-│   │   ├── errors.ts            # エラー型
-│   │   └── repository.ts        # Repository IF
-│   ├── user/                    # ユーザードメイン
-│   │   ├── schema.ts            # User スキーマ
-│   │   ├── logic.ts             # ドメインロジック
-│   │   ├── errors.ts            # エラー型
-│   │   └── repository.ts        # Repository IF
-│   └── shared/                  # 共通定義
-│       ├── ids.ts               # Brand型ID（全集約共通）
-│       ├── errors.ts            # 共通エラー型 + DomainErrorCodeOf
-│       ├── repository.ts        # RepositoryError 型
-│       └── storage.ts           # StorageService IF
-│
-├── infrastructure/              # Infrastructure層
-│   ├── repositories/            # Repository 実装（集約ごと）
-│   ├── domain-services/         # DomainService 実装
-│   ├── authorization/           # AuthorizationService 実装
-│   ├── storage/                 # StorageService 実装（R2）
-│   └── di.ts                   # DIコンテナ
-│
-├── features/                    # 機能別モジュール（Presentation + Actions）
-│   ├── <feature>/
-│   │   ├── actions/             # TanStack Query統合
-│   │   │   ├── index.ts         # re-export
-│   │   │   ├── queries.ts       # Server Functions (GET) + QueryOptions
-│   │   │   └── mutations.ts     # Server Functions (POST) + Mutation Hooks
-│   │   └── components/          # 機能固有のUIコンポーネント
-│   │       └── index.ts         # re-export
-│   └── ...
-│
-├── routes/                      # TanStack Router（ファイルベースルーティング）
-│   ├── __root.tsx               # ルートレイアウト
-│   ├── _authenticated.ts        # 認証済みレイアウト
-│   ├── _public.tsx              # 公開レイアウト
-│   ├── admin.tsx                # 管理画面レイアウト
-│   ├── _authenticated/$slug/    # イベントスコープのルート
-│   │   ├── committee/           # 実行委員向けページ
-│   │   └── org/                 # 団体向けページ
-│   └── admin/                   # システム管理ページ
-│
-├── components/                  # 共通UIコンポーネント
-│   └── ui/                      # Park UI コンポーネント
-│
-├── db/                          # データベース
-│   ├── schema.ts                # Drizzle スキーマ
-│   ├── auth-schema.ts           # Better Auth スキーマ
-│   └── index.ts                 # DB クライアント
-│
-├── libs/                        # 共通ライブラリ
-│   ├── auth.ts                  # Better Auth 設定
-│   ├── auth-client.ts           # Auth クライアント
-│   ├── session-server.ts        # セッション取得 + authMiddleware
-│   ├── result.ts                # gen / suspend ヘルパー
-│   ├── id.ts                    # ID生成関数
-│   ├── date.ts                  # 日付ユーティリティ
-│   └── text.tsx                 # テキストユーティリティ
-│
-└── theme/                       # Panda CSS テーマ設定
-    ├── recipes/                 # Park UI コンポーネントレシピ
-    ├── tokens/                  # デザイントークン
-    └── colors/                  # カラーパレット
-```
-
----
-
 ## レイヤー設計
 
-### Domain層（ドメイン層）
+### Domain層（`@archive/domain`）
 
 **責務**: ビジネスルール・不変条件・ドメインロジック
 
@@ -346,7 +388,7 @@ src/
 
 ---
 
-### Infrastructure層（インフラ層）
+### Infrastructure層（`@archive/infrastructure`）
 
 **責務**: 永続化・外部システム連携・I/O操作
 
@@ -358,7 +400,7 @@ src/
 
 ---
 
-### Application層（アプリケーション層）
+### Application層（`@archive/application`）
 
 CQRSパターンに従い、Command（書き込み）とQuery（読み取り）に分離します。
 
@@ -413,7 +455,7 @@ export async function listEvents(): Promise<Result.Result<EventListItem[], Query
 
 ---
 
-### Presentation層（プレゼンテーション層）
+### Presentation層（`apps/web`）
 
 **責務**: UI表示・ユーザーインタラクション
 
@@ -421,7 +463,8 @@ export async function listEvents(): Promise<Result.Result<EventListItem[], Query
 
 - `routes/`: TanStack Router ファイルベースルーティング（loader + component）
 - `features/`: 機能別モジュール（actions + components）
-- `components/ui/`: Park UI 共通コンポーネント
+- `components/`: 共通 UI コンポーネント
+- `@archive/ui`: Park UI ベースの再利用コンポーネントライブラリ
 
 ---
 
@@ -439,7 +482,7 @@ export async function listEvents(): Promise<Result.Result<EventListItem[], Query
 ### ドメイン層: インターフェース
 
 ```typescript
-// domain/event/service.ts
+// packages/domain/src/event/service.ts
 export interface EventDomainService {
   ensureSlugUnique(
     slug: string,
@@ -455,7 +498,7 @@ export interface EventDomainService {
 ### インフラ層: 実装
 
 ```typescript
-// infrastructure/domain-services/event-domain-service.ts
+// packages/infrastructure/src/services/event-domain-service.ts
 export class EventDomainServiceImpl implements EventDomainService {
   constructor(private readonly eventRepo: EventRepository) {}
 
@@ -474,7 +517,7 @@ export class EventDomainServiceImpl implements EventDomainService {
 ### DI への登録
 
 ```typescript
-// infrastructure/di.ts
+// apps/web/src/libs/dependencies.ts
 export type Dependencies = {
   // Repositories
   projectRepo: ProjectRepository;
@@ -516,7 +559,7 @@ export const dependencies = createDependencies();
 すべての型は Zod スキーマから派生させます。
 
 ```typescript
-// domain/project/schema.ts
+// packages/domain/src/project/schema.ts
 
 // バリデーション定数
 export const PROJECT_NAME_MIN_LENGTH = 1;
@@ -542,7 +585,7 @@ export type Project = z.infer<typeof projectSchema>;
 ### Brand型によるID管理
 
 ```typescript
-// domain/shared/ids.ts
+// packages/domain/src/shared/ids.ts
 export const projectIdSchema = z.string().brand<"ProjectId">();
 export const eventIdSchema = z.string().brand<"EventId">();
 export const orgIdSchema = z.string().brand<"OrgId">();
@@ -568,7 +611,7 @@ export function cast<T extends string>(id: string): T {
 タグなどの関連データを含む複合型は、ベーススキーマの `extend` で定義します。
 
 ```typescript
-// domain/project/schema.ts
+// packages/domain/src/project/schema.ts
 export const draftWithTagsSchema = projectDraftSchema.extend({
   tags: z.array(tagIdSchema),
 });
@@ -587,7 +630,7 @@ export type SubmissionWithTags = z.infer<typeof submissionWithTagsSchema>;
 ### エラー型の構造
 
 ```typescript
-// domain/shared/errors.ts
+// packages/domain/src/shared/errors.ts
 
 // 共通エラーコード（全ドメインで使用可能）
 export const DOMAIN_ERROR_CODE = {
@@ -613,7 +656,7 @@ export function createError<TCode extends string>(code: TCode, message: string):
 ### ドメインごとのエラー定義
 
 ```typescript
-// domain/event/errors.ts
+// packages/domain/src/event/errors.ts
 export const EVENT_ERROR_CODE = {
   EVENT_ARCHIVED: "EVENT_ARCHIVED",
   SLUG_NOT_UNIQUE: "SLUG_NOT_UNIQUE",
@@ -635,7 +678,7 @@ export function eventError(code: EventErrorCode, message: string): EventError {
 `gen` 関数を使うと、Result型を簡潔に扱えます。
 
 ```typescript
-import { gen } from "@/libs/result";
+import { gen } from "@archive/result";
 
 export function createEvent(deps: Dependencies, input: Input) {
   return gen(async function* ($) {
@@ -653,7 +696,7 @@ export function createEvent(deps: Dependencies, input: Input) {
 
 ## 実装パターン
 
-### domain/project/schema.ts
+### packages/domain/src/project/schema.ts
 
 ```typescript
 import { z } from "zod";
@@ -733,7 +776,7 @@ export type SubmissionWithTags = z.infer<typeof submissionWithTagsSchema>;
 
 ---
 
-### domain/project/logic.ts
+### packages/domain/src/project/logic.ts
 
 ```typescript
 import { Result } from "@praha/byethrow";
@@ -794,19 +837,18 @@ export function createProjectDraftEntity(input: {
 
 ---
 
-### application/command/event/create-event.ts（Commandパターン）
+### packages/application/src/command/event/create-event.ts（Commandパターン）
 
 ```typescript
 import { Result } from "@praha/byethrow";
-import { gen } from "@/libs/result";
-import { generateId } from "@/libs/id";
-import type { EventId } from "@/domain/shared/ids";
-import type { EventError } from "@/domain/event/errors";
-import type { RepositoryError } from "@/domain/shared/repository";
-import type { AuthorizationError } from "@/domain/authorization/errors";
-import { createEventEntity } from "@/domain/event/logic";
-import { eventResource } from "@/domain/authorization/logic";
-import type { Dependencies } from "@/infrastructure/di";
+import { gen } from "@archive/result";
+import type { EventId } from "@archive/domain/shared/ids";
+import type { EventError } from "@archive/domain/event/errors";
+import type { RepositoryError } from "@archive/domain/shared/repository";
+import type { AuthorizationError } from "@archive/domain/authorization/errors";
+import { createEventEntity } from "@archive/domain/event/logic";
+import { eventResource } from "@archive/domain/authorization/logic";
+import type { Dependencies } from "@archive/application/command/shared/dependencies";
 
 export type CreateEventInput = {
   name: string;
@@ -847,10 +889,10 @@ export async function createEvent(
 
 ### features/ ディレクトリパターン
 
-`features/` ディレクトリは、Application層とPresentation層をつなぐ統合レイヤーです。
+`apps/web/src/features/` ディレクトリは、Application層とPresentation層をつなぐ統合レイヤーです。
 
 ```
-features/<feature>/
+apps/web/src/features/<feature>/
 ├── actions/
 │   ├── index.ts         # re-export
 │   ├── queries.ts       # Server Functions (GET) + Cache Key + Query Options
@@ -873,7 +915,7 @@ features/<feature>/
 **実装例**:
 
 ```typescript
-// features/event/actions/queries/tag.ts
+// apps/web/src/features/event/actions/queries/tag.ts
 export const loadTagsFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .inputValidator(z.object({ eventId: eventIdSchema }))
@@ -910,7 +952,7 @@ export function generateLoadTagsQueryOptions(eventId: string) {
 **実装例**:
 
 ```typescript
-// features/event/actions/mutations/tag.ts
+// apps/web/src/features/event/actions/mutations/tag.ts
 export const createTagInputSchema = z.object({
   eventId: eventIdSchema,
   name: tagSchema.shape.name,
@@ -962,7 +1004,7 @@ onSuccess: Result.inspect(async ({ eventId }) => {
 ### Route 統合パターン
 
 ```typescript
-// routes/_authenticated/$slug/committee/tags.tsx
+// apps/web/src/routes/_authenticated/$slug/committee/tags.tsx
 export const Route = createFileRoute("/_authenticated/$slug/committee/tags")({
   loader: async ({ params, context }) => {
     const event = await context.queryClient.ensureQueryData(
@@ -984,7 +1026,7 @@ function TagsPage() {
 ### Form 統合パターン（TanStack Form）
 
 ```typescript
-// features/event/components/create-tag-dialog.tsx
+// apps/web/src/features/event/components/create-tag-dialog.tsx
 const { mutateAsync } = useCreateTagMutation();
 
 const form = useForm({
@@ -1037,7 +1079,7 @@ UI (form submit)
   → Mutation Hook (mutateAsync)
     → Server Function (POST)
       → resolveActor (認可コンテキスト取得)
-      → Command (application/command/)
+      → Command (@archive/application/command/)
         ├─ authService.enforce (認可チェック)
         ├─ DomainService (I/O必要なルール)
         ├─ Domain Logic (純粋関数)
@@ -1053,7 +1095,7 @@ UI (form submit)
 Route loader
   → ensureQueryData(queryOptions)
     → Server Function (GET)
-      → Query (application/query/)
+      → Query (@archive/application/query/)
         ├─ 直接DB (Drizzle ORM)
         └─ DTO変換 (zod parse)
       ← Result<DTO[], QueryError>
@@ -1070,7 +1112,7 @@ Component render
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│                    Presentation                     │
+│              Presentation (apps/web)                 │
 │  ┌────────────────┐         ┌────────────────┐     │
 │  │  routes/loader │         │  features/     │     │
 │  │  (プリフェッチ)│         │  actions/      │     │
@@ -1081,8 +1123,9 @@ Component render
          │ Query                        │ Command
          ▼                              ▼
 ┌──────────────────┐         ┌──────────────────┐
-│ application/     │         │ application/     │
-│   query/         │         │   command/       │
+│ @archive/        │         │ @archive/        │
+│ application      │         │ application      │
+│   /query         │         │   /command       │
 │                  │         │                  │
 │ - DTO定義(zod)   │         │ - Use Cases      │
 │ - 直接DB         │         │ - Repository経由 │
@@ -1092,7 +1135,7 @@ Component render
          │                              │
          │                              ▼
          │                    ┌──────────────────┐
-         │                    │     Domain       │
+         │                    │ @archive/domain  │
          │                    │   - logic.ts     │
          │                    │   - schema.ts    │
          │                    │   - service.ts   │
@@ -1100,13 +1143,13 @@ Component render
          │                              │
          └──────────┬───────────────────┘
                     ▼
-         ┌─────────────────────┐
-         │   Infrastructure    │
-         │  - repositories/    │
-         │  - domain-services/ │
-         │  - authorization/   │
-         │  - DB (Drizzle)     │
-         └─────────────────────┘
+         ┌─────────────────────────┐
+         │ @archive/infrastructure │
+         │  - repositories/        │
+         │  - services/            │
+         │  - auth/                │
+         │  - DB (Drizzle)         │
+         └─────────────────────────┘
                     │
                     ▼
               ┌─────────┐
@@ -1151,7 +1194,7 @@ Component render
 ### Actor 型
 
 ```typescript
-// domain/authorization/schema.ts
+// packages/domain/src/authorization/schema.ts
 export type Actor = {
   userId: UserId;
   globalRole: GlobalRole; // "admin" | "user"
@@ -1165,7 +1208,7 @@ export type Actor = {
 リソースごとに型を定義し、認可チェック時に使用します。
 
 ```typescript
-// domain/authorization/logic.ts
+// packages/domain/src/authorization/logic.ts
 export function eventResource(eventId: EventId): EventResource;
 export function organizationResource(orgId: OrgId, eventId: EventId): OrganizationResource;
 export function projectResource(
@@ -1186,7 +1229,7 @@ export function projectResource(
    → 権限がなければ AuthorizationError を返す
 ```
 
-詳細は `src/domain/authorization/` を参照。
+詳細は `packages/domain/src/authorization/` を参照。
 
 ---
 
@@ -1197,7 +1240,7 @@ export function projectResource(
 純粋関数なので、モック不要でテストできます。
 
 ```typescript
-// domain/event/logic.test.ts
+// packages/domain/src/event/logic.test.ts
 describe("createEventEntity", () => {
   it("正常な入力でイベントを作成できる", () => {
     const result = createEventEntity({ id: eventId, name: "学園祭2026", slug: "2026" });
@@ -1219,7 +1262,7 @@ describe("createEventEntity", () => {
 Repositoryをモックして注入します。
 
 ```typescript
-// infrastructure/domain-services/event-domain-service.test.ts
+// packages/infrastructure/src/services/event-domain-service.test.ts
 describe("ensureSlugUnique", () => {
   it("未使用のスラッグで成功", async () => {
     const mockRepo = { findBySlug: vi.fn().mockResolvedValue(Result.succeed(null)) };
@@ -1235,7 +1278,7 @@ describe("ensureSlugUnique", () => {
 依存をモックして注入します。
 
 ```typescript
-// application/command/event/create-event.test.ts
+// packages/application/src/command/event/create-event.test.ts
 describe("createEvent", () => {
   it("正常系: イベント作成成功", async () => {
     const deps = {
@@ -1256,8 +1299,9 @@ describe("createEvent", () => {
 ### プロジェクト内
 
 - [README](../README.md)
-- [スキーマ定義](../src/db/schema.ts)
-- [認証スキーマ](../src/db/auth-schema.ts)
+- [DBスキーマ](../packages/infrastructure/src/db/schema.ts)
+- [認証スキーマ](../packages/infrastructure/src/db/auth-schema.ts)
+- [ドメインモデル](../packages/domain/src/)
 
 ### 技術リファレンス
 

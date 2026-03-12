@@ -1,0 +1,39 @@
+{
+  "name": "@archive/ui",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "exports": {
+    "./panda-preset": {
+      "import": "./dist/panda-preset.mjs",
+      "types": "./dist/panda-preset.d.mts"
+    },
+    "./components/*": {
+      "import": "./dist/components/*/index.mjs",
+      "types": "./dist/components/*/index.d.mts"
+    }
+  },
+  "scripts": {
+    "lint": "oxlint --type-aware --type-check",
+    "build": "tsdown",
+    "build:preset": "tsdown --no-clean src/panda-preset.ts",
+    "dev": "tsdown --no-clean --watch"
+  },
+  "devDependencies": {
+    "@archive/config": "workspace:*",
+    "@pandacss/dev": "catalog:build",
+    "@pandacss/types": "catalog:build",
+    "@types/react": "catalog:types",
+    "oxlint": "catalog:lint",
+    "oxlint-tsgolint": "catalog:lint",
+    "tsdown": "catalog:build",
+    "typescript": "catalog:build"
+  },
+  "peerDependencies": {
+    "@archive/styled-system": "workspace:*",
+    "@ark-ui/react": "^5",
+    "lucide-react": "^0",
+    "react": "^19",
+    "react-dom": "^19"
+  }
+}

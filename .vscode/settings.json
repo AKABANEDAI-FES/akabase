@@ -26,5 +26,6 @@
   "[jsonc]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
-  "cSpell.words": ["toyo"]
+  "cSpell.words": ["toyo"],
+  "oxc.typeAware": true
 }

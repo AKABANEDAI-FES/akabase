@@ -1,0 +1,51 @@
+{
+  "name": "@archive/domain",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "exports": {
+    "./authorization/*": {
+      "import": "./dist/authorization/*.mjs",
+      "types": "./dist/authorization/*.d.mts"
+    },
+    "./event/*": {
+      "import": "./dist/event/*.mjs",
+      "types": "./dist/event/*.d.mts"
+    },
+    "./organization/*": {
+      "import": "./dist/organization/*.mjs",
+      "types": "./dist/organization/*.d.mts"
+    },
+    "./project/*": {
+      "import": "./dist/project/*.mjs",
+      "types": "./dist/project/*.d.mts"
+    },
+    "./shared/*": {
+      "import": "./dist/shared/*.mjs",
+      "types": "./dist/shared/*.d.mts"
+    },
+    "./user/*": {
+      "import": "./dist/user/*.mjs",
+      "types": "./dist/user/*.d.mts"
+    }
+  },
+  "scripts": {
+    "lint": "oxlint --type-aware --type-check",
+    "build": "tsdown",
+    "dev": "tsdown --no-clean --watch",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@archive/result": "workspace:*",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@archive/config": "workspace:*",
+    "@typescript/native-preview": "catalog:build",
+    "oxlint": "catalog:lint",
+    "oxlint-tsgolint": "catalog:lint",
+    "tsdown": "catalog:build",
+    "typescript": "catalog:build",
+    "vitest": "catalog:test"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "name": "@archive/infrastructure",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "exports": {
+    "./auth": {
+      "import": "./dist/auth/index.mjs",
+      "types": "./dist/auth/index.d.mts"
+    },
+    "./db": {
+      "import": "./dist/db/index.mjs",
+      "types": "./dist/db/index.d.mts"
+    },
+    "./repositories/*": {
+      "import": "./dist/repositories/*.mjs",
+      "types": "./dist/repositories/*.d.mts"
+    },
+    "./services/*": {
+      "import": "./dist/services/*.mjs",
+      "types": "./dist/services/*.d.mts"
+    },
+    "./storage/*": {
+      "import": "./dist/storage/*.mjs",
+      "types": "./dist/storage/*.d.mts"
+    }
+  },
+  "scripts": {
+    "lint": "oxlint --type-aware --type-check",
+    "build": "tsdown",
+    "dev": "tsdown --no-clean --watch",
+    "cf-typegen": "wrangler types --include-env false",
+    "migration": "drizzle-kit generate"
+  },
+  "dependencies": {
+    "@archive/result": "workspace:*",
+    "@archive/domain": "workspace:*",
+    "@types/node": "catalog:types",
+    "better-auth": "catalog:backend",
+    "drizzle-orm": "catalog:backend",
+    "drizzle-zod": "catalog:backend",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@archive/config": "workspace:*",
+    "@typescript/native-preview": "catalog:build",
+    "drizzle-kit": "catalog:build",
+    "oxlint": "catalog:lint",
+    "oxlint-tsgolint": "catalog:lint",
+    "tsdown": "catalog:build",
+    "typescript": "catalog:build",
+    "vitest": "catalog:test",
+    "wrangler": "catalog:build"
+  }
+}
