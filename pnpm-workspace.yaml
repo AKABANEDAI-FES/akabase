@@ -58,7 +58,6 @@ catalogs:
     "@pandacss/types": ^1.9.0
     drizzle-kit: "0.31.9"
     wrangler: ^4.69.0
-    vite-tsconfig-paths: ^6.0.2
 
   test:
     vitest: ^4.0.18
