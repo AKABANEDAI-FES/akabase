@@ -3,10 +3,18 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "lint": "pnpm -r run lint",
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint -- --fix",
+    "check": "oxfmt --check && turbo run lint",
+    "check:fix": "oxfmt --write && turbo run lint -- --fix",
     "format": "oxfmt --write"
   },
   "devDependencies": {
-    "oxfmt": "catalog:lint"
-  }
+    "oxfmt": "catalog:lint",
+    "turbo": "^2.8.16"
+  },
+  "packageManager": "pnpm@10.32.1"
 }

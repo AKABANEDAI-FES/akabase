@@ -53,7 +53,6 @@
     "react": "catalog:frontend",
     "react-dom": "catalog:frontend",
     "react-reverse-portal": "catalog:frontend",
-    "vite-tsconfig-paths": "catalog:build",
     "wasm-xlsxwriter": "catalog:frontend",
     "zod": "catalog:"
   },

@@ -46,8 +46,7 @@ catalogs:
 
   build:
     vite: ^8.0.0
-    "@vitejs/plugin-react": ^6.0.0
-    vite-tsconfig-paths: ^6.0.2
+    "@vitejs/plugin-react": ^5.2.0
     "@cloudflare/vite-plugin": ^1.25.2
     "@tanstack/router-plugin": ^1.161.4
     "@tanstack/devtools-vite": ^0.5.1
@@ -56,6 +55,7 @@ catalogs:
     typescript: ^5.7.2
     "@typescript/native-preview": 7.0.0-dev.20260310.1
     "@pandacss/dev": ^1.9.0
+    "@pandacss/types": ^1.9.0
     drizzle-kit: "0.31.9"
     wrangler: ^4.69.0
     concurrently: ^9.2.1

@@ -1,6 +1,7 @@
 import { defineAnimationStyles } from "@pandacss/dev";
+import type { AnimationStyles } from "@pandacss/types";
 
-export const animationStyles = defineAnimationStyles({
+export const animationStyles: AnimationStyles = defineAnimationStyles({
   "slide-fade-in": {
     value: {
       transformOrigin: "var(--transform-origin)",

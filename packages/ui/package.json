@@ -21,6 +21,7 @@
   "devDependencies": {
     "@archive/config": "workspace:*",
     "@pandacss/dev": "catalog:build",
+    "@pandacss/types": "catalog:build",
     "@types/react": "catalog:types",
     "oxlint": "catalog:lint",
     "oxlint-tsgolint": "catalog:lint",
