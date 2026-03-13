@@ -1,3 +1,4 @@
+import { stringify } from "@std/csv/stringify";
 import { Fragment, useCallback, useMemo, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
@@ -176,24 +177,18 @@ function toAbsoluteUrl(path: string): string {
   return `${globalThis.window.location.origin}${path}`;
 }
 
-function escapeCSVField(value: string): string {
-  if (value.includes(",") || value.includes('"') || value.includes("\n")) {
-    return `"${value.replace(/"/g, '""')}"`;
-  }
-  return value;
-}
-
 function toCSV(data: EventPublishedDataItem[]): string {
-  const header = ["企画名", "出展団体名", "パンフレットテキスト", "場所", "タグ", "ロゴURL"];
-  const rows = data.map((item) => [
-    escapeCSVField(item.projectName),
-    escapeCSVField(item.orgName),
-    escapeCSVField(item.pamphletText),
-    escapeCSVField(item.placeName ?? ""),
-    escapeCSVField(item.tags.join(", ")),
-    escapeCSVField(item.logoUrl ? toAbsoluteUrl(item.logoUrl) : ""),
-  ]);
-  return [header.map(escapeCSVField).join(","), ...rows.map((r) => r.join(","))].join("\n");
+  return stringify(
+    data.map((item) => ({
+      企画名: item.projectName,
+      出展団体名: item.orgName,
+      パンフレットテキスト: item.pamphletText,
+      場所: item.placeName ?? "",
+      タグ: item.tags.join(", "),
+      ロゴURL: item.logoUrl ? toAbsoluteUrl(item.logoUrl) : "",
+    })),
+    { columns: ["企画名", "出展団体名", "パンフレットテキスト", "場所", "タグ", "ロゴURL"] },
+  );
 }
 
 // --- Place filter popover ---
