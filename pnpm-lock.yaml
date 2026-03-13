@@ -87,6 +87,9 @@ catalogs:
     '@dnd-kit/utilities':
       specifier: ^3.2.2
       version: 3.2.2
+    '@std/csv':
+      specifier: jsr:^1.0.6
+      version: 1.0.6
     '@tanstack/react-devtools':
       specifier: ^0.9.6
       version: 0.9.13
@@ -233,6 +236,9 @@ importers:
       '@hono/standard-validator':
         specifier: catalog:backend
         version: 0.2.2(@standard-schema/spec@1.1.0)(hono@4.12.7)
+      '@std/csv':
+        specifier: catalog:frontend
+        version: '@jsr/std__csv@1.0.6'
       '@tanstack/react-devtools':
         specifier: catalog:frontend
         version: 0.9.13(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(csstype@3.2.3)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(solid-js@1.9.11)
@@ -1690,6 +1696,15 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
+
+  '@jsr/std__bytes@1.0.6':
+    resolution: {integrity: sha512-St6yKggjFGhxS52IFLJWvkchRFbAKg2Xh8UxA4S1EGz7GJ2Ui+ssDDldj/w2c8vCxvl6qgR0HaYbKeFJNqujmA==, tarball: https://npm.jsr.io/~/11/@jsr/std__bytes/1.0.6.tgz}
+
+  '@jsr/std__csv@1.0.6':
+    resolution: {integrity: sha512-9n/SZzjolPQ907gUPksQU3EFURwRl4GA9V6MylA8hpSkpxhcj6J98zDpn9EmDqgE2A4L9MnlUvFhRpeWl+Y/ZQ==, tarball: https://npm.jsr.io/~/11/@jsr/std__csv/1.0.6.tgz}
+
+  '@jsr/std__streams@1.0.17':
+    resolution: {integrity: sha512-LnPlWk20mDIV5/nqoUomAB8umOimfGEyWRApxLgekXFuqKGDsGpUAi58amieVU2XAGNclmUOtQOcQ/qOl3PNFg==, tarball: https://npm.jsr.io/~/11/@jsr/std__streams/1.0.17.tgz}
 
   '@libsql/client@0.17.0':
     resolution: {integrity: sha512-TLjSU9Otdpq0SpKHl1tD1Nc9MKhrsZbCFGot3EbCxRa8m1E5R1mMwoOjKMMM31IyF7fr+hPNHLpYfwbMKNusmg==}
@@ -5956,6 +5971,16 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@jsr/std__bytes@1.0.6': {}
+
+  '@jsr/std__csv@1.0.6':
+    dependencies:
+      '@jsr/std__streams': 1.0.17
+
+  '@jsr/std__streams@1.0.17':
+    dependencies:
+      '@jsr/std__bytes': 1.0.6
 
   '@libsql/client@0.17.0':
     dependencies:

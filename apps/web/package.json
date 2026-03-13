@@ -28,6 +28,7 @@
     "@dnd-kit/sortable": "catalog:frontend",
     "@dnd-kit/utilities": "catalog:frontend",
     "@hono/standard-validator": "catalog:backend",
+    "@std/csv": "catalog:frontend",
     "@tanstack/react-devtools": "catalog:frontend",
     "@tanstack/react-form": "catalog:frontend",
     "@tanstack/react-query": "catalog:frontend",
