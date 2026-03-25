@@ -35,7 +35,6 @@
   "dependencies": {
     "@archive/result": "workspace:*",
     "@archive/domain": "workspace:*",
-    "@types/node": "catalog:types",
     "better-auth": "catalog:backend",
     "drizzle-orm": "catalog:backend",
     "drizzle-zod": "catalog:backend",
@@ -43,6 +42,7 @@
   },
   "devDependencies": {
     "@archive/config": "workspace:*",
+    "@types/node": "catalog:types",
     "@typescript/native-preview": "catalog:build",
     "drizzle-kit": "catalog:build",
     "oxlint": "catalog:lint",

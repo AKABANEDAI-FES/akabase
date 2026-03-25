@@ -461,9 +461,6 @@ importers:
       '@archive/result':
         specifier: workspace:*
         version: link:../result
-      '@types/node':
-        specifier: catalog:types
-        version: 22.19.15
       better-auth:
         specifier: catalog:backend
         version: 1.5.5(@tanstack/react-start@1.166.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@8.0.0(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0)))(drizzle-kit@0.31.9)(drizzle-orm@0.45.1(@libsql/client@0.17.0)(kysely@0.28.11))(mongodb@7.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(solid-js@1.9.11)(vitest@4.1.0(@types/node@22.19.15)(vite@8.0.0(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0)))
@@ -480,6 +477,9 @@ importers:
       '@archive/config':
         specifier: workspace:*
         version: link:../config
+      '@types/node':
+        specifier: catalog:types
+        version: 22.19.15
       '@typescript/native-preview':
         specifier: catalog:build
         version: 7.0.0-dev.20260310.1
