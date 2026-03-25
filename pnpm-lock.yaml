@@ -53,8 +53,8 @@ catalogs:
       specifier: ^0.21.1
       version: 0.21.2
     typescript:
-      specifier: ^5.7.2
-      version: 5.9.3
+      specifier: ^6.0.0
+      version: 6.0.2
     vite:
       specifier: ^8.0.0
       version: 8.0.0
@@ -329,7 +329,7 @@ importers:
         version: 0.17.0
       '@pandacss/dev':
         specifier: catalog:build
-        version: 1.9.0(typescript@5.9.3)
+        version: 1.9.0(typescript@6.0.2)
       '@tanstack/devtools-vite':
         specifier: catalog:build
         version: 0.5.5(vite@8.0.0(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0))
@@ -362,7 +362,7 @@ importers:
         version: 0.16.0
       typescript:
         specifier: catalog:build
-        version: 5.9.3
+        version: 6.0.2
       vite:
         specifier: catalog:build
         version: 8.0.0(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0)
@@ -408,10 +408,10 @@ importers:
         version: 0.16.0
       tsdown:
         specifier: catalog:build
-        version: 0.21.2(@typescript/native-preview@7.0.0-dev.20260310.1)(typescript@5.9.3)
+        version: 0.21.2(@typescript/native-preview@7.0.0-dev.20260310.1)(typescript@6.0.2)
       typescript:
         specifier: catalog:build
-        version: 5.9.3
+        version: 6.0.2
       vitest:
         specifier: catalog:test
         version: 4.1.0(@types/node@22.19.15)(vite@8.0.0(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0))
@@ -445,10 +445,10 @@ importers:
         version: 0.16.0
       tsdown:
         specifier: catalog:build
-        version: 0.21.2(@typescript/native-preview@7.0.0-dev.20260310.1)(typescript@5.9.3)
+        version: 0.21.2(@typescript/native-preview@7.0.0-dev.20260310.1)(typescript@6.0.2)
       typescript:
         specifier: catalog:build
-        version: 5.9.3
+        version: 6.0.2
       vitest:
         specifier: catalog:test
         version: 4.1.0(@types/node@22.19.15)(vite@8.0.0(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0))
@@ -494,10 +494,10 @@ importers:
         version: 0.16.0
       tsdown:
         specifier: catalog:build
-        version: 0.21.2(@typescript/native-preview@7.0.0-dev.20260310.1)(typescript@5.9.3)
+        version: 0.21.2(@typescript/native-preview@7.0.0-dev.20260310.1)(typescript@6.0.2)
       typescript:
         specifier: catalog:build
-        version: 5.9.3
+        version: 6.0.2
       vitest:
         specifier: catalog:test
         version: 4.1.0(@types/node@22.19.15)(vite@8.0.0(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0))
@@ -509,7 +509,7 @@ importers:
     dependencies:
       '@praha/byethrow':
         specifier: 'catalog:'
-        version: 0.10.0(typescript@5.9.3)
+        version: 0.10.0(typescript@6.0.2)
     devDependencies:
       '@archive/config':
         specifier: workspace:*
@@ -522,10 +522,10 @@ importers:
         version: 0.16.0
       tsdown:
         specifier: catalog:build
-        version: 0.21.2(@typescript/native-preview@7.0.0-dev.20260310.1)(typescript@5.9.3)
+        version: 0.21.2(@typescript/native-preview@7.0.0-dev.20260310.1)(typescript@6.0.2)
       typescript:
         specifier: catalog:build
-        version: 5.9.3
+        version: 6.0.2
       vitest:
         specifier: catalog:test
         version: 4.1.0(@types/node@22.19.15)(vite@8.0.0(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0))
@@ -563,7 +563,7 @@ importers:
         version: link:../config
       '@pandacss/dev':
         specifier: catalog:build
-        version: 1.9.0(typescript@5.9.3)
+        version: 1.9.0(typescript@6.0.2)
       '@pandacss/types':
         specifier: catalog:build
         version: 1.9.0
@@ -578,10 +578,10 @@ importers:
         version: 0.16.0
       tsdown:
         specifier: catalog:build
-        version: 0.21.2(@typescript/native-preview@7.0.0-dev.20260310.1)(typescript@5.9.3)
+        version: 0.21.2(@typescript/native-preview@7.0.0-dev.20260310.1)(typescript@6.0.2)
       typescript:
         specifier: catalog:build
-        version: 5.9.3
+        version: 6.0.2
 
 packages:
 
@@ -4859,6 +4859,11 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  typescript@6.0.2:
+    resolution: {integrity: sha512-bGdAIrZ0wiGDo5l8c++HWtbaNCWTS4UTv7RaTH/ThVIgjkveJt83m74bBHMJkuCbslY8ixgLBVZJIOiQlQTjfQ==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
   uc.micro@2.1.0:
     resolution: {integrity: sha512-ARDJmphmdvUk6Glw7y9DQ2bFkKBHwQHLi2lsaH6PPmz/Ka9sFOBsBluozhDltWmnv9u/cF6Rt87znRTPV+yp/A==}
 
@@ -6282,14 +6287,14 @@ snapshots:
       postcss-selector-parser: 7.1.1
       ts-pattern: 5.9.0
 
-  '@pandacss/dev@1.9.0(typescript@5.9.3)':
+  '@pandacss/dev@1.9.0(typescript@6.0.2)':
     dependencies:
       '@clack/prompts': 0.11.0
       '@pandacss/config': 1.9.0
       '@pandacss/logger': 1.9.0
-      '@pandacss/mcp': 1.9.0(typescript@5.9.3)
-      '@pandacss/node': 1.9.0(typescript@5.9.3)
-      '@pandacss/postcss': 1.9.0(typescript@5.9.3)
+      '@pandacss/mcp': 1.9.0(typescript@6.0.2)
+      '@pandacss/node': 1.9.0(typescript@6.0.2)
+      '@pandacss/postcss': 1.9.0(typescript@6.0.2)
       '@pandacss/preset-base': 1.9.0
       '@pandacss/preset-panda': 1.9.0
       '@pandacss/shared': 1.9.0
@@ -6302,10 +6307,10 @@ snapshots:
       - supports-color
       - typescript
 
-  '@pandacss/extractor@1.9.0(typescript@5.9.3)':
+  '@pandacss/extractor@1.9.0(typescript@6.0.2)':
     dependencies:
       '@pandacss/shared': 1.9.0
-      ts-evaluator: 1.2.0(typescript@5.9.3)
+      ts-evaluator: 1.2.0(typescript@6.0.2)
       ts-morph: 27.0.2
     transitivePeerDependencies:
       - jsdom
@@ -6332,12 +6337,12 @@ snapshots:
       '@pandacss/types': 1.9.0
       kleur: 4.1.5
 
-  '@pandacss/mcp@1.9.0(typescript@5.9.3)':
+  '@pandacss/mcp@1.9.0(typescript@6.0.2)':
     dependencies:
       '@clack/prompts': 0.11.0
       '@modelcontextprotocol/sdk': 1.27.1(zod@4.3.6)
       '@pandacss/logger': 1.9.0
-      '@pandacss/node': 1.9.0(typescript@5.9.3)
+      '@pandacss/node': 1.9.0(typescript@6.0.2)
       '@pandacss/token-dictionary': 1.9.0
       '@pandacss/types': 1.9.0
       zod: 4.3.6
@@ -6347,13 +6352,13 @@ snapshots:
       - supports-color
       - typescript
 
-  '@pandacss/node@1.9.0(typescript@5.9.3)':
+  '@pandacss/node@1.9.0(typescript@6.0.2)':
     dependencies:
       '@pandacss/config': 1.9.0
       '@pandacss/core': 1.9.0
       '@pandacss/generator': 1.9.0
       '@pandacss/logger': 1.9.0
-      '@pandacss/parser': 1.9.0(typescript@5.9.3)
+      '@pandacss/parser': 1.9.0(typescript@6.0.2)
       '@pandacss/reporter': 1.9.0
       '@pandacss/shared': 1.9.0
       '@pandacss/token-dictionary': 1.9.0
@@ -6377,16 +6382,16 @@ snapshots:
       prettier: 3.2.5
       ts-morph: 27.0.2
       ts-pattern: 5.9.0
-      tsconfck: 3.1.6(typescript@5.9.3)
+      tsconfck: 3.1.6(typescript@6.0.2)
     transitivePeerDependencies:
       - jsdom
       - typescript
 
-  '@pandacss/parser@1.9.0(typescript@5.9.3)':
+  '@pandacss/parser@1.9.0(typescript@6.0.2)':
     dependencies:
       '@pandacss/config': 1.9.0
       '@pandacss/core': 1.9.0
-      '@pandacss/extractor': 1.9.0(typescript@5.9.3)
+      '@pandacss/extractor': 1.9.0(typescript@6.0.2)
       '@pandacss/logger': 1.9.0
       '@pandacss/shared': 1.9.0
       '@pandacss/types': 1.9.0
@@ -6398,9 +6403,9 @@ snapshots:
       - jsdom
       - typescript
 
-  '@pandacss/postcss@1.9.0(typescript@5.9.3)':
+  '@pandacss/postcss@1.9.0(typescript@6.0.2)':
     dependencies:
-      '@pandacss/node': 1.9.0(typescript@5.9.3)
+      '@pandacss/node': 1.9.0(typescript@6.0.2)
       postcss: 8.5.6
     transitivePeerDependencies:
       - jsdom
@@ -6448,10 +6453,10 @@ snapshots:
 
   '@poppinss/exception@1.2.3': {}
 
-  '@praha/byethrow@0.10.0(typescript@5.9.3)':
+  '@praha/byethrow@0.10.0(typescript@6.0.2)':
     dependencies:
       '@standard-schema/spec': 1.1.0
-      typescript: 5.9.3
+      typescript: 6.0.2
 
   '@quansync/fs@1.0.0':
     dependencies:
@@ -9278,7 +9283,7 @@ snapshots:
 
   reusify@1.1.0: {}
 
-  rolldown-plugin-dts@0.22.5(@typescript/native-preview@7.0.0-dev.20260310.1)(rolldown@1.0.0-rc.9)(typescript@5.9.3):
+  rolldown-plugin-dts@0.22.5(@typescript/native-preview@7.0.0-dev.20260310.1)(rolldown@1.0.0-rc.9)(typescript@6.0.2):
     dependencies:
       '@babel/generator': 8.0.0-rc.2
       '@babel/helper-validator-identifier': 8.0.0-rc.2
@@ -9292,7 +9297,7 @@ snapshots:
       rolldown: 1.0.0-rc.9
     optionalDependencies:
       '@typescript/native-preview': 7.0.0-dev.20260310.1
-      typescript: 5.9.3
+      typescript: 6.0.2
     transitivePeerDependencies:
       - oxc-resolver
 
@@ -9537,12 +9542,12 @@ snapshots:
 
   tree-kill@1.2.2: {}
 
-  ts-evaluator@1.2.0(typescript@5.9.3):
+  ts-evaluator@1.2.0(typescript@6.0.2):
     dependencies:
       ansi-colors: 4.1.3
       crosspath: 2.0.0
       object-path: 0.11.8
-      typescript: 5.9.3
+      typescript: 6.0.2
 
   ts-morph@27.0.2:
     dependencies:
@@ -9551,11 +9556,11 @@ snapshots:
 
   ts-pattern@5.9.0: {}
 
-  tsconfck@3.1.6(typescript@5.9.3):
+  tsconfck@3.1.6(typescript@6.0.2):
     optionalDependencies:
-      typescript: 5.9.3
+      typescript: 6.0.2
 
-  tsdown@0.21.2(@typescript/native-preview@7.0.0-dev.20260310.1)(typescript@5.9.3):
+  tsdown@0.21.2(@typescript/native-preview@7.0.0-dev.20260310.1)(typescript@6.0.2):
     dependencies:
       ansis: 4.2.0
       cac: 7.0.0
@@ -9566,7 +9571,7 @@ snapshots:
       obug: 2.1.1
       picomatch: 4.0.3
       rolldown: 1.0.0-rc.9
-      rolldown-plugin-dts: 0.22.5(@typescript/native-preview@7.0.0-dev.20260310.1)(rolldown@1.0.0-rc.9)(typescript@5.9.3)
+      rolldown-plugin-dts: 0.22.5(@typescript/native-preview@7.0.0-dev.20260310.1)(rolldown@1.0.0-rc.9)(typescript@6.0.2)
       semver: 7.7.4
       tinyexec: 1.0.2
       tinyglobby: 0.2.15
@@ -9574,7 +9579,7 @@ snapshots:
       unconfig-core: 7.5.0
       unrun: 0.2.32
     optionalDependencies:
-      typescript: 5.9.3
+      typescript: 6.0.2
     transitivePeerDependencies:
       - '@ts-macro/tsc'
       - '@typescript/native-preview'
@@ -9625,6 +9630,8 @@ snapshots:
       mime-types: 3.0.2
 
   typescript@5.9.3: {}
+
+  typescript@6.0.2: {}
 
   uc.micro@2.1.0: {}
 
