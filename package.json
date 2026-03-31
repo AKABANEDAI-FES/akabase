@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "postinstall": "pnpm -F @archive/ui build:preset",
-    "dev": "vp run -r dev",
+    "dev": "pnpm -r --parallel run dev",
     "build": "vp run -r build",
     "test": "vp run -r test",
     "lint": "vp run -r lint",
