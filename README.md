@@ -24,9 +24,10 @@
 | 認証              | Better Auth (Google OIDC, @toyo.jp 制限) |
 | ルーティング      | TanStack Router (ファイルベース)         |
 | サーバー状態      | TanStack Query                           |
-| テスト            | Vitest                                   |
-| Lint / Format     | oxlint + oxfmt                           |
-| ビルド            | Vite, tsdown, Turborepo                  |
+| テスト            | Vitest (vp test)                         |
+| Lint, Format      | oxlint, oxfmt (vp lint, vp fmt)          |
+| ビルド            | Vite, tsdown (vp build, vp pack)         |
+| タスクランナー    | Vite Task (vp run)                       |
 | パッケージ管理    | pnpm workspaces                          |
 
 ## モノレポ構成
@@ -64,13 +65,13 @@ archive/
 
 ### 前提条件
 
-- Node.js 22+
-- pnpm 10+
+- Vite Plus
+  - https://viteplus.dev/guide/#install-vp
 
 ### インストール
 
 ```bash
-pnpm install
+vp install
 ```
 
 ### 環境変数
@@ -102,10 +103,10 @@ pnpm dev
 ### ルート（モノレポ全体）
 
 ```bash
-pnpm dev              # 全パッケージの開発サーバー起動（Turborepo）
-pnpm build            # 全パッケージのビルド（Turborepo）
-pnpm test             # 全パッケージのテスト実行（Turborepo）
-pnpm lint             # 全パッケージの Lint（Turborepo）
+pnpm dev              # 全パッケージの開発サーバー起動
+pnpm build            # 全パッケージのビルド
+pnpm test             # 全パッケージのテスト実行
+pnpm lint             # 全パッケージの Lint
 pnpm check            # フォーマットチェック + Lint
 pnpm check:fix        # フォーマット自動修正 + Lint 自動修正
 ```
