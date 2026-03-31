@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vite-plus/test";
 import { Result } from "@archive/result";
 import type { EventId } from "@archive/domain/event/schema";
 import { createTestDb } from "../../test/db-mock";

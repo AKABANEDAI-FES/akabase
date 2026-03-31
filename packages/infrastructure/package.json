@@ -26,9 +26,9 @@
     }
   },
   "scripts": {
-    "lint": "oxlint --type-aware --type-check",
-    "build": "tsdown",
-    "dev": "tsdown --no-clean --watch",
+    "lint": "vp lint",
+    "build": "vp pack",
+    "dev": "vp pack --no-clean --watch",
     "cf-typegen": "wrangler types --include-env false",
     "migration": "drizzle-kit generate"
   },
@@ -45,11 +45,8 @@
     "@types/node": "catalog:types",
     "@typescript/native-preview": "catalog:build",
     "drizzle-kit": "catalog:build",
-    "oxlint": "catalog:lint",
-    "oxlint-tsgolint": "catalog:lint",
-    "tsdown": "catalog:build",
     "typescript": "catalog:build",
-    "vitest": "catalog:test",
+    "vite-plus": "catalog:build",
     "wrangler": "catalog:build"
   }
 }

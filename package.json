@@ -4,18 +4,17 @@
   "type": "module",
   "scripts": {
     "postinstall": "pnpm -F @archive/ui build:preset",
-    "dev": "turbo run dev",
-    "build": "turbo run build",
-    "test": "turbo run test",
-    "lint": "turbo run lint",
-    "lint:fix": "turbo run lint -- --fix",
-    "check": "oxfmt --check && turbo run lint",
-    "check:fix": "oxfmt --write && turbo run lint -- --fix",
-    "format": "oxfmt --write"
+    "dev": "vp run -r dev",
+    "build": "vp run -r build",
+    "test": "vp run -r test",
+    "lint": "vp run -r lint",
+    "lint:fix": "vp run -r lint -- --fix",
+    "check": "vp fmt --check && vp run -r lint",
+    "check:fix": "vp fmt --write && vp run -r lint -- --fix",
+    "format": "vp fmt --write"
   },
   "devDependencies": {
-    "oxfmt": "catalog:lint",
-    "turbo": "^2.8.16"
+    "vite-plus": "catalog:build"
   },
   "packageManager": "pnpm@10.32.1"
 }

@@ -2,7 +2,7 @@
  * Authorization service tests
  */
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { Result } from "@archive/result";
 import { AuthorizationService } from "./service";
 import type { CommitteeRole, OrgRole } from "./schema";

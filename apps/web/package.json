@@ -4,10 +4,10 @@
   "type": "module",
   "scripts": {
     "prepare": "panda codegen",
-    "dev": "vite dev",
-    "build": "vite build",
-    "preview": "vite preview",
-    "lint": "oxlint --type-aware --type-check",
+    "dev": "vp dev",
+    "build": "vp build",
+    "preview": "vp preview",
+    "lint": "vp lint",
     "cf-typegen": "wrangler types",
     "migrate": "wrangler d1 migrations apply archive --local",
     "seed": "wrangler d1 execute archive --local --file=./scripts/seed.sql",
@@ -69,11 +69,8 @@
     "babel-plugin-react-compiler": "catalog:build",
     "drizzle-kit": "catalog:build",
     "drizzle-orm": "catalog:backend",
-    "oxlint": "catalog:lint",
-    "oxlint-tsgolint": "catalog:lint",
     "typescript": "catalog:build",
-    "vite": "catalog:build",
-    "vitest": "catalog:test",
+    "vite-plus": "catalog:build",
     "wrangler": "catalog:build"
   }
 }

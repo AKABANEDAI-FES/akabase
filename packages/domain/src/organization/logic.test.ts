@@ -1,5 +1,5 @@
 import { Result } from "@archive/result";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import type { OrgId, OrgMember, Organization } from "./schema";
 import { cast } from "../shared/ids";
 import type { EventId } from "../event/schema";

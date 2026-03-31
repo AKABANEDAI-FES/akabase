@@ -2,7 +2,7 @@
  * Authorization logic helper functions unit tests
  */
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { createActor, getCommitteeRoleForEvent, getOrgRoleForOrg, isGlobalAdmin } from "./logic";
 import type { CommitteeRole, OrgRole } from "./schema";
 import { cast } from "../shared/ids";

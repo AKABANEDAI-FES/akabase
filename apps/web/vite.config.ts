@@ -1,10 +1,11 @@
-import { defineConfig } from "vite";
+import { defineConfig } from "vite-plus";
 import { devtools } from "@tanstack/devtools-vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import { cloudflare } from "@cloudflare/vite-plugin";
+import { reactConfig } from "@archive/config/oxlint/react";
 
-const config = defineConfig({
+export default defineConfig({
   resolve: {
     tsconfigPaths: true,
   },
@@ -18,6 +19,17 @@ const config = defineConfig({
     }),
     cloudflare({ viteEnvironment: { name: "ssr" } }),
   ],
+  lint: {
+    ...reactConfig,
+    ignorePatterns: ["postcss.config.cjs", "worker-configuration.d.ts", "routeTree.gen.ts"],
+    overrides: [
+      ...(reactConfig.overrides ?? []),
+      {
+        files: ["src/routes/**/*.{ts,tsx}"],
+        rules: {
+          "unicorn/filename-case": "off",
+        },
+      },
+    ],
+  },
 });
-
-export default config;

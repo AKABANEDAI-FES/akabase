@@ -2,6 +2,10 @@ packages:
   - apps/*
   - packages/*
 
+overrides:
+  vite: npm:@voidzero-dev/vite-plus-core@^0.1.14
+  vitest: npm:@voidzero-dev/vite-plus-test@^0.1.14
+
 catalog:
   "@praha/byethrow": ^0.10.0
   es-toolkit: ^1.45.1
@@ -25,10 +29,10 @@ catalogs:
     "@vitejs/plugin-react": ^5.2.0
     babel-plugin-react-compiler: ^1.0.0
     drizzle-kit: "0.31.9"
-    tsdown: ^0.21.1
     typescript: ^6.0.0
-    vite: ^8.0.0
+    vite-plus: ^0.1.14
     wrangler: ^4.69.0
+
   frontend:
     "@ark-ui/react": ^5.32.0
     "@dnd-kit/core": ^6.3.1
@@ -59,14 +63,8 @@ catalogs:
     react-reverse-portal: ^2.3.0
     wasm-xlsxwriter: ^0.12.2
 
-  lint:
-    oxfmt: ^0.40.0
-    oxlint: ^1.49.0
-    oxlint-tsgolint: ^0.16.0
-
   test:
     "@libsql/client": ^0.17.0
-    vitest: ^4.0.18
 
   types:
     "@types/node": ^22.10.2
