@@ -30,7 +30,7 @@ catalogs:
     babel-plugin-react-compiler: ^1.0.0
     drizzle-kit: "0.31.9"
     typescript: ^6.0.0
-    vite-plus: ^0.1.14
+    vite-plus: ^0.1.15
     wrangler: ^4.69.0
 
   frontend:
