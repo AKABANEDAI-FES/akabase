@@ -4,13 +4,13 @@
   "type": "module",
   "scripts": {
     "postinstall": "pnpm -F @archive/ui build:preset",
-    "dev": "vp run -r --parallel dev",
-    "build": "vp run -r build",
-    "test": "vp run -r test",
-    "lint": "vp run -r lint",
-    "lint:fix": "vp run -r lint -- --fix",
-    "check": "vp fmt --check && vp run -r lint",
-    "check:fix": "vp fmt --write && vp run -r lint -- --fix",
+    "dev": "vpr -r --parallel dev",
+    "build": "vpr -r build",
+    "test": "vpr -r test",
+    "lint": "vpr -r lint",
+    "lint:fix": "vpr -r lint --fix",
+    "check": "vp fmt --check && vpr -r lint",
+    "check:fix": "vp fmt --write && vpr -r lint --fix",
     "format": "vp fmt --write"
   },
   "devDependencies": {
