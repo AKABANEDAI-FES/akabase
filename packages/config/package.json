@@ -2,7 +2,13 @@
   "name": "@archive/config",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
+  "exports": {
+    "./oxlint/base": "./oxlint/base.ts",
+    "./oxlint/react": "./oxlint/react.ts",
+    "./typescript/*": "./typescript/*"
+  },
   "devDependencies": {
-    "oxlint": "catalog:lint"
+    "vite-plus": "catalog:build"
   }
 }

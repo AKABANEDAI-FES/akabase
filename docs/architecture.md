@@ -34,7 +34,7 @@
 - **Styling**: Panda CSS + Park UI
 - **Type Safety**: TypeScript + Zod
 - **Error Handling**: `@praha/byethrow` (Result型)
-- **Build**: Turborepo + pnpm workspaces
+- **Build**: Vite Plus + pnpm workspaces
 
 ### 設計方針
 
@@ -127,7 +127,7 @@ export function canSubmit(project: Project): Result.Result<true, ProjectError> {
 
 ## モノレポ構成
 
-pnpm workspaces + Turborepo によるモノレポ構成で、DDD の各レイヤーを独立したパッケージとして管理します。
+pnpm workspaces + Vite Plus によるモノレポ構成で、DDD の各レイヤーを独立したパッケージとして管理します。
 
 ```
 archive/

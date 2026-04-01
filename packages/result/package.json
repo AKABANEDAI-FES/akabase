@@ -10,18 +10,15 @@
     }
   },
   "scripts": {
-    "lint": "oxlint --type-aware --type-check",
-    "build": "tsdown",
-    "dev": "tsdown --no-clean --watch",
-    "test": "vitest run"
+    "lint": "vp lint",
+    "build": "vp pack",
+    "dev": "vp pack --no-clean --watch",
+    "test": "vp test run"
   },
   "devDependencies": {
     "@archive/config": "workspace:*",
-    "oxlint": "catalog:lint",
-    "oxlint-tsgolint": "catalog:lint",
-    "tsdown": "catalog:build",
     "typescript": "catalog:build",
-    "vitest": "catalog:test"
+    "vite-plus": "catalog:build"
   },
   "dependencies": {
     "@praha/byethrow": "catalog:"

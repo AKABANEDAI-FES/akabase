@@ -14,20 +14,18 @@
     }
   },
   "scripts": {
-    "lint": "oxlint --type-aware --type-check",
-    "build": "tsdown",
-    "build:preset": "tsdown --no-clean src/panda-preset.ts",
-    "dev": "tsdown --no-clean --watch"
+    "lint": "vp lint",
+    "build": "vp pack",
+    "build:preset": "vp pack --no-clean src/panda-preset.ts",
+    "dev": "vp pack --no-clean --watch"
   },
   "devDependencies": {
     "@archive/config": "workspace:*",
     "@pandacss/dev": "catalog:build",
     "@pandacss/types": "catalog:build",
     "@types/react": "catalog:types",
-    "oxlint": "catalog:lint",
-    "oxlint-tsgolint": "catalog:lint",
-    "tsdown": "catalog:build",
-    "typescript": "catalog:build"
+    "typescript": "catalog:build",
+    "vite-plus": "catalog:build"
   },
   "peerDependencies": {
     "@archive/styled-system": "workspace:*",

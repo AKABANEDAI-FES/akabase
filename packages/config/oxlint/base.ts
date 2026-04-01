@@ -1,23 +1,19 @@
-{
-  "$schema": "../node_modules/oxlint/configuration_schema.json",
-  "plugins": ["typescript", "import", "unicorn", "eslint", "promise"],
-  "categories": {
-    "correctness": "error",
-    "suspicious": "warn",
-    "perf": "warn",
-    "style": "warn",
-    "restriction": "error"
+import type { OxlintConfig } from "vite-plus/lint";
+
+export const baseConfig: OxlintConfig = {
+  plugins: ["typescript", "import", "unicorn", "eslint", "promise"],
+  categories: {
+    correctness: "error",
+    suspicious: "warn",
+    perf: "warn",
+    style: "warn",
+    restriction: "error",
   },
-  "ignorePatterns": [
-    "**/.nx/**",
-    "**/.svelte-kit/**",
-    "**/build/**",
-    "**/coverage/**",
-    "**/dist/**",
-    "**/snap/**",
-    "**/vite.config.*.timestamp-*.*"
-  ],
-  "rules": {
+  options: {
+    typeAware: true,
+    typeCheck: true,
+  },
+  rules: {
     "no-eq-null": "off",
     "import/group-exports": "off",
     "import/no-named-export": "off",
@@ -27,7 +23,7 @@
     "import/no-namespace": "off",
     "import/exports-last": "off",
     "eslint/id-length": "off",
-    "eslint/func-style": ["warn", "declaration", { "allowArrowFunctions": true }],
+    "eslint/func-style": ["warn", "declaration", { allowArrowFunctions: true }],
     "eslint/no-ternary": "off",
     "eslint/max-statements": ["warn", 20],
     "eslint/sort-keys": "off",
@@ -41,40 +37,30 @@
     "eslint/arrow-body-style": "off",
     "eslint/new-cap": "off",
     "eslint/no-continue": "off",
-    "sort-imports": [
-      "error",
-      {
-        "ignoreDeclarationSort": true
-      }
-    ],
-    "eslint/no-duplicate-imports": ["error", { "allowSeparateTypeImports": true }],
-    "func-names": ["error", "as-needed", { "generators": "never" }],
+    "sort-imports": ["error", { ignoreDeclarationSort: true }],
+    "eslint/no-duplicate-imports": ["error", { allowSeparateTypeImports: true }],
+    "func-names": ["error", "as-needed", { generators: "never" }],
     "typescript/consistent-type-definitions": ["warn", "type"],
     "typescript/explicit-function-return-type": "off",
     "typescript/explicit-module-boundary-types": "off",
     "unicorn/no-null": "off",
     "unicorn/no-array-method-this-argument": "off",
     "unicorn/no-nested-ternary": "off",
-    "unicorn/filename-case": [
-      "error",
-      {
-        "case": "kebabCase"
-      }
-    ],
-    "promise/prefer-await-to-callbacks": "off"
+    "unicorn/filename-case": ["error", { case: "kebabCase" }],
+    "promise/prefer-await-to-callbacks": "off",
   },
-  "overrides": [
+  overrides: [
     {
-      "plugins": ["typescript", "import", "unicorn", "eslint", "promise", "vitest"],
-      "files": ["**/*.test.ts", "**/*.spec.ts"],
-      "rules": {
+      plugins: ["typescript", "import", "unicorn", "eslint", "promise", "vitest"],
+      files: ["**/*.test.ts", "**/*.spec.ts"],
+      rules: {
         "typescript/no-explicit-any": "off",
         "typescript/no-unsafe-type-assertion": "off",
         "typescript/no-non-null-assertion": "off",
         "eslint/no-magic-numbers": "off",
         "eslint/max-statements": "off",
-        "eslint/init-declarations": "off"
-      }
-    }
-  ]
-}
+        "eslint/init-declarations": "off",
+      },
+    },
+  ],
+};
