@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { Container, Flex, Stack } from "@archive/styled-system/jsx";
 import { Heading } from "@archive/ui/components/heading";
@@ -23,6 +23,8 @@ export const Route = createFileRoute("/_authenticated/$slug/committee/submission
 function SubmissionsPage() {
   const { slug } = Route.useParams();
   const { activeEvent: event } = Route.useRouteContext();
+  const { status, page } = Route.useSearch();
+  const navigate = useNavigate({ from: Route.fullPath });
 
   return (
     <Container maxW="6xl" py="8">
@@ -33,7 +35,13 @@ function SubmissionsPage() {
           </Heading>
         </Flex>
 
-        <EventSubmissionsTable eventId={event.id} slug={slug} />
+        <EventSubmissionsTable
+          eventId={event.id}
+          slug={slug}
+          status={status}
+          page={page}
+          onSearchChange={(updates) => navigate({ search: (prev) => ({ ...prev, ...updates }) })}
+        />
       </Stack>
     </Container>
   );
