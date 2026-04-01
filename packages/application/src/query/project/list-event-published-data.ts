@@ -10,7 +10,7 @@ import type { Actor } from "@archive/domain/authorization/schema";
 import { eventResource } from "@archive/domain/authorization/logic";
 import type { AuthorizationService } from "@archive/domain/authorization/service";
 import type { ImageRepository } from "@archive/domain/shared/image";
-import { QueryException } from "../shared";
+import { QueryExceptionError } from "../shared";
 
 export const eventPublishedDataItemSchema = z.object({
   projectId: projectIdSchema,
@@ -36,7 +36,7 @@ export async function listEventPublishedData(
     "event:list_submissions",
   );
   if (Result.isFailure(authResult)) {
-    throw new QueryException("VALIDATION_ERROR", authResult.error.message, authResult.error);
+    throw new QueryExceptionError("VALIDATION_ERROR", authResult.error.message, authResult.error);
   }
 
   try {
@@ -83,6 +83,6 @@ export async function listEventPublishedData(
         }),
       );
   } catch (error) {
-    throw new QueryException("DATABASE_ERROR", "公開データの取得に失敗しました。", error);
+    throw new QueryExceptionError("DATABASE_ERROR", "公開データの取得に失敗しました。", error);
   }
 }

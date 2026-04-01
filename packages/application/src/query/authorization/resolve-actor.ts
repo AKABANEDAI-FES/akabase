@@ -16,7 +16,7 @@ import type {
 } from "@archive/domain/authorization/schema";
 import { createActor } from "@archive/domain/authorization/logic";
 import { globalRoleSchema, orgRoleSchema } from "@archive/domain/authorization/schema";
-import { QueryException } from "../shared";
+import { QueryExceptionError } from "../shared";
 import { cast } from "@archive/domain/shared/ids";
 
 export type ResolveActorOptions = {
@@ -68,7 +68,7 @@ export async function resolveActor(
     ]);
 
     if (!userRow) {
-      throw new QueryException(
+      throw new QueryExceptionError(
         "ACTOR_RESOLUTION_FAILED",
         `ユーザー ${options.userId} が見つかりません`,
       );
@@ -87,10 +87,10 @@ export async function resolveActor(
 
     return createActor(options.userId, globalRole, committeeRolesMap, orgRolesMap);
   } catch (error) {
-    if (error instanceof QueryException) {
+    if (error instanceof QueryExceptionError) {
       throw error;
     }
-    throw new QueryException("ACTOR_RESOLUTION_FAILED", `Actor の解決に失敗しました`, error);
+    throw new QueryExceptionError("ACTOR_RESOLUTION_FAILED", `Actor の解決に失敗しました`, error);
   }
 }
 

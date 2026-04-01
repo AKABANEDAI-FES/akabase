@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { Database } from "@archive/infrastructure/db";
 import type { EventId } from "@archive/domain/event/schema";
 import { eventIdSchema } from "@archive/domain/event/schema";
-import { QueryException } from "../shared";
+import { QueryExceptionError } from "../shared";
 
 export const eventDetailSchema = z.object({
   id: eventIdSchema,
@@ -37,6 +37,6 @@ export async function getEventDetail(
       updatedAt: new Date(row.updatedAt),
     });
   } catch (error) {
-    throw new QueryException("DATABASE_ERROR", "イベント詳細の取得に失敗しました。", error);
+    throw new QueryExceptionError("DATABASE_ERROR", "イベント詳細の取得に失敗しました。", error);
   }
 }

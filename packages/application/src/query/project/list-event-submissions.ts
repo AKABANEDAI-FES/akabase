@@ -13,7 +13,7 @@ import {
 import type { Actor } from "@archive/domain/authorization/schema";
 import { eventResource } from "@archive/domain/authorization/logic";
 import type { AuthorizationService } from "@archive/domain/authorization/service";
-import { QueryException } from "../shared";
+import { QueryExceptionError } from "../shared";
 
 export const eventSubmissionListItemSchema = z.object({
   id: submissionIdSchema,
@@ -41,7 +41,7 @@ export async function listEventSubmissions(
     "event:list_submissions",
   );
   if (Result.isFailure(authResult)) {
-    throw new QueryException("VALIDATION_ERROR", authResult.error.message, authResult.error);
+    throw new QueryExceptionError("VALIDATION_ERROR", authResult.error.message, authResult.error);
   }
 
   try {
@@ -78,6 +78,6 @@ export async function listEventSubmissions(
       }),
     );
   } catch (error) {
-    throw new QueryException("DATABASE_ERROR", "提出一覧の取得に失敗しました。", error);
+    throw new QueryExceptionError("DATABASE_ERROR", "提出一覧の取得に失敗しました。", error);
   }
 }

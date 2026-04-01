@@ -9,7 +9,7 @@ import {
   orgMemberRoleSchema,
   organizationSchema,
 } from "@archive/domain/organization/schema";
-import { QueryException } from "../shared";
+import { QueryExceptionError } from "../shared";
 
 export const myOrganizationListItemSchema = z.object({
   id: orgIdSchema,
@@ -47,6 +47,6 @@ export async function listMyOrganizations(
       }),
     );
   } catch (error) {
-    throw new QueryException("DATABASE_ERROR", "所属出展団体の取得に失敗しました。", error);
+    throw new QueryExceptionError("DATABASE_ERROR", "所属出展団体の取得に失敗しました。", error);
   }
 }

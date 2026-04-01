@@ -14,7 +14,7 @@ import { committeeRoleSchema } from "@archive/domain/authorization/schema";
 import type { Actor } from "@archive/domain/authorization/schema";
 import { eventResource } from "@archive/domain/authorization/logic";
 import type { AuthorizationService } from "@archive/domain/authorization/service";
-import { QueryException } from "../shared";
+import { QueryExceptionError } from "../shared";
 
 export const userForEventSchema = z.object({
   id: userIdSchema,
@@ -33,7 +33,7 @@ export async function listUsersForEvent(
 ): Promise<UserForEvent[]> {
   const authResult = deps.authService.enforce(actor, eventResource(eventId), "user:list_for_event");
   if (Result.isFailure(authResult)) {
-    throw new QueryException("VALIDATION_ERROR", authResult.error.message, authResult.error);
+    throw new QueryExceptionError("VALIDATION_ERROR", authResult.error.message, authResult.error);
   }
 
   try {
@@ -65,7 +65,7 @@ export async function listUsersForEvent(
       }),
     );
   } catch (error) {
-    throw new QueryException(
+    throw new QueryExceptionError(
       "DATABASE_ERROR",
       "イベントのユーザー一覧の取得に失敗しました。",
       error,

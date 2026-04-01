@@ -20,7 +20,7 @@ import { userIdSchema } from "@archive/domain/user/schema";
 import type { Actor } from "@archive/domain/authorization/schema";
 import { projectResource } from "@archive/domain/authorization/logic";
 import type { AuthorizationService } from "@archive/domain/authorization/service";
-import { QueryException } from "../shared";
+import { QueryExceptionError } from "../shared";
 
 export const submissionDetailSchema = z.object({
   id: submissionIdSchema,
@@ -134,6 +134,6 @@ export async function getSubmissionDetail(
       })),
     });
   } catch (error) {
-    throw new QueryException("DATABASE_ERROR", "提出詳細の取得に失敗しました。", error);
+    throw new QueryExceptionError("DATABASE_ERROR", "提出詳細の取得に失敗しました。", error);
   }
 }

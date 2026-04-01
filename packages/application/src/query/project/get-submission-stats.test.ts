@@ -218,7 +218,7 @@ describe("getSubmissionStats", () => {
     });
   });
 
-  it("権限がないユーザーはQueryExceptionが発生する", async () => {
+  it("権限がないユーザーはQueryExceptionErrorが発生する", async () => {
     const actor = createUserActor();
 
     await expect(getSubmissionStats(deps, eventId, actor)).rejects.toThrow();

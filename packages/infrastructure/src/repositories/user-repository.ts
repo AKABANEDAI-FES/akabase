@@ -5,7 +5,7 @@ import type { UserRepository } from "@archive/domain/user/repository";
 import { committeeRoleAssignmentSchema, userSchema } from "@archive/domain/user/schema";
 import type { CommitteeRoleAssignment, User, UserId } from "@archive/domain/user/schema";
 import type { EventId } from "@archive/domain/event/schema";
-import { REPOSITORY_ERROR_CODE, RepositoryException } from "@archive/domain/shared/repository";
+import { REPOSITORY_ERROR_CODE, RepositoryExceptionError } from "@archive/domain/shared/repository";
 
 /**
  * User Repository Implementation using Drizzle ORM
@@ -40,7 +40,7 @@ export class UserRepositoryImpl implements UserRepository {
 
       return user;
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to find user",
         error,
@@ -71,7 +71,7 @@ export class UserRepositoryImpl implements UserRepository {
 
       return user;
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to find user by email",
         error,
@@ -100,7 +100,7 @@ export class UserRepositoryImpl implements UserRepository {
 
       return users;
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to list users",
         error,
@@ -135,7 +135,7 @@ export class UserRepositoryImpl implements UserRepository {
           },
         });
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to save user",
         error,
@@ -170,7 +170,7 @@ export class UserRepositoryImpl implements UserRepository {
 
       return assignment;
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to find committee role assignment",
         error,
@@ -194,7 +194,7 @@ export class UserRepositoryImpl implements UserRepository {
           set: { role: assignment.role },
         });
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to save committee role assignment",
         error,

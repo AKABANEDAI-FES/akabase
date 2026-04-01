@@ -24,7 +24,7 @@ import type {
 import type { OrgId } from "@archive/domain/organization/schema";
 import type { UserId } from "@archive/domain/user/schema";
 import type { ProjectRepository } from "@archive/domain/project/repository";
-import { REPOSITORY_ERROR_CODE, RepositoryException } from "@archive/domain/shared/repository";
+import { REPOSITORY_ERROR_CODE, RepositoryExceptionError } from "@archive/domain/shared/repository";
 
 /**
  * Project Repository Implementation using Drizzle ORM
@@ -59,7 +59,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
       return project;
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to find project",
         error,
@@ -95,7 +95,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
       return draft;
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to find draft",
         error,
@@ -133,7 +133,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
       return submission;
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to find submission",
         error,
@@ -169,7 +169,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
       return published;
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to find published data",
         error,
@@ -198,7 +198,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
       return projectList;
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to list projects",
         error,
@@ -226,7 +226,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
       return submissions;
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to list submissions",
         error,
@@ -260,7 +260,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
           where: eq(schema.projects.eventId, project.eventId),
         });
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to save project",
         error,
@@ -317,7 +317,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
       await this.db.batch(query);
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to save draft",
         error,
@@ -374,7 +374,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
       await this.db.batch(query);
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to save published data",
         error,
@@ -410,7 +410,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
       return action;
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to find approval action",
         error,
@@ -432,7 +432,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
       return result[0]?.count ?? 0;
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to count approval actions",
         error,
@@ -534,7 +534,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
       // Execute all operations atomically
       await this.db.batch(query);
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to approve with transaction",
         error,
@@ -582,7 +582,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         }),
       ]);
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to return with transaction",
         error,
@@ -636,7 +636,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
       await this.db.batch(query);
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to withdraw with transaction",
         error,
@@ -709,7 +709,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
       // Execute all operations atomically
       await this.db.batch(query);
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to submit with transaction",
         error,

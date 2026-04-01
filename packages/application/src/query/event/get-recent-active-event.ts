@@ -3,7 +3,7 @@ import { desc, eq } from "drizzle-orm";
 import { schema } from "@archive/infrastructure/db";
 import type { Database } from "@archive/infrastructure/db";
 import { eventIdSchema } from "@archive/domain/event/schema";
-import { QueryException } from "../shared";
+import { QueryExceptionError } from "../shared";
 
 export const recentActiveEventSchema = z.object({
   id: eventIdSchema,
@@ -36,7 +36,7 @@ export async function getRecentActiveEvent(deps: {
       updatedAt: new Date(row.updatedAt),
     });
   } catch (error) {
-    throw new QueryException(
+    throw new QueryExceptionError(
       "DATABASE_ERROR",
       "最新のアクティブイベントの取得に失敗しました。",
       error,

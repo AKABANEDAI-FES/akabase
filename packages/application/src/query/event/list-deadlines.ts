@@ -4,7 +4,7 @@ import { schema } from "@archive/infrastructure/db";
 import type { Database } from "@archive/infrastructure/db";
 import { DEADLINE_FIELD_KEYS, deadlineIdSchema, eventIdSchema } from "@archive/domain/event/schema";
 import type { EventId } from "@archive/domain/event/schema";
-import { QueryException } from "../shared";
+import { QueryExceptionError } from "../shared";
 
 export const deadlineListItemSchema = z.object({
   id: deadlineIdSchema,
@@ -38,6 +38,6 @@ export async function listDeadlines(
       }),
     );
   } catch (error) {
-    throw new QueryException("DATABASE_ERROR", "締切一覧の取得に失敗しました。", error);
+    throw new QueryExceptionError("DATABASE_ERROR", "締切一覧の取得に失敗しました。", error);
   }
 }

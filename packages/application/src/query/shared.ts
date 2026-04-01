@@ -11,13 +11,13 @@ export type QueryErrorCode = "DATABASE_ERROR" | "ACTOR_RESOLUTION_FAILED" | "VAL
  * Query exception class
  * Thrown when query operations fail due to infrastructure or unexpected errors
  */
-export class QueryException extends Error {
+export class QueryExceptionError extends Error {
   readonly code: QueryErrorCode;
   readonly cause?: unknown;
 
   constructor(code: QueryErrorCode, message: string, cause?: unknown) {
     super(message);
-    this.name = "QueryException";
+    this.name = "QueryExceptionError";
     this.code = code;
     this.cause = cause;
   }

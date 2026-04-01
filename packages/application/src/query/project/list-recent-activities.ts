@@ -10,7 +10,7 @@ import {
   submissionIdSchema,
 } from "@archive/domain/project/schema";
 import type { Actor } from "@archive/domain/authorization/schema";
-import { QueryException } from "../shared";
+import { QueryExceptionError } from "../shared";
 
 export const recentActivitySchema = z.object({
   actionId: z.string(),
@@ -83,6 +83,10 @@ export async function listRecentActivities(
       }),
     );
   } catch (error) {
-    throw new QueryException("DATABASE_ERROR", "最近のアクティビティの取得に失敗しました。", error);
+    throw new QueryExceptionError(
+      "DATABASE_ERROR",
+      "最近のアクティビティの取得に失敗しました。",
+      error,
+    );
   }
 }

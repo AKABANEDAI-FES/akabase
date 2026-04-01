@@ -4,7 +4,7 @@ import { schema } from "@archive/infrastructure/db";
 import type { Database } from "@archive/infrastructure/db";
 import type { EventId } from "@archive/domain/event/schema";
 import { eventIdSchema, placeIdSchema } from "@archive/domain/event/schema";
-import { QueryException } from "../shared";
+import { QueryExceptionError } from "../shared";
 
 export const placeListItemSchema = z.object({
   id: placeIdSchema,
@@ -36,6 +36,6 @@ export async function listPlaces(
       }),
     );
   } catch (error) {
-    throw new QueryException("DATABASE_ERROR", "開催場所の一覧取得に失敗しました。", error);
+    throw new QueryExceptionError("DATABASE_ERROR", "開催場所の一覧取得に失敗しました。", error);
   }
 }

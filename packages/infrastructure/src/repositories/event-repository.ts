@@ -14,7 +14,7 @@ import type {
   TagId,
 } from "@archive/domain/event/schema";
 import type { EventRepository } from "@archive/domain/event/repository";
-import { REPOSITORY_ERROR_CODE, RepositoryException } from "@archive/domain/shared/repository";
+import { REPOSITORY_ERROR_CODE, RepositoryExceptionError } from "@archive/domain/shared/repository";
 
 /**
  * Event Repository Implementation using Drizzle ORM
@@ -47,7 +47,7 @@ export class EventRepositoryImpl implements EventRepository {
 
       return event;
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to find event",
         error,
@@ -76,7 +76,7 @@ export class EventRepositoryImpl implements EventRepository {
 
       return event;
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to find event by slug",
         error,
@@ -103,7 +103,7 @@ export class EventRepositoryImpl implements EventRepository {
 
       return eventList;
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to list events",
         error,
@@ -134,7 +134,7 @@ export class EventRepositoryImpl implements EventRepository {
           },
         });
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to save event",
         error,
@@ -164,7 +164,7 @@ export class EventRepositoryImpl implements EventRepository {
 
       return tagList;
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to find tags",
         error,
@@ -193,7 +193,7 @@ export class EventRepositoryImpl implements EventRepository {
           where: eq(schema.tags.eventId, tag.eventId),
         });
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to save tag",
         error,
@@ -210,7 +210,7 @@ export class EventRepositoryImpl implements EventRepository {
 
       return result?.maxOrder ?? -1;
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to get max tag display order",
         error,
@@ -235,7 +235,7 @@ export class EventRepositoryImpl implements EventRepository {
       // oxlint-disable-next-line typescript/no-unsafe-type-assertion
       await this.db.batch(queries as [BatchItem<"sqlite">, ...BatchItem<"sqlite">[]]);
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to update tag display orders",
         error,
@@ -249,7 +249,7 @@ export class EventRepositoryImpl implements EventRepository {
         .delete(schema.tags)
         .where(and(eq(schema.tags.id, tagId), eq(schema.tags.eventId, eventId)));
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to delete tag",
         error,
@@ -279,7 +279,7 @@ export class EventRepositoryImpl implements EventRepository {
 
       return placeList;
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to find places",
         error,
@@ -308,7 +308,7 @@ export class EventRepositoryImpl implements EventRepository {
           where: eq(schema.places.eventId, place.eventId),
         });
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to save place",
         error,
@@ -322,7 +322,7 @@ export class EventRepositoryImpl implements EventRepository {
         .delete(schema.places)
         .where(and(eq(schema.places.id, placeId), eq(schema.places.eventId, eventId)));
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to delete place",
         error,
@@ -353,7 +353,7 @@ export class EventRepositoryImpl implements EventRepository {
 
       return deadlineList;
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to find deadlines",
         error,
@@ -381,7 +381,7 @@ export class EventRepositoryImpl implements EventRepository {
           },
         });
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to save deadline",
         error,
@@ -395,7 +395,7 @@ export class EventRepositoryImpl implements EventRepository {
         .delete(schema.deadlines)
         .where(and(eq(schema.deadlines.id, deadlineId), eq(schema.deadlines.eventId, eventId)));
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to delete deadline",
         error,

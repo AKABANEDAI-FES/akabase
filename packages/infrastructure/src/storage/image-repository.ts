@@ -8,7 +8,7 @@ import type {
   ValidatedImage,
 } from "@archive/domain/shared/image";
 import type { UserId } from "@archive/domain/user/schema";
-import { REPOSITORY_ERROR_CODE, RepositoryException } from "@archive/domain/shared/repository";
+import { REPOSITORY_ERROR_CODE, RepositoryExceptionError } from "@archive/domain/shared/repository";
 import type { Database } from "../db";
 import { schema } from "../db";
 
@@ -68,7 +68,7 @@ export class ImageRepositoryImpl implements ImageRepository {
         },
       });
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "画像のアップロードに失敗しました。",
         error,
@@ -88,7 +88,7 @@ export class ImageRepositoryImpl implements ImageRepository {
       // Rollback: delete uploaded file from R2 (best-effort, ignore errors)
       // oxlint-disable-next-line no-empty-function
       await this.bucket.delete(objectKey).catch(() => {});
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "画像のメタデータ保存に失敗しました。",
         error,
@@ -102,7 +102,7 @@ export class ImageRepositoryImpl implements ImageRepository {
     try {
       await this.bucket.delete(key);
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "画像の削除に失敗しました。",
         error,
@@ -153,10 +153,10 @@ export class ImageRepositoryImpl implements ImageRepository {
         })
         .where(eq(schema.images.id, imageId));
     } catch (error) {
-      if (error instanceof RepositoryException) {
+      if (error instanceof RepositoryExceptionError) {
         throw error;
       }
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "画像スコープの移行に失敗しました。",
         error,
