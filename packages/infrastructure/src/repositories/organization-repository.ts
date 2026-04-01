@@ -12,7 +12,7 @@ import { REPOSITORY_ERROR_CODE, RepositoryException } from "@archive/domain/shar
  * Organization Repository Implementation using Drizzle ORM
  */
 export class OrganizationRepositoryImpl implements OrganizationRepository {
-  private db: Database;
+  private readonly db: Database;
 
   constructor(db: Database) {
     this.db = db;

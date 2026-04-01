@@ -11,7 +11,7 @@ import { REPOSITORY_ERROR_CODE, RepositoryException } from "@archive/domain/shar
  * User Repository Implementation using Drizzle ORM
  */
 export class UserRepositoryImpl implements UserRepository {
-  private db: Database;
+  private readonly db: Database;
 
   constructor(db: Database) {
     this.db = db;

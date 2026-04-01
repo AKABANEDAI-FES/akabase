@@ -20,7 +20,7 @@ import { REPOSITORY_ERROR_CODE, RepositoryException } from "@archive/domain/shar
  * Event Repository Implementation using Drizzle ORM
  */
 export class EventRepositoryImpl implements EventRepository {
-  private db: Database;
+  private readonly db: Database;
 
   constructor(db: Database) {
     this.db = db;

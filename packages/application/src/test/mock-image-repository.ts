@@ -9,7 +9,7 @@ import type {
 import type { UserId } from "@archive/domain/user/schema";
 
 export class MockImageRepository implements ImageRepository {
-  private uploadedFiles = new Map<string, { id: string; objectKey: string }>();
+  private readonly uploadedFiles = new Map<string, { id: string; objectKey: string }>();
 
   async uploadImage(
     _image: ValidatedImage,
