@@ -3,7 +3,8 @@ import { baseConfig } from "@archive/config/oxlint/base";
 
 export default defineConfig({
   lint: {
-    ...baseConfig,
+    extends: [baseConfig],
+    plugins: baseConfig.plugins,
   },
   pack: {
     entry: ["src/**/*.ts", "!src/**/*.test.ts"],

@@ -3,9 +3,9 @@ import { reactConfig } from "@archive/config/oxlint/react";
 
 export default defineConfig({
   lint: {
-    ...reactConfig,
+    extends: [reactConfig],
+    plugins: reactConfig.plugins,
     overrides: [
-      ...(reactConfig.overrides ?? []),
       {
         files: ["src/components/**/*.tsx"],
         rules: {

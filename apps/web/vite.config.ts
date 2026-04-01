@@ -20,10 +20,10 @@ export default defineConfig({
     cloudflare({ viteEnvironment: { name: "ssr" } }),
   ],
   lint: {
-    ...reactConfig,
+    extends: [reactConfig],
+    plugins: reactConfig.plugins,
     ignorePatterns: ["postcss.config.cjs", "worker-configuration.d.ts", "routeTree.gen.ts"],
     overrides: [
-      ...(reactConfig.overrides ?? []),
       {
         files: ["src/routes/**/*.{ts,tsx}"],
         rules: {
