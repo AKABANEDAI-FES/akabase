@@ -3,7 +3,7 @@ import { desc, eq } from "drizzle-orm";
 import { schema } from "@archive/infrastructure/db";
 import type { Database } from "@archive/infrastructure/db";
 import type { EventId } from "@archive/domain/event/schema";
-import { QueryException } from "../shared";
+import { QueryExceptionError } from "../shared";
 
 export const organizationListItemSchema = z.object({
   id: z.string(),
@@ -39,6 +39,6 @@ export async function listOrganizations(
       }),
     );
   } catch (error) {
-    throw new QueryException("DATABASE_ERROR", "出展団体一覧の取得に失敗しました。", error);
+    throw new QueryExceptionError("DATABASE_ERROR", "出展団体一覧の取得に失敗しました。", error);
   }
 }

@@ -11,7 +11,7 @@ import { projectIdSchema, submissionStatusSchema } from "@archive/domain/project
 import type { Actor } from "@archive/domain/authorization/schema";
 import { organizationResource } from "@archive/domain/authorization/logic";
 import type { AuthorizationService } from "@archive/domain/authorization/service";
-import { QueryException } from "../shared";
+import { QueryExceptionError } from "../shared";
 
 export const projectListItemSchema = z.object({
   id: projectIdSchema,
@@ -40,7 +40,7 @@ export async function listProjects(
     "organization:read",
   );
   if (Result.isFailure(authResult)) {
-    throw new QueryException("VALIDATION_ERROR", authResult.error.message, authResult.error);
+    throw new QueryExceptionError("VALIDATION_ERROR", authResult.error.message, authResult.error);
   }
 
   try {
@@ -74,6 +74,6 @@ export async function listProjects(
       }),
     );
   } catch (error) {
-    throw new QueryException("DATABASE_ERROR", "企画一覧の取得に失敗しました。", error);
+    throw new QueryExceptionError("DATABASE_ERROR", "企画一覧の取得に失敗しました。", error);
   }
 }

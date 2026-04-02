@@ -10,7 +10,7 @@ import { orgMemberRoleSchema } from "@archive/domain/organization/schema";
 import type { Actor } from "@archive/domain/authorization/schema";
 import { organizationResource } from "@archive/domain/authorization/logic";
 import type { AuthorizationService } from "@archive/domain/authorization/service";
-import { QueryException } from "../shared";
+import { QueryExceptionError } from "../shared";
 
 export const organizationMemberListItemSchema = z.object({
   id: z.string(),
@@ -35,7 +35,7 @@ export async function listOrganizationMembers(
     "organization:read",
   );
   if (Result.isFailure(authResult)) {
-    throw new QueryException("VALIDATION_ERROR", authResult.error.message, authResult.error);
+    throw new QueryExceptionError("VALIDATION_ERROR", authResult.error.message, authResult.error);
   }
 
   try {
@@ -64,6 +64,6 @@ export async function listOrganizationMembers(
       }),
     );
   } catch (error) {
-    throw new QueryException("DATABASE_ERROR", "メンバー一覧の取得に失敗しました。", error);
+    throw new QueryExceptionError("DATABASE_ERROR", "メンバー一覧の取得に失敗しました。", error);
   }
 }

@@ -7,7 +7,7 @@ import type { EventId } from "@archive/domain/event/schema";
 import type { OrgId } from "@archive/domain/organization/schema";
 import { cast } from "@archive/domain/shared/ids";
 import { createAdminActor, createUserActor } from "../../test/test-helpers";
-import { QueryException } from "../shared";
+import { QueryExceptionError } from "../shared";
 
 describe("listOrganizationMembers", () => {
   let testDb: Awaited<ReturnType<typeof createTestDb>>;
@@ -118,7 +118,7 @@ describe("listOrganizationMembers", () => {
     expect(result).toEqual([]);
   });
 
-  it("権限のないユーザーはQueryExceptionがスローされる", async () => {
+  it("権限のないユーザーはQueryExceptionErrorがスローされる", async () => {
     const actor = createUserActor();
 
     await expect(
@@ -128,7 +128,7 @@ describe("listOrganizationMembers", () => {
         orgId,
         actor,
       ),
-    ).rejects.toThrow(QueryException);
+    ).rejects.toThrow(QueryExceptionError);
   });
 
   it("DTOにcreatedAtが含まれる", async () => {

@@ -19,13 +19,13 @@ export type RepositoryError = {
  * Repository Exception
  * Exception for unrecoverable infrastructure failures (database errors, connection issues)
  */
-export class RepositoryException extends Error {
+export class RepositoryExceptionError extends Error {
   public readonly code: RepositoryErrorCode;
   public readonly cause?: unknown;
 
   constructor(code: RepositoryErrorCode, message: string, cause?: unknown) {
     super(message);
-    this.name = "RepositoryException";
+    this.name = "RepositoryExceptionError";
     this.code = code;
     this.cause = cause;
   }

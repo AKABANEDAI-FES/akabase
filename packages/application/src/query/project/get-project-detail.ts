@@ -9,7 +9,7 @@ import type { Actor } from "@archive/domain/authorization/schema";
 import { projectResource } from "@archive/domain/authorization/logic";
 import type { AuthorizationService } from "@archive/domain/authorization/service";
 import type { ImageRepository } from "@archive/domain/shared/image";
-import { QueryException } from "../shared";
+import { QueryExceptionError } from "../shared";
 
 export const projectDetailSchema = z.object({
   id: projectIdSchema,
@@ -69,6 +69,6 @@ export async function getProjectDetail(
       updatedAt: project.updatedAt,
     });
   } catch (error) {
-    throw new QueryException("DATABASE_ERROR", "企画情報の取得に失敗しました。", error);
+    throw new QueryExceptionError("DATABASE_ERROR", "企画情報の取得に失敗しました。", error);
   }
 }

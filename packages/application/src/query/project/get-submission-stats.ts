@@ -7,7 +7,7 @@ import type { EventId } from "@archive/domain/event/schema";
 import type { Actor } from "@archive/domain/authorization/schema";
 import { eventResource } from "@archive/domain/authorization/logic";
 import type { AuthorizationService } from "@archive/domain/authorization/service";
-import { QueryException } from "../shared";
+import { QueryExceptionError } from "../shared";
 
 export const submissionStatsSchema = z.object({
   submitted: z.number(),
@@ -29,7 +29,7 @@ export async function getSubmissionStats(
     "event:list_submissions",
   );
   if (Result.isFailure(authResult)) {
-    throw new QueryException("VALIDATION_ERROR", authResult.error.message, authResult.error);
+    throw new QueryExceptionError("VALIDATION_ERROR", authResult.error.message, authResult.error);
   }
 
   try {
@@ -84,9 +84,9 @@ export async function getSubmissionStats(
       withdrawn,
     });
   } catch (error) {
-    if (error instanceof QueryException) {
+    if (error instanceof QueryExceptionError) {
       throw error;
     }
-    throw new QueryException("DATABASE_ERROR", "提出統計の取得に失敗しました。", error);
+    throw new QueryExceptionError("DATABASE_ERROR", "提出統計の取得に失敗しました。", error);
   }
 }

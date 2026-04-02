@@ -4,7 +4,7 @@ import { schema } from "@archive/infrastructure/db";
 import type { Database } from "@archive/infrastructure/db";
 import type { EventId } from "@archive/domain/event/schema";
 import { eventIdSchema, tagIdSchema } from "@archive/domain/event/schema";
-import { QueryException } from "../shared";
+import { QueryExceptionError } from "../shared";
 
 export const tagListItemSchema = z.object({
   id: tagIdSchema,
@@ -33,6 +33,6 @@ export async function listTags(deps: { db: Database }, eventId: EventId): Promis
       }),
     );
   } catch (error) {
-    throw new QueryException("DATABASE_ERROR", "タグ一覧の取得に失敗しました。", error);
+    throw new QueryExceptionError("DATABASE_ERROR", "タグ一覧の取得に失敗しました。", error);
   }
 }

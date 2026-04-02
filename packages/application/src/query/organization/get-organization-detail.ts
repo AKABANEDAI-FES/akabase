@@ -8,7 +8,7 @@ import { orgIdSchema } from "@archive/domain/organization/schema";
 import type { Actor } from "@archive/domain/authorization/schema";
 import { organizationResource } from "@archive/domain/authorization/logic";
 import type { AuthorizationService } from "@archive/domain/authorization/service";
-import { QueryException } from "../shared";
+import { QueryExceptionError } from "../shared";
 
 export const organizationDetailSchema = z.object({
   id: orgIdSchema,
@@ -57,6 +57,6 @@ export async function getOrganizationDetail(
       updatedAt: new Date(row.updatedAt),
     });
   } catch (error) {
-    throw new QueryException("DATABASE_ERROR", "出展団体詳細の取得に失敗しました。", error);
+    throw new QueryExceptionError("DATABASE_ERROR", "出展団体詳細の取得に失敗しました。", error);
   }
 }

@@ -98,13 +98,13 @@ export type UploadImageResult = {
 export type ImageRepository = {
   /**
    * Upload image to storage and save metadata to DB
-   * @throws {RepositoryException} on storage errors
+   * @throws {RepositoryExceptionError} on storage errors
    */
   uploadImage(image: ValidatedImage, scope: ImageScope, userId: UserId): Promise<UploadImageResult>;
 
   /**
    * Delete image by key
-   * @throws {RepositoryException} on storage errors
+   * @throws {RepositoryExceptionError} on storage errors
    */
   deleteImage(key: string): Promise<void>;
 
@@ -112,7 +112,7 @@ export type ImageRepository = {
    * Migrate a pending image to its correct scope
    * Looks up image by ID, moves in R2, updates DB (objectKey, scopeType)
    * Skips if image is not pending (already migrated)
-   * @throws {RepositoryException} on storage errors
+   * @throws {RepositoryExceptionError} on storage errors
    */
   migrateScope(imageId: ImageId, newScope: ImageScope): Promise<void>;
 

@@ -10,7 +10,7 @@ import { submissionIdSchema, submissionStatusSchema } from "@archive/domain/proj
 import type { Actor } from "@archive/domain/authorization/schema";
 import { projectResource } from "@archive/domain/authorization/logic";
 import type { AuthorizationService } from "@archive/domain/authorization/service";
-import { QueryException } from "../shared";
+import { QueryExceptionError } from "../shared";
 
 export const submissionListItemSchema = z.object({
   id: submissionIdSchema,
@@ -42,7 +42,7 @@ export async function listSubmissions(
     "project:read",
   );
   if (Result.isFailure(authResult)) {
-    throw new QueryException("VALIDATION_ERROR", authResult.error.message, authResult.error);
+    throw new QueryExceptionError("VALIDATION_ERROR", authResult.error.message, authResult.error);
   }
 
   try {
@@ -79,6 +79,6 @@ export async function listSubmissions(
       });
     });
   } catch (error) {
-    throw new QueryException("DATABASE_ERROR", "提出一覧の取得に失敗しました。", error);
+    throw new QueryExceptionError("DATABASE_ERROR", "提出一覧の取得に失敗しました。", error);
   }
 }

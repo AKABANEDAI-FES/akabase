@@ -11,7 +11,7 @@ import type { Actor } from "@archive/domain/authorization/schema";
 import { userResource } from "@archive/domain/authorization/logic";
 import { userIdSchema } from "@archive/domain/user/schema";
 import type { AuthorizationService } from "@archive/domain/authorization/service";
-import { QueryException } from "../shared";
+import { QueryExceptionError } from "../shared";
 
 export const userListItemSchema = z.object({
   id: userIdSchema,
@@ -29,7 +29,7 @@ export async function listUsersWithRoles(
 ): Promise<UserListItem[]> {
   const authResult = deps.authService.enforce(actor, userResource(actor.userId), "user:list");
   if (Result.isFailure(authResult)) {
-    throw new QueryException("VALIDATION_ERROR", authResult.error.message, authResult.error);
+    throw new QueryExceptionError("VALIDATION_ERROR", authResult.error.message, authResult.error);
   }
 
   try {
@@ -54,6 +54,6 @@ export async function listUsersWithRoles(
       }),
     );
   } catch (error) {
-    throw new QueryException("DATABASE_ERROR", "ユーザー一覧の取得に失敗しました。", error);
+    throw new QueryExceptionError("DATABASE_ERROR", "ユーザー一覧の取得に失敗しました。", error);
   }
 }

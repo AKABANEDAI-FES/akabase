@@ -6,13 +6,13 @@ import type { OrgId, OrgMember, Organization } from "@archive/domain/organizatio
 import type { OrganizationRepository } from "@archive/domain/organization/repository";
 import type { EventId } from "@archive/domain/event/schema";
 import type { UserId } from "@archive/domain/user/schema";
-import { REPOSITORY_ERROR_CODE, RepositoryException } from "@archive/domain/shared/repository";
+import { REPOSITORY_ERROR_CODE, RepositoryExceptionError } from "@archive/domain/shared/repository";
 
 /**
  * Organization Repository Implementation using Drizzle ORM
  */
 export class OrganizationRepositoryImpl implements OrganizationRepository {
-  private db: Database;
+  private readonly db: Database;
 
   constructor(db: Database) {
     this.db = db;
@@ -41,7 +41,7 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
 
       return organization;
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to find organization",
         error,
@@ -68,7 +68,7 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
 
       return members;
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to find organization members",
         error,
@@ -97,7 +97,7 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
 
       return orgList;
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to list organizations",
         error,
@@ -130,7 +130,7 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
           where: eq(schema.organizations.eventId, org.eventId),
         });
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to save organization",
         error,
@@ -144,7 +144,7 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
         .delete(schema.organizations)
         .where(and(eq(schema.organizations.id, id), eq(schema.organizations.eventId, eventId)));
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to delete organization",
         error,
@@ -171,7 +171,7 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
           },
         });
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to save member",
         error,
@@ -185,7 +185,7 @@ export class OrganizationRepositoryImpl implements OrganizationRepository {
         .delete(schema.orgMembers)
         .where(and(eq(schema.orgMembers.orgId, orgId), eq(schema.orgMembers.userId, userId)));
     } catch (error) {
-      throw new RepositoryException(
+      throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to remove member",
         error,

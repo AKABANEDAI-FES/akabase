@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
   createColumnHelper,
@@ -22,7 +22,6 @@ import { Text } from "@archive/ui/components/text";
 import { Flex, Stack } from "@archive/styled-system/jsx";
 import { SubmissionStatusBadge } from "./submission-status-badge";
 import { generateLoadEventSubmissionsQueryOptions } from "../actions/queries";
-import { Route } from "@/routes/_authenticated/$slug/committee/submissions";
 import type { EventSubmissionListItem } from "@archive/application/query/project/list-event-submissions";
 import type { SubmissionStatus } from "@archive/domain/project/schema";
 import type { EventId } from "@archive/domain/event/schema";
@@ -92,12 +91,19 @@ const createColumns = (slug: string) => [
 type EventSubmissionsTableProps = {
   eventId: EventId;
   slug: string;
+  status?: SubmissionStatus[];
+  page?: number;
+  onSearchChange: (updates: { status?: SubmissionStatus[]; page?: number }) => void;
 };
 
-export function EventSubmissionsTable({ eventId, slug }: EventSubmissionsTableProps) {
+export function EventSubmissionsTable({
+  eventId,
+  slug,
+  status,
+  page,
+  onSearchChange,
+}: EventSubmissionsTableProps) {
   const { data: submissions } = useSuspenseQuery(generateLoadEventSubmissionsQueryOptions(eventId));
-  const { status, page } = Route.useSearch();
-  const navigate = useNavigate({ from: Route.fullPath });
   const columns = useMemo(() => createColumns(slug), [slug]);
 
   const columnFilters: ColumnFiltersState = useMemo(
@@ -125,18 +131,15 @@ export function EventSubmissionsTable({ eventId, slug }: EventSubmissionsTablePr
 
   const selectedStatuses = status ?? statusOptions;
 
-  const toggleStatus = async (s: SubmissionStatus) => {
+  const toggleStatus = (s: SubmissionStatus) => {
     const isCurrentlySelected = selectedStatuses.includes(s);
     const next = isCurrentlySelected
       ? selectedStatuses.filter((x: SubmissionStatus) => x !== s)
       : [...selectedStatuses, s];
 
-    await navigate({
-      search: (prev) => ({
-        ...prev,
-        status: next.length === statusOptions.length ? undefined : next,
-        page: undefined,
-      }),
+    onSearchChange({
+      status: next.length === statusOptions.length ? undefined : next,
+      page: undefined,
     });
   };
 

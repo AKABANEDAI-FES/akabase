@@ -2,7 +2,7 @@
  * User repository interface
  * Contract for user data persistence
  *
- * Repository methods throw RepositoryException on infrastructure failures.
+ * Repository methods throw RepositoryExceptionError on infrastructure failures.
  * Returns null for "not found" scenarios (valid state, not an error).
  */
 
@@ -15,7 +15,7 @@ export type UserRepository = {
    *
    * @param userId - User ID to search for
    * @returns User if found, null otherwise
-   * @throws {RepositoryException} on database errors
+   * @throws {RepositoryExceptionError} on database errors
    */
   findById(userId: UserId): Promise<User | null>;
 
@@ -24,7 +24,7 @@ export type UserRepository = {
    *
    * @param email - Email address to search for
    * @returns User if found, null otherwise
-   * @throws {RepositoryException} on database errors
+   * @throws {RepositoryExceptionError} on database errors
    */
   findByEmail(email: string): Promise<User | null>;
 
@@ -33,7 +33,7 @@ export type UserRepository = {
    * Used for admin user management
    *
    * @returns List of all users
-   * @throws {RepositoryException} on database errors
+   * @throws {RepositoryExceptionError} on database errors
    */
   listAll(): Promise<User[]>;
 
@@ -42,7 +42,7 @@ export type UserRepository = {
    * Use domain logic functions to compute the user before calling this
    *
    * @param user - User entity to save
-   * @throws {RepositoryException} on database errors
+   * @throws {RepositoryExceptionError} on database errors
    */
   saveUser(user: User): Promise<void>;
 
@@ -52,7 +52,7 @@ export type UserRepository = {
    * @param userId - User ID
    * @param eventId - Event ID
    * @returns CommitteeRoleAssignment if found, null otherwise
-   * @throws {RepositoryException} on database errors
+   * @throws {RepositoryExceptionError} on database errors
    */
   findCommitteeRoleAssignment(
     userId: UserId,
@@ -64,7 +64,7 @@ export type UserRepository = {
    * Use domain logic functions to create or update the assignment before calling this
    *
    * @param assignment - CommitteeRoleAssignment entity to save
-   * @throws {RepositoryException} on database errors
+   * @throws {RepositoryExceptionError} on database errors
    */
   saveCommitteeRoleAssignment(assignment: CommitteeRoleAssignment): Promise<void>;
 };

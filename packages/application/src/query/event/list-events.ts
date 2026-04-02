@@ -3,7 +3,7 @@ import { desc } from "drizzle-orm";
 import { schema } from "@archive/infrastructure/db";
 import type { Database } from "@archive/infrastructure/db";
 import { eventIdSchema } from "@archive/domain/event/schema";
-import { QueryException } from "../shared";
+import { QueryExceptionError } from "../shared";
 
 export const eventListItemSchema = z.object({
   id: eventIdSchema,
@@ -31,6 +31,6 @@ export async function listEvents(deps: { db: Database }): Promise<EventListItem[
       }),
     );
   } catch (error) {
-    throw new QueryException("DATABASE_ERROR", "イベント一覧の取得に失敗しました。", error);
+    throw new QueryExceptionError("DATABASE_ERROR", "イベント一覧の取得に失敗しました。", error);
   }
 }

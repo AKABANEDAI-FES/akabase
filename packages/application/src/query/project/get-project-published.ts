@@ -9,7 +9,7 @@ import { projectIdSchema, projectPublishedSchema } from "@archive/domain/project
 import type { Actor } from "@archive/domain/authorization/schema";
 import { projectResource } from "@archive/domain/authorization/logic";
 import type { AuthorizationService } from "@archive/domain/authorization/service";
-import { QueryException } from "../shared";
+import { QueryExceptionError } from "../shared";
 
 export const projectPublishedDetailSchema = z.object({
   projectId: projectIdSchema,
@@ -71,6 +71,6 @@ export async function getProjectPublished(
         .map((t) => ({ id: t.tag.id, name: t.tag.name })),
     });
   } catch (error) {
-    throw new QueryException("DATABASE_ERROR", "公開用データの取得に失敗しました。", error);
+    throw new QueryExceptionError("DATABASE_ERROR", "公開用データの取得に失敗しました。", error);
   }
 }
