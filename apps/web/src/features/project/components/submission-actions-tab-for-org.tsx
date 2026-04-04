@@ -1,12 +1,12 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Flex } from "@archive/styled-system/jsx";
+import { Flex } from "@akabase/styled-system/jsx";
 import { XCircleIcon } from "lucide-react";
-import { Button } from "@archive/ui/components/button";
-import { Card } from "@archive/ui/components/card";
-import { Text } from "@archive/ui/components/text";
-import type { SubmissionDetail } from "@archive/application/query/project/get-submission-detail";
-import type { EventId } from "@archive/domain/event/schema";
-import type { OrgId } from "@archive/domain/organization/schema";
+import { Button } from "@akabase/ui/components/button";
+import { Card } from "@akabase/ui/components/card";
+import { Text } from "@akabase/ui/components/text";
+import type { SubmissionDetail } from "@akabase/application/query/project/get-submission-detail";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { OrgId } from "@akabase/domain/organization/schema";
 import { generateCheckOrganizationPermissionsQueryOptions } from "@/features/authorization/actions/queries";
 import { WithdrawSubmissionDialog } from "./withdraw-submission-dialog";
 

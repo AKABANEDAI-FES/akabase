@@ -1,13 +1,13 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Container, Stack } from "@archive/styled-system/jsx";
-import { Button } from "@archive/ui/components/button";
-import { Heading } from "@archive/ui/components/heading";
+import { Container, Stack } from "@akabase/styled-system/jsx";
+import { Button } from "@akabase/ui/components/button";
+import { Heading } from "@akabase/ui/components/heading";
 import { ArrowLeftIcon } from "lucide-react";
 import { generateLoadSubmissionsQueryOptions } from "@/features/project/actions/queries";
 import { ProjectSubmissionsHistory } from "@/features/project/components/project-submissions-history";
-import { cast } from "@archive/domain/shared/ids";
-import type { OrgId } from "@archive/domain/organization/schema";
-import type { ProjectId } from "@archive/domain/project/schema";
+import { cast } from "@akabase/domain/shared/ids";
+import type { OrgId } from "@akabase/domain/organization/schema";
+import type { ProjectId } from "@akabase/domain/project/schema";
 
 export const Route = createFileRoute(
   "/_authenticated/$slug/orgs/$orgId_/projects/$projectId/submissions",

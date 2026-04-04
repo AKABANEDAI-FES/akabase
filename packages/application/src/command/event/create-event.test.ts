@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vite-plus/test";
-import { Result } from "@archive/result";
+import { Result } from "@akabase/result";
 import { createTestDb } from "../../test/db-mock";
 import { createTestDependencies } from "../../test/test-dependencies";
 import { createAdminActor, createUserActor } from "../../test/test-helpers";

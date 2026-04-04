@@ -1,4 +1,4 @@
-import type { Result } from "@archive/result";
+import type { Result } from "@akabase/result";
 import type { Event, EventId, PlaceId, TagId } from "./schema";
 import type { EventError } from "./errors";
 

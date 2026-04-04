@@ -182,22 +182,22 @@ importers:
 
   apps/web:
     dependencies:
-      '@archive/application':
+      '@akabase/application':
         specifier: workspace:*
         version: link:../../packages/application
-      '@archive/domain':
+      '@akabase/domain':
         specifier: workspace:*
         version: link:../../packages/domain
-      '@archive/infrastructure':
+      '@akabase/infrastructure':
         specifier: workspace:*
         version: link:../../packages/infrastructure
-      '@archive/result':
+      '@akabase/result':
         specifier: workspace:*
         version: link:../../packages/result
-      '@archive/styled-system':
+      '@akabase/styled-system':
         specifier: workspace:*
         version: link:../../packages/styled-system
-      '@archive/ui':
+      '@akabase/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@ark-ui/react':
@@ -205,7 +205,7 @@ importers:
         version: 5.34.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@cloudflare/vite-plugin':
         specifier: catalog:build
-        version: 1.27.0(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0))(workerd@1.20260310.1)(wrangler@4.72.0)
+        version: 1.27.0(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0))(workerd@1.20260310.1)(wrangler@4.72.0)
       '@dnd-kit/core':
         specifier: catalog:frontend
         version: 6.3.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -229,7 +229,7 @@ importers:
         version: 0.9.13(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(csstype@3.2.3)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(solid-js@1.9.11)
       '@tanstack/react-form':
         specifier: catalog:frontend
-        version: 1.28.5(@tanstack/react-start@1.166.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0)))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        version: 1.28.5(@tanstack/react-start@1.166.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0)))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@tanstack/react-query':
         specifier: catalog:frontend
         version: 5.90.21(react@19.2.4)
@@ -247,13 +247,13 @@ importers:
         version: 1.166.7(@tanstack/query-core@5.90.20)(@tanstack/react-query@5.90.21(react@19.2.4))(@tanstack/react-router@1.166.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@tanstack/router-core@1.166.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@tanstack/react-start':
         specifier: catalog:frontend
-        version: 1.166.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0))
+        version: 1.166.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0))
       '@tanstack/react-table':
         specifier: catalog:frontend
         version: 8.21.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@tanstack/router-plugin':
         specifier: catalog:build
-        version: 1.166.7(@tanstack/react-router@1.166.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0))
+        version: 1.166.7(@tanstack/react-router@1.166.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0))
       '@tiptap/core':
         specifier: catalog:frontend
         version: 3.20.1(@tiptap/pm@3.20.1)
@@ -280,7 +280,7 @@ importers:
         version: 3.20.1
       better-auth:
         specifier: catalog:backend
-        version: 1.5.5(@tanstack/react-start@1.166.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0)))(drizzle-kit@0.31.9)(drizzle-orm@0.45.1(@libsql/client@0.17.0)(kysely@0.28.11))(mongodb@7.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(solid-js@1.9.11)(vitest@4.1.0(@types/node@22.19.15)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0)))
+        version: 1.5.5(@tanstack/react-start@1.166.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0)))(drizzle-kit@0.31.9)(drizzle-orm@0.45.1(@libsql/client@0.17.0)(kysely@0.28.11))(mongodb@7.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(solid-js@1.9.11)(vitest@4.1.0(@types/node@22.19.15)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0)))
       es-toolkit:
         specifier: 'catalog:'
         version: 1.45.1
@@ -306,7 +306,7 @@ importers:
         specifier: 'catalog:'
         version: 4.3.6
     devDependencies:
-      '@archive/config':
+      '@akabase/config':
         specifier: workspace:*
         version: link:../../packages/config
       '@libsql/client':
@@ -317,7 +317,7 @@ importers:
         version: 1.9.0(typescript@6.0.2)
       '@tanstack/devtools-vite':
         specifier: catalog:build
-        version: 0.5.5(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0))
+        version: 0.5.5(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0))
       '@types/node':
         specifier: catalog:types
         version: 22.19.15
@@ -329,7 +329,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       '@vitejs/plugin-react':
         specifier: catalog:build
-        version: 5.2.0(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0))
+        version: 5.2.0(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0))
       babel-plugin-react-compiler:
         specifier: catalog:build
         version: 1.0.0
@@ -344,27 +344,27 @@ importers:
         version: 6.0.2
       vite-plus:
         specifier: catalog:build
-        version: 0.1.14(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0)(typescript@6.0.2)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0))
+        version: 0.1.14(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0)(typescript@6.0.2)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0))
       wrangler:
         specifier: catalog:build
         version: 4.72.0
 
   packages/application:
     dependencies:
-      '@archive/domain':
+      '@akabase/domain':
         specifier: workspace:*
         version: link:../domain
-      '@archive/infrastructure':
+      '@akabase/infrastructure':
         specifier: workspace:*
         version: link:../infrastructure
-      '@archive/result':
+      '@akabase/result':
         specifier: workspace:*
         version: link:../result
       zod:
         specifier: 'catalog:'
         version: 4.3.6
     devDependencies:
-      '@archive/config':
+      '@akabase/config':
         specifier: workspace:*
         version: link:../config
       '@libsql/client':
@@ -391,14 +391,14 @@ importers:
 
   packages/domain:
     dependencies:
-      '@archive/result':
+      '@akabase/result':
         specifier: workspace:*
         version: link:../result
       zod:
         specifier: 'catalog:'
         version: 4.3.6
     devDependencies:
-      '@archive/config':
+      '@akabase/config':
         specifier: workspace:*
         version: link:../config
       '@typescript/native-preview':
@@ -413,15 +413,15 @@ importers:
 
   packages/infrastructure:
     dependencies:
-      '@archive/domain':
+      '@akabase/domain':
         specifier: workspace:*
         version: link:../domain
-      '@archive/result':
+      '@akabase/result':
         specifier: workspace:*
         version: link:../result
       better-auth:
         specifier: catalog:backend
-        version: 1.5.5(@tanstack/react-start@1.166.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0)))(drizzle-kit@0.31.9)(drizzle-orm@0.45.1(@libsql/client@0.17.0)(kysely@0.28.11))(mongodb@7.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(solid-js@1.9.11)(vitest@4.1.0(@types/node@22.19.15)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0)))
+        version: 1.5.5(@tanstack/react-start@1.166.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0)))(drizzle-kit@0.31.9)(drizzle-orm@0.45.1(@libsql/client@0.17.0)(kysely@0.28.11))(mongodb@7.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(solid-js@1.9.11)(vitest@4.1.0(@types/node@22.19.15)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0)))
       drizzle-orm:
         specifier: catalog:backend
         version: 0.45.1(@libsql/client@0.17.0)(kysely@0.28.11)
@@ -432,7 +432,7 @@ importers:
         specifier: 'catalog:'
         version: 4.3.6
     devDependencies:
-      '@archive/config':
+      '@akabase/config':
         specifier: workspace:*
         version: link:../config
       '@types/node':
@@ -449,7 +449,7 @@ importers:
         version: 6.0.2
       vite-plus:
         specifier: catalog:build
-        version: 0.1.14(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0)(typescript@6.0.2)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0))
+        version: 0.1.14(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0)(typescript@6.0.2)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0))
       wrangler:
         specifier: catalog:build
         version: 4.72.0
@@ -460,7 +460,7 @@ importers:
         specifier: 'catalog:'
         version: 0.10.0(typescript@6.0.2)
     devDependencies:
-      '@archive/config':
+      '@akabase/config':
         specifier: workspace:*
         version: link:../config
       typescript:
@@ -482,7 +482,7 @@ importers:
 
   packages/ui:
     dependencies:
-      '@archive/styled-system':
+      '@akabase/styled-system':
         specifier: workspace:*
         version: link:../styled-system
       '@ark-ui/react':
@@ -498,7 +498,7 @@ importers:
         specifier: ^19
         version: 19.2.4(react@19.2.4)
     devDependencies:
-      '@archive/config':
+      '@akabase/config':
         specifier: workspace:*
         version: link:../config
       '@pandacss/dev':
@@ -5829,12 +5829,12 @@ snapshots:
     optionalDependencies:
       workerd: 1.20260310.1
 
-  '@cloudflare/vite-plugin@1.27.0(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0))(workerd@1.20260310.1)(wrangler@4.72.0)':
+  '@cloudflare/vite-plugin@1.27.0(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0))(workerd@1.20260310.1)(wrangler@4.72.0)':
     dependencies:
       '@cloudflare/unenv-preset': 2.15.0(unenv@2.0.0-rc.24)(workerd@1.20260310.1)
       miniflare: 4.20260310.0
       unenv: 2.0.0-rc.24
-      vite: 8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0)
+      vite: 8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0)
       wrangler: 4.72.0
       ws: 8.18.0
     transitivePeerDependencies:
@@ -7124,7 +7124,7 @@ snapshots:
     transitivePeerDependencies:
       - csstype
 
-  '@tanstack/devtools-vite@0.5.5(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0))':
+  '@tanstack/devtools-vite@0.5.5(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0))':
     dependencies:
       '@babel/core': 7.29.0
       '@babel/generator': 7.29.1
@@ -7136,7 +7136,7 @@ snapshots:
       chalk: 5.6.2
       launch-editor: 2.13.1
       picomatch: 4.0.3
-      vite: 8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0)
+      vite: 8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0)
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -7185,13 +7185,13 @@ snapshots:
       - solid-js
       - utf-8-validate
 
-  '@tanstack/react-form@1.28.5(@tanstack/react-start@1.166.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0)))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+  '@tanstack/react-form@1.28.5(@tanstack/react-start@1.166.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0)))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
     dependencies:
       '@tanstack/form-core': 1.28.5
       '@tanstack/react-store': 0.9.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react: 19.2.4
     optionalDependencies:
-      '@tanstack/react-start': 1.166.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0))
+      '@tanstack/react-start': 1.166.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0))
     transitivePeerDependencies:
       - react-dom
 
@@ -7280,7 +7280,6 @@ snapshots:
       - supports-color
       - vite-plugin-solid
       - webpack
-    optional: true
 
   '@tanstack/react-start@1.166.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0))':
     dependencies:
@@ -7301,6 +7300,7 @@ snapshots:
       - supports-color
       - vite-plugin-solid
       - webpack
+    optional: true
 
   '@tanstack/react-store@0.9.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
     dependencies:
@@ -7367,7 +7367,6 @@ snapshots:
       vite: 8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0)
     transitivePeerDependencies:
       - supports-color
-    optional: true
 
   '@tanstack/router-plugin@1.166.7(@tanstack/react-router@1.166.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0))':
     dependencies:
@@ -7389,6 +7388,7 @@ snapshots:
       vite: 8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0)
     transitivePeerDependencies:
       - supports-color
+    optional: true
 
   '@tanstack/router-ssr-query-core@1.166.7(@tanstack/query-core@5.90.20)(@tanstack/router-core@1.166.7)':
     dependencies:
@@ -7451,7 +7451,6 @@ snapshots:
       - supports-color
       - vite-plugin-solid
       - webpack
-    optional: true
 
   '@tanstack/start-plugin-core@1.166.8(@tanstack/react-router@1.166.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0))':
     dependencies:
@@ -7484,6 +7483,7 @@ snapshots:
       - supports-color
       - vite-plugin-solid
       - webpack
+    optional: true
 
   '@tanstack/start-server-core@1.166.7':
     dependencies:
@@ -7800,7 +7800,7 @@ snapshots:
       '@typescript/native-preview-win32-arm64': 7.0.0-dev.20260310.1
       '@typescript/native-preview-win32-x64': 7.0.0-dev.20260310.1
 
-  '@vitejs/plugin-react@5.2.0(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0))':
+  '@vitejs/plugin-react@5.2.0(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0))':
     dependencies:
       '@babel/core': 7.29.0
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.29.0)
@@ -7808,7 +7808,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-rc.3
       '@types/babel__core': 7.20.5
       react-refresh: 0.18.0
-      vite: 8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0)
+      vite: 8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -10708,11 +10708,11 @@ snapshots:
   vitefu@1.1.2(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0)):
     optionalDependencies:
       vite: 8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0)
-    optional: true
 
   vitefu@1.1.2(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0)):
     optionalDependencies:
       vite: 8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0)
+    optional: true
 
   vitest@4.1.0(@types/node@22.19.15)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.25.12)(tsx@4.21.0)):
     dependencies:

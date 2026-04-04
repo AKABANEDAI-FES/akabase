@@ -3,23 +3,23 @@
  * Adds a new member to an organization
  */
 
-import { Result } from "@archive/result";
-import { generateId } from "@archive/domain/shared/ids";
-import type { EventId } from "@archive/domain/event/schema";
-import type { OrgId, OrgMemberRole } from "@archive/domain/organization/schema";
-import type { OrganizationError } from "@archive/domain/organization/errors";
-import { ORGANIZATION_ERROR_CODE, organizationError } from "@archive/domain/organization/errors";
-import type { EventError } from "@archive/domain/event/errors";
-import type { AuthorizationError } from "@archive/domain/authorization/errors";
-import type { Actor } from "@archive/domain/authorization/schema";
-import { organizationResource } from "@archive/domain/authorization/logic";
-import { createOrgMemberEntity } from "@archive/domain/organization/logic";
-import type { User } from "@archive/domain/user/schema";
-import type { OrganizationRepository } from "@archive/domain/organization/repository";
-import type { UserRepository } from "@archive/domain/user/repository";
-import type { AuthorizationService } from "@archive/domain/authorization/service";
-import type { OrganizationDomainService } from "@archive/domain/organization/service";
-import type { EventDomainService } from "@archive/domain/event/service";
+import { Result } from "@akabase/result";
+import { generateId } from "@akabase/domain/shared/ids";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { OrgId, OrgMemberRole } from "@akabase/domain/organization/schema";
+import type { OrganizationError } from "@akabase/domain/organization/errors";
+import { ORGANIZATION_ERROR_CODE, organizationError } from "@akabase/domain/organization/errors";
+import type { EventError } from "@akabase/domain/event/errors";
+import type { AuthorizationError } from "@akabase/domain/authorization/errors";
+import type { Actor } from "@akabase/domain/authorization/schema";
+import { organizationResource } from "@akabase/domain/authorization/logic";
+import { createOrgMemberEntity } from "@akabase/domain/organization/logic";
+import type { User } from "@akabase/domain/user/schema";
+import type { OrganizationRepository } from "@akabase/domain/organization/repository";
+import type { UserRepository } from "@akabase/domain/user/repository";
+import type { AuthorizationService } from "@akabase/domain/authorization/service";
+import type { OrganizationDomainService } from "@akabase/domain/organization/service";
+import type { EventDomainService } from "@akabase/domain/event/service";
 
 export type AddOrganizationMemberInput = {
   eventId: EventId;

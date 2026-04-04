@@ -1,18 +1,18 @@
 import type { ReactNode } from "react";
-import { Button } from "@archive/ui/components/button";
-import { CloseButton } from "@archive/ui/components/close-button";
-import { Dialog } from "@archive/ui/components/dialog";
-import { Field } from "@archive/ui/components/field";
-import { Textarea } from "@archive/ui/components/textarea";
-import { toaster } from "@archive/ui/components/toast";
+import { Button } from "@akabase/ui/components/button";
+import { CloseButton } from "@akabase/ui/components/close-button";
+import { Dialog } from "@akabase/ui/components/dialog";
+import { Field } from "@akabase/ui/components/field";
+import { Textarea } from "@akabase/ui/components/textarea";
+import { toaster } from "@akabase/ui/components/toast";
 import { Portal } from "@ark-ui/react/portal";
 import { useDialogContext } from "@ark-ui/react/dialog";
-import { Result } from "@archive/result";
+import { Result } from "@akabase/result";
 import { revalidateLogic, useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { approveProjectInputSchema, useApproveProjectMutationOption } from "../actions/mutations";
-import type { EventId } from "@archive/domain/event/schema";
-import type { SubmissionId } from "@archive/domain/project/schema";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { SubmissionId } from "@akabase/domain/project/schema";
 import { nl2br } from "@/libs/text";
 
 type ApproveProjectDialogProps = {

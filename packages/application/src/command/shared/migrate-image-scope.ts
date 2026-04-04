@@ -3,7 +3,7 @@
  * Moves a pending image to its correct scope (best-effort)
  */
 
-import type { ImageId, ImageRepository, ImageScope } from "@archive/domain/shared/image";
+import type { ImageId, ImageRepository, ImageScope } from "@akabase/domain/shared/image";
 
 export async function migrateImageScope(
   deps: {

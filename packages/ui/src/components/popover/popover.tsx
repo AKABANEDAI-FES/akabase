@@ -2,8 +2,8 @@
 import { ark } from "@ark-ui/react/factory";
 import { Popover } from "@ark-ui/react/popover";
 import type { ComponentProps } from "react";
-import { createStyleContext } from "@archive/styled-system/jsx";
-import { popover } from "@archive/styled-system/recipes";
+import { createStyleContext } from "@akabase/styled-system/jsx";
+import { popover } from "@akabase/styled-system/recipes";
 
 const { withRootProvider, withContext } = createStyleContext(popover);
 

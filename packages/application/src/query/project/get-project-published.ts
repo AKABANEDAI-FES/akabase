@@ -1,14 +1,14 @@
 import { z } from "zod";
-import { Result } from "@archive/result";
-import type { Database } from "@archive/infrastructure/db";
-import type { EventId } from "@archive/domain/event/schema";
-import { tagSchema } from "@archive/domain/event/schema";
-import type { OrgId } from "@archive/domain/organization/schema";
-import type { ProjectId } from "@archive/domain/project/schema";
-import { projectIdSchema, projectPublishedSchema } from "@archive/domain/project/schema";
-import type { Actor } from "@archive/domain/authorization/schema";
-import { projectResource } from "@archive/domain/authorization/logic";
-import type { AuthorizationService } from "@archive/domain/authorization/service";
+import { Result } from "@akabase/result";
+import type { Database } from "@akabase/infrastructure/db";
+import type { EventId } from "@akabase/domain/event/schema";
+import { tagSchema } from "@akabase/domain/event/schema";
+import type { OrgId } from "@akabase/domain/organization/schema";
+import type { ProjectId } from "@akabase/domain/project/schema";
+import { projectIdSchema, projectPublishedSchema } from "@akabase/domain/project/schema";
+import type { Actor } from "@akabase/domain/authorization/schema";
+import { projectResource } from "@akabase/domain/authorization/logic";
+import type { AuthorizationService } from "@akabase/domain/authorization/service";
 import { QueryExceptionError } from "../shared";
 
 export const projectPublishedDetailSchema = z.object({

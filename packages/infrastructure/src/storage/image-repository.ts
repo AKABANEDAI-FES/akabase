@@ -1,14 +1,14 @@
 import { eq } from "drizzle-orm";
-import { generateId } from "@archive/domain/shared/ids";
+import { generateId } from "@akabase/domain/shared/ids";
 import type {
   ImageId,
   ImageRepository,
   ImageScope,
   UploadImageResult,
   ValidatedImage,
-} from "@archive/domain/shared/image";
-import type { UserId } from "@archive/domain/user/schema";
-import { REPOSITORY_ERROR_CODE, RepositoryExceptionError } from "@archive/domain/shared/repository";
+} from "@akabase/domain/shared/image";
+import type { UserId } from "@akabase/domain/user/schema";
+import { REPOSITORY_ERROR_CODE, RepositoryExceptionError } from "@akabase/domain/shared/repository";
 import type { Database } from "../db";
 import { schema } from "../db";
 

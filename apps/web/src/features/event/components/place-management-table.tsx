@@ -1,11 +1,11 @@
 import { useMemo } from "react";
 import { Link } from "@tanstack/react-router";
-import { IconButton } from "@archive/ui/components/icon-button";
-import { Table } from "@archive/ui/components/table";
-import { Flex } from "@archive/styled-system/jsx";
+import { IconButton } from "@akabase/ui/components/icon-button";
+import { Table } from "@akabase/ui/components/table";
+import { Flex } from "@akabase/styled-system/jsx";
 import { PencilIcon, Trash2Icon } from "lucide-react";
-import type { EventId } from "@archive/domain/event/schema";
-import type { PlaceListItem } from "@archive/application/query/event/list-places";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { PlaceListItem } from "@akabase/application/query/event/list-places";
 import { DeletePlaceDialog } from "./delete-place-dialog";
 import { FormatDate } from "@/libs/date";
 

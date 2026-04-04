@@ -1,8 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { listDeadlines } from "@archive/application/query/event/list-deadlines";
+import { listDeadlines } from "@akabase/application/query/event/list-deadlines";
 import { authMiddleware } from "@/libs/auth";
-import { eventIdSchema } from "@archive/domain/event/schema";
+import { eventIdSchema } from "@akabase/domain/event/schema";
 import { queryOptions } from "@tanstack/react-query";
 import { dependenciesMiddleware } from "@/libs/dependencies";
 

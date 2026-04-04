@@ -1,8 +1,8 @@
 "use client";
 import { Tabs } from "@ark-ui/react/tabs";
 import type { ComponentProps } from "react";
-import { createStyleContext } from "@archive/styled-system/jsx";
-import { tabs } from "@archive/styled-system/recipes";
+import { createStyleContext } from "@akabase/styled-system/jsx";
+import { tabs } from "@akabase/styled-system/recipes";
 
 const { withProvider, withContext } = createStyleContext(tabs);
 

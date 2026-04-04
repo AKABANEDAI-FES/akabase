@@ -1,4 +1,4 @@
-import { Alert } from "@archive/ui/components/alert";
+import { Alert } from "@akabase/ui/components/alert";
 
 type EventStatusAlertProps = {
   status: "active" | "archived";

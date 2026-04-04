@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Container, Flex, Stack } from "@archive/styled-system/jsx";
-import { Heading } from "@archive/ui/components/heading";
+import { Container, Flex, Stack } from "@akabase/styled-system/jsx";
+import { Heading } from "@akabase/ui/components/heading";
 import { generateLoadEventPublishedDataQueryOptions } from "@/features/project/actions/queries";
 import { generateLoadPlacesQueryOptions } from "@/features/event/actions/queries/place";
 import { ExportDataTable } from "@/features/project/components/export-data-table";

@@ -1,5 +1,5 @@
-import { Field } from "@archive/ui/components/field";
-import { Input } from "@archive/ui/components/input";
+import { Field } from "@akabase/ui/components/field";
+import { Input } from "@akabase/ui/components/input";
 import type { EmailFieldProps } from "./add-member-dialog";
 
 export function EmailInput({ value, onChange }: EmailFieldProps) {

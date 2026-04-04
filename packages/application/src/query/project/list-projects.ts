@@ -1,16 +1,16 @@
 import { z } from "zod";
 import { and, desc, eq } from "drizzle-orm";
-import { Result } from "@archive/result";
-import { schema } from "@archive/infrastructure/db";
-import type { Database } from "@archive/infrastructure/db";
-import type { EventId } from "@archive/domain/event/schema";
-import { eventIdSchema, placeIdSchema } from "@archive/domain/event/schema";
-import { orgIdSchema } from "@archive/domain/organization/schema";
-import type { OrgId } from "@archive/domain/organization/schema";
-import { projectIdSchema, submissionStatusSchema } from "@archive/domain/project/schema";
-import type { Actor } from "@archive/domain/authorization/schema";
-import { organizationResource } from "@archive/domain/authorization/logic";
-import type { AuthorizationService } from "@archive/domain/authorization/service";
+import { Result } from "@akabase/result";
+import { schema } from "@akabase/infrastructure/db";
+import type { Database } from "@akabase/infrastructure/db";
+import type { EventId } from "@akabase/domain/event/schema";
+import { eventIdSchema, placeIdSchema } from "@akabase/domain/event/schema";
+import { orgIdSchema } from "@akabase/domain/organization/schema";
+import type { OrgId } from "@akabase/domain/organization/schema";
+import { projectIdSchema, submissionStatusSchema } from "@akabase/domain/project/schema";
+import type { Actor } from "@akabase/domain/authorization/schema";
+import { organizationResource } from "@akabase/domain/authorization/logic";
+import type { AuthorizationService } from "@akabase/domain/authorization/service";
 import { QueryExceptionError } from "../shared";
 
 export const projectListItemSchema = z.object({

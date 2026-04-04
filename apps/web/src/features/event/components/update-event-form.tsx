@@ -1,15 +1,15 @@
 import { revalidateLogic, useForm } from "@tanstack/react-form";
-import { Result } from "@archive/result";
+import { Result } from "@akabase/result";
 import { useMutation } from "@tanstack/react-query";
 import { updateEventInputSchema, useUpdateEventMutationOption } from "../actions/mutations";
-import type { EventDetail } from "@archive/application/query/event/get-event-detail";
-import { Button } from "@archive/ui/components/button";
-import { Field } from "@archive/ui/components/field";
-import { Fieldset } from "@archive/ui/components/fieldset";
-import { Input } from "@archive/ui/components/input";
-import { toaster } from "@archive/ui/components/toast";
+import type { EventDetail } from "@akabase/application/query/event/get-event-detail";
+import { Button } from "@akabase/ui/components/button";
+import { Field } from "@akabase/ui/components/field";
+import { Fieldset } from "@akabase/ui/components/fieldset";
+import { Input } from "@akabase/ui/components/input";
+import { toaster } from "@akabase/ui/components/toast";
 import { nl2br } from "@/libs/text";
-import { EVENT_ERROR_CODE } from "@archive/domain/event/errors";
+import { EVENT_ERROR_CODE } from "@akabase/domain/event/errors";
 
 type UpdateEventFormProps = {
   event: EventDetail;

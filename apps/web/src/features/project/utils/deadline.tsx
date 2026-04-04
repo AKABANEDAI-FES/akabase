@@ -1,5 +1,5 @@
-import type { Deadline, DeadlineFieldKey } from "@archive/domain/event/schema";
-import { DEADLINE_FIELD_LABELS } from "@archive/domain/event/schema";
+import type { Deadline, DeadlineFieldKey } from "@akabase/domain/event/schema";
+import { DEADLINE_FIELD_LABELS } from "@akabase/domain/event/schema";
 import { FormatDate } from "@/libs/date";
 
 /**

@@ -1,16 +1,16 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { Result } from "@archive/result";
-import { updateCommitteeRole } from "@archive/application/command/user/update-committee-role";
-import { updateGlobalRole } from "@archive/application/command/user/update-global-role";
-import { resolveActor } from "@archive/application/query/authorization/resolve-actor";
+import { Result } from "@akabase/result";
+import { updateCommitteeRole } from "@akabase/application/command/user/update-committee-role";
+import { updateGlobalRole } from "@akabase/application/command/user/update-global-role";
+import { resolveActor } from "@akabase/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/auth";
 import { dependenciesMiddleware } from "@/libs/dependencies";
-import { cast } from "@archive/domain/shared/ids";
-import { userIdSchema } from "@archive/domain/user/schema";
-import type { UserId } from "@archive/domain/user/schema";
-import { committeeRoleSchema, globalRoleSchema } from "@archive/domain/authorization/schema";
-import { eventIdSchema } from "@archive/domain/event/schema";
+import { cast } from "@akabase/domain/shared/ids";
+import { userIdSchema } from "@akabase/domain/user/schema";
+import type { UserId } from "@akabase/domain/user/schema";
+import { committeeRoleSchema, globalRoleSchema } from "@akabase/domain/authorization/schema";
+import { eventIdSchema } from "@akabase/domain/event/schema";
 import { mutationOptions, useQueryClient } from "@tanstack/react-query";
 import { generateLoadUsersForEventCacheKey, generateLoadUsersWithRolesCacheKey } from "./queries";
 

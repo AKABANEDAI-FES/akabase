@@ -1,4 +1,4 @@
-import { Result } from "@archive/result";
+import { Result } from "@akabase/result";
 import { describe, expect, it } from "vite-plus/test";
 import type { Event, EventId } from "./schema";
 import { cast } from "../shared/ids";

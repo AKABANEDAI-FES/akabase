@@ -4,13 +4,13 @@
  */
 
 import { z } from "zod";
-import { Result } from "@archive/result";
-import type { Database } from "@archive/infrastructure/db";
-import { globalRoleSchema } from "@archive/domain/authorization/schema";
-import type { Actor } from "@archive/domain/authorization/schema";
-import { userResource } from "@archive/domain/authorization/logic";
-import { userIdSchema } from "@archive/domain/user/schema";
-import type { AuthorizationService } from "@archive/domain/authorization/service";
+import { Result } from "@akabase/result";
+import type { Database } from "@akabase/infrastructure/db";
+import { globalRoleSchema } from "@akabase/domain/authorization/schema";
+import type { Actor } from "@akabase/domain/authorization/schema";
+import { userResource } from "@akabase/domain/authorization/logic";
+import { userIdSchema } from "@akabase/domain/user/schema";
+import type { AuthorizationService } from "@akabase/domain/authorization/service";
 import { QueryExceptionError } from "../shared";
 
 export const userListItemSchema = z.object({

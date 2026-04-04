@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Container, Flex, Stack } from "@archive/styled-system/jsx";
+import { Container, Flex, Stack } from "@akabase/styled-system/jsx";
 import { ArrowLeftIcon } from "lucide-react";
-import { Button } from "@archive/ui/components/button";
-import { Heading } from "@archive/ui/components/heading";
-import { Tabs } from "@archive/ui/components/tabs";
-import { Text } from "@archive/ui/components/text";
+import { Button } from "@akabase/ui/components/button";
+import { Heading } from "@akabase/ui/components/heading";
+import { Tabs } from "@akabase/ui/components/tabs";
+import { Text } from "@akabase/ui/components/text";
 import { SubmissionActionsTab } from "@/features/project/components/submission-actions-tab";
 import { SubmissionHistoryTab } from "@/features/project/components/submission-history-tab";
 import { SubmissionOverviewTab } from "@/features/project/components/submission-overview-tab";

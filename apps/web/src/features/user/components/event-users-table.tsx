@@ -1,9 +1,9 @@
-import { Code } from "@archive/ui/components/code";
-import { Table } from "@archive/ui/components/table";
+import { Code } from "@akabase/ui/components/code";
+import { Table } from "@akabase/ui/components/table";
 import { CommitteeRoleSelect } from "./committee-role-select";
-import type { CommitteeRole } from "@archive/domain/authorization/schema";
-import type { EventId } from "@archive/domain/event/schema";
-import type { UserId } from "@archive/domain/user/schema";
+import type { CommitteeRole } from "@akabase/domain/authorization/schema";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { UserId } from "@akabase/domain/user/schema";
 
 type User = {
   id: UserId;

@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Flex, Grid, HStack, Stack } from "@archive/styled-system/jsx";
+import { Flex, Grid, HStack, Stack } from "@akabase/styled-system/jsx";
 import {
   CheckCircleIcon,
   CornerDownLeftIcon,
@@ -8,10 +8,10 @@ import {
   MinusCircleIcon,
   UndoIcon,
 } from "lucide-react";
-import { Card } from "@archive/ui/components/card";
-import { Text } from "@archive/ui/components/text";
-import type { SubmissionDetail } from "@archive/application/query/project/get-submission-detail";
-import { SUBMISSION_ACTION_LABELS } from "@archive/domain/project/schema";
+import { Card } from "@akabase/ui/components/card";
+import { Text } from "@akabase/ui/components/text";
+import type { SubmissionDetail } from "@akabase/application/query/project/get-submission-detail";
+import { SUBMISSION_ACTION_LABELS } from "@akabase/domain/project/schema";
 import { FormatDate } from "@/libs/date";
 
 type SubmissionHistoryTabProps = {

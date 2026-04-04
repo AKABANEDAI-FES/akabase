@@ -1,7 +1,7 @@
-import { ButtonGroup } from "@archive/ui/components/button";
-import { IconButton } from "@archive/ui/components/icon-button";
-import { ScrollArea } from "@archive/ui/components/scroll-area";
-import { Box, Flex, Grid } from "@archive/styled-system/jsx";
+import { ButtonGroup } from "@akabase/ui/components/button";
+import { IconButton } from "@akabase/ui/components/icon-button";
+import { ScrollArea } from "@akabase/ui/components/scroll-area";
+import { Box, Flex, Grid } from "@akabase/styled-system/jsx";
 import { UndoRedoButton } from "./undo-redo-button";
 import { HeadingSelect } from "./heading-select";
 import { MarkButton } from "./mark-button";
@@ -10,7 +10,7 @@ import { TextAlignButton } from "./text-align-button";
 import { ImageUploadButton } from "./image-upload-button";
 import { LinkButton } from "./link-button";
 import { ToolbarSeparator } from "./toolbar-separator";
-import type { ImageScope } from "@archive/domain/shared/image";
+import type { ImageScope } from "@akabase/domain/shared/image";
 import { Maximize2Icon, Minimize2Icon } from "lucide-react";
 
 type Props = {

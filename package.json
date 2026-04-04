@@ -1,9 +1,9 @@
 {
-  "name": "archive",
+  "name": "akabase",
   "private": true,
   "type": "module",
   "scripts": {
-    "postinstall": "pnpm -F @archive/ui build:preset",
+    "postinstall": "pnpm -F @akabase/ui build:preset",
     "dev": "vpr -r --parallel dev",
     "build": "vpr -r build",
     "test": "vpr -r test",

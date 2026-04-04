@@ -1,11 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { IconButton } from "@archive/ui/components/icon-button";
-import { Table } from "@archive/ui/components/table";
-import { Flex } from "@archive/styled-system/jsx";
+import { IconButton } from "@akabase/ui/components/icon-button";
+import { Table } from "@akabase/ui/components/table";
+import { Flex } from "@akabase/styled-system/jsx";
 import { PencilIcon, Trash2Icon } from "lucide-react";
-import { DEADLINE_FIELD_LABELS } from "@archive/domain/event/schema";
-import type { EventId } from "@archive/domain/event/schema";
-import type { DeadlineListItem } from "@archive/application/query/event/list-deadlines";
+import { DEADLINE_FIELD_LABELS } from "@akabase/domain/event/schema";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { DeadlineListItem } from "@akabase/application/query/event/list-deadlines";
 import { DeleteDeadlineDialog } from "./delete-deadline-dialog";
 import { FormatDate } from "@/libs/date";
 

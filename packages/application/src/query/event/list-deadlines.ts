@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { asc, eq } from "drizzle-orm";
-import { schema } from "@archive/infrastructure/db";
-import type { Database } from "@archive/infrastructure/db";
-import { DEADLINE_FIELD_KEYS, deadlineIdSchema, eventIdSchema } from "@archive/domain/event/schema";
-import type { EventId } from "@archive/domain/event/schema";
+import { schema } from "@akabase/infrastructure/db";
+import type { Database } from "@akabase/infrastructure/db";
+import { DEADLINE_FIELD_KEYS, deadlineIdSchema, eventIdSchema } from "@akabase/domain/event/schema";
+import type { EventId } from "@akabase/domain/event/schema";
 import { QueryExceptionError } from "../shared";
 
 export const deadlineListItemSchema = z.object({

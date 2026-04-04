@@ -1,12 +1,12 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Flex, Stack } from "@archive/styled-system/jsx";
-import { Badge } from "@archive/ui/components/badge";
-import { Card } from "@archive/ui/components/card";
-import { Text } from "@archive/ui/components/text";
+import { Flex, Stack } from "@akabase/styled-system/jsx";
+import { Badge } from "@akabase/ui/components/badge";
+import { Card } from "@akabase/ui/components/card";
+import { Text } from "@akabase/ui/components/text";
 import { generateLoadProjectPublishedQueryOptions } from "../actions/queries";
-import type { EventId } from "@archive/domain/event/schema";
-import type { OrgId } from "@archive/domain/organization/schema";
-import type { ProjectId } from "@archive/domain/project/schema";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { OrgId } from "@akabase/domain/organization/schema";
+import type { ProjectId } from "@akabase/domain/project/schema";
 import { TipTapContentRenderer } from "./tiptap-content-renderer";
 
 type ProjectPublishedDataCardProps = {

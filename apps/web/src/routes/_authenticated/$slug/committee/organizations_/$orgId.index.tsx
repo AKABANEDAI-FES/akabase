@@ -1,15 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Stack } from "@archive/styled-system/jsx";
+import { Stack } from "@akabase/styled-system/jsx";
 import { Trash2Icon } from "lucide-react";
 import { generateLoadOrganizationDetailQueryOptions } from "@/features/organization/actions/queries";
 import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions/queries";
 import { UpdateOrganizationForm } from "@/features/organization/components/update-organization-form";
 import { DeleteOrganizationDialog } from "@/features/organization/components/delete-organization-dialog";
-import { Button } from "@archive/ui/components/button";
-import { Fieldset } from "@archive/ui/components/fieldset";
-import type { EventId } from "@archive/domain/event/schema";
-import type { OrgId } from "@archive/domain/organization/schema";
+import { Button } from "@akabase/ui/components/button";
+import { Fieldset } from "@akabase/ui/components/fieldset";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { OrgId } from "@akabase/domain/organization/schema";
 
 export const Route = createFileRoute("/_authenticated/$slug/committee/organizations_/$orgId/")({
   loader: async ({ params, context }) => {

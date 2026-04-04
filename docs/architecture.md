@@ -54,9 +54,9 @@
 各レイヤーは独立したパッケージとして分離され、下位レイヤーへの依存のみ許可します。
 
 ```
-apps/web (Presentation) → @archive/application (Command/Query) → @archive/domain
+apps/web (Presentation) → @akabase/application (Command/Query) → @akabase/domain
                                       ↓
-                          @archive/infrastructure
+                          @akabase/infrastructure
 ```
 
 **CQRS パターン**: Application層をCommand（書き込み）とQuery（読み取り）に分離し、それぞれ異なる最適化を行います。
@@ -130,7 +130,7 @@ export function canSubmit(project: Project): Result.Result<true, ProjectError> {
 pnpm workspaces + Vite Plus によるモノレポ構成で、DDD の各レイヤーを独立したパッケージとして管理します。
 
 ```
-archive/
+akabase/
 ├── apps/
 │   └── web/                         # Presentation層（TanStack Start + Cloudflare Workers）
 ├── packages/
@@ -149,20 +149,20 @@ archive/
 
 ```
 apps/web
-  ├── @archive/application
-  │     ├── @archive/domain
-  │     │     └── @archive/result
-  │     └── @archive/infrastructure
-  │           ├── @archive/domain
-  │           └── @archive/result
-  ├── @archive/ui
-  │     └── @archive/styled-system
-  └── @archive/infrastructure (直接参照: DB初期化、DI)
+  ├── @akabase/application
+  │     ├── @akabase/domain
+  │     │     └── @akabase/result
+  │     └── @akabase/infrastructure
+  │           ├── @akabase/domain
+  │           └── @akabase/result
+  ├── @akabase/ui
+  │     └── @akabase/styled-system
+  └── @akabase/infrastructure (直接参照: DB初期化、DI)
 ```
 
 ### インポートパターン
 
-- **パッケージ間**: `@archive/*` (例: `import { Project } from "@archive/domain/project/schema"`)
+- **パッケージ間**: `@akabase/*` (例: `import { Project } from "@akabase/domain/project/schema"`)
 - **apps/web 内部**: `@/` エイリアス (例: `import { getSessionFn } from "@/libs/auth"`)
 
 ---
@@ -290,7 +290,7 @@ apps/web/src/
          ▼                           ▼
 ┌──────────────────┐        ┌──────────────────┐
 │  Query Service   │        │  Command (UC)    │
-│  @archive/       │        │  @archive/       │
+│  @akabase/       │        │  @akabase/       │
 │  application     │        │  application     │
 │    /query        │        │    /command       │
 │                  │        │                  │
@@ -305,7 +305,7 @@ apps/web/src/
          │                           ▼
          │                  ┌──────────────────┐
          │                  │  Domain Layer    │
-         │                  │  @archive/domain │
+         │                  │  @akabase/domain │
          │                  │  - schema.ts     │
          │                  │  - logic.ts      │
          │                  │  - service.ts    │
@@ -316,7 +316,7 @@ apps/web/src/
                      ▼
          ┌──────────────────────────────┐
          │  Infrastructure Layer        │
-         │  @archive/infrastructure     │
+         │  @akabase/infrastructure     │
          │  - repositories/             │
          │  - services/                 │
          │  - auth/                     │
@@ -343,7 +343,7 @@ apps/web/src/
 | 側面             | Command (書き込み)              | Query (読み取り)              |
 | ---------------- | ------------------------------- | ----------------------------- |
 | **目的**         | ビジネスロジック実行、状態変更  | データ表示                    |
-| **パッケージ**   | `@archive/application` command/ | `@archive/application` query/ |
+| **パッケージ**   | `@akabase/application` command/ | `@akabase/application` query/ |
 | **使用場所**     | Server Function (POST)          | Server Function (GET)         |
 | **データソース** | Repository (集約単位)           | 直接DB (JOIN可能)             |
 | **戻り値**       | 集約モデル（Domain型）          | DTO（表示用型）               |
@@ -365,7 +365,7 @@ Queryでは、ドメインモデルとは別にDTO（Data Transfer Object）を�
 
 ## レイヤー設計
 
-### Domain層（`@archive/domain`）
+### Domain層（`@akabase/domain`）
 
 **責務**: ビジネスルール・不変条件・ドメインロジック
 
@@ -388,7 +388,7 @@ Queryでは、ドメインモデルとは別にDTO（Data Transfer Object）を�
 
 ---
 
-### Infrastructure層（`@archive/infrastructure`）
+### Infrastructure層（`@akabase/infrastructure`）
 
 **責務**: 永続化・外部システム連携・I/O操作
 
@@ -400,7 +400,7 @@ Queryでは、ドメインモデルとは別にDTO（Data Transfer Object）を�
 
 ---
 
-### Application層（`@archive/application`）
+### Application層（`@akabase/application`）
 
 CQRSパターンに従い、Command（書き込み）とQuery（読み取り）に分離します。
 
@@ -464,7 +464,7 @@ export async function listEvents(): Promise<Result.Result<EventListItem[], Query
 - `routes/`: TanStack Router ファイルベースルーティング（loader + component）
 - `features/`: 機能別モジュール（actions + components）
 - `components/`: 共通 UI コンポーネント
-- `@archive/ui`: Park UI ベースの再利用コンポーネントライブラリ
+- `@akabase/ui`: Park UI ベースの再利用コンポーネントライブラリ
 
 ---
 
@@ -678,7 +678,7 @@ export function eventError(code: EventErrorCode, message: string): EventError {
 `gen` 関数を使うと、Result型を簡潔に扱えます。
 
 ```typescript
-import { gen } from "@archive/result";
+import { gen } from "@akabase/result";
 
 export function createEvent(deps: Dependencies, input: Input) {
   return gen(async function* ($) {
@@ -841,14 +841,14 @@ export function createProjectDraftEntity(input: {
 
 ```typescript
 import { Result } from "@praha/byethrow";
-import { gen } from "@archive/result";
-import type { EventId } from "@archive/domain/shared/ids";
-import type { EventError } from "@archive/domain/event/errors";
-import type { RepositoryError } from "@archive/domain/shared/repository";
-import type { AuthorizationError } from "@archive/domain/authorization/errors";
-import { createEventEntity } from "@archive/domain/event/logic";
-import { eventResource } from "@archive/domain/authorization/logic";
-import type { Dependencies } from "@archive/application/command/shared/dependencies";
+import { gen } from "@akabase/result";
+import type { EventId } from "@akabase/domain/shared/ids";
+import type { EventError } from "@akabase/domain/event/errors";
+import type { RepositoryError } from "@akabase/domain/shared/repository";
+import type { AuthorizationError } from "@akabase/domain/authorization/errors";
+import { createEventEntity } from "@akabase/domain/event/logic";
+import { eventResource } from "@akabase/domain/authorization/logic";
+import type { Dependencies } from "@akabase/application/command/shared/dependencies";
 
 export type CreateEventInput = {
   name: string;
@@ -1079,7 +1079,7 @@ UI (form submit)
   → Mutation Hook (mutateAsync)
     → Server Function (POST)
       → resolveActor (認可コンテキスト取得)
-      → Command (@archive/application/command/)
+      → Command (@akabase/application/command/)
         ├─ authService.enforce (認可チェック)
         ├─ DomainService (I/O必要なルール)
         ├─ Domain Logic (純粋関数)
@@ -1095,7 +1095,7 @@ UI (form submit)
 Route loader
   → ensureQueryData(queryOptions)
     → Server Function (GET)
-      → Query (@archive/application/query/)
+      → Query (@akabase/application/query/)
         ├─ 直接DB (Drizzle ORM)
         └─ DTO変換 (zod parse)
       ← Result<DTO[], QueryError>
@@ -1123,7 +1123,7 @@ Component render
          │ Query                        │ Command
          ▼                              ▼
 ┌──────────────────┐         ┌──────────────────┐
-│ @archive/        │         │ @archive/        │
+│ @akabase/        │         │ @akabase/        │
 │ application      │         │ application      │
 │   /query         │         │   /command       │
 │                  │         │                  │
@@ -1135,7 +1135,7 @@ Component render
          │                              │
          │                              ▼
          │                    ┌──────────────────┐
-         │                    │ @archive/domain  │
+         │                    │ @akabase/domain  │
          │                    │   - logic.ts     │
          │                    │   - schema.ts    │
          │                    │   - service.ts   │
@@ -1144,7 +1144,7 @@ Component render
          └──────────┬───────────────────┘
                     ▼
          ┌─────────────────────────┐
-         │ @archive/infrastructure │
+         │ @akabase/infrastructure │
          │  - repositories/        │
          │  - services/            │
          │  - auth/                │

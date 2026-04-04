@@ -3,15 +3,15 @@
  * Validates and uploads an image to storage
  */
 
-import { Result } from "@archive/result";
-import { ValidatedImage } from "@archive/domain/shared/image";
+import { Result } from "@akabase/result";
+import { ValidatedImage } from "@akabase/domain/shared/image";
 import type {
   ImageId,
   ImageRepository,
   ImageScope,
   ImageValidationError,
-} from "@archive/domain/shared/image";
-import type { UserId } from "@archive/domain/user/schema";
+} from "@akabase/domain/shared/image";
+import type { UserId } from "@akabase/domain/user/schema";
 
 export type UploadImageInput = {
   file: ArrayBuffer;

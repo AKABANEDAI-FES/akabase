@@ -1,10 +1,10 @@
 import { Link, Outlet, createFileRoute, useLocation } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { generateLoadEventDetailQueryOptions } from "@/features/event/actions/queries";
-import { Button } from "@archive/ui/components/button";
-import { Heading } from "@archive/ui/components/heading";
-import { SegmentGroup } from "@archive/ui/components/segment-group";
-import { Container, Stack } from "@archive/styled-system/jsx";
+import { Button } from "@akabase/ui/components/button";
+import { Heading } from "@akabase/ui/components/heading";
+import { SegmentGroup } from "@akabase/ui/components/segment-group";
+import { Container, Stack } from "@akabase/styled-system/jsx";
 import { ArrowLeftIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/events_/$eventId")({

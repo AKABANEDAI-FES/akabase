@@ -1,13 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { listOrganizationMembers } from "@archive/application/query/organization/list-organization-members";
-import { resolveActor } from "@archive/application/query/authorization/resolve-actor";
+import { listOrganizationMembers } from "@akabase/application/query/organization/list-organization-members";
+import { resolveActor } from "@akabase/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/auth";
 import { dependenciesMiddleware } from "@/libs/dependencies";
-import { cast } from "@archive/domain/shared/ids";
-import { eventIdSchema } from "@archive/domain/event/schema";
-import { orgIdSchema } from "@archive/domain/organization/schema";
-import type { UserId } from "@archive/domain/user/schema";
+import { cast } from "@akabase/domain/shared/ids";
+import { eventIdSchema } from "@akabase/domain/event/schema";
+import { orgIdSchema } from "@akabase/domain/organization/schema";
+import type { UserId } from "@akabase/domain/user/schema";
 import { queryOptions } from "@tanstack/react-query";
 
 /**

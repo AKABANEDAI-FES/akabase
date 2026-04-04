@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "archive",
+  "name": "akabase",
   "compatibility_date": "2025-09-02",
   "compatibility_flags": ["nodejs_compat"],
   "main": "src/server.ts",
@@ -10,16 +10,16 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "archive",
+      "database_name": "akabase",
       "database_id": "923a490d-aba7-4e8a-a8c1-1db9db656f3b",
       "preview_database_id": "DB",
-      "migrations_dir": "node_modules/@archive/infrastructure/src/db/migrations",
+      "migrations_dir": "node_modules/@akabase/infrastructure/src/db/migrations",
     },
   ],
   "r2_buckets": [
     {
       "binding": "STORAGE",
-      "bucket_name": "archive-images",
+      "bucket_name": "akabase-images",
     },
   ],
   "vars": {

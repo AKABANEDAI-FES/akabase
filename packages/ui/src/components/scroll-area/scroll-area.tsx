@@ -1,8 +1,8 @@
 "use client";
 import { ScrollArea } from "@ark-ui/react/scroll-area";
 import type { ComponentProps } from "react";
-import { createStyleContext } from "@archive/styled-system/jsx";
-import { scrollArea } from "@archive/styled-system/recipes";
+import { createStyleContext } from "@akabase/styled-system/jsx";
+import { scrollArea } from "@akabase/styled-system/recipes";
 
 const { withProvider, withContext } = createStyleContext(scrollArea);
 

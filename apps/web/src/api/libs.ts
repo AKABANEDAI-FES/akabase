@@ -1,7 +1,7 @@
-import { createAuth } from "@archive/infrastructure/auth";
-import type { Auth, Session } from "@archive/infrastructure/auth";
-import { createDb } from "@archive/infrastructure/db";
-import type { Database } from "@archive/infrastructure/db";
+import { createAuth } from "@akabase/infrastructure/auth";
+import type { Auth, Session } from "@akabase/infrastructure/auth";
+import { createDb } from "@akabase/infrastructure/db";
+import type { Database } from "@akabase/infrastructure/db";
 import { env } from "cloudflare:workers";
 import { createFactory } from "hono/factory";
 

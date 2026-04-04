@@ -2,8 +2,8 @@
 import { NumberInput } from "@ark-ui/react/number-input";
 import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import type { ComponentProps } from "react";
-import { createStyleContext } from "@archive/styled-system/jsx";
-import { numberInput } from "@archive/styled-system/recipes";
+import { createStyleContext } from "@akabase/styled-system/jsx";
+import { numberInput } from "@akabase/styled-system/recipes";
 
 const { withProvider, withContext } = createStyleContext(numberInput);
 

@@ -1,8 +1,8 @@
 "use client";
 import { ark } from "@ark-ui/react/factory";
 import type { ComponentProps } from "react";
-import { createStyleContext } from "@archive/styled-system/jsx";
-import { card } from "@archive/styled-system/recipes";
+import { createStyleContext } from "@akabase/styled-system/jsx";
+import { card } from "@akabase/styled-system/recipes";
 
 const { withProvider, withContext } = createStyleContext(card);
 

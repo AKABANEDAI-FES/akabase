@@ -1,9 +1,9 @@
-import { Flex, Grid, HStack, Stack } from "@archive/styled-system/jsx";
+import { Flex, Grid, HStack, Stack } from "@akabase/styled-system/jsx";
 import { TagIcon } from "lucide-react";
-import { Badge } from "@archive/ui/components/badge";
-import { Card } from "@archive/ui/components/card";
-import { Text } from "@archive/ui/components/text";
-import type { SubmissionDetail } from "@archive/application/query/project/get-submission-detail";
+import { Badge } from "@akabase/ui/components/badge";
+import { Card } from "@akabase/ui/components/card";
+import { Text } from "@akabase/ui/components/text";
+import type { SubmissionDetail } from "@akabase/application/query/project/get-submission-detail";
 import { TipTapContentRenderer } from "./tiptap-content-renderer";
 import { FormatDate } from "@/libs/date";
 

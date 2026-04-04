@@ -1,9 +1,9 @@
-import { Result } from "@archive/result";
-import type { EventDomainService } from "@archive/domain/event/service";
-import type { EventRepository } from "@archive/domain/event/repository";
-import type { EventId, PlaceId, TagId } from "@archive/domain/event/schema";
-import { EVENT_ERROR_CODE, eventError } from "@archive/domain/event/errors";
-import { canModifyEvent } from "@archive/domain/event/logic";
+import { Result } from "@akabase/result";
+import type { EventDomainService } from "@akabase/domain/event/service";
+import type { EventRepository } from "@akabase/domain/event/repository";
+import type { EventId, PlaceId, TagId } from "@akabase/domain/event/schema";
+import { EVENT_ERROR_CODE, eventError } from "@akabase/domain/event/errors";
+import { canModifyEvent } from "@akabase/domain/event/logic";
 
 export class EventDomainServiceImpl implements EventDomainService {
   private readonly eventRepo: EventRepository;

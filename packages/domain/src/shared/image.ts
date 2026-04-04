@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { BaseError } from "./errors";
 import { createError } from "./errors";
-import { Result } from "@archive/result";
+import { Result } from "@akabase/result";
 import type { UserId } from "../user/schema";
 
 /**

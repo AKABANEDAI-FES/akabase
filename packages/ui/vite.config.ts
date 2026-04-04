@@ -1,5 +1,5 @@
 import { defineConfig } from "vite-plus";
-import { reactConfig } from "@archive/config/oxlint/react";
+import { reactConfig } from "@akabase/config/oxlint/react";
 
 export default defineConfig({
   lint: {
@@ -18,7 +18,7 @@ export default defineConfig({
     entry: ["src/panda-preset.ts", "src/components/*/index.ts"],
     deps: {
       neverBundle: [
-        "@archive/styled-system",
+        "@akabase/styled-system",
         "@ark-ui/react",
         "react",
         "react-dom",

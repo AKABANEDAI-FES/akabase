@@ -10,7 +10,7 @@
 import crypto from "node:crypto";
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
-import { schema } from "@archive/infrastructure/db";
+import { schema } from "@akabase/infrastructure/db";
 import { zip } from "es-toolkit/array";
 
 // ---------------------------------------------------------------------------

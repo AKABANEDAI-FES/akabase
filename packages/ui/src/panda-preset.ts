@@ -15,8 +15,8 @@ import { globalCss } from "./theme/global-css";
 import { conditions } from "./theme/conditions";
 import { recipes, slotRecipes } from "./theme/recipes";
 
-export const archivePreset = definePreset({
-  name: "@archive/panda-preset",
+export const akabasePreset = definePreset({
+  name: "@akabase/panda-preset",
 
   theme: {
     extend: {

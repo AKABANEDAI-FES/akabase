@@ -3,19 +3,19 @@
  * Updates an existing organization's name and description
  */
 
-import { Result } from "@archive/result";
-import type { EventId } from "@archive/domain/event/schema";
-import type { OrgId } from "@archive/domain/organization/schema";
-import type { OrganizationError } from "@archive/domain/organization/errors";
-import { ORGANIZATION_ERROR_CODE, organizationError } from "@archive/domain/organization/errors";
-import type { EventError } from "@archive/domain/event/errors";
-import { updateOrganizationEntity as updateOrganizationLogic } from "@archive/domain/organization/logic";
-import type { AuthorizationError } from "@archive/domain/authorization/errors";
-import type { Actor } from "@archive/domain/authorization/schema";
-import { organizationResource } from "@archive/domain/authorization/logic";
-import type { OrganizationRepository } from "@archive/domain/organization/repository";
-import type { AuthorizationService } from "@archive/domain/authorization/service";
-import type { EventDomainService } from "@archive/domain/event/service";
+import { Result } from "@akabase/result";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { OrgId } from "@akabase/domain/organization/schema";
+import type { OrganizationError } from "@akabase/domain/organization/errors";
+import { ORGANIZATION_ERROR_CODE, organizationError } from "@akabase/domain/organization/errors";
+import type { EventError } from "@akabase/domain/event/errors";
+import { updateOrganizationEntity as updateOrganizationLogic } from "@akabase/domain/organization/logic";
+import type { AuthorizationError } from "@akabase/domain/authorization/errors";
+import type { Actor } from "@akabase/domain/authorization/schema";
+import { organizationResource } from "@akabase/domain/authorization/logic";
+import type { OrganizationRepository } from "@akabase/domain/organization/repository";
+import type { AuthorizationService } from "@akabase/domain/authorization/service";
+import type { EventDomainService } from "@akabase/domain/event/service";
 
 export type UpdateOrganizationInput = {
   eventId: EventId;

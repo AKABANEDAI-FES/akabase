@@ -1,14 +1,14 @@
 import type { ReactNode } from "react";
-import { Result } from "@archive/result";
+import { Result } from "@akabase/result";
 import { useDialogContext } from "@ark-ui/react/dialog";
-import { Button } from "@archive/ui/components/button";
-import { CloseButton } from "@archive/ui/components/close-button";
-import { Dialog } from "@archive/ui/components/dialog";
-import { toaster } from "@archive/ui/components/toast";
+import { Button } from "@akabase/ui/components/button";
+import { CloseButton } from "@akabase/ui/components/close-button";
+import { Dialog } from "@akabase/ui/components/dialog";
+import { toaster } from "@akabase/ui/components/toast";
 import { Portal } from "@ark-ui/react/portal";
-import { DEADLINE_FIELD_LABELS } from "@archive/domain/event/schema";
-import type { EventId } from "@archive/domain/event/schema";
-import type { DeadlineListItem } from "@archive/application/query/event/list-deadlines";
+import { DEADLINE_FIELD_LABELS } from "@akabase/domain/event/schema";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { DeadlineListItem } from "@akabase/application/query/event/list-deadlines";
 import { useMutation } from "@tanstack/react-query";
 import { useDeleteDeadlineMutationOption } from "../actions/mutations/deadline";
 

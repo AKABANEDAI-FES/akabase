@@ -1,5 +1,5 @@
 import { apiClient } from "@/api/client";
-import type { ImageScope } from "@archive/domain/shared/image";
+import type { ImageScope } from "@akabase/domain/shared/image";
 import { mutationOptions } from "@tanstack/react-query";
 
 export async function uploadImage({ file, scope }: { file: File; scope: ImageScope }) {

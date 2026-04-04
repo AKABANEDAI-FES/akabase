@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { asc, eq } from "drizzle-orm";
-import { schema } from "@archive/infrastructure/db";
-import type { Database } from "@archive/infrastructure/db";
-import type { EventId } from "@archive/domain/event/schema";
-import { eventIdSchema, placeIdSchema } from "@archive/domain/event/schema";
+import { schema } from "@akabase/infrastructure/db";
+import type { Database } from "@akabase/infrastructure/db";
+import type { EventId } from "@akabase/domain/event/schema";
+import { eventIdSchema, placeIdSchema } from "@akabase/domain/event/schema";
 import { QueryExceptionError } from "../shared";
 
 export const placeListItemSchema = z.object({

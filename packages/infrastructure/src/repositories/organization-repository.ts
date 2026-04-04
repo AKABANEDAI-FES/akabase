@@ -1,12 +1,12 @@
 import type { Database } from "../db";
 import { schema } from "../db";
 import { and, desc, eq } from "drizzle-orm";
-import { orgMemberSchema, organizationSchema } from "@archive/domain/organization/schema";
-import type { OrgId, OrgMember, Organization } from "@archive/domain/organization/schema";
-import type { OrganizationRepository } from "@archive/domain/organization/repository";
-import type { EventId } from "@archive/domain/event/schema";
-import type { UserId } from "@archive/domain/user/schema";
-import { REPOSITORY_ERROR_CODE, RepositoryExceptionError } from "@archive/domain/shared/repository";
+import { orgMemberSchema, organizationSchema } from "@akabase/domain/organization/schema";
+import type { OrgId, OrgMember, Organization } from "@akabase/domain/organization/schema";
+import type { OrganizationRepository } from "@akabase/domain/organization/repository";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { UserId } from "@akabase/domain/user/schema";
+import { REPOSITORY_ERROR_CODE, RepositoryExceptionError } from "@akabase/domain/shared/repository";
 
 /**
  * Organization Repository Implementation using Drizzle ORM

@@ -22,7 +22,7 @@ jobs:
         run: vp fmt --check
 
       - name: Build packages
-        run: vp run -F '@archive/*' build
+        run: vp run -F '@akabase/*' build
 
       - name: Lint
         run: vp run -r lint

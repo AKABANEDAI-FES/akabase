@@ -2,10 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { generateLoadUsersWithRolesQueryOptions } from "@/features/user/actions/queries";
 import { GlobalRoleSelect } from "@/features/user/components/global-role-select";
-import { Code } from "@archive/ui/components/code";
-import { Heading } from "@archive/ui/components/heading";
-import { Table } from "@archive/ui/components/table";
-import { Container, Flex, Stack } from "@archive/styled-system/jsx";
+import { Code } from "@akabase/ui/components/code";
+import { Heading } from "@akabase/ui/components/heading";
+import { Table } from "@akabase/ui/components/table";
+import { Container, Flex, Stack } from "@akabase/styled-system/jsx";
 import { FormatDate } from "@/libs/date";
 
 export const Route = createFileRoute("/_authenticated/admin/users")({

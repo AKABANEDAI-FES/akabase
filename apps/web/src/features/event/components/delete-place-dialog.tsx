@@ -1,13 +1,13 @@
 import type { ReactNode } from "react";
-import { Result } from "@archive/result";
-import { Button } from "@archive/ui/components/button";
-import { CloseButton } from "@archive/ui/components/close-button";
-import { Dialog } from "@archive/ui/components/dialog";
-import { toaster } from "@archive/ui/components/toast";
+import { Result } from "@akabase/result";
+import { Button } from "@akabase/ui/components/button";
+import { CloseButton } from "@akabase/ui/components/close-button";
+import { Dialog } from "@akabase/ui/components/dialog";
+import { toaster } from "@akabase/ui/components/toast";
 import { Portal } from "@ark-ui/react/portal";
 import { useDialogContext } from "@ark-ui/react/dialog";
-import type { EventId } from "@archive/domain/event/schema";
-import type { PlaceListItem } from "@archive/application/query/event/list-places";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { PlaceListItem } from "@akabase/application/query/event/list-places";
 import { useMutation } from "@tanstack/react-query";
 import { useDeletePlaceMutationOption } from "../actions/mutations/place";
 

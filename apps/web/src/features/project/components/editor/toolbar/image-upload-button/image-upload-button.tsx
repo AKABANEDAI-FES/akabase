@@ -6,11 +6,11 @@ import { ToolbarButton } from "../toolbar-button";
 import { useUploadImageMutationOption } from "@/features/shared/actions/mutations";
 import { ProcessImageDialog } from "@/features/shared/components/process-image-dialog";
 import type { ProcessedImageResult } from "@/features/shared/components/process-image-dialog";
-import { toaster } from "@archive/ui/components/toast";
-import type { ImageScope } from "@archive/domain/shared/image";
-import { ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE } from "@archive/domain/shared/image";
+import { toaster } from "@akabase/ui/components/toast";
+import type { ImageScope } from "@akabase/domain/shared/image";
+import { ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE } from "@akabase/domain/shared/image";
 import type { Editor } from "@tiptap/react";
-import { css } from "@archive/styled-system/css";
+import { css } from "@akabase/styled-system/css";
 
 const ACCEPT = ALLOWED_IMAGE_TYPES.join(",");
 

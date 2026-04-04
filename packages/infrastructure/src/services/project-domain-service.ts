@@ -1,9 +1,9 @@
-import { Result } from "@archive/result";
-import type { ProjectDomainService } from "@archive/domain/project/service";
-import type { ProjectRepository } from "@archive/domain/project/repository";
-import type { ProjectId, SubmissionId } from "@archive/domain/project/schema";
-import type { UserId } from "@archive/domain/user/schema";
-import { PROJECT_ERROR_CODE, projectError } from "@archive/domain/project/errors";
+import { Result } from "@akabase/result";
+import type { ProjectDomainService } from "@akabase/domain/project/service";
+import type { ProjectRepository } from "@akabase/domain/project/repository";
+import type { ProjectId, SubmissionId } from "@akabase/domain/project/schema";
+import type { UserId } from "@akabase/domain/user/schema";
+import { PROJECT_ERROR_CODE, projectError } from "@akabase/domain/project/errors";
 
 export class ProjectDomainServiceImpl implements ProjectDomainService {
   private readonly projectRepo: ProjectRepository;

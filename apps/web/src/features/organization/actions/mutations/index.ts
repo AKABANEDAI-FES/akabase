@@ -1,16 +1,16 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { Result } from "@archive/result";
-import { createOrganization } from "@archive/application/command/organization/create-organization";
-import { updateOrganization } from "@archive/application/command/organization/update-organization";
-import { deleteOrganization } from "@archive/application/command/organization/delete-organization";
-import { resolveActor } from "@archive/application/query/authorization/resolve-actor";
+import { Result } from "@akabase/result";
+import { createOrganization } from "@akabase/application/command/organization/create-organization";
+import { updateOrganization } from "@akabase/application/command/organization/update-organization";
+import { deleteOrganization } from "@akabase/application/command/organization/delete-organization";
+import { resolveActor } from "@akabase/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/auth";
 import { dependenciesMiddleware } from "@/libs/dependencies";
-import { cast } from "@archive/domain/shared/ids";
-import { eventIdSchema } from "@archive/domain/event/schema";
-import { orgIdSchema, organizationSchema } from "@archive/domain/organization/schema";
-import type { UserId } from "@archive/domain/user/schema";
+import { cast } from "@akabase/domain/shared/ids";
+import { eventIdSchema } from "@akabase/domain/event/schema";
+import { orgIdSchema, organizationSchema } from "@akabase/domain/organization/schema";
+import type { UserId } from "@akabase/domain/user/schema";
 import { mutationOptions, useQueryClient } from "@tanstack/react-query";
 import {
   generateLoadMyOrganizationsCacheKey,

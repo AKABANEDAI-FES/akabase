@@ -3,11 +3,11 @@ import { Link2Icon } from "lucide-react";
 import { Portal } from "@ark-ui/react/portal";
 import { useEditorState } from "@tiptap/react";
 import type { Editor } from "@tiptap/react";
-import { Button } from "@archive/ui/components/button";
-import { Field } from "@archive/ui/components/field";
-import { Input } from "@archive/ui/components/input";
-import { Popover } from "@archive/ui/components/popover";
-import { Flex, Stack } from "@archive/styled-system/jsx";
+import { Button } from "@akabase/ui/components/button";
+import { Field } from "@akabase/ui/components/field";
+import { Input } from "@akabase/ui/components/input";
+import { Popover } from "@akabase/ui/components/popover";
+import { Flex, Stack } from "@akabase/styled-system/jsx";
 import { useTiptapEditor } from "../../hooks/use-tiptap-editor";
 import { ToolbarButton } from "../toolbar-button";
 

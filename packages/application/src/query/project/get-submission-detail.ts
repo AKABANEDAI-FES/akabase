@@ -1,13 +1,13 @@
 import { z } from "zod";
 import { eq } from "drizzle-orm";
-import { Result } from "@archive/result";
-import { schema } from "@archive/infrastructure/db";
-import type { Database } from "@archive/infrastructure/db";
-import { cast } from "@archive/domain/shared/ids";
-import type { EventId } from "@archive/domain/event/schema";
-import { orgIdSchema } from "@archive/domain/organization/schema";
-import type { OrgId } from "@archive/domain/organization/schema";
-import type { ProjectId, SubmissionId } from "@archive/domain/project/schema";
+import { Result } from "@akabase/result";
+import { schema } from "@akabase/infrastructure/db";
+import type { Database } from "@akabase/infrastructure/db";
+import { cast } from "@akabase/domain/shared/ids";
+import type { EventId } from "@akabase/domain/event/schema";
+import { orgIdSchema } from "@akabase/domain/organization/schema";
+import type { OrgId } from "@akabase/domain/organization/schema";
+import type { ProjectId, SubmissionId } from "@akabase/domain/project/schema";
 import {
   projectIdSchema,
   submissionActionIdSchema,
@@ -15,11 +15,11 @@ import {
   submissionIdSchema,
   submissionMessageIdSchema,
   submissionStatusSchema,
-} from "@archive/domain/project/schema";
-import { userIdSchema } from "@archive/domain/user/schema";
-import type { Actor } from "@archive/domain/authorization/schema";
-import { projectResource } from "@archive/domain/authorization/logic";
-import type { AuthorizationService } from "@archive/domain/authorization/service";
+} from "@akabase/domain/project/schema";
+import { userIdSchema } from "@akabase/domain/user/schema";
+import type { Actor } from "@akabase/domain/authorization/schema";
+import { projectResource } from "@akabase/domain/authorization/logic";
+import type { AuthorizationService } from "@akabase/domain/authorization/service";
 import { QueryExceptionError } from "../shared";
 
 export const submissionDetailSchema = z.object({

@@ -1,7 +1,7 @@
 import { z } from "zod";
-import type { Database } from "@archive/infrastructure/db";
-import type { EventId } from "@archive/domain/event/schema";
-import { eventIdSchema } from "@archive/domain/event/schema";
+import type { Database } from "@akabase/infrastructure/db";
+import type { EventId } from "@akabase/domain/event/schema";
+import { eventIdSchema } from "@akabase/domain/event/schema";
 import { QueryExceptionError } from "../shared";
 
 export const eventDetailSchema = z.object({

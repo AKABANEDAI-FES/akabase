@@ -1,13 +1,13 @@
 import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Button } from "@archive/ui/components/button";
-import { IconButton } from "@archive/ui/components/icon-button";
-import { Table } from "@archive/ui/components/table";
-import { Flex, Stack } from "@archive/styled-system/jsx";
+import { Button } from "@akabase/ui/components/button";
+import { IconButton } from "@akabase/ui/components/icon-button";
+import { Table } from "@akabase/ui/components/table";
+import { Flex, Stack } from "@akabase/styled-system/jsx";
 import { PencilIcon, PlusIcon } from "lucide-react";
 import { generateLoadProjectsQueryOptions } from "@/features/project/actions/queries";
-import { cast } from "@archive/domain/shared/ids";
-import type { EventId } from "@archive/domain/event/schema";
+import { cast } from "@akabase/domain/shared/ids";
+import type { EventId } from "@akabase/domain/event/schema";
 import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions/queries";
 import { FormatDate } from "@/libs/date";
 

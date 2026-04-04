@@ -1,14 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it } from "vite-plus/test";
-import { Result } from "@archive/result";
+import { Result } from "@akabase/result";
 import { createTestDb } from "../../test/db-mock";
 import { createTestDependencies } from "../../test/test-dependencies";
 import { createAdminActor, createUserActor } from "../../test/test-helpers";
 import { updateOrganization } from "./update-organization";
 import { createOrganization } from "./create-organization";
 import { createEvent } from "../event/create-event";
-import type { EventId } from "@archive/domain/event/schema";
-import type { OrgId } from "@archive/domain/organization/schema";
-import { cast } from "@archive/domain/shared/ids";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { OrgId } from "@akabase/domain/organization/schema";
+import { cast } from "@akabase/domain/shared/ids";
 
 describe("updateOrganization", () => {
   let testDb: Awaited<ReturnType<typeof createTestDb>>;

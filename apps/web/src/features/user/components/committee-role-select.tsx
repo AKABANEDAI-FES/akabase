@@ -1,14 +1,14 @@
-import { Result } from "@archive/result";
+import { Result } from "@akabase/result";
 import { createListCollection } from "@ark-ui/react/collection";
 import { useTransition } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useUpdateCommitteeRoleMutationOption } from "../actions/mutations";
-import { Select } from "@archive/ui/components/select";
-import { toaster } from "@archive/ui/components/toast";
-import { COMMITTEE_ROLES, COMMITTEE_ROLE_LABELS } from "@archive/domain/authorization/schema";
-import type { CommitteeRole } from "@archive/domain/authorization/schema";
-import type { EventId } from "@archive/domain/event/schema";
-import type { UserId } from "@archive/domain/user/schema";
+import { Select } from "@akabase/ui/components/select";
+import { toaster } from "@akabase/ui/components/toast";
+import { COMMITTEE_ROLES, COMMITTEE_ROLE_LABELS } from "@akabase/domain/authorization/schema";
+import type { CommitteeRole } from "@akabase/domain/authorization/schema";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { UserId } from "@akabase/domain/user/schema";
 
 const roleCollection = createListCollection({
   items: COMMITTEE_ROLES.map((role) => ({

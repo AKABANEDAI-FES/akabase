@@ -1,5 +1,5 @@
 import { AlertCircleIcon, CheckCircleIcon, MinusCircleIcon, XCircleIcon } from "lucide-react";
-import { Badge } from "@archive/ui/components/badge";
+import { Badge } from "@akabase/ui/components/badge";
 
 export function SubmissionStatusBadge({
   status,

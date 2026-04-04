@@ -12,18 +12,18 @@ import type { ColumnFiltersState } from "@tanstack/react-table";
 import { DownloadTrigger } from "@ark-ui/react/download-trigger";
 import { Portal } from "@ark-ui/react/portal";
 import { BracesIcon, ListFilterIcon, SheetIcon, TableIcon } from "lucide-react";
-import { Flex, Stack } from "@archive/styled-system/jsx";
-import { Button } from "@archive/ui/components/button";
-import { Checkbox } from "@archive/ui/components/checkbox";
-import { IconButton } from "@archive/ui/components/icon-button";
-import { Popover } from "@archive/ui/components/popover";
-import { Table } from "@archive/ui/components/table";
-import { Text } from "@archive/ui/components/text";
+import { Flex, Stack } from "@akabase/styled-system/jsx";
+import { Button } from "@akabase/ui/components/button";
+import { Checkbox } from "@akabase/ui/components/checkbox";
+import { IconButton } from "@akabase/ui/components/icon-button";
+import { Popover } from "@akabase/ui/components/popover";
+import { Table } from "@akabase/ui/components/table";
+import { Text } from "@akabase/ui/components/text";
 import { generateLoadEventPublishedDataQueryOptions } from "../actions/queries";
 import { generateLoadPlacesQueryOptions } from "@/features/event/actions/queries/place";
-import type { EventPublishedDataItem } from "@archive/application/query/project/list-event-published-data";
-import type { PlaceListItem } from "@archive/application/query/event/list-places";
-import type { EventId } from "@archive/domain/event/schema";
+import type { EventPublishedDataItem } from "@akabase/application/query/project/list-event-published-data";
+import type { PlaceListItem } from "@akabase/application/query/event/list-places";
+import type { EventId } from "@akabase/domain/event/schema";
 import { createImageObject, processImage } from "@/libs/image";
 
 // --- Place hierarchy helpers ---

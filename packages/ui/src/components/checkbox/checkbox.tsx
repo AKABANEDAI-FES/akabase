@@ -2,9 +2,9 @@
 import { Checkbox, useCheckboxContext } from "@ark-ui/react/checkbox";
 import { forwardRef } from "react";
 import type { ComponentProps } from "react";
-import { createStyleContext, styled } from "@archive/styled-system/jsx";
-import { checkbox } from "@archive/styled-system/recipes";
-import type { HTMLStyledProps } from "@archive/styled-system/types";
+import { createStyleContext, styled } from "@akabase/styled-system/jsx";
+import { checkbox } from "@akabase/styled-system/recipes";
+import type { HTMLStyledProps } from "@akabase/styled-system/types";
 
 const { withProvider, withContext } = createStyleContext(checkbox);
 

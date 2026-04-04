@@ -1,5 +1,5 @@
 import { defineConfig } from "vite-plus";
-import { baseConfig } from "@archive/config/oxlint/base";
+import { baseConfig } from "@akabase/config/oxlint/base";
 
 export default defineConfig({
   lint: {

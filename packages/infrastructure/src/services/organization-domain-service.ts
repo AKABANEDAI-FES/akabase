@@ -1,10 +1,10 @@
-import { Result } from "@archive/result";
-import type { OrganizationDomainService } from "@archive/domain/organization/service";
-import type { OrganizationRepository } from "@archive/domain/organization/repository";
-import type { OrgId } from "@archive/domain/organization/schema";
-import type { UserId } from "@archive/domain/user/schema";
-import { canAddMember, canRemoveMember } from "@archive/domain/organization/logic";
-import { ORGANIZATION_ERROR_CODE, organizationError } from "@archive/domain/organization/errors";
+import { Result } from "@akabase/result";
+import type { OrganizationDomainService } from "@akabase/domain/organization/service";
+import type { OrganizationRepository } from "@akabase/domain/organization/repository";
+import type { OrgId } from "@akabase/domain/organization/schema";
+import type { UserId } from "@akabase/domain/user/schema";
+import { canAddMember, canRemoveMember } from "@akabase/domain/organization/logic";
+import { ORGANIZATION_ERROR_CODE, organizationError } from "@akabase/domain/organization/errors";
 
 export class OrganizationDomainServiceImpl implements OrganizationDomainService {
   private readonly organizationRepo: OrganizationRepository;

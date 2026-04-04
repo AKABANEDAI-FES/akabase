@@ -2,10 +2,10 @@ import { afterEach, beforeEach, describe, expect, it } from "vite-plus/test";
 import { createTestDb } from "../../test/db-mock";
 import { createTestDependencies } from "../../test/test-dependencies";
 import { getOrganizationDetail } from "./get-organization-detail";
-import { schema } from "@archive/infrastructure/db";
-import type { EventId } from "@archive/domain/event/schema";
-import type { OrgId } from "@archive/domain/organization/schema";
-import { cast } from "@archive/domain/shared/ids";
+import { schema } from "@akabase/infrastructure/db";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { OrgId } from "@akabase/domain/organization/schema";
+import { cast } from "@akabase/domain/shared/ids";
 import { createAdminActor, createUserActor } from "../../test/test-helpers";
 
 describe("getOrganizationDetail", () => {

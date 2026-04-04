@@ -1,14 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Stack } from "@archive/styled-system/jsx";
-import { Card } from "@archive/ui/components/card";
-import { Text } from "@archive/ui/components/text";
+import { Stack } from "@akabase/styled-system/jsx";
+import { Card } from "@akabase/ui/components/card";
+import { Text } from "@akabase/ui/components/text";
 import { SubmissionStatusBadge } from "./submission-status-badge";
-import { SUBMISSION_ACTION_LABELS } from "@archive/domain/project/schema";
+import { SUBMISSION_ACTION_LABELS } from "@akabase/domain/project/schema";
 import { generateLoadSubmissionsQueryOptions } from "../actions/queries";
-import type { EventId } from "@archive/domain/event/schema";
-import type { OrgId } from "@archive/domain/organization/schema";
-import type { ProjectId } from "@archive/domain/project/schema";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { OrgId } from "@akabase/domain/organization/schema";
+import type { ProjectId } from "@akabase/domain/project/schema";
 import { FormatDate } from "@/libs/date";
 
 type ProjectSubmissionsHistoryProps = {

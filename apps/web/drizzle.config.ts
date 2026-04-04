@@ -17,7 +17,7 @@ const PREVIEW_ID = "DB";
 const url = `${PERSIST}/${UNIQUE_KEY}/${durableObjectNamespaceIdFromName(UNIQUE_KEY, PREVIEW_ID)}.sqlite`;
 
 export default defineConfig({
-  schema: "./node_modules/@archive/infrastructure/src/db/schema.ts",
+  schema: "./node_modules/@akabase/infrastructure/src/db/schema.ts",
   dialect: "sqlite",
   dbCredentials: { url },
 });

@@ -1,5 +1,5 @@
 {
-  "extends": "@archive/config/typescript/react.json",
+  "extends": "@akabase/config/typescript/react.json",
   "compilerOptions": {
     "types": ["vite-plus/client"],
     "noEmit": true,

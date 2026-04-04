@@ -3,17 +3,17 @@
  * Reorders tags for an event
  */
 
-import { Result } from "@archive/result";
-import type { EventId, TagId } from "@archive/domain/event/schema";
-import type { EventError } from "@archive/domain/event/errors";
-import { EVENT_ERROR_CODE, eventError } from "@archive/domain/event/errors";
-import type { AuthorizationError } from "@archive/domain/authorization/errors";
-import type { Actor } from "@archive/domain/authorization/schema";
-import { eventResource } from "@archive/domain/authorization/logic";
-import type { EventRepository } from "@archive/domain/event/repository";
-import type { AuthorizationService } from "@archive/domain/authorization/service";
-import type { EventDomainService } from "@archive/domain/event/service";
-import { DOMAIN_ERROR_CODE } from "@archive/domain/shared/errors";
+import { Result } from "@akabase/result";
+import type { EventId, TagId } from "@akabase/domain/event/schema";
+import type { EventError } from "@akabase/domain/event/errors";
+import { EVENT_ERROR_CODE, eventError } from "@akabase/domain/event/errors";
+import type { AuthorizationError } from "@akabase/domain/authorization/errors";
+import type { Actor } from "@akabase/domain/authorization/schema";
+import { eventResource } from "@akabase/domain/authorization/logic";
+import type { EventRepository } from "@akabase/domain/event/repository";
+import type { AuthorizationService } from "@akabase/domain/authorization/service";
+import type { EventDomainService } from "@akabase/domain/event/service";
+import { DOMAIN_ERROR_CODE } from "@akabase/domain/shared/errors";
 
 export type ReorderTagsInput = {
   eventId: EventId;

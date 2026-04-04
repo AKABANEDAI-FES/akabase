@@ -1,11 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { getEventDetail } from "@archive/application/query/event/get-event-detail";
+import { getEventDetail } from "@akabase/application/query/event/get-event-detail";
 import { authMiddleware } from "@/libs/auth";
-import { eventIdSchema } from "@archive/domain/event/schema";
-import { listEvents } from "@archive/application/query/event/list-events";
-import { getRecentActiveEvent } from "@archive/application/query/event/get-recent-active-event";
-import { getEventBySlug } from "@archive/application/query/event/get-event-by-slug";
+import { eventIdSchema } from "@akabase/domain/event/schema";
+import { listEvents } from "@akabase/application/query/event/list-events";
+import { getRecentActiveEvent } from "@akabase/application/query/event/get-recent-active-event";
+import { getEventBySlug } from "@akabase/application/query/event/get-event-by-slug";
 import { queryOptions } from "@tanstack/react-query";
 import { dependenciesMiddleware } from "@/libs/dependencies";
 import { NotFoundError } from "@/libs/error";

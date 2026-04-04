@@ -2,12 +2,12 @@ import type { ErrorComponentProps } from "@tanstack/react-router";
 import { Link, createRouteMask, createRouter } from "@tanstack/react-router";
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
 import * as TanstackQuery from "./integrations/tanstack-query/root-provider";
-import { Grid, VStack } from "@archive/styled-system/jsx";
+import { Grid, VStack } from "@akabase/styled-system/jsx";
 import { RotateCcwIcon, SearchXIcon, TriangleAlertIcon } from "lucide-react";
-import { Button } from "@archive/ui/components/button";
-import { Heading } from "@archive/ui/components/heading";
-import { Icon } from "@archive/ui/components/icon";
-import { Text } from "@archive/ui/components/text";
+import { Button } from "@akabase/ui/components/button";
+import { Heading } from "@akabase/ui/components/heading";
+import { Icon } from "@akabase/ui/components/icon";
+import { Text } from "@akabase/ui/components/text";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";

@@ -3,7 +3,7 @@ import { devtools } from "@tanstack/devtools-vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import { cloudflare } from "@cloudflare/vite-plugin";
-import { reactConfig } from "@archive/config/oxlint/react";
+import { reactConfig } from "@akabase/config/oxlint/react";
 
 export default defineConfig({
   resolve: {

@@ -1,8 +1,8 @@
 "use client";
 import { ToggleGroup } from "@ark-ui/react/toggle-group";
 import type { ComponentProps } from "react";
-import { createStyleContext } from "@archive/styled-system/jsx";
-import { toggleGroup } from "@archive/styled-system/recipes";
+import { createStyleContext } from "@akabase/styled-system/jsx";
+import { toggleGroup } from "@akabase/styled-system/recipes";
 
 const { withProvider, withContext } = createStyleContext(toggleGroup);
 

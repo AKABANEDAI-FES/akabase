@@ -1,21 +1,21 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { Result } from "@archive/result";
-import { resolveActor } from "@archive/application/query/authorization/resolve-actor";
+import { Result } from "@akabase/result";
+import { resolveActor } from "@akabase/application/query/authorization/resolve-actor";
 import {
   eventResource,
   getCommitteeRoleForEvent,
   organizationResource,
   projectResource,
-} from "@archive/domain/authorization/logic";
+} from "@akabase/domain/authorization/logic";
 import { authMiddleware } from "@/libs/auth";
-import { cast } from "@archive/domain/shared/ids";
-import { eventIdSchema } from "@archive/domain/event/schema";
-import { orgIdSchema } from "@archive/domain/organization/schema";
-import type { OrgId } from "@archive/domain/organization/schema";
-import type { ProjectId } from "@archive/domain/project/schema";
-import type { UserId } from "@archive/domain/user/schema";
-import type { Action, Resource } from "@archive/domain/authorization/schema";
+import { cast } from "@akabase/domain/shared/ids";
+import { eventIdSchema } from "@akabase/domain/event/schema";
+import { orgIdSchema } from "@akabase/domain/organization/schema";
+import type { OrgId } from "@akabase/domain/organization/schema";
+import type { ProjectId } from "@akabase/domain/project/schema";
+import type { UserId } from "@akabase/domain/user/schema";
+import type { Action, Resource } from "@akabase/domain/authorization/schema";
 import { queryOptions } from "@tanstack/react-query";
 import { dependenciesMiddleware } from "@/libs/dependencies";
 

@@ -1,8 +1,8 @@
 import { Link, Outlet, createFileRoute, useLocation } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Container, Stack } from "@archive/styled-system/jsx";
-import { Heading } from "@archive/ui/components/heading";
-import { SegmentGroup } from "@archive/ui/components/segment-group";
+import { Container, Stack } from "@akabase/styled-system/jsx";
+import { Heading } from "@akabase/ui/components/heading";
+import { SegmentGroup } from "@akabase/ui/components/segment-group";
 import { generateLoadOrganizationDetailQueryOptions } from "@/features/organization/actions/queries";
 import { handleNotFoundError } from "@/libs/error";
 

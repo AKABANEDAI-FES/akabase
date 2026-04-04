@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vite-plus/test";
-import { Result } from "@archive/result";
+import { Result } from "@akabase/result";
 import {
   ALLOWED_IMAGE_TYPES,
   IMAGE_VALIDATION_ERROR_CODE,

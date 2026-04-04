@@ -3,8 +3,8 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { AddMemberDialog } from "@/features/organization/components/add-member-dialog";
 import { EmailInput } from "@/features/organization/components/email-input";
 import { generateLoadOrganizationDetailQueryOptions } from "@/features/organization/actions/queries";
-import { cast } from "@archive/domain/shared/ids";
-import type { OrgId } from "@archive/domain/organization/schema";
+import { cast } from "@akabase/domain/shared/ids";
+import type { OrgId } from "@akabase/domain/organization/schema";
 
 export const Route = createFileRoute("/_authenticated/$slug/orgs/$orgId/members/new")({
   loader: async ({ params, context }) => {

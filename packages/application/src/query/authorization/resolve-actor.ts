@@ -3,21 +3,21 @@
  */
 
 import { and, eq, inArray } from "drizzle-orm";
-import { schema } from "@archive/infrastructure/db";
-import type { Database } from "@archive/infrastructure/db";
-import type { EventId } from "@archive/domain/event/schema";
-import type { OrgId } from "@archive/domain/organization/schema";
-import type { UserId } from "@archive/domain/user/schema";
+import { schema } from "@akabase/infrastructure/db";
+import type { Database } from "@akabase/infrastructure/db";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { OrgId } from "@akabase/domain/organization/schema";
+import type { UserId } from "@akabase/domain/user/schema";
 import type {
   Actor,
   CommitteeRole,
   GlobalRole,
   OrgRole,
-} from "@archive/domain/authorization/schema";
-import { createActor } from "@archive/domain/authorization/logic";
-import { globalRoleSchema, orgRoleSchema } from "@archive/domain/authorization/schema";
+} from "@akabase/domain/authorization/schema";
+import { createActor } from "@akabase/domain/authorization/logic";
+import { globalRoleSchema, orgRoleSchema } from "@akabase/domain/authorization/schema";
 import { QueryExceptionError } from "../shared";
-import { cast } from "@archive/domain/shared/ids";
+import { cast } from "@akabase/domain/shared/ids";
 
 export type ResolveActorOptions = {
   userId: UserId;
