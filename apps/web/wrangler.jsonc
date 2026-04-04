@@ -10,7 +10,7 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "akabase",
+      "database_name": "archive",
       "database_id": "923a490d-aba7-4e8a-a8c1-1db9db656f3b",
       "preview_database_id": "DB",
       "migrations_dir": "node_modules/@akabase/infrastructure/src/db/migrations",
@@ -19,7 +19,7 @@
   "r2_buckets": [
     {
       "binding": "STORAGE",
-      "bucket_name": "akabase-images",
+      "bucket_name": "archive-images",
     },
   ],
   "vars": {
