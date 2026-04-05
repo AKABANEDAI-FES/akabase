@@ -1,12 +1,12 @@
-import { generateId } from "@archive/domain/shared/ids";
+import { generateId } from "@akabase/domain/shared/ids";
 import type {
   ImageId,
   ImageRepository,
   ImageScope,
   UploadImageResult,
   ValidatedImage,
-} from "@archive/domain/shared/image";
-import type { UserId } from "@archive/domain/user/schema";
+} from "@akabase/domain/shared/image";
+import type { UserId } from "@akabase/domain/user/schema";
 
 export class MockImageRepository implements ImageRepository {
   private readonly uploadedFiles = new Map<string, { id: string; objectKey: string }>();

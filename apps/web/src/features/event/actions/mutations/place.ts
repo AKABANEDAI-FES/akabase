@@ -1,15 +1,15 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { Result } from "@archive/result";
-import { createPlace } from "@archive/application/command/event/create-place";
-import { updatePlace } from "@archive/application/command/event/update-place";
-import { deletePlace } from "@archive/application/command/event/delete-place";
-import { resolveActor } from "@archive/application/query/authorization/resolve-actor";
+import { Result } from "@akabase/result";
+import { createPlace } from "@akabase/application/command/event/create-place";
+import { updatePlace } from "@akabase/application/command/event/update-place";
+import { deletePlace } from "@akabase/application/command/event/delete-place";
+import { resolveActor } from "@akabase/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/auth";
 import { dependenciesMiddleware } from "@/libs/dependencies";
-import { cast } from "@archive/domain/shared/ids";
-import { eventIdSchema, placeIdSchema, placeSchema } from "@archive/domain/event/schema";
-import type { UserId } from "@archive/domain/user/schema";
+import { cast } from "@akabase/domain/shared/ids";
+import { eventIdSchema, placeIdSchema, placeSchema } from "@akabase/domain/event/schema";
+import type { UserId } from "@akabase/domain/user/schema";
 import { mutationOptions, useQueryClient } from "@tanstack/react-query";
 import { generateLoadPlacesCacheKey } from "../queries/place";
 

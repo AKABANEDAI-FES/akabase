@@ -1,5 +1,5 @@
-import { createAuth } from "@archive/infrastructure/auth";
-import type { Auth, Session } from "@archive/infrastructure/auth";
+import { createAuth } from "@akabase/infrastructure/auth";
+import type { Auth, Session } from "@akabase/infrastructure/auth";
 import { createDbFn } from "./db";
 import { env } from "cloudflare:workers";
 import { createMiddleware, createServerFn, createServerOnlyFn } from "@tanstack/react-start";

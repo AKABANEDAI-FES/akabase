@@ -9,14 +9,14 @@ import {
   FileTextIcon,
 } from "lucide-react";
 import { Format } from "@ark-ui/react/format";
-import { Badge } from "@archive/ui/components/badge";
-import { Button } from "@archive/ui/components/button";
-import { Card } from "@archive/ui/components/card";
-import { Heading } from "@archive/ui/components/heading";
-import { Skeleton } from "@archive/ui/components/skeleton";
-import { Text } from "@archive/ui/components/text";
-import { css } from "@archive/styled-system/css";
-import { Container, Flex, Grid, HStack, Stack } from "@archive/styled-system/jsx";
+import { Badge } from "@akabase/ui/components/badge";
+import { Button } from "@akabase/ui/components/button";
+import { Card } from "@akabase/ui/components/card";
+import { Heading } from "@akabase/ui/components/heading";
+import { Skeleton } from "@akabase/ui/components/skeleton";
+import { Text } from "@akabase/ui/components/text";
+import { css } from "@akabase/styled-system/css";
+import { Container, Flex, Grid, HStack, Stack } from "@akabase/styled-system/jsx";
 import { SubmissionStatusBadge } from "@/features/project/components/submission-status-badge";
 import { generateCheckCommitteeRoleQueryOptions } from "@/features/authorization/actions/queries";
 import { generateLoadDeadlinesQueryOptions } from "@/features/event/actions/queries/deadline";
@@ -26,9 +26,9 @@ import {
   generateLoadSubmissionStatsQueryOptions,
 } from "@/features/project/actions/queries";
 import { generateLoadMyOrganizationsQueryOptions } from "@/features/organization/actions/queries";
-import { DEADLINE_FIELD_LABELS } from "@archive/domain/event/schema";
+import { DEADLINE_FIELD_LABELS } from "@akabase/domain/event/schema";
 import { Suspense } from "react";
-import type { SubmissionStatus } from "@archive/domain/project/schema";
+import type { SubmissionStatus } from "@akabase/domain/project/schema";
 import { FormatDate } from "@/libs/date";
 
 export const Route = createFileRoute("/_authenticated/$slug/")({

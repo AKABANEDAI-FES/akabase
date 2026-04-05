@@ -1,5 +1,5 @@
 {
-  "extends": "@archive/config/typescript/library.json",
+  "extends": "@akabase/config/typescript/library.json",
   "compilerOptions": {
     "outDir": "dist"
   }

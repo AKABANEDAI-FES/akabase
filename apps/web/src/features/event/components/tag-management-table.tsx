@@ -1,14 +1,14 @@
 import { useOptimistic, useTransition } from "react";
 import type { CSSProperties } from "react";
 import { Link } from "@tanstack/react-router";
-import { Result } from "@archive/result";
-import { IconButton } from "@archive/ui/components/icon-button";
-import { Table } from "@archive/ui/components/table";
-import { toaster } from "@archive/ui/components/toast";
-import { Flex } from "@archive/styled-system/jsx";
+import { Result } from "@akabase/result";
+import { IconButton } from "@akabase/ui/components/icon-button";
+import { Table } from "@akabase/ui/components/table";
+import { toaster } from "@akabase/ui/components/toast";
+import { Flex } from "@akabase/styled-system/jsx";
 import { GripVerticalIcon, PencilIcon, Trash2Icon } from "lucide-react";
-import type { EventId, TagId } from "@archive/domain/event/schema";
-import type { TagListItem } from "@archive/application/query/event/list-tags";
+import type { EventId, TagId } from "@akabase/domain/event/schema";
+import type { TagListItem } from "@akabase/application/query/event/list-tags";
 import { DeleteTagDialog } from "./delete-tag-dialog";
 import { FormatDate } from "@/libs/date";
 import { useReorderTagsMutationOption } from "../actions/mutations/tag";
@@ -30,10 +30,10 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { css } from "@archive/styled-system/css";
+import { css } from "@akabase/styled-system/css";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { generateLoadTagsQueryOptions } from "../actions/queries/tag";
-import { cast } from "@archive/domain/shared/ids";
+import { cast } from "@akabase/domain/shared/ids";
 
 type TagManagementTableProps = {
   tags: TagListItem[];

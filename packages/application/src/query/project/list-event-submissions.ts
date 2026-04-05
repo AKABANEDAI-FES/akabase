@@ -1,18 +1,18 @@
 import { z } from "zod";
 import { desc, eq } from "drizzle-orm";
-import { Result } from "@archive/result";
-import { schema } from "@archive/infrastructure/db";
-import type { Database } from "@archive/infrastructure/db";
-import type { EventId } from "@archive/domain/event/schema";
-import { orgIdSchema } from "@archive/domain/organization/schema";
+import { Result } from "@akabase/result";
+import { schema } from "@akabase/infrastructure/db";
+import type { Database } from "@akabase/infrastructure/db";
+import type { EventId } from "@akabase/domain/event/schema";
+import { orgIdSchema } from "@akabase/domain/organization/schema";
 import {
   projectIdSchema,
   submissionIdSchema,
   submissionStatusSchema,
-} from "@archive/domain/project/schema";
-import type { Actor } from "@archive/domain/authorization/schema";
-import { eventResource } from "@archive/domain/authorization/logic";
-import type { AuthorizationService } from "@archive/domain/authorization/service";
+} from "@akabase/domain/project/schema";
+import type { Actor } from "@akabase/domain/authorization/schema";
+import { eventResource } from "@akabase/domain/authorization/logic";
+import type { AuthorizationService } from "@akabase/domain/authorization/service";
 import { QueryExceptionError } from "../shared";
 
 export const eventSubmissionListItemSchema = z.object({

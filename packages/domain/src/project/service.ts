@@ -1,4 +1,4 @@
-import type { Result } from "@archive/result";
+import type { Result } from "@akabase/result";
 import type { UserId } from "../user/schema";
 import type { ProjectId, SubmissionId } from "./schema";
 import type { ProjectError } from "./errors";

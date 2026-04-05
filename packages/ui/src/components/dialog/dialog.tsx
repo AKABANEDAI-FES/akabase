@@ -3,9 +3,9 @@ import { Dialog, useDialogContext } from "@ark-ui/react/dialog";
 import { ark } from "@ark-ui/react/factory";
 import { forwardRef } from "react";
 import type { ComponentProps } from "react";
-import { createStyleContext, styled } from "@archive/styled-system/jsx";
-import { dialog } from "@archive/styled-system/recipes";
-import type { HTMLStyledProps } from "@archive/styled-system/types";
+import { createStyleContext, styled } from "@akabase/styled-system/jsx";
+import { dialog } from "@akabase/styled-system/recipes";
+import type { HTMLStyledProps } from "@akabase/styled-system/types";
 import type { PolymorphicProps } from "@ark-ui/react/factory";
 
 const { withRootProvider, withContext } = createStyleContext(dialog);

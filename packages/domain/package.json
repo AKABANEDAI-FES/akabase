@@ -1,5 +1,5 @@
 {
-  "name": "@archive/domain",
+  "name": "@akabase/domain",
   "private": true,
   "type": "module",
   "version": "1.0.0",
@@ -36,11 +36,11 @@
     "test": "vp test run"
   },
   "dependencies": {
-    "@archive/result": "workspace:*",
+    "@akabase/result": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@archive/config": "workspace:*",
+    "@akabase/config": "workspace:*",
     "@typescript/native-preview": "catalog:build",
     "typescript": "catalog:build",
     "vite-plus": "catalog:build"

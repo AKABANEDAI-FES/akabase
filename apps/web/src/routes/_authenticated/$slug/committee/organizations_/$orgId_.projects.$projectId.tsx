@@ -1,8 +1,8 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Container, Stack } from "@archive/styled-system/jsx";
-import { Button } from "@archive/ui/components/button";
-import { Heading } from "@archive/ui/components/heading";
-import { Tabs } from "@archive/ui/components/tabs";
+import { Container, Stack } from "@akabase/styled-system/jsx";
+import { Button } from "@akabase/ui/components/button";
+import { Heading } from "@akabase/ui/components/heading";
+import { Tabs } from "@akabase/ui/components/tabs";
 import { ArrowLeftIcon } from "lucide-react";
 import {
   generateLoadProjectDetailQueryOptions,

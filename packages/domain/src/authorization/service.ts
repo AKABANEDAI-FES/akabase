@@ -3,7 +3,7 @@
  * Implements permission rules for all resources and actions
  */
 
-import { Result } from "@archive/result";
+import { Result } from "@akabase/result";
 import type { Action, Actor, AuthorizationDecision, Resource } from "./schema";
 import { getCommitteeRoleForEvent, getOrgRoleForOrg, isGlobalAdmin } from "./logic";
 import { AUTHORIZATION_ERROR_CODE, authorizationError } from "./errors";

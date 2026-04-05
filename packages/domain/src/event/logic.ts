@@ -1,4 +1,4 @@
-import { Result } from "@archive/result";
+import { Result } from "@akabase/result";
 import type {
   Deadline,
   DeadlineFieldKey,

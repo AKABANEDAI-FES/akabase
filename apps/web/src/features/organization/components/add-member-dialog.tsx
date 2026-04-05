@@ -1,26 +1,26 @@
 import { useRef, useState } from "react";
 import { revalidateLogic, useForm } from "@tanstack/react-form";
-import { Result } from "@archive/result";
+import { Result } from "@akabase/result";
 import { Portal } from "@ark-ui/react/portal";
 import { createListCollection } from "@ark-ui/react/collection";
 import { useMutation } from "@tanstack/react-query";
-import { Button } from "@archive/ui/components/button";
-import { CloseButton } from "@archive/ui/components/close-button";
-import { Dialog } from "@archive/ui/components/dialog";
-import { Field } from "@archive/ui/components/field";
-import { Select } from "@archive/ui/components/select";
-import { toaster } from "@archive/ui/components/toast";
-import { Stack } from "@archive/styled-system/jsx";
+import { Button } from "@akabase/ui/components/button";
+import { CloseButton } from "@akabase/ui/components/close-button";
+import { Dialog } from "@akabase/ui/components/dialog";
+import { Field } from "@akabase/ui/components/field";
+import { Select } from "@akabase/ui/components/select";
+import { toaster } from "@akabase/ui/components/toast";
+import { Stack } from "@akabase/styled-system/jsx";
 import {
   addOrganizationMemberInputSchema,
   useAddOrganizationMemberMutationOption,
 } from "../actions/mutations/member";
-import { ORG_ROLES, ORG_ROLE_LABELS } from "@archive/domain/authorization/roles";
-import type { OrgId, OrgMemberRole } from "@archive/domain/organization/schema";
+import { ORG_ROLES, ORG_ROLE_LABELS } from "@akabase/domain/authorization/roles";
+import type { OrgId, OrgMemberRole } from "@akabase/domain/organization/schema";
 import { nl2br } from "@/libs/text";
-import { ORGANIZATION_ERROR_CODE } from "@archive/domain/organization/errors";
-import type { EventId } from "@archive/domain/event/schema";
-import type { AddOrganizationMemberOutput } from "@archive/application/command/organization/add-organization-member";
+import { ORGANIZATION_ERROR_CODE } from "@akabase/domain/organization/errors";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { AddOrganizationMemberOutput } from "@akabase/application/command/organization/add-organization-member";
 
 export type EmailFieldProps = {
   value: string | null;

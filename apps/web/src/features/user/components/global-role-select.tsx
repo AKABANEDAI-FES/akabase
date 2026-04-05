@@ -1,12 +1,12 @@
-import { Result } from "@archive/result";
+import { Result } from "@akabase/result";
 import { createListCollection } from "@ark-ui/react/collection";
 import { useTransition } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useUpdateGlobalRoleMutationOption } from "../actions/mutations";
-import { Select } from "@archive/ui/components/select";
-import { toaster } from "@archive/ui/components/toast";
-import { GLOBAL_ROLES, GLOBAL_ROLE_LABELS } from "@archive/domain/authorization/schema";
-import type { GlobalRole } from "@archive/domain/authorization/schema";
+import { Select } from "@akabase/ui/components/select";
+import { toaster } from "@akabase/ui/components/toast";
+import { GLOBAL_ROLES, GLOBAL_ROLE_LABELS } from "@akabase/domain/authorization/schema";
+import type { GlobalRole } from "@akabase/domain/authorization/schema";
 
 const roleCollection = createListCollection({
   items: GLOBAL_ROLES.map((role) => ({

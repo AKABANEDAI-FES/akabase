@@ -4,8 +4,8 @@ import { Toaster as ArkToaster, Toast, createToaster, useToastContext } from "@a
 import type { CreateToasterReturn } from "@ark-ui/react/toast";
 import { CheckCircleIcon, CircleAlertIcon, CircleXIcon } from "lucide-react";
 import { forwardRef } from "react";
-import { Stack, createStyleContext, styled } from "@archive/styled-system/jsx";
-import { toast } from "@archive/styled-system/recipes";
+import { Stack, createStyleContext, styled } from "@akabase/styled-system/jsx";
+import { toast } from "@akabase/styled-system/recipes";
 import { CloseButton } from "../close-button/close-button";
 import { Icon } from "../icon/icon";
 import type { IconProps } from "../icon/icon";

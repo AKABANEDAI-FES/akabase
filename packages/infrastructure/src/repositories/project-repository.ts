@@ -9,7 +9,7 @@ import {
   publishedWithTagsSchema,
   submissionActionSchema,
   submissionWithTagsSchema,
-} from "@archive/domain/project/schema";
+} from "@akabase/domain/project/schema";
 import type {
   DraftWithTags,
   Project,
@@ -20,11 +20,11 @@ import type {
   SubmissionId,
   SubmissionMessage,
   SubmissionWithTags,
-} from "@archive/domain/project/schema";
-import type { OrgId } from "@archive/domain/organization/schema";
-import type { UserId } from "@archive/domain/user/schema";
-import type { ProjectRepository } from "@archive/domain/project/repository";
-import { REPOSITORY_ERROR_CODE, RepositoryExceptionError } from "@archive/domain/shared/repository";
+} from "@akabase/domain/project/schema";
+import type { OrgId } from "@akabase/domain/organization/schema";
+import type { UserId } from "@akabase/domain/user/schema";
+import type { ProjectRepository } from "@akabase/domain/project/repository";
+import { REPOSITORY_ERROR_CODE, RepositoryExceptionError } from "@akabase/domain/shared/repository";
 
 /**
  * Project Repository Implementation using Drizzle ORM

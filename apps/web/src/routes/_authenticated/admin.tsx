@@ -1,5 +1,5 @@
 import { Link, createFileRoute, redirect } from "@tanstack/react-router";
-import { Stack } from "@archive/styled-system/jsx";
+import { Stack } from "@akabase/styled-system/jsx";
 import { CalendarIcon, UsersIcon } from "lucide-react";
 import { NavLink, SidebarLayout } from "@/components/sidebar-layout";
 

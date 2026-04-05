@@ -1,6 +1,6 @@
-import { Field } from "@archive/ui/components/field";
-import { MAX_FILE_SIZE } from "@archive/domain/shared/image";
-import type { ImageScope } from "@archive/domain/shared/image";
+import { Field } from "@akabase/ui/components/field";
+import { MAX_FILE_SIZE } from "@akabase/domain/shared/image";
+import type { ImageScope } from "@akabase/domain/shared/image";
 import { ImageUpload } from "@/features/shared/components/image-upload";
 import { Format } from "@ark-ui/react";
 

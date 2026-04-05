@@ -1,8 +1,8 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { generateLoadRecentActiveEventQueryOptions } from "@/features/event/actions/queries";
 import { CalendarDaysIcon, CalendarOffIcon } from "lucide-react";
-import { css } from "@archive/styled-system/css";
-import { Grid } from "@archive/styled-system/jsx";
+import { css } from "@akabase/styled-system/css";
+import { Grid } from "@akabase/styled-system/jsx";
 
 export const Route = createFileRoute("/_authenticated/")({
   beforeLoad: async ({ context }) => {

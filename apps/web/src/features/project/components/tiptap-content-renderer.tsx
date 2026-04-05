@@ -1,10 +1,10 @@
 import { generateHTML } from "@tiptap/core";
 import { useSyncExternalStore } from "react";
-import { Box } from "@archive/styled-system/jsx";
-import { richTextEditor } from "@archive/styled-system/recipes";
+import { Box } from "@akabase/styled-system/jsx";
+import { richTextEditor } from "@akabase/styled-system/recipes";
 import { editorExtensions } from "./editor/extensions";
-import { cx } from "@archive/styled-system/css";
-import { Spinner } from "@archive/ui/components/spinner";
+import { cx } from "@akabase/styled-system/css";
+import { Spinner } from "@akabase/ui/components/spinner";
 
 type TipTapContentRendererProps = {
   content: unknown;

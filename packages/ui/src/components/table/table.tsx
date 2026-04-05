@@ -1,10 +1,10 @@
 "use client";
 import { ark } from "@ark-ui/react/factory";
 import { forwardRef } from "react";
-import { css } from "@archive/styled-system/css";
-import { createStyleContext } from "@archive/styled-system/jsx";
-import { table } from "@archive/styled-system/recipes";
-import type { TableRecipe } from "@archive/styled-system/recipes";
+import { css } from "@akabase/styled-system/css";
+import { createStyleContext } from "@akabase/styled-system/jsx";
+import { table } from "@akabase/styled-system/recipes";
+import type { TableRecipe } from "@akabase/styled-system/recipes";
 import type {
   AsProps,
   Assign,
@@ -13,7 +13,7 @@ import type {
   JsxStyleProps,
   RecipeVariantProps,
   UnstyledProps,
-} from "@archive/styled-system/types";
+} from "@akabase/styled-system/types";
 import type { PolymorphicProps } from "@ark-ui/react";
 
 const { withProvider, withContext } = createStyleContext(table);

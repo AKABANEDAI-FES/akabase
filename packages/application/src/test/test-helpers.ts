@@ -1,6 +1,6 @@
-import type { Actor } from "@archive/domain/authorization/schema";
-import { cast } from "@archive/domain/shared/ids";
-import type { UserId } from "@archive/domain/user/schema";
+import type { Actor } from "@akabase/domain/authorization/schema";
+import { cast } from "@akabase/domain/shared/ids";
+import type { UserId } from "@akabase/domain/user/schema";
 
 export function createAdminActor(userId = "test-admin-user"): Actor {
   return {

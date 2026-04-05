@@ -1,14 +1,14 @@
 import { z } from "zod";
 import { eq } from "drizzle-orm";
-import { schema } from "@archive/infrastructure/db";
-import type { Database } from "@archive/infrastructure/db";
-import type { EventId } from "@archive/domain/event/schema";
-import type { Actor } from "@archive/domain/authorization/schema";
+import { schema } from "@akabase/infrastructure/db";
+import type { Database } from "@akabase/infrastructure/db";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { Actor } from "@akabase/domain/authorization/schema";
 import {
   orgIdSchema,
   orgMemberRoleSchema,
   organizationSchema,
-} from "@archive/domain/organization/schema";
+} from "@akabase/domain/organization/schema";
 import { QueryExceptionError } from "../shared";
 
 export const myOrganizationListItemSchema = z.object({

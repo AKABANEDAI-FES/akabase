@@ -3,7 +3,7 @@
  */
 
 import { describe, expect, it } from "vite-plus/test";
-import { Result } from "@archive/result";
+import { Result } from "@akabase/result";
 import { AuthorizationService } from "./service";
 import type { CommitteeRole, OrgRole } from "./schema";
 import {

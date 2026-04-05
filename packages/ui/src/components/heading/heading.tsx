@@ -1,8 +1,8 @@
 import type { ComponentProps } from "react";
-import { styled } from "@archive/styled-system/jsx";
-import { heading } from "@archive/styled-system/recipes";
-import type { HeadingVariantProps } from "@archive/styled-system/recipes";
-import type { StyledComponent } from "@archive/styled-system/types";
+import { styled } from "@akabase/styled-system/jsx";
+import { heading } from "@akabase/styled-system/recipes";
+import type { HeadingVariantProps } from "@akabase/styled-system/recipes";
+import type { StyledComponent } from "@akabase/styled-system/types";
 
 type Props = HeadingVariantProps & { as?: React.ElementType };
 

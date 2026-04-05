@@ -3,9 +3,9 @@ import { createTestDb } from "../../test/db-mock";
 import { createTestDependencies } from "../../test/test-dependencies";
 import { createAdminActor, createUserActor } from "../../test/test-helpers";
 import { getSubmissionStats } from "./get-submission-stats";
-import { schema } from "@archive/infrastructure/db";
-import { cast } from "@archive/domain/shared/ids";
-import type { EventId } from "@archive/domain/event/schema";
+import { schema } from "@akabase/infrastructure/db";
+import { cast } from "@akabase/domain/shared/ids";
+import type { EventId } from "@akabase/domain/event/schema";
 
 describe("getSubmissionStats", () => {
   let testDb: Awaited<ReturnType<typeof createTestDb>>;

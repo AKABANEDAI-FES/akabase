@@ -2,8 +2,8 @@ import { createFileRoute, redirect, useNavigate, useRouter } from "@tanstack/rea
 import { CreateDeadlineDialog } from "@/features/event/components/create-deadline-dialog";
 import { generateLoadDeadlinesQueryOptions } from "@/features/event/actions/queries/deadline";
 import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions/queries";
-import { cast } from "@archive/domain/shared/ids";
-import type { EventId } from "@archive/domain/event/schema";
+import { cast } from "@akabase/domain/shared/ids";
+import type { EventId } from "@akabase/domain/event/schema";
 
 export const Route = createFileRoute("/_authenticated/$slug/committee/deadlines/new")({
   beforeLoad: async ({ params, context }) => {

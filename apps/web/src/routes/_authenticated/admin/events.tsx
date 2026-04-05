@@ -1,10 +1,10 @@
 import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 import { EventStatusBadge } from "@/features/event/components/event-status-badge";
-import { Button } from "@archive/ui/components/button";
-import { Code } from "@archive/ui/components/code";
-import { Heading } from "@archive/ui/components/heading";
-import { Table } from "@archive/ui/components/table";
-import { Container, Flex, Stack } from "@archive/styled-system/jsx";
+import { Button } from "@akabase/ui/components/button";
+import { Code } from "@akabase/ui/components/code";
+import { Heading } from "@akabase/ui/components/heading";
+import { Table } from "@akabase/ui/components/table";
+import { Container, Flex, Stack } from "@akabase/styled-system/jsx";
 import { PencilIcon, PlusIcon } from "lucide-react";
 import { generateLoadEventsQueryOptions } from "@/features/event/actions/queries";
 import { useSuspenseQuery } from "@tanstack/react-query";

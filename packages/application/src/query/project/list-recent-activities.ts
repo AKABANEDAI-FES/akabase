@@ -1,15 +1,15 @@
 import { z } from "zod";
 import { and, desc, eq, inArray } from "drizzle-orm";
-import { schema } from "@archive/infrastructure/db";
-import type { Database } from "@archive/infrastructure/db";
-import type { EventId } from "@archive/domain/event/schema";
-import { orgIdSchema } from "@archive/domain/organization/schema";
+import { schema } from "@akabase/infrastructure/db";
+import type { Database } from "@akabase/infrastructure/db";
+import type { EventId } from "@akabase/domain/event/schema";
+import { orgIdSchema } from "@akabase/domain/organization/schema";
 import {
   projectIdSchema,
   submissionActionTypeSchema,
   submissionIdSchema,
-} from "@archive/domain/project/schema";
-import type { Actor } from "@archive/domain/authorization/schema";
+} from "@akabase/domain/project/schema";
+import type { Actor } from "@akabase/domain/authorization/schema";
 import { QueryExceptionError } from "../shared";
 
 export const recentActivitySchema = z.object({

@@ -9,9 +9,9 @@ import {
 import { NodeSelection, TextSelection } from "@tiptap/pm/state";
 import type { Editor } from "@tiptap/react";
 import { useCallback, useEffect, useState } from "react";
-import { css } from "@archive/styled-system/css";
-import { HStack } from "@archive/styled-system/jsx";
-import { Menu } from "@archive/ui/components/menu";
+import { css } from "@akabase/styled-system/css";
+import { HStack } from "@akabase/styled-system/jsx";
+import { Menu } from "@akabase/ui/components/menu";
 import { useTiptapEditor } from "../../hooks/use-tiptap-editor";
 import { findNodePosition, isValidPosition } from "../../lib/tiptap-utils";
 import { Portal } from "@ark-ui/react";

@@ -2,8 +2,8 @@
 import { Pagination, usePaginationContext } from "@ark-ui/react/pagination";
 import { EllipsisIcon } from "lucide-react";
 import type { ComponentProps } from "react";
-import { createStyleContext } from "@archive/styled-system/jsx";
-import { pagination } from "@archive/styled-system/recipes";
+import { createStyleContext } from "@akabase/styled-system/jsx";
+import { pagination } from "@akabase/styled-system/recipes";
 import { IconButton } from "../icon-button/icon-button";
 
 const { withProvider, withContext } = createStyleContext(pagination);

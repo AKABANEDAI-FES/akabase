@@ -1,8 +1,8 @@
 import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Button } from "@archive/ui/components/button";
-import { Heading } from "@archive/ui/components/heading";
-import { Container, Flex, Stack } from "@archive/styled-system/jsx";
+import { Button } from "@akabase/ui/components/button";
+import { Heading } from "@akabase/ui/components/heading";
+import { Container, Flex, Stack } from "@akabase/styled-system/jsx";
 import { PlusIcon } from "lucide-react";
 import { generateLoadTagsQueryOptions } from "@/features/event/actions/queries/tag";
 import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions/queries";

@@ -1,9 +1,9 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { authClient } from "@/libs/auth";
 import { z } from "zod";
-import { css } from "@archive/styled-system/css";
+import { css } from "@akabase/styled-system/css";
 import { CalendarDaysIcon } from "lucide-react";
-import { Grid } from "@archive/styled-system/jsx";
+import { Grid } from "@akabase/styled-system/jsx";
 
 const loginSearchSchema = z.object({
   redirect: z.string().optional(),

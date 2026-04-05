@@ -1,6 +1,6 @@
 "use client";
 import { forwardRef } from "react";
-import type { HTMLStyledProps } from "@archive/styled-system/jsx";
+import type { HTMLStyledProps } from "@akabase/styled-system/jsx";
 import { AbsoluteCenter } from "../absolute-center/absolute-center";
 import { Span } from "../span/span";
 import { Spinner } from "../spinner/spinner";

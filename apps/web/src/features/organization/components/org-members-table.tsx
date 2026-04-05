@@ -1,13 +1,13 @@
 import { Trash2Icon } from "lucide-react";
-import { Code } from "@archive/ui/components/code";
-import { IconButton } from "@archive/ui/components/icon-button";
-import { Table } from "@archive/ui/components/table";
+import { Code } from "@akabase/ui/components/code";
+import { IconButton } from "@akabase/ui/components/icon-button";
+import { Table } from "@akabase/ui/components/table";
 import { OrgMemberRoleSelect } from "./org-member-role-select";
 import { RemoveMemberDialog } from "./remove-member-dialog";
-import type { OrgId, OrgMemberRole } from "@archive/domain/organization/schema";
-import { ORG_ROLE_LABELS } from "@archive/domain/authorization/roles";
-import type { EventId } from "@archive/domain/event/schema";
-import type { UserId } from "@archive/domain/user/schema";
+import type { OrgId, OrgMemberRole } from "@akabase/domain/organization/schema";
+import { ORG_ROLE_LABELS } from "@akabase/domain/authorization/roles";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { UserId } from "@akabase/domain/user/schema";
 
 type Member = {
   id: string;

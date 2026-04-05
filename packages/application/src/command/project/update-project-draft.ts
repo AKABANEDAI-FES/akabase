@@ -3,22 +3,22 @@
  * Updates a project's draft content with deadline enforcement
  */
 
-import { Result } from "@archive/result";
-import type { EventId, TagId } from "@archive/domain/event/schema";
-import type { OrgId } from "@archive/domain/organization/schema";
-import type { DraftWithTags, ProjectId } from "@archive/domain/project/schema";
-import type { ProjectError } from "@archive/domain/project/errors";
-import { PROJECT_ERROR_CODE, projectError } from "@archive/domain/project/errors";
-import type { EventError } from "@archive/domain/event/errors";
-import type { AuthorizationError } from "@archive/domain/authorization/errors";
-import type { Actor } from "@archive/domain/authorization/schema";
-import { projectResource } from "@archive/domain/authorization/logic";
-import { updateProjectDraftEntity } from "@archive/domain/project/logic";
-import { getBlockedFieldKeys } from "@archive/domain/event/logic";
-import type { ProjectRepository } from "@archive/domain/project/repository";
-import type { EventRepository } from "@archive/domain/event/repository";
-import type { AuthorizationService } from "@archive/domain/authorization/service";
-import type { EventDomainService } from "@archive/domain/event/service";
+import { Result } from "@akabase/result";
+import type { EventId, TagId } from "@akabase/domain/event/schema";
+import type { OrgId } from "@akabase/domain/organization/schema";
+import type { DraftWithTags, ProjectId } from "@akabase/domain/project/schema";
+import type { ProjectError } from "@akabase/domain/project/errors";
+import { PROJECT_ERROR_CODE, projectError } from "@akabase/domain/project/errors";
+import type { EventError } from "@akabase/domain/event/errors";
+import type { AuthorizationError } from "@akabase/domain/authorization/errors";
+import type { Actor } from "@akabase/domain/authorization/schema";
+import { projectResource } from "@akabase/domain/authorization/logic";
+import { updateProjectDraftEntity } from "@akabase/domain/project/logic";
+import { getBlockedFieldKeys } from "@akabase/domain/event/logic";
+import type { ProjectRepository } from "@akabase/domain/project/repository";
+import type { EventRepository } from "@akabase/domain/event/repository";
+import type { AuthorizationService } from "@akabase/domain/authorization/service";
+import type { EventDomainService } from "@akabase/domain/event/service";
 
 export type UpdateProjectDraftInput = {
   projectId: ProjectId;

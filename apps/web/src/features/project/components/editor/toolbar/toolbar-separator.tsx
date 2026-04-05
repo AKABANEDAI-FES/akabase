@@ -1,4 +1,4 @@
-import { Box } from "@archive/styled-system/jsx";
+import { Box } from "@akabase/styled-system/jsx";
 
 /**
  * Visual separator for toolbar button groups

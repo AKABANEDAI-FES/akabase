@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Stack } from "@archive/styled-system/jsx";
+import { Stack } from "@akabase/styled-system/jsx";
 import { generateLoadOrganizationDetailQueryOptions } from "@/features/organization/actions/queries";
 import { generateLoadProjectsQueryOptions } from "@/features/project/actions/queries";
 import { OrgProjectsList } from "@/features/organization/components/org-projects-list";
-import { cast } from "@archive/domain/shared/ids";
-import type { OrgId } from "@archive/domain/organization/schema";
+import { cast } from "@akabase/domain/shared/ids";
+import type { OrgId } from "@akabase/domain/organization/schema";
 
 export const Route = createFileRoute("/_authenticated/$slug/orgs/$orgId/")({
   loader: async ({ context, params }) => {

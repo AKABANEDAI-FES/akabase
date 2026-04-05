@@ -1,5 +1,5 @@
 {
-  "name": "@archive/ui",
+  "name": "@akabase/ui",
   "private": true,
   "type": "module",
   "version": "1.0.0",
@@ -20,7 +20,7 @@
     "dev": "vp pack --no-clean --watch"
   },
   "devDependencies": {
-    "@archive/config": "workspace:*",
+    "@akabase/config": "workspace:*",
     "@pandacss/dev": "catalog:build",
     "@pandacss/types": "catalog:build",
     "@types/react": "catalog:types",
@@ -28,7 +28,7 @@
     "vite-plus": "catalog:build"
   },
   "peerDependencies": {
-    "@archive/styled-system": "workspace:*",
+    "@akabase/styled-system": "workspace:*",
     "@ark-ui/react": "^5",
     "lucide-react": "^0",
     "react": "^19",

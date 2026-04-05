@@ -1,6 +1,6 @@
-import type { IconButtonProps } from "@archive/ui/components/icon-button";
-import { IconButton } from "@archive/ui/components/icon-button";
-import { Tooltip } from "@archive/ui/components/tooltip";
+import type { IconButtonProps } from "@akabase/ui/components/icon-button";
+import { IconButton } from "@akabase/ui/components/icon-button";
+import { Tooltip } from "@akabase/ui/components/tooltip";
 import type { TooltipRootProps } from "@ark-ui/react";
 
 export type ToolbarButtonProps = IconButtonProps & {

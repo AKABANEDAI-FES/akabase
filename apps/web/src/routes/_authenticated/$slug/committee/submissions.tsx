@@ -1,10 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
-import { Container, Flex, Stack } from "@archive/styled-system/jsx";
-import { Heading } from "@archive/ui/components/heading";
+import { Container, Flex, Stack } from "@akabase/styled-system/jsx";
+import { Heading } from "@akabase/ui/components/heading";
 import { generateLoadEventSubmissionsQueryOptions } from "@/features/project/actions/queries";
 import { EventSubmissionsTable } from "@/features/project/components/event-submissions-table";
-import { submissionStatusSchema } from "@archive/domain/project/schema";
+import { submissionStatusSchema } from "@akabase/domain/project/schema";
 
 const searchSchema = z.object({
   status: z.array(submissionStatusSchema).optional(),

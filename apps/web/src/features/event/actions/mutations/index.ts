@@ -1,16 +1,16 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { Result } from "@archive/result";
-import { createEvent } from "@archive/application/command/event/create-event";
-import { updateEvent } from "@archive/application/command/event/update-event";
-import { archiveEvent } from "@archive/application/command/event/archive-event";
-import { activateEvent } from "@archive/application/command/event/activate-event";
-import { resolveActor } from "@archive/application/query/authorization/resolve-actor";
+import { Result } from "@akabase/result";
+import { createEvent } from "@akabase/application/command/event/create-event";
+import { updateEvent } from "@akabase/application/command/event/update-event";
+import { archiveEvent } from "@akabase/application/command/event/archive-event";
+import { activateEvent } from "@akabase/application/command/event/activate-event";
+import { resolveActor } from "@akabase/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/auth";
 import { dependenciesMiddleware } from "@/libs/dependencies";
-import { cast } from "@archive/domain/shared/ids";
-import { eventIdSchema, eventSchema } from "@archive/domain/event/schema";
-import type { UserId } from "@archive/domain/user/schema";
+import { cast } from "@akabase/domain/shared/ids";
+import { eventIdSchema, eventSchema } from "@akabase/domain/event/schema";
+import type { UserId } from "@akabase/domain/user/schema";
 import { mutationOptions, useQueryClient } from "@tanstack/react-query";
 import { generateLoadEventDetailCacheKey, generateLoadEventsCacheKey } from "../queries";
 

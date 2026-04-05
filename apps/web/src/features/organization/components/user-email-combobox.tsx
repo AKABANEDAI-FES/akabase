@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { useListCollection } from "@ark-ui/react/collection";
 import { useFilter } from "@ark-ui/react/locale";
-import { Combobox } from "@archive/ui/components/combobox";
-import { Spinner } from "@archive/ui/components/spinner";
+import { Combobox } from "@akabase/ui/components/combobox";
+import { Spinner } from "@akabase/ui/components/spinner";
 import { generateLoadUsersForEventQueryOptions } from "@/features/user/actions/queries";
 import type { ComboboxInputValueChangeDetails, ComboboxValueChangeDetails } from "@ark-ui/react";
-import type { EventId } from "@archive/domain/event/schema";
+import type { EventId } from "@akabase/domain/event/schema";
 import type { EmailFieldProps } from "./add-member-dialog";
 import { useEffect } from "react";
 

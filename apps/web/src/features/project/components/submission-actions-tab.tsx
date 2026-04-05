@@ -1,9 +1,9 @@
-import { Flex } from "@archive/styled-system/jsx";
+import { Flex } from "@akabase/styled-system/jsx";
 import { CheckCircleIcon, UndoIcon } from "lucide-react";
-import { Button } from "@archive/ui/components/button";
-import { Card } from "@archive/ui/components/card";
-import type { SubmissionDetail } from "@archive/application/query/project/get-submission-detail";
-import type { EventId } from "@archive/domain/event/schema";
+import { Button } from "@akabase/ui/components/button";
+import { Card } from "@akabase/ui/components/card";
+import type { SubmissionDetail } from "@akabase/application/query/project/get-submission-detail";
+import type { EventId } from "@akabase/domain/event/schema";
 import { ApproveProjectDialog } from "./approve-project-dialog";
 import { ReturnProjectDialog } from "./return-project-dialog";
 

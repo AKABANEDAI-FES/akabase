@@ -1,5 +1,5 @@
-import { Badge } from "@archive/ui/components/badge";
-import type { EventListItem } from "@archive/application/query/event/list-events";
+import { Badge } from "@akabase/ui/components/badge";
+import type { EventListItem } from "@akabase/application/query/event/list-events";
 
 type EventStatusBadgeProps = {
   status: EventListItem["status"];

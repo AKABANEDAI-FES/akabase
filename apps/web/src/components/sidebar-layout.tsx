@@ -1,15 +1,15 @@
 import { createContext, use, useState } from "react";
 import { Outlet } from "@tanstack/react-router";
 import { Portal } from "@ark-ui/react/portal";
-import { css } from "@archive/styled-system/css";
-import { Stack } from "@archive/styled-system/jsx";
+import { css } from "@akabase/styled-system/css";
+import { Stack } from "@akabase/styled-system/jsx";
 import { MenuIcon } from "lucide-react";
-import { Button } from "@archive/ui/components/button";
-import { CloseButton } from "@archive/ui/components/close-button";
-import { Drawer } from "@archive/ui/components/drawer";
-import { Heading } from "@archive/ui/components/heading";
-import { IconButton } from "@archive/ui/components/icon-button";
-import { Text } from "@archive/ui/components/text";
+import { Button } from "@akabase/ui/components/button";
+import { CloseButton } from "@akabase/ui/components/close-button";
+import { Drawer } from "@akabase/ui/components/drawer";
+import { Heading } from "@akabase/ui/components/heading";
+import { IconButton } from "@akabase/ui/components/icon-button";
+import { Text } from "@akabase/ui/components/text";
 
 const SidebarNavContext = createContext<{ onNavigate?: () => void }>({});
 

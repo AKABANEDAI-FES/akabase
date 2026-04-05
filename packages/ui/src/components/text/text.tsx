@@ -1,8 +1,8 @@
 import type { ComponentProps } from "react";
-import { styled } from "@archive/styled-system/jsx";
-import { text } from "@archive/styled-system/recipes";
-import type { TextVariantProps } from "@archive/styled-system/recipes";
-import type { StyledComponent } from "@archive/styled-system/types";
+import { styled } from "@akabase/styled-system/jsx";
+import { text } from "@akabase/styled-system/recipes";
+import type { TextVariantProps } from "@akabase/styled-system/recipes";
+import type { StyledComponent } from "@akabase/styled-system/types";
 
 type Props = TextVariantProps & { as?: React.ElementType };
 

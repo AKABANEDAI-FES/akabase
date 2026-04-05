@@ -3,18 +3,18 @@
  * Creates a new place for an event
  */
 
-import { Result } from "@archive/result";
-import { generateId } from "@archive/domain/shared/ids";
-import type { EventId, PlaceId } from "@archive/domain/event/schema";
-import type { EventError } from "@archive/domain/event/errors";
-import { EVENT_ERROR_CODE, eventError } from "@archive/domain/event/errors";
-import { createPlaceEntity } from "@archive/domain/event/logic";
-import type { AuthorizationError } from "@archive/domain/authorization/errors";
-import type { Actor } from "@archive/domain/authorization/schema";
-import { eventResource } from "@archive/domain/authorization/logic";
-import type { EventRepository } from "@archive/domain/event/repository";
-import type { AuthorizationService } from "@archive/domain/authorization/service";
-import type { EventDomainService } from "@archive/domain/event/service";
+import { Result } from "@akabase/result";
+import { generateId } from "@akabase/domain/shared/ids";
+import type { EventId, PlaceId } from "@akabase/domain/event/schema";
+import type { EventError } from "@akabase/domain/event/errors";
+import { EVENT_ERROR_CODE, eventError } from "@akabase/domain/event/errors";
+import { createPlaceEntity } from "@akabase/domain/event/logic";
+import type { AuthorizationError } from "@akabase/domain/authorization/errors";
+import type { Actor } from "@akabase/domain/authorization/schema";
+import { eventResource } from "@akabase/domain/authorization/logic";
+import type { EventRepository } from "@akabase/domain/event/repository";
+import type { AuthorizationService } from "@akabase/domain/authorization/service";
+import type { EventDomainService } from "@akabase/domain/event/service";
 
 export type CreatePlaceInput = {
   eventId: EventId;

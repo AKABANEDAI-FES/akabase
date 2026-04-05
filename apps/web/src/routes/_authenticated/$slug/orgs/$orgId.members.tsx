@@ -1,14 +1,14 @@
 import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Flex, Stack } from "@archive/styled-system/jsx";
-import { Button } from "@archive/ui/components/button";
-import { Heading } from "@archive/ui/components/heading";
+import { Flex, Stack } from "@akabase/styled-system/jsx";
+import { Button } from "@akabase/ui/components/button";
+import { Heading } from "@akabase/ui/components/heading";
 import { PlusIcon } from "lucide-react";
 import { generateLoadOrganizationMembersQueryOptions } from "@/features/organization/actions/queries/member";
 import { generateCheckOrganizationPermissionsQueryOptions } from "@/features/authorization/actions/queries";
 import { OrgMembersTable } from "@/features/organization/components/org-members-table";
-import { cast } from "@archive/domain/shared/ids";
-import type { OrgId } from "@archive/domain/organization/schema";
+import { cast } from "@akabase/domain/shared/ids";
+import type { OrgId } from "@akabase/domain/organization/schema";
 
 export const Route = createFileRoute("/_authenticated/$slug/orgs/$orgId/members")({
   loader: async ({ params, context }) => {

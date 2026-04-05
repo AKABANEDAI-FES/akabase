@@ -3,16 +3,16 @@
  * Updates a user's global role (admin or user)
  */
 
-import { Result } from "@archive/result";
-import type { UserId } from "@archive/domain/user/schema";
-import type { Actor, GlobalRole } from "@archive/domain/authorization/schema";
-import type { UserError } from "@archive/domain/user/errors";
-import { userError } from "@archive/domain/user/errors";
-import type { AuthorizationError } from "@archive/domain/authorization/errors";
-import { userResource } from "@archive/domain/authorization/logic";
-import { updateUserGlobalRole } from "@archive/domain/user/logic";
-import type { UserRepository } from "@archive/domain/user/repository";
-import type { AuthorizationService } from "@archive/domain/authorization/service";
+import { Result } from "@akabase/result";
+import type { UserId } from "@akabase/domain/user/schema";
+import type { Actor, GlobalRole } from "@akabase/domain/authorization/schema";
+import type { UserError } from "@akabase/domain/user/errors";
+import { userError } from "@akabase/domain/user/errors";
+import type { AuthorizationError } from "@akabase/domain/authorization/errors";
+import { userResource } from "@akabase/domain/authorization/logic";
+import { updateUserGlobalRole } from "@akabase/domain/user/logic";
+import type { UserRepository } from "@akabase/domain/user/repository";
+import type { AuthorizationService } from "@akabase/domain/authorization/service";
 
 export type UpdateGlobalRoleInput = {
   userId: UserId;

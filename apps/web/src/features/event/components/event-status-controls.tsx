@@ -1,14 +1,14 @@
-import { Result } from "@archive/result";
+import { Result } from "@akabase/result";
 import { useMutation } from "@tanstack/react-query";
 import {
   useActivateEventMutationOption,
   useArchiveEventMutationOption,
 } from "../actions/mutations";
-import { Button } from "@archive/ui/components/button";
-import { Fieldset } from "@archive/ui/components/fieldset";
-import { toaster } from "@archive/ui/components/toast";
+import { Button } from "@akabase/ui/components/button";
+import { Fieldset } from "@akabase/ui/components/fieldset";
+import { toaster } from "@akabase/ui/components/toast";
 import { ArchiveIcon, ArchiveRestoreIcon } from "lucide-react";
-import type { EventId } from "@archive/domain/event/schema";
+import type { EventId } from "@akabase/domain/event/schema";
 
 type EventStatusControlsProps = {
   eventId: EventId;

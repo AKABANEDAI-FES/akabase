@@ -1,13 +1,13 @@
 import { env, waitUntil } from "cloudflare:workers";
-import { ImageRepositoryImpl } from "@archive/infrastructure/storage/image-repository";
-import { uploadImage } from "@archive/application/command/shared/upload-image";
+import { ImageRepositoryImpl } from "@akabase/infrastructure/storage/image-repository";
+import { uploadImage } from "@akabase/application/command/shared/upload-image";
 import { authMiddleware, factory } from "./libs";
 import { z } from "zod";
 import { sValidator } from "@hono/standard-validator";
-import { Result } from "@archive/result";
-import { ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE, imageScopeSchema } from "@archive/domain/shared/image";
-import { cast } from "@archive/domain/shared/ids";
-import type { UserId } from "@archive/domain/user/schema";
+import { Result } from "@akabase/result";
+import { ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE, imageScopeSchema } from "@akabase/domain/shared/image";
+import { cast } from "@akabase/domain/shared/ids";
+import type { UserId } from "@akabase/domain/user/schema";
 
 const getStorageHandler = factory.createHandlers(async (c) => {
   const path = c.req.param("path");

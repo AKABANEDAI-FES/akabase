@@ -2,8 +2,8 @@ import { createFileRoute, redirect, useNavigate, useRouter } from "@tanstack/rea
 import { CreateProjectDialog } from "@/features/project/components/create-project-dialog";
 import { generateLoadPlacesQueryOptions } from "@/features/event/actions/queries/place";
 import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions/queries";
-import { cast } from "@archive/domain/shared/ids";
-import type { OrgId } from "@archive/domain/organization/schema";
+import { cast } from "@akabase/domain/shared/ids";
+import type { OrgId } from "@akabase/domain/organization/schema";
 
 export const Route = createFileRoute(
   "/_authenticated/$slug/committee/organizations_/$orgId/projects/new",

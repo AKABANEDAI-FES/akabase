@@ -1,16 +1,16 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { Result } from "@archive/result";
-import { createTag } from "@archive/application/command/event/create-tag";
-import { updateTag } from "@archive/application/command/event/update-tag";
-import { deleteTag } from "@archive/application/command/event/delete-tag";
-import { reorderTags } from "@archive/application/command/event/reorder-tags";
-import { resolveActor } from "@archive/application/query/authorization/resolve-actor";
+import { Result } from "@akabase/result";
+import { createTag } from "@akabase/application/command/event/create-tag";
+import { updateTag } from "@akabase/application/command/event/update-tag";
+import { deleteTag } from "@akabase/application/command/event/delete-tag";
+import { reorderTags } from "@akabase/application/command/event/reorder-tags";
+import { resolveActor } from "@akabase/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/auth";
 import { dependenciesMiddleware } from "@/libs/dependencies";
-import { cast } from "@archive/domain/shared/ids";
-import { eventIdSchema, tagIdSchema, tagSchema } from "@archive/domain/event/schema";
-import type { UserId } from "@archive/domain/user/schema";
+import { cast } from "@akabase/domain/shared/ids";
+import { eventIdSchema, tagIdSchema, tagSchema } from "@akabase/domain/event/schema";
+import type { UserId } from "@akabase/domain/user/schema";
 import { mutationOptions, useQueryClient } from "@tanstack/react-query";
 import { generateLoadTagsCacheKey } from "../queries/tag";
 

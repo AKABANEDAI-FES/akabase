@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vite-plus/test";
-import { Result } from "@archive/result";
-import type { EventId } from "@archive/domain/event/schema";
+import { Result } from "@akabase/result";
+import type { EventId } from "@akabase/domain/event/schema";
 import { createTestDb } from "../../test/db-mock";
 import { createTestDependencies } from "../../test/test-dependencies";
 import { createAdminActor, createUserActor } from "../../test/test-helpers";

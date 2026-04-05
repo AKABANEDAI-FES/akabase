@@ -1,19 +1,19 @@
 import { useState } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Container, Flex, Stack } from "@archive/styled-system/jsx";
+import { Container, Flex, Stack } from "@akabase/styled-system/jsx";
 import { ArrowLeftIcon } from "lucide-react";
-import { Button } from "@archive/ui/components/button";
-import { Heading } from "@archive/ui/components/heading";
-import { Tabs } from "@archive/ui/components/tabs";
-import { Text } from "@archive/ui/components/text";
+import { Button } from "@akabase/ui/components/button";
+import { Heading } from "@akabase/ui/components/heading";
+import { Tabs } from "@akabase/ui/components/tabs";
+import { Text } from "@akabase/ui/components/text";
 import { SubmissionActionsTabForOrg } from "@/features/project/components/submission-actions-tab-for-org";
 import { SubmissionHistoryTab } from "@/features/project/components/submission-history-tab";
 import { SubmissionOverviewTab } from "@/features/project/components/submission-overview-tab";
 import { SubmissionStatusBadge } from "@/features/project/components/submission-status-badge";
 import { generateCheckOrganizationPermissionsQueryOptions } from "@/features/authorization/actions/queries";
-import { cast } from "@archive/domain/shared/ids";
-import type { OrgId } from "@archive/domain/organization/schema";
+import { cast } from "@akabase/domain/shared/ids";
+import type { OrgId } from "@akabase/domain/organization/schema";
 import { generateLoadSubmissionDetailQueryOptions } from "@/features/project/actions/queries";
 import { handleNotFoundError } from "@/libs/error";
 

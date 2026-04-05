@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { revalidateLogic, useForm } from "@tanstack/react-form";
-import { Result } from "@archive/result";
-import { Button } from "@archive/ui/components/button";
-import { CloseButton } from "@archive/ui/components/close-button";
-import { Dialog } from "@archive/ui/components/dialog";
-import { Field } from "@archive/ui/components/field";
-import { Input } from "@archive/ui/components/input";
-import { toaster } from "@archive/ui/components/toast";
+import { Result } from "@akabase/result";
+import { Button } from "@akabase/ui/components/button";
+import { CloseButton } from "@akabase/ui/components/close-button";
+import { Dialog } from "@akabase/ui/components/dialog";
+import { Field } from "@akabase/ui/components/field";
+import { Input } from "@akabase/ui/components/input";
+import { toaster } from "@akabase/ui/components/toast";
 import { Portal } from "@ark-ui/react/portal";
-import { Stack } from "@archive/styled-system/jsx";
-import { DEADLINE_FIELD_LABELS, deadlineRefinement } from "@archive/domain/event/schema";
-import type { EventId } from "@archive/domain/event/schema";
-import type { DeadlineListItem } from "@archive/application/query/event/list-deadlines";
+import { Stack } from "@akabase/styled-system/jsx";
+import { DEADLINE_FIELD_LABELS, deadlineRefinement } from "@akabase/domain/event/schema";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { DeadlineListItem } from "@akabase/application/query/event/list-deadlines";
 import { useMutation } from "@tanstack/react-query";
 import {
   updateDeadlineInputSchema,

@@ -2,13 +2,13 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { authMiddleware } from "@/libs/auth";
 import { dependenciesMiddleware } from "@/libs/dependencies";
-import { listUsersWithRoles } from "@archive/application/query/user/list-users-with-roles";
-import { listUsersForEvent } from "@archive/application/query/user/list-users-for-event";
-import { cast } from "@archive/domain/shared/ids";
-import { eventIdSchema } from "@archive/domain/event/schema";
-import type { UserId } from "@archive/domain/user/schema";
+import { listUsersWithRoles } from "@akabase/application/query/user/list-users-with-roles";
+import { listUsersForEvent } from "@akabase/application/query/user/list-users-for-event";
+import { cast } from "@akabase/domain/shared/ids";
+import { eventIdSchema } from "@akabase/domain/event/schema";
+import type { UserId } from "@akabase/domain/user/schema";
 import { queryOptions } from "@tanstack/react-query";
-import { resolveActor } from "@archive/application/query/authorization/resolve-actor";
+import { resolveActor } from "@akabase/application/query/authorization/resolve-actor";
 
 export const loadUsersWithRolesFn = createServerFn({ method: "GET" })
   .middleware([authMiddleware, dependenciesMiddleware])

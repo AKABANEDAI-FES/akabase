@@ -1,19 +1,19 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Container, Flex, Stack } from "@archive/styled-system/jsx";
-import { Button } from "@archive/ui/components/button";
-import { Heading } from "@archive/ui/components/heading";
-import { Text } from "@archive/ui/components/text";
+import { Container, Flex, Stack } from "@akabase/styled-system/jsx";
+import { Button } from "@akabase/ui/components/button";
+import { Heading } from "@akabase/ui/components/heading";
+import { Text } from "@akabase/ui/components/text";
 import { ArrowLeftIcon, EditIcon, HistoryIcon, MapPinIcon } from "lucide-react";
 import {
   generateLoadProjectDetailQueryOptions,
   generateLoadProjectPublishedQueryOptions,
 } from "@/features/project/actions/queries";
 import { ProjectPublishedDataCard } from "@/features/project/components/project-published-data-card";
-import { cast } from "@archive/domain/shared/ids";
+import { cast } from "@akabase/domain/shared/ids";
 import { handleNotFoundError } from "@/libs/error";
-import type { OrgId } from "@archive/domain/organization/schema";
-import type { ProjectId } from "@archive/domain/project/schema";
+import type { OrgId } from "@akabase/domain/organization/schema";
+import type { ProjectId } from "@akabase/domain/project/schema";
 
 export const Route = createFileRoute("/_authenticated/$slug/orgs/$orgId_/projects/$projectId/")({
   loader: async ({ params, context }) => {

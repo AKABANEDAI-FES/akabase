@@ -1,17 +1,17 @@
 import { ClientOnly, Link, createFileRoute, useBlocker } from "@tanstack/react-router";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { Container, Flex, Stack } from "@archive/styled-system/jsx";
-import { Alert } from "@archive/ui/components/alert";
-import { Badge } from "@archive/ui/components/badge";
-import { Button } from "@archive/ui/components/button";
-import { Field } from "@archive/ui/components/field";
-import { Heading } from "@archive/ui/components/heading";
-import { Select } from "@archive/ui/components/select";
-import { Textarea } from "@archive/ui/components/textarea";
-import { toaster } from "@archive/ui/components/toast";
+import { Container, Flex, Stack } from "@akabase/styled-system/jsx";
+import { Alert } from "@akabase/ui/components/alert";
+import { Badge } from "@akabase/ui/components/badge";
+import { Button } from "@akabase/ui/components/button";
+import { Field } from "@akabase/ui/components/field";
+import { Heading } from "@akabase/ui/components/heading";
+import { Select } from "@akabase/ui/components/select";
+import { Textarea } from "@akabase/ui/components/textarea";
+import { toaster } from "@akabase/ui/components/toast";
 import { ArrowLeftIcon, SaveIcon, SendIcon } from "lucide-react";
 import { revalidateLogic, useForm, useStore } from "@tanstack/react-form";
-import { Result } from "@archive/result";
+import { Result } from "@akabase/result";
 import { generateLoadDraftQueryOptions } from "@/features/project/actions/queries";
 import {
   updateProjectDraftInputSchema,
@@ -26,12 +26,12 @@ import { nl2br } from "@/libs/text";
 import { createListCollection } from "@ark-ui/react/collection";
 import { Portal } from "@ark-ui/react/portal";
 import { getDeadlineMessage, getFieldDeadlineStatus } from "@/features/project/utils/deadline";
-import { PROJECT_MAX_TAGS, PROJECT_PAMPHLET_TEXT_MAX_LENGTH } from "@archive/domain/project/schema";
-import type { OrgId } from "@archive/domain/organization/schema";
-import type { ProjectId } from "@archive/domain/project/schema";
-import { cast } from "@archive/domain/shared/ids";
+import { PROJECT_MAX_TAGS, PROJECT_PAMPHLET_TEXT_MAX_LENGTH } from "@akabase/domain/project/schema";
+import type { OrgId } from "@akabase/domain/organization/schema";
+import type { ProjectId } from "@akabase/domain/project/schema";
+import { cast } from "@akabase/domain/shared/ids";
 import { z } from "zod";
-import { getBlockedFieldKeys } from "@archive/domain/event/logic";
+import { getBlockedFieldKeys } from "@akabase/domain/event/logic";
 import { confirm } from "@/components/confirm";
 import { handleNotFoundError } from "@/libs/error";
 

@@ -1,11 +1,11 @@
 import type { Database } from "../db";
 import { schema } from "../db";
 import { and, eq } from "drizzle-orm";
-import type { UserRepository } from "@archive/domain/user/repository";
-import { committeeRoleAssignmentSchema, userSchema } from "@archive/domain/user/schema";
-import type { CommitteeRoleAssignment, User, UserId } from "@archive/domain/user/schema";
-import type { EventId } from "@archive/domain/event/schema";
-import { REPOSITORY_ERROR_CODE, RepositoryExceptionError } from "@archive/domain/shared/repository";
+import type { UserRepository } from "@akabase/domain/user/repository";
+import { committeeRoleAssignmentSchema, userSchema } from "@akabase/domain/user/schema";
+import type { CommitteeRoleAssignment, User, UserId } from "@akabase/domain/user/schema";
+import type { EventId } from "@akabase/domain/event/schema";
+import { REPOSITORY_ERROR_CODE, RepositoryExceptionError } from "@akabase/domain/shared/repository";
 
 /**
  * User Repository Implementation using Drizzle ORM

@@ -1,20 +1,20 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { Result } from "@archive/result";
-import { createDeadline } from "@archive/application/command/event/create-deadline";
-import { updateDeadline } from "@archive/application/command/event/update-deadline";
-import { deleteDeadline } from "@archive/application/command/event/delete-deadline";
-import { resolveActor } from "@archive/application/query/authorization/resolve-actor";
+import { Result } from "@akabase/result";
+import { createDeadline } from "@akabase/application/command/event/create-deadline";
+import { updateDeadline } from "@akabase/application/command/event/update-deadline";
+import { deleteDeadline } from "@akabase/application/command/event/delete-deadline";
+import { resolveActor } from "@akabase/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/auth";
 import { dependenciesMiddleware } from "@/libs/dependencies";
-import { cast } from "@archive/domain/shared/ids";
+import { cast } from "@akabase/domain/shared/ids";
 import {
   deadlineIdSchema,
   deadlineRefinement,
   deadlineSchema,
   eventIdSchema,
-} from "@archive/domain/event/schema";
-import type { UserId } from "@archive/domain/user/schema";
+} from "@akabase/domain/event/schema";
+import type { UserId } from "@akabase/domain/user/schema";
 import { mutationOptions, useQueryClient } from "@tanstack/react-query";
 import { generateLoadDeadlinesCacheKey } from "../queries/deadline";
 

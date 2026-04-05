@@ -3,22 +3,22 @@
  * Assigns or updates a user's committee role for a specific event
  */
 
-import { Result } from "@archive/result";
-import type { UserId } from "@archive/domain/user/schema";
-import type { EventId } from "@archive/domain/event/schema";
-import type { Actor, CommitteeRole } from "@archive/domain/authorization/schema";
-import type { UserError } from "@archive/domain/user/errors";
-import type { EventError } from "@archive/domain/event/errors";
-import type { AuthorizationError } from "@archive/domain/authorization/errors";
-import type { UserRepository } from "@archive/domain/user/repository";
-import { eventResource } from "@archive/domain/authorization/logic";
-import { generateId } from "@archive/domain/shared/ids";
+import { Result } from "@akabase/result";
+import type { UserId } from "@akabase/domain/user/schema";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { Actor, CommitteeRole } from "@akabase/domain/authorization/schema";
+import type { UserError } from "@akabase/domain/user/errors";
+import type { EventError } from "@akabase/domain/event/errors";
+import type { AuthorizationError } from "@akabase/domain/authorization/errors";
+import type { UserRepository } from "@akabase/domain/user/repository";
+import { eventResource } from "@akabase/domain/authorization/logic";
+import { generateId } from "@akabase/domain/shared/ids";
 import {
   createCommitteeRoleAssignment,
   updateCommitteeRoleAssignment,
-} from "@archive/domain/user/logic";
-import type { AuthorizationService } from "@archive/domain/authorization/service";
-import type { EventDomainService } from "@archive/domain/event/service";
+} from "@akabase/domain/user/logic";
+import type { AuthorizationService } from "@akabase/domain/authorization/service";
+import type { EventDomainService } from "@akabase/domain/event/service";
 
 export type UpdateCommitteeRoleInput = {
   userId: UserId;

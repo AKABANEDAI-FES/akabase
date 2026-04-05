@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vite-plus/test";
-import { Result } from "@archive/result";
+import { Result } from "@akabase/result";
 import { createTestDb } from "../../test/db-mock";
 import { createTestDependencies } from "../../test/test-dependencies";
 import { createAdminActor, createUserActor } from "../../test/test-helpers";
@@ -7,11 +7,11 @@ import { updateOrganizationMemberRole } from "./update-organization-member-role"
 import { addOrganizationMember } from "./add-organization-member";
 import { createOrganization } from "./create-organization";
 import { createEvent } from "../event/create-event";
-import { schema } from "@archive/infrastructure/db";
-import type { EventId } from "@archive/domain/event/schema";
-import type { OrgId } from "@archive/domain/organization/schema";
-import type { UserId } from "@archive/domain/user/schema";
-import { cast } from "@archive/domain/shared/ids";
+import { schema } from "@akabase/infrastructure/db";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { OrgId } from "@akabase/domain/organization/schema";
+import type { UserId } from "@akabase/domain/user/schema";
+import { cast } from "@akabase/domain/shared/ids";
 
 describe("updateOrganizationMemberRole", () => {
   let testDb: Awaited<ReturnType<typeof createTestDb>>;

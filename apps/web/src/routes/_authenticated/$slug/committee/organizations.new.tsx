@@ -1,8 +1,8 @@
 import { createFileRoute, redirect, useNavigate, useRouter } from "@tanstack/react-router";
 import { CreateOrganizationDialog } from "@/features/organization/components/create-organization-dialog";
 import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions/queries";
-import { cast } from "@archive/domain/shared/ids";
-import type { EventId } from "@archive/domain/event/schema";
+import { cast } from "@akabase/domain/shared/ids";
+import type { EventId } from "@akabase/domain/event/schema";
 
 export const Route = createFileRoute("/_authenticated/$slug/committee/organizations/new")({
   beforeLoad: async ({ params, context }) => {

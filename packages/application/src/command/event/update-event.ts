@@ -3,16 +3,16 @@
  * Updates an existing event's name and slug
  */
 
-import { Result } from "@archive/result";
-import type { EventId } from "@archive/domain/event/schema";
-import type { EventError } from "@archive/domain/event/errors";
-import { updateEventEntity } from "@archive/domain/event/logic";
-import type { AuthorizationError } from "@archive/domain/authorization/errors";
-import type { Actor } from "@archive/domain/authorization/schema";
-import { eventResource } from "@archive/domain/authorization/logic";
-import type { EventRepository } from "@archive/domain/event/repository";
-import type { AuthorizationService } from "@archive/domain/authorization/service";
-import type { EventDomainService } from "@archive/domain/event/service";
+import { Result } from "@akabase/result";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { EventError } from "@akabase/domain/event/errors";
+import { updateEventEntity } from "@akabase/domain/event/logic";
+import type { AuthorizationError } from "@akabase/domain/authorization/errors";
+import type { Actor } from "@akabase/domain/authorization/schema";
+import { eventResource } from "@akabase/domain/authorization/logic";
+import type { EventRepository } from "@akabase/domain/event/repository";
+import type { AuthorizationService } from "@akabase/domain/authorization/service";
+import type { EventDomainService } from "@akabase/domain/event/service";
 
 export type UpdateEventInput = {
   eventId: EventId;

@@ -1,4 +1,4 @@
-import { Result } from "@archive/result";
+import { Result } from "@akabase/result";
 import type { OrgId, OrgMember, OrgMemberRole, Organization } from "./schema";
 import { orgMemberSchema, organizationSchema } from "./schema";
 import type { OrganizationError } from "./errors";

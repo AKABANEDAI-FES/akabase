@@ -2,7 +2,7 @@ import type { Database } from "../db";
 import { schema } from "../db";
 import { and, desc, eq, max } from "drizzle-orm";
 import type { BatchItem } from "drizzle-orm/batch";
-import { deadlineSchema, eventSchema, placeSchema, tagSchema } from "@archive/domain/event/schema";
+import { deadlineSchema, eventSchema, placeSchema, tagSchema } from "@akabase/domain/event/schema";
 import type {
   Deadline,
   DeadlineId,
@@ -12,9 +12,9 @@ import type {
   PlaceId,
   Tag,
   TagId,
-} from "@archive/domain/event/schema";
-import type { EventRepository } from "@archive/domain/event/repository";
-import { REPOSITORY_ERROR_CODE, RepositoryExceptionError } from "@archive/domain/shared/repository";
+} from "@akabase/domain/event/schema";
+import type { EventRepository } from "@akabase/domain/event/repository";
+import { REPOSITORY_ERROR_CODE, RepositoryExceptionError } from "@akabase/domain/shared/repository";
 
 /**
  * Event Repository Implementation using Drizzle ORM

@@ -1,18 +1,18 @@
 import { revalidateLogic, useForm } from "@tanstack/react-form";
-import { Result } from "@archive/result";
+import { Result } from "@akabase/result";
 import { useMutation } from "@tanstack/react-query";
 import {
   updateOrganizationInputSchema,
   useUpdateOrganizationMutationOption,
 } from "../actions/mutations";
-import { Button } from "@archive/ui/components/button";
-import { Field } from "@archive/ui/components/field";
-import { Fieldset } from "@archive/ui/components/fieldset";
-import { Input } from "@archive/ui/components/input";
-import { Textarea } from "@archive/ui/components/textarea";
-import { toaster } from "@archive/ui/components/toast";
+import { Button } from "@akabase/ui/components/button";
+import { Field } from "@akabase/ui/components/field";
+import { Fieldset } from "@akabase/ui/components/fieldset";
+import { Input } from "@akabase/ui/components/input";
+import { Textarea } from "@akabase/ui/components/textarea";
+import { toaster } from "@akabase/ui/components/toast";
 import { nl2br } from "@/libs/text";
-import type { OrganizationDetail } from "@archive/application/query/organization/get-organization-detail";
+import type { OrganizationDetail } from "@akabase/application/query/organization/get-organization-detail";
 
 type UpdateOrganizationFormProps = {
   organization: OrganizationDetail;

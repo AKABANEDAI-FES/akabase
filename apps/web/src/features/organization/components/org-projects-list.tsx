@@ -1,11 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Stack } from "@archive/styled-system/jsx";
-import { Text } from "@archive/ui/components/text";
-import { css } from "@archive/styled-system/css";
+import { Stack } from "@akabase/styled-system/jsx";
+import { Text } from "@akabase/ui/components/text";
+import { css } from "@akabase/styled-system/css";
 import { generateLoadProjectsQueryOptions } from "@/features/project/actions/queries";
-import type { EventId } from "@archive/domain/event/schema";
-import type { OrgId } from "@archive/domain/organization/schema";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { OrgId } from "@akabase/domain/organization/schema";
 import { FormatDate } from "@/libs/date";
 
 type OrgProjectsListProps = {

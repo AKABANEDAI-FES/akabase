@@ -9,8 +9,8 @@ import appCss from "../styles.css?url";
 import type { QueryClient } from "@tanstack/react-query";
 import { getSessionFn } from "@/libs/auth";
 import type { SessionData } from "@/libs/auth";
-import { Toaster } from "@archive/ui/components/toast";
-import type { Event } from "@archive/domain/event/schema";
+import { Toaster } from "@akabase/ui/components/toast";
+import type { Event } from "@akabase/domain/event/schema";
 import { LocaleProvider } from "@ark-ui/react/locale";
 import { ConfirmHost } from "@/components/confirm";
 
