@@ -17,10 +17,7 @@ import { useState } from "react";
 import { nl2br } from "@/libs/text";
 import type { EventId } from "@akabase/domain/event/schema";
 import type { OrgId } from "@akabase/domain/organization/schema";
-import {
-  CONTEST_VOTE_NUMBER_MAX,
-  CONTEST_VOTE_NUMBER_MIN,
-} from "@akabase/domain/project/schema";
+import { CONTEST_VOTE_NUMBER_MAX, CONTEST_VOTE_NUMBER_MIN } from "@akabase/domain/project/schema";
 import { z } from "zod";
 import { LogoUploadField } from "./logo-upload-field";
 
@@ -69,9 +66,16 @@ export function CreateProjectDialog({
             (val) => {
               if (val === "") return true;
               const num = Number(val);
-              return !Number.isNaN(num) && Number.isInteger(num) && num >= CONTEST_VOTE_NUMBER_MIN && num <= CONTEST_VOTE_NUMBER_MAX;
+              return (
+                !Number.isNaN(num) &&
+                Number.isInteger(num) &&
+                num >= CONTEST_VOTE_NUMBER_MIN &&
+                num <= CONTEST_VOTE_NUMBER_MAX
+              );
             },
-            { message: `投票番号は${CONTEST_VOTE_NUMBER_MIN}〜${CONTEST_VOTE_NUMBER_MAX}の整数で入力してください` },
+            {
+              message: `投票番号は${CONTEST_VOTE_NUMBER_MIN}〜${CONTEST_VOTE_NUMBER_MAX}の整数で入力してください`,
+            },
           ),
         }),
       onSubmitAsync: async ({ value }) => {

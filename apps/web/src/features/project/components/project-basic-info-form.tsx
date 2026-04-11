@@ -61,9 +61,16 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
           (val) => {
             if (val === "") return true;
             const num = Number(val);
-            return !Number.isNaN(num) && Number.isInteger(num) && num >= CONTEST_VOTE_NUMBER_MIN && num <= CONTEST_VOTE_NUMBER_MAX;
+            return (
+              !Number.isNaN(num) &&
+              Number.isInteger(num) &&
+              num >= CONTEST_VOTE_NUMBER_MIN &&
+              num <= CONTEST_VOTE_NUMBER_MAX
+            );
           },
-          { message: `投票番号は${CONTEST_VOTE_NUMBER_MIN}〜${CONTEST_VOTE_NUMBER_MAX}の整数で入力してください` },
+          {
+            message: `投票番号は${CONTEST_VOTE_NUMBER_MIN}〜${CONTEST_VOTE_NUMBER_MAX}の整数で入力してください`,
+          },
         ),
       }),
       onSubmitAsync: async ({ value }) => {
