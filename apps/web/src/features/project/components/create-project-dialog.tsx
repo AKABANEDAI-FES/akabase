@@ -17,6 +17,7 @@ import { useState } from "react";
 import { nl2br } from "@/libs/text";
 import type { EventId } from "@akabase/domain/event/schema";
 import type { OrgId } from "@akabase/domain/organization/schema";
+import { z } from "zod";
 import { LogoUploadField } from "./logo-upload-field";
 
 type CreateProjectDialogProps = {
@@ -54,12 +55,19 @@ export function CreateProjectDialog({
       name: "",
       placeId: null as string | null,
       logoImageId: null as string | null,
+      contestVoteNumber: "",
     },
     validators: {
-      onDynamic: createProjectInputSchema.omit({ eventId: true, orgId: true }),
+      onDynamic: createProjectInputSchema
+        .omit({ eventId: true, orgId: true, contestVoteNumber: true })
+        .extend({ contestVoteNumber: z.string() }),
       onSubmitAsync: async ({ value }) => {
         try {
-          const result = await mutateAsync({ data: { ...value, eventId, orgId } });
+          const parsedVoteNumber =
+            value.contestVoteNumber === "" ? null : Number.parseInt(value.contestVoteNumber, 10);
+          const result = await mutateAsync({
+            data: { ...value, contestVoteNumber: parsedVoteNumber, eventId, orgId },
+          });
 
           if (Result.isFailure(result)) {
             // Display error as toast
@@ -191,6 +199,35 @@ export function CreateProjectDialog({
                           </Field.ErrorText>
                         )}
                         <Field.HelperText>企画を実施する場所を選択してください</Field.HelperText>
+                      </Field.Root>
+                    )}
+                  </form.Field>
+
+                  {/* Contest vote number field */}
+                  <form.Field name="contestVoteNumber">
+                    {(field) => (
+                      <Field.Root invalid={!field.state.meta.isValid}>
+                        <Field.Label htmlFor={field.name}>コンテスト投票番号（任意）</Field.Label>
+                        <Input
+                          id={field.name}
+                          name={field.name}
+                          type="number"
+                          min={1}
+                          max={9999}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          placeholder="投票番号を入力"
+                        />
+                        {!field.state.meta.isValid && (
+                          <Field.ErrorText>
+                            {nl2br(
+                              field.state.meta.errors
+                                .map((error) => error?.message ?? "")
+                                .join("\n"),
+                            )}
+                          </Field.ErrorText>
+                        )}
                       </Field.Root>
                     )}
                   </form.Field>

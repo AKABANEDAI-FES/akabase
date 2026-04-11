@@ -41,6 +41,7 @@ export const createProjectInputSchema = projectSchema.pick({
   name: true,
   placeId: true,
   logoImageId: true,
+  contestVoteNumber: true,
 });
 
 /**
@@ -64,6 +65,7 @@ export const createProjectFn = createServerFn({ method: "POST" })
             name: data.name,
             placeId: data.placeId,
             logoImageId: data.logoImageId,
+            contestVoteNumber: data.contestVoteNumber,
             actor,
           }),
         );
@@ -364,6 +366,7 @@ export const updateProjectInputSchema = z.object({
   name: projectSchema.shape.name,
   placeId: projectSchema.shape.placeId,
   logoImageId: projectSchema.shape.logoImageId,
+  contestVoteNumber: projectSchema.shape.contestVoteNumber,
 });
 
 export const updateProjectFn = createServerFn({ method: "POST" })

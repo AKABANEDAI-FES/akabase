@@ -46,15 +46,19 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
       name: project.name,
       placeId: project.placeId,
       logoImageId: project.logoImageId,
+      contestVoteNumber: project.contestVoteNumber?.toString() ?? "",
     },
     validators: {
       onDynamic: z.object({
         name: updateProjectInputSchema.shape.name,
         placeId: updateProjectInputSchema.shape.placeId,
         logoImageId: updateProjectInputSchema.shape.logoImageId,
+        contestVoteNumber: z.string(),
       }),
       onSubmitAsync: async ({ value }) => {
         try {
+          const parsedVoteNumber =
+            value.contestVoteNumber === "" ? null : Number.parseInt(value.contestVoteNumber, 10);
           const projectData = updateProjectInputSchema.parse({
             projectId: cast<ProjectId>(projectId),
             eventId,
@@ -62,6 +66,7 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
             name: value.name,
             placeId: value.placeId,
             logoImageId: value.logoImageId,
+            contestVoteNumber: parsedVoteNumber,
           });
 
           const result = await updateProjectMutate({ data: projectData });
@@ -162,6 +167,30 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
                   </Select.Positioner>
                 </Portal>
               </Select.Root>
+              {!field.state.meta.isValid && (
+                <Field.ErrorText>
+                  {nl2br(field.state.meta.errors.map((error) => error?.message ?? "").join("\n"))}
+                </Field.ErrorText>
+              )}
+            </Field.Root>
+          )}
+        </form.Field>
+
+        <form.Field name="contestVoteNumber">
+          {(field) => (
+            <Field.Root invalid={!field.state.meta.isValid}>
+              <Field.Label htmlFor={field.name}>コンテスト投票番号</Field.Label>
+              <Input
+                id={field.name}
+                name={field.name}
+                type="number"
+                min={1}
+                max={9999}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                placeholder="投票番号を入力（任意）"
+              />
               {!field.state.meta.isValid && (
                 <Field.ErrorText>
                   {nl2br(field.state.meta.errors.map((error) => error?.message ?? "").join("\n"))}

@@ -53,6 +53,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
         name: row.name,
         placeId: row.placeId,
         logoImageId: row.logoImageId,
+        contestVoteNumber: row.contestVoteNumber ?? null,
         createdAt: new Date(row.createdAt),
         updatedAt: new Date(row.updatedAt),
       });
@@ -191,6 +192,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
           name: row.name,
           placeId: row.placeId,
           logoImageId: row.logoImageId,
+          contestVoteNumber: row.contestVoteNumber ?? null,
           createdAt: new Date(row.createdAt),
           updatedAt: new Date(row.updatedAt),
         }),
@@ -245,6 +247,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
           name: project.name,
           placeId: project.placeId,
           logoImageId: project.logoImageId,
+          contestVoteNumber: project.contestVoteNumber,
           createdAt: project.createdAt,
           updatedAt: project.updatedAt,
         })
@@ -255,6 +258,7 @@ export class ProjectRepositoryImpl implements ProjectRepository {
             name: project.name,
             placeId: project.placeId,
             logoImageId: project.logoImageId,
+            contestVoteNumber: project.contestVoteNumber,
             updatedAt: project.updatedAt,
           },
           where: eq(schema.projects.eventId, project.eventId),

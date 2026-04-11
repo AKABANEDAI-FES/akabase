@@ -27,6 +27,7 @@ export type UpdateProjectInput = {
   name: string;
   placeId: PlaceId | null;
   logoImageId: ImageId | null;
+  contestVoteNumber: number | null;
   actor: Actor;
 };
 
@@ -66,6 +67,7 @@ export async function updateProject(
         name: input.name,
         placeId: input.placeId,
         logoImageId: input.logoImageId,
+        contestVoteNumber: input.contestVoteNumber,
       }),
     );
 
