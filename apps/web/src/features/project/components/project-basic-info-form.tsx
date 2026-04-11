@@ -189,6 +189,7 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
                 type="number"
                 min={1}
                 max={9999}
+                step={1}
                 value={field.state.value}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
