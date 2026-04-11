@@ -229,8 +229,8 @@ export function CreateProjectDialog({
                           id={field.name}
                           name={field.name}
                           type="number"
-                          min={1}
-                          max={9999}
+                          min={CONTEST_VOTE_NUMBER_MIN}
+                          max={CONTEST_VOTE_NUMBER_MAX}
                           step={1}
                           value={field.state.value}
                           onBlur={field.handleBlur}
