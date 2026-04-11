@@ -15,7 +15,11 @@ import { nl2br } from "@/libs/text";
 import { createListCollection } from "@ark-ui/react/collection";
 import { Portal } from "@ark-ui/react/portal";
 import type { OrgId } from "@akabase/domain/organization/schema";
-import type { ProjectId } from "@akabase/domain/project/schema";
+import {
+  CONTEST_VOTE_NUMBER_MAX,
+  CONTEST_VOTE_NUMBER_MIN,
+  type ProjectId,
+} from "@akabase/domain/project/schema";
 import { cast } from "@akabase/domain/shared/ids";
 import { z } from "zod";
 import { LogoUploadField } from "./logo-upload-field";
@@ -53,9 +57,13 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
         name: updateProjectInputSchema.shape.name,
         placeId: updateProjectInputSchema.shape.placeId,
         logoImageId: updateProjectInputSchema.shape.logoImageId,
-        contestVoteNumber: z.preprocess(
-          (val) => (val === "" ? null : Number(val)),
-          updateProjectInputSchema.shape.contestVoteNumber,
+        contestVoteNumber: z.string().refine(
+          (val) => {
+            if (val === "") return true;
+            const num = Number(val);
+            return !Number.isNaN(num) && Number.isInteger(num) && num >= CONTEST_VOTE_NUMBER_MIN && num <= CONTEST_VOTE_NUMBER_MAX;
+          },
+          { message: `投票番号は${CONTEST_VOTE_NUMBER_MIN}〜${CONTEST_VOTE_NUMBER_MAX}の整数で入力してください` },
         ),
       }),
       onSubmitAsync: async ({ value }) => {
