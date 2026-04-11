@@ -60,11 +60,16 @@ export function CreateProjectDialog({
     validators: {
       onDynamic: createProjectInputSchema
         .omit({ eventId: true, orgId: true, contestVoteNumber: true })
-        .extend({ contestVoteNumber: z.string() }),
+        .extend({
+          contestVoteNumber: z.preprocess(
+            (val) => (val === "" ? null : Number(val)),
+            createProjectInputSchema.shape.contestVoteNumber,
+          ),
+        }),
       onSubmitAsync: async ({ value }) => {
         try {
           const parsedVoteNumber =
-            value.contestVoteNumber === "" ? null : Number.parseInt(value.contestVoteNumber, 10);
+            value.contestVoteNumber === "" ? null : Number(value.contestVoteNumber);
           const result = await mutateAsync({
             data: { ...value, contestVoteNumber: parsedVoteNumber, eventId, orgId },
           });

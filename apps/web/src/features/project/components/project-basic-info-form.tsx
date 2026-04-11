@@ -53,12 +53,15 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
         name: updateProjectInputSchema.shape.name,
         placeId: updateProjectInputSchema.shape.placeId,
         logoImageId: updateProjectInputSchema.shape.logoImageId,
-        contestVoteNumber: z.string(),
+        contestVoteNumber: z.preprocess(
+          (val) => (val === "" ? null : Number(val)),
+          updateProjectInputSchema.shape.contestVoteNumber,
+        ),
       }),
       onSubmitAsync: async ({ value }) => {
         try {
           const parsedVoteNumber =
-            value.contestVoteNumber === "" ? null : Number.parseInt(value.contestVoteNumber, 10);
+            value.contestVoteNumber === "" ? null : Number(value.contestVoteNumber);
           const projectData = updateProjectInputSchema.parse({
             projectId: cast<ProjectId>(projectId),
             eventId,
