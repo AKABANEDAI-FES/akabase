@@ -14,6 +14,7 @@ import { NavLink, NavSection, SidebarLayout } from "@/components/sidebar-layout"
 import { generateLoadEventBySlugQueryOptions } from "@/features/event/actions/queries";
 import { generateCheckCommitteeRoleQueryOptions } from "@/features/authorization/actions/queries";
 import { generateLoadMyOrganizationsQueryOptions } from "@/features/organization/actions/queries";
+import { NotificationBell } from "@/features/notification/components/notification-bell";
 import { handleNotFoundError } from "@/libs/error";
 
 export const Route = createFileRoute("/_authenticated/$slug")({
@@ -49,7 +50,7 @@ function SlugLayout() {
   const isCommitteeMember = committeeRole !== "default";
 
   return (
-    <SidebarLayout title={event.name}>
+    <SidebarLayout title={event.name} headerExtra={<NotificationBell eventId={event.id} />}>
       <NavLink>
         <Link to="/$slug" params={{ slug }} activeOptions={{ exact: true }}>
           <HomeIcon />

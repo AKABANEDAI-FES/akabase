@@ -36,6 +36,10 @@
       "import": "./dist/query/event/*.mjs",
       "types": "./dist/query/event/*.d.mts"
     },
+    "./query/notification/*": {
+      "import": "./dist/query/notification/*.mjs",
+      "types": "./dist/query/notification/*.d.mts"
+    },
     "./query/organization/*": {
       "import": "./dist/query/organization/*.mjs",
       "types": "./dist/query/organization/*.d.mts"

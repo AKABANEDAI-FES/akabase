@@ -31,6 +31,10 @@ import {
   generateLoadSubmissionDetailCacheKey,
   generateLoadSubmissionsCacheKey,
 } from "../queries";
+import {
+  generateLoadNotificationsCacheKey,
+  generateLoadUnreadCountCacheKey,
+} from "@/features/notification/actions/queries";
 import { z } from "zod";
 
 /**
@@ -197,6 +201,12 @@ export function useSubmitProjectMutationOption() {
         queryClient.invalidateQueries({
           queryKey: generateLoadSubmissionDetailCacheKey(eventId, submissionId),
         }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadNotificationsCacheKey(eventId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadUnreadCountCacheKey(eventId),
+        }),
       ]);
     }),
   });
@@ -255,6 +265,12 @@ export function useApproveProjectMutationOption() {
         }),
         queryClient.invalidateQueries({
           queryKey: generateLoadEventSubmissionsCacheKey(eventId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadNotificationsCacheKey(eventId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadUnreadCountCacheKey(eventId),
         }),
       ]);
     }),
@@ -323,6 +339,12 @@ export function useReturnProjectMutationOption() {
         queryClient.invalidateQueries({
           queryKey: generateLoadDraftCacheKey(eventId, orgId, projectId),
         }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadNotificationsCacheKey(eventId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadUnreadCountCacheKey(eventId),
+        }),
       ]);
     }),
   });
@@ -386,6 +408,12 @@ export function useWithdrawSubmissionMutationOption() {
         }),
         queryClient.invalidateQueries({
           queryKey: generateLoadEventSubmissionsCacheKey(eventId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadNotificationsCacheKey(eventId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadUnreadCountCacheKey(eventId),
         }),
       ]);
     }),
