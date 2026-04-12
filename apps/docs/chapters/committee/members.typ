@@ -1,4 +1,3 @@
-// apps/docs/chapters/committee/members.typ
 #import "../_styles.typ": note, placeholder
 
 = メンバー管理

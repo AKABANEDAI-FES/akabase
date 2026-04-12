@@ -1,4 +1,3 @@
-// apps/docs/chapters/committee/deadlines.typ
 #import "../_styles.typ": note, placeholder
 
 = 締切管理

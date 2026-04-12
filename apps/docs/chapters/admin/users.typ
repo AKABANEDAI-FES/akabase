@@ -1,4 +1,3 @@
-// apps/docs/chapters/admin/users.typ
 #import "../_styles.typ": note, placeholder
 
 = ユーザー管理

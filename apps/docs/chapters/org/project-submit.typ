@@ -1,4 +1,3 @@
-// apps/docs/chapters/org/project-submit.typ
 #import "../_styles.typ": note, placeholder
 
 = 企画の提出と取り下げ

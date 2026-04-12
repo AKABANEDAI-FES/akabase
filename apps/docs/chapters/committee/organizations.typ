@@ -1,4 +1,3 @@
-// apps/docs/chapters/committee/organizations.typ
 #import "../_styles.typ": note, placeholder
 
 = 出展団体管理

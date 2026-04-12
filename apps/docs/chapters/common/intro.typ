@@ -1,4 +1,3 @@
-// apps/docs/chapters/common/intro.typ
 #import "../_styles.typ": note, placeholder
 
 = はじめに

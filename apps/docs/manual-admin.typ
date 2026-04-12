@@ -1,4 +1,3 @@
-// apps/docs/manual-admin.typ
 #import "_template.typ": template
 #import "chapters/_styles.typ": note, placeholder
 #show: template.with(subtitle: "管理者向け")

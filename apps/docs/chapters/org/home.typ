@@ -1,4 +1,3 @@
-// apps/docs/chapters/org/home.typ
 #import "../_styles.typ": note, placeholder
 
 = ホーム画面

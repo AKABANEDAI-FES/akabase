@@ -1,4 +1,3 @@
-// apps/docs/chapters/org/project-detail.typ
 #import "../_styles.typ": note, placeholder
 
 = 企画詳細

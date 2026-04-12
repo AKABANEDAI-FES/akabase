@@ -1,4 +1,3 @@
-// apps/docs/chapters/committee/tags-places.typ
 #import "../_styles.typ": note, placeholder
 
 = タグ・場所の管理

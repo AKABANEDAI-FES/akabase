@@ -1,4 +1,3 @@
-// apps/docs/chapters/common/login.typ
 #import "../_styles.typ": note, placeholder
 
 = ログイン

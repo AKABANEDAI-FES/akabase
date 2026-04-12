@@ -1,4 +1,3 @@
-// apps/docs/chapters/admin/events.typ
 #import "../_styles.typ": note, placeholder
 
 = イベント管理

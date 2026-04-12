@@ -1,4 +1,3 @@
-// apps/docs/chapters/_styles.typ
 
 // スクリーンショットのプレースホルダー
 // 使用例: #placeholder("ホーム画面")

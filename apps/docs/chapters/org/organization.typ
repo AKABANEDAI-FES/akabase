@@ -1,4 +1,3 @@
-// apps/docs/chapters/org/organization.typ
 #import "../_styles.typ": note, placeholder
 
 = 団体ページ

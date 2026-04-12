@@ -1,4 +1,3 @@
-// apps/docs/chapters/org/project-edit.typ
 #import "../_styles.typ": note, placeholder
 
 = 企画の編集
