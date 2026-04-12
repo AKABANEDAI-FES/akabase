@@ -1,23 +1,7 @@
 // apps/docs/manual-committee.typ
-#include "index.typ"
-#include "chapters/_styles.typ"
-
-// 表紙
-#align(center + horizon)[
-  #text(size: 24pt, weight: "bold")[AKABASE]
-  #v(0.5em)
-  #text(size: 18pt, weight: "bold")[ユーザーマニュアル]
-  #v(1em)
-  #text(size: 14pt, fill: luma(80))[委員会向け]
-  #v(3em)
-  #text(size: 11pt, fill: luma(120))[大学祭企画情報管理システム]
-]
-
-#pagebreak()
-
-#outline(title: "目次", depth: 2)
-
-#pagebreak()
+#import "_template.typ": template
+#import "chapters/_styles.typ": placeholder, note
+#show: template.with(subtitle: "委員会向け")
 
 #include "chapters/common/intro.typ"
 #include "chapters/common/login.typ"
