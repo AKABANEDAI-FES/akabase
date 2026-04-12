@@ -1,10 +1,7 @@
+import type { MouseEvent } from "react";
 import { useMutation } from "@tanstack/react-query";
-import {
-  CheckCircleIcon,
-  RotateCcwIcon,
-  SendIcon,
-  XCircleIcon,
-} from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { CheckCircleIcon, RotateCcwIcon, SendIcon, XCircleIcon } from "lucide-react";
 import { css } from "@akabase/styled-system/css";
 import { Stack } from "@akabase/styled-system/jsx";
 import { Text } from "@akabase/ui/components/text";
@@ -42,17 +39,62 @@ function formatRelativeTime(date: Date): string {
   return date.toLocaleDateString("ja-JP");
 }
 
+function getNotificationLink(notification: NotificationListItem, slug: string): string | null {
+  if (!notification.submissionId) {
+    return null;
+  }
+
+  switch (notification.type) {
+    case "submitted":
+    case "withdrawn": {
+      return `/${slug}/committee/submissions/${notification.submissionId}`;
+    }
+    case "approved":
+    case "returned": {
+      if (!notification.orgId || !notification.projectId) {
+        return null;
+      }
+      return `/${slug}/orgs/${notification.orgId}/projects/${notification.projectId}/submissions/${notification.submissionId}`;
+    }
+    default: {
+      return null;
+    }
+  }
+}
+
+const itemStyle = css({
+  display: "flex",
+  gap: "3",
+  padding: "3",
+  width: "full",
+  textAlign: "left",
+  borderRadius: "md",
+  transition: "background-color 0.15s",
+  position: "relative",
+  textDecoration: "none",
+  color: "inherit",
+});
+
 type NotificationItemProps = {
   notification: NotificationListItem;
   eventId: string;
+  slug: string;
+  onNavigate: () => void;
 };
 
-export function NotificationItem({ notification, eventId }: NotificationItemProps) {
+export function NotificationItem({
+  notification,
+  eventId,
+  slug,
+  onNavigate,
+}: NotificationItemProps) {
   const markAsRead = useMutation(useMarkAsReadMutationOption());
   const Icon = ACTION_ICONS[notification.type];
   const isUnread = notification.readAt === null;
+  const link = getNotificationLink(notification, slug);
+  const hasLink = link !== null;
 
-  const handleClick = () => {
+  const handleMarkAsRead = () => {
     if (isUnread && !markAsRead.isPending) {
       markAsRead.mutate({
         data: { notificationId: notification.id, eventId },
@@ -60,24 +102,15 @@ export function NotificationItem({ notification, eventId }: NotificationItemProp
     }
   };
 
-  return (
-    <button
-      type="button"
-      onClick={handleClick}
-      className={css({
-        display: "flex",
-        gap: "3",
-        padding: "3",
-        width: "full",
-        textAlign: "left",
-        cursor: isUnread ? "pointer" : "default",
-        borderRadius: "md",
-        backgroundColor: isUnread ? "bg.subtle" : "transparent",
-        _hover: isUnread ? { backgroundColor: "bg.muted" } : {},
-        transition: "background-color 0.15s",
-        position: "relative",
-      })}
-    >
+  const handleLinkClick = (e: MouseEvent) => {
+    handleMarkAsRead();
+    if (!e.metaKey && !e.ctrlKey) {
+      onNavigate();
+    }
+  };
+
+  const content = (
+    <>
       <Icon
         className={css({
           flexShrink: "0",
@@ -111,6 +144,35 @@ export function NotificationItem({ notification, eventId }: NotificationItemProp
           })}
         />
       )}
-    </button>
+    </>
+  );
+
+  if (hasLink) {
+    return (
+      <Link
+        to={link}
+        onClick={handleLinkClick}
+        className={`${itemStyle} ${css({
+          cursor: "pointer",
+          backgroundColor: isUnread ? "bg.subtle" : "transparent",
+          _hover: { backgroundColor: "bg.muted" },
+        })}`}
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <div
+      className={`${itemStyle} ${css({
+        cursor: isUnread ? "pointer" : "default",
+        backgroundColor: isUnread ? "bg.subtle" : "transparent",
+        _hover: isUnread ? { backgroundColor: "bg.muted" } : {},
+      })}`}
+      onClick={handleMarkAsRead}
+    >
+      {content}
+    </div>
   );
 }

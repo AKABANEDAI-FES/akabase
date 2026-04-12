@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Portal } from "@ark-ui/react/portal";
 import { BellIcon } from "lucide-react";
@@ -9,13 +10,19 @@ import { NotificationList } from "./notification-list";
 
 type NotificationBellProps = {
   eventId: string;
+  slug: string;
 };
 
-export function NotificationBell({ eventId }: NotificationBellProps) {
+export function NotificationBell({ eventId, slug }: NotificationBellProps) {
+  const [open, setOpen] = useState(false);
   const { data: unreadCount } = useQuery(generateLoadUnreadCountQueryOptions(eventId));
 
   return (
-    <Popover.Root positioning={{ placement: "bottom-end" }}>
+    <Popover.Root
+      positioning={{ placement: "bottom-end" }}
+      open={open}
+      onOpenChange={({ open }) => setOpen(open)}
+    >
       <Popover.Trigger asChild>
         <IconButton
           variant="plain"
@@ -52,7 +59,7 @@ export function NotificationBell({ eventId }: NotificationBellProps) {
       <Portal>
         <Popover.Positioner>
           <Popover.Content className={css({ width: "sm", overflow: "hidden" })}>
-            <NotificationList eventId={eventId} />
+            <NotificationList eventId={eventId} slug={slug} onNavigate={() => setOpen(false)} />
           </Popover.Content>
         </Popover.Positioner>
       </Portal>

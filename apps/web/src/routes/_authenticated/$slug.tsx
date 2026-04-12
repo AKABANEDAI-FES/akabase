@@ -50,7 +50,10 @@ function SlugLayout() {
   const isCommitteeMember = committeeRole !== "default";
 
   return (
-    <SidebarLayout title={event.name} headerExtra={<NotificationBell eventId={event.id} />}>
+    <SidebarLayout
+      title={event.name}
+      headerExtra={<NotificationBell eventId={event.id} slug={slug} />}
+    >
       <NavLink>
         <Link to="/$slug" params={{ slug }} activeOptions={{ exact: true }}>
           <HomeIcon />

@@ -12,9 +12,11 @@ import { NotificationItem } from "./notification-item";
 
 type NotificationListProps = {
   eventId: string;
+  slug: string;
+  onNavigate: () => void;
 };
 
-export function NotificationList({ eventId }: NotificationListProps) {
+export function NotificationList({ eventId, slug, onNavigate }: NotificationListProps) {
   const { data: notifications, isLoading } = useQuery(
     generateLoadNotificationsQueryOptions(eventId),
   );
@@ -65,9 +67,7 @@ export function NotificationList({ eventId }: NotificationListProps) {
       )}
 
       {!isLoading && notifications && notifications.length > 0 && (
-        <ScrollArea.Root
-          className={css({ maxHeight: "sm" })}
-        >
+        <ScrollArea.Root className={css({ maxHeight: "sm" })}>
           <ScrollArea.Viewport>
             <ScrollArea.Content>
               <Stack gap="0" padding="1">
@@ -76,6 +76,8 @@ export function NotificationList({ eventId }: NotificationListProps) {
                     key={notification.id}
                     notification={notification}
                     eventId={eventId}
+                    slug={slug}
+                    onNavigate={onNavigate}
                   />
                 ))}
               </Stack>
