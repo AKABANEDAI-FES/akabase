@@ -1,10 +1,13 @@
-#import "../_styles.typ": note, placeholder
+#import "../_styles.typ": note
 
 = 締切管理
 
 サイドバーの「*締切*」をクリックすると締切管理ページが表示されます。締切はフィールドごとに設定でき、締切を過ぎると出展団体側でそのフィールドが編集不可になります。
 
-#placeholder("締切管理ページ")
+#figure(
+  image("../../assets/committee/deadlines.png"),
+  caption: "締切管理ページ",
+)
 
 == 締切の対象フィールド
 
@@ -13,16 +16,19 @@
 #table(
   columns: (auto, 1fr),
   table.header([*フィールドキー*], [*対象フィールド*]),
-  [pamphlet_text], [企画編集画面の「パンフレット用説明」],
-  [tags], [企画編集画面の「タグ」],
-  [web_content], [企画編集画面の「Web用コンテンツ」],
+  [パンフレット説明文], [企画編集画面の「パンフレット用説明」],
+  [タグ], [企画編集画面の「タグ」],
+  [Webコンテンツ], [企画編集画面の「Web用コンテンツ」],
 )
 
 == 締切の追加
 
 「*締切を追加*」ボタンをクリックするとダイアログが表示されます。
 
-#placeholder("締切追加ダイアログ")
+#figure(
+  image("../../assets/committee/deadlines-add-dialog.png"),
+  caption: "締切追加ダイアログ",
+)
 
 #table(
   columns: (auto, auto, 1fr),

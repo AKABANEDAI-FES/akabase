@@ -1,4 +1,4 @@
-#import "../_styles.typ": note, placeholder
+#import "../_styles.typ": note
 
 = タグ・場所の管理
 
@@ -6,13 +6,16 @@
 
 サイドバーの「*タグ*」をクリックするとタグ管理ページが表示されます。タグは出展団体が企画に設定するカテゴリラベルです。
 
-#placeholder("タグ管理ページ")
+#figure(image("../../assets/committee/tags.png"), caption: "タグ管理ページ")
 
 === タグの作成
 
 「*タグを作成*」ボタンをクリックするとダイアログが表示されます。タグ名を入力して「作成」をクリックします。
 
-#placeholder("タグ作成ダイアログ")
+#figure(
+  image("../../assets/committee/tags-create-dialog.png"),
+  caption: "タグ作成ダイアログ",
+)
 
 === タグの編集・削除
 
@@ -26,13 +29,16 @@
 
 サイドバーの「*場所*」をクリックすると場所管理ページが表示されます。場所は企画の開催場所として使用されます。
 
-#placeholder("場所管理ページ")
+#figure(image("../../assets/committee/places.png"), caption: "場所管理ページ")
 
 === 場所の作成
 
 「*場所を追加*」ボタンをクリックするとダイアログが表示されます。場所名を入力して「作成」をクリックします。
 
-#placeholder("場所作成ダイアログ")
+#figure(
+  image("../../assets/committee/places-create-dialog.png"),
+  caption: "場所作成ダイアログ",
+)
 
 === 場所の編集・削除
 

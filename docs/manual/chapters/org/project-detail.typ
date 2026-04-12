@@ -1,10 +1,10 @@
-#import "../_styles.typ": note, placeholder
+#import "../_styles.typ": note
 
 = 企画詳細
 
 企画一覧から企画名をクリックすると企画詳細ページが表示されます。
 
-#placeholder("企画詳細ページ")
+#figure(image("../../assets/org/project-detail.png"), caption: "企画詳細ページ")
 
 == 表示される情報
 

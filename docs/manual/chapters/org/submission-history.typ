@@ -1,10 +1,13 @@
-#import "../_styles.typ": note, placeholder
+#import "../_styles.typ": note
 
 = 提出履歴とフィードバックの確認
 
 企画詳細ページの「*提出履歴*」ボタンをクリックすると、過去の提出一覧が表示されます。
 
-#placeholder("提出履歴一覧")
+#figure(
+  image("../../assets/org/submission-history.png"),
+  caption: "提出履歴一覧",
+)
 
 各行には提出日時と現在のステータスが表示されます。行をクリックすると提出詳細ページに遷移します。
 
@@ -12,7 +15,10 @@
 
 提出詳細ページには3つのタブがあります。
 
-#placeholder("提出詳細ページ")
+#figure(
+  image("../../assets/org/submission-detail.png"),
+  caption: "提出詳細ページ",
+)
 
 === 概要タブ
 
@@ -22,7 +28,10 @@
 
 提出に関連するアクション履歴（提出・承認・差戻し等）とフィードバックメッセージが時系列で表示されます。
 
-#placeholder("履歴とフィードバックタブ")
+#figure(
+  image("../../assets/org/submission-detail-feedback.png"),
+  caption: "履歴とフィードバックタブ",
+)
 
 差戻しがあった場合は、委員会からのフィードバックメッセージを確認できます。フィードバックを参考にして企画内容を修正し、再提出してください。
 

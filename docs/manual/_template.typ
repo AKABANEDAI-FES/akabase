@@ -19,7 +19,7 @@
   )
   show heading: set block(above: 24pt, below: 24pt)
   show figure: set figure.caption(position: top)
-  show figure: set block(breakable: true)
+  show figure: set block(breakable: false)
 
   // 表紙
   align(center + horizon)[

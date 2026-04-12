@@ -1,9 +1,12 @@
 #import "_template.typ": template
-#import "chapters/_styles.typ": note, placeholder
+#import "chapters/_styles.typ": note
 #show: template.with(subtitle: "出展団体向け")
 
 #include "chapters/common/intro.typ"
 #include "chapters/common/login.typ"
+
+#pagebreak()
+
 #include "chapters/org/home.typ"
 #include "chapters/org/organization.typ"
 #include "chapters/org/project-detail.typ"
