@@ -1,5 +1,5 @@
 // apps/docs/chapters/org/submission-history.typ
-#import "../_styles.typ": placeholder, note
+#import "../_styles.typ": note, placeholder
 
 = 提出履歴とフィードバックの確認
 

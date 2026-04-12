@@ -1,5 +1,5 @@
 // apps/docs/chapters/committee/submissions.typ
-#import "../_styles.typ": placeholder, note
+#import "../_styles.typ": note, placeholder
 
 = 提出一覧と審査
 

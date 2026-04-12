@@ -1,5 +1,5 @@
 // apps/docs/chapters/admin/events.typ
-#import "../_styles.typ": placeholder, note
+#import "../_styles.typ": note, placeholder
 
 = イベント管理
 
@@ -17,7 +17,9 @@
   columns: (auto, auto, 1fr),
   table.header([*フィールド*], [*必須*], [*説明*]),
   [イベント名], [必須], [大学祭の名称（例：第〇回白門祭）],
-  [スラッグ], [必須], [URLに使用される識別子。英数字・ハイフンのみ使用可（例：2024）],
+  [スラッグ],
+  [必須],
+  [URLに使用される識別子。英数字・ハイフンのみ使用可（例：2024）],
 )
 
 == イベント詳細・設定
@@ -33,7 +35,9 @@
 #table(
   columns: (auto, 1fr),
   table.header([*ステータス*], [*説明*]),
-  [active], [現在進行中のイベント。ユーザーがホームにアクセスした際にリダイレクトされる。],
+  [active],
+  [現在進行中のイベント。ユーザーがホームにアクセスした際にリダイレクトされる。],
+
   [archived], [終了したイベント。読み取り専用となる。],
 )
 

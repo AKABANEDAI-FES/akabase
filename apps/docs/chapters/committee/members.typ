@@ -1,5 +1,5 @@
 // apps/docs/chapters/committee/members.typ
-#import "../_styles.typ": placeholder, note
+#import "../_styles.typ": note, placeholder
 
 = メンバー管理
 
@@ -15,8 +15,11 @@
   columns: (auto, 1fr),
   table.header([*ロール*], [*説明*]),
   [default], [一般ユーザー。委員会管理メニューは表示されない。],
-  [member], [委員会メンバー。委員会管理メニューが表示され、審査・各種管理が行える。],
-  [admin], [委員長。委員会メンバーの権限に加えて、イベント設定変更・団体作成・各種マスタ管理が行える。],
+  [member],
+  [委員会メンバー。委員会管理メニューが表示され、審査・各種管理が行える。],
+
+  [admin],
+  [委員長。委員会メンバーの権限に加えて、イベント設定変更・団体作成・各種マスタ管理が行える。],
 )
 
 #note[

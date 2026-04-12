@@ -1,6 +1,6 @@
 // apps/docs/manual-all.typ
 #import "_template.typ": template
-#import "chapters/_styles.typ": placeholder, note
+#import "chapters/_styles.typ": note, placeholder
 #show: template.with(subtitle: "全役割版")
 
 // 共通

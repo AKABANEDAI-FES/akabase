@@ -1,5 +1,5 @@
 // apps/docs/chapters/committee/export.typ
-#import "../_styles.typ": placeholder, note
+#import "../_styles.typ": note, placeholder
 
 = データエクスポート
 

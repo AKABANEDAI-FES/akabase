@@ -1,5 +1,5 @@
 // apps/docs/chapters/admin/users.typ
-#import "../_styles.typ": placeholder, note
+#import "../_styles.typ": note, placeholder
 
 = ユーザー管理
 
@@ -15,7 +15,8 @@
   columns: (auto, 1fr),
   table.header([*ロール*], [*説明*]),
   [user], [一般ユーザー。各イベントでの権限はイベントメンバー設定に依存する。],
-  [admin], [システム管理者。管理者画面（`/admin`）にアクセスでき、イベント・ユーザー管理が行える。],
+  [admin],
+  [システム管理者。管理者画面（`/admin`）にアクセスでき、イベント・ユーザー管理が行える。],
 )
 
 #note[
