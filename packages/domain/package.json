@@ -12,6 +12,10 @@
       "import": "./dist/event/*.mjs",
       "types": "./dist/event/*.d.mts"
     },
+    "./notification/*": {
+      "import": "./dist/notification/*.mjs",
+      "types": "./dist/notification/*.d.mts"
+    },
     "./organization/*": {
       "import": "./dist/organization/*.mjs",
       "types": "./dist/organization/*.d.mts"

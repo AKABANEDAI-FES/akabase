@@ -41,6 +41,7 @@ export type ApproveProjectOutput = {
   orgId: OrgId;
   projectId: ProjectId;
   submissionId: SubmissionId;
+  projectName: string;
 };
 
 export type ApproveProjectError = ProjectError | EventError | AuthorizationError;
@@ -120,6 +121,7 @@ export async function approveProject(
       orgId: project.orgId,
       projectId: project.id,
       submissionId: input.submissionId,
+      projectName: project.name,
     };
   });
 }

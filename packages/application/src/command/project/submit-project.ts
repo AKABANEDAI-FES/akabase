@@ -40,6 +40,7 @@ export type SubmitProjectOutput = {
   orgId: OrgId;
   projectId: ProjectId;
   submissionId: SubmissionId;
+  projectName: string;
 };
 
 export type SubmitProjectError = ProjectError | EventError | AuthorizationError;
@@ -117,6 +118,7 @@ export async function submitProject(
       orgId: project.orgId,
       projectId: project.id,
       submissionId,
+      projectName: project.name,
     };
   });
 }

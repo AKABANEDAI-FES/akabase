@@ -8,6 +8,10 @@
       "import": "./dist/command/event/*.mjs",
       "types": "./dist/command/event/*.d.mts"
     },
+    "./command/notification/*": {
+      "import": "./dist/command/notification/*.mjs",
+      "types": "./dist/command/notification/*.d.mts"
+    },
     "./command/organization/*": {
       "import": "./dist/command/organization/*.mjs",
       "types": "./dist/command/organization/*.d.mts"

@@ -39,6 +39,7 @@ export type WithdrawSubmissionOutput = {
   orgId: OrgId;
   projectId: ProjectId;
   submissionId: SubmissionId;
+  projectName: string;
 };
 
 export type WithdrawSubmissionError = ProjectError | EventError | AuthorizationError;
@@ -113,6 +114,7 @@ export async function withdrawSubmission(
       orgId: project.orgId,
       projectId: project.id,
       submissionId: submission.id,
+      projectName: project.name,
     };
   });
 }

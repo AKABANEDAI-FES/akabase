@@ -445,6 +445,51 @@ export const submissionMessages = sqliteTable(
 );
 
 // ============================================================================
+// Notification Context
+// ============================================================================
+
+/**
+ * Notification (通知)
+ * ステータス変更時にユーザーへ通知を送る
+ */
+export const notifications = sqliteTable(
+  "notifications",
+  {
+    id: text("id").primaryKey(),
+    recipientId: text("recipient_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    eventId: text("event_id")
+      .notNull()
+      .references(() => events.id, { onDelete: "cascade" }),
+    type: text("type", {
+      enum: ["submitted", "approved", "returned", "withdrawn"],
+    }).notNull(),
+    title: text("title").notNull(),
+    message: text("message").notNull(),
+    projectId: text("project_id").references(() => projects.id, {
+      onDelete: "set null",
+    }),
+    submissionId: text("submission_id").references(() => projectSubmissions.id, {
+      onDelete: "set null",
+    }),
+    orgId: text("org_id").references(() => organizations.id, {
+      onDelete: "set null",
+    }),
+    readAt: integer("read_at", { mode: "timestamp_ms" }),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+  },
+  (table) => [
+    index("notifications_recipient_id_idx").on(table.recipientId),
+    index("notifications_recipient_read_idx").on(table.recipientId, table.readAt),
+    index("notifications_event_id_idx").on(table.eventId),
+    index("notifications_created_at_idx").on(table.createdAt),
+  ],
+);
+
+// ============================================================================
 // Relations
 // ============================================================================
 
@@ -656,6 +701,29 @@ export const submissionActionsRelations = relations(submissionActions, ({ one, m
   messages: many(submissionMessages),
 }));
 
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+  recipient: one(user, {
+    fields: [notifications.recipientId],
+    references: [user.id],
+  }),
+  event: one(events, {
+    fields: [notifications.eventId],
+    references: [events.id],
+  }),
+  project: one(projects, {
+    fields: [notifications.projectId],
+    references: [projects.id],
+  }),
+  submission: one(projectSubmissions, {
+    fields: [notifications.submissionId],
+    references: [projectSubmissions.id],
+  }),
+  organization: one(organizations, {
+    fields: [notifications.orgId],
+    references: [organizations.id],
+  }),
+}));
+
 // ============================================================================
 // Zod Schemas
 // ============================================================================
@@ -716,6 +784,10 @@ export const selectSubmissionMessageSchema = createSelectSchema(submissionMessag
 export const insertSubmissionActionSchema = createInsertSchema(submissionActions);
 export const selectSubmissionActionSchema = createSelectSchema(submissionActions);
 
+// Notification Context Schemas
+export const insertNotificationSchema = createInsertSchema(notifications);
+export const selectNotificationSchema = createSelectSchema(notifications);
+
 // Type exports for convenience
 export type InsertImage = z.infer<typeof insertImageSchema>;
 export type SelectImage = z.infer<typeof selectImageSchema>;
@@ -767,3 +839,6 @@ export type SelectSubmissionMessage = z.infer<typeof selectSubmissionMessageSche
 
 export type InsertSubmissionAction = z.infer<typeof insertSubmissionActionSchema>;
 export type SelectSubmissionAction = z.infer<typeof selectSubmissionActionSchema>;
+
+export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+export type SelectNotification = z.infer<typeof selectNotificationSchema>;
