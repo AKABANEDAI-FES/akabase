@@ -23,7 +23,7 @@
 
   // 表紙
   align(center + horizon)[
-    #text(size: 24pt, weight: "bold"D)[AKABASE]
+    #text(size: 24pt, weight: "bold")[AKABASE]
     #v(0.5em)
     #text(size: 18pt, weight: "bold")[ユーザーマニュアル]
     #v(1em)
