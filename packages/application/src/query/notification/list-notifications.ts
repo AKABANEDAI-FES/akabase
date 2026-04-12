@@ -14,10 +14,6 @@ export async function listNotifications(
   try {
     return await deps.notificationRepo.findByRecipient(recipientId, options);
   } catch (error) {
-    throw new QueryExceptionError(
-      "DATABASE_ERROR",
-      "通知の取得に失敗しました。",
-      error,
-    );
+    throw new QueryExceptionError("DATABASE_ERROR", "通知の取得に失敗しました。", error);
   }
 }

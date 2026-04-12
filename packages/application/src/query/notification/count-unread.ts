@@ -11,10 +11,6 @@ export async function countUnreadNotifications(
   try {
     return await deps.notificationRepo.countUnread(recipientId, eventId);
   } catch (error) {
-    throw new QueryExceptionError(
-      "DATABASE_ERROR",
-      "未読通知数の取得に失敗しました。",
-      error,
-    );
+    throw new QueryExceptionError("DATABASE_ERROR", "未読通知数の取得に失敗しました。", error);
   }
 }

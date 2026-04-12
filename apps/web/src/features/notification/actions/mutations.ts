@@ -9,10 +9,7 @@ import { notificationIdSchema } from "@akabase/domain/notification/schema";
 import { eventIdSchema } from "@akabase/domain/event/schema";
 import type { UserId } from "@akabase/domain/user/schema";
 import { mutationOptions, useQueryClient } from "@tanstack/react-query";
-import {
-  generateLoadNotificationsCacheKey,
-  generateLoadUnreadCountCacheKey,
-} from "./queries";
+import { generateLoadNotificationsCacheKey, generateLoadUnreadCountCacheKey } from "./queries";
 
 /**
  * Server function to mark a notification as read

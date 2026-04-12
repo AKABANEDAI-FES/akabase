@@ -22,11 +22,11 @@ export const loadNotificationsFn = createServerFn({ method: "GET" })
     }),
   )
   .handler(async ({ data, context }) => {
-    return await listNotifications(
-      context.dependencies,
-      cast<UserId>(context.session.user.id),
-      { eventId: data.eventId, limit: data.limit, offset: data.offset },
-    );
+    return await listNotifications(context.dependencies, cast<UserId>(context.session.user.id), {
+      eventId: data.eventId,
+      limit: data.limit,
+      offset: data.offset,
+    });
   });
 
 export function generateLoadNotificationsCacheKey(eventId: string) {
