@@ -168,15 +168,19 @@ export function NotificationItem({
   }
 
   return (
-    <div
+    <button
+      type="button"
       className={`${itemStyle} ${css({
         cursor: isUnread ? "pointer" : "default",
         backgroundColor: isUnread ? "bg.subtle" : "transparent",
         _hover: isUnread ? { backgroundColor: "bg.muted" } : {},
+        border: "none",
       })}`}
       onClick={handleMarkAsRead}
+      disabled={!isUnread}
     >
+      <span className={css({ srOnly: true })}>{isUnread ? "既読にする:" : "既読済み:"}</span>
       {content}
-    </div>
+    </button>
   );
 }
