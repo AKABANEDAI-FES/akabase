@@ -8,7 +8,6 @@ import type { Notification, NotificationId } from "./schema";
  * Notification Repository
  * =============================================================================
  * Repository methods throw RepositoryExceptionError on infrastructure failures.
- * Returns null for "not found" scenarios (valid state, not an error).
  */
 
 export type NotificationRepository = {
