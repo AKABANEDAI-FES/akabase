@@ -1,0 +1,69 @@
+#import "../_styles.typ": note
+
+= 出展団体管理
+
+サイドバーの「*出展団体*」をクリックすると、イベントに登録されている出展団体の一覧が表示されます。
+
+#figure(
+  image("../../assets/committee/organizations.png"),
+  caption: "出展団体一覧ページ",
+)
+
+== 出展団体の作成
+
+「*出展団体を作成*」ボタンをクリックすると作成ダイアログが表示されます。
+
+#figure(
+  image("../../assets/committee/organizations-create-dialog.png"),
+  caption: "出展団体作成ダイアログ",
+)
+
+#table(
+  columns: (auto, auto, 1fr),
+  table.header([*フィールド*], [*必須*], [*説明*]),
+  [団体名], [必須], [出展団体の名称],
+  [説明], [任意], [団体の概要説明],
+)
+
+== 出展団体の詳細
+
+一覧の「詳細」をクリックすると、出展団体の詳細ページ（委員会用）が表示されます。3つのタブで情報を管理できます。
+
+=== 基本情報タブ
+
+団体名・説明の編集、団体の削除が行えます。
+
+#figure(
+  image("../../assets/committee/organization-detail-info.png"),
+  caption: "出展団体詳細・基本情報タブ",
+)
+
+=== メンバータブ
+
+団体に所属するメンバーの追加・削除が行えます。操作方法は出展団体側の「メンバー管理」と同様です。
+
+=== 企画一覧タブ
+
+団体に登録されている企画の一覧が表示されます。「*企画を作成*」ボタンから企画を追加できます。
+
+#figure(
+  image("../../assets/committee/organization-detail-projects.png"),
+  caption: "出展団体詳細・企画一覧タブ",
+)
+
+==== 企画の作成
+
+「企画を作成」をクリックすると企画作成ダイアログが表示されます。
+
+#figure(
+  image("../../assets/committee/organization-create-project-dialog.png"),
+  caption: "企画作成ダイアログ",
+)
+
+#table(
+  columns: (auto, auto, 1fr),
+  table.header([*フィールド*], [*必須*], [*説明*]),
+  [企画名], [必須], [企画の名称],
+  [開催場所], [任意], [企画を実施する場所（事前に場所を登録しておく必要あり）],
+  [ロゴ画像], [任意], [企画のロゴ画像],
+)
