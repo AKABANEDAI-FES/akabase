@@ -1,6 +1,6 @@
 import type { MouseEvent } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
+import { Link, linkOptions } from "@tanstack/react-router";
 import { CheckCircleIcon, RotateCcwIcon, SendIcon, XCircleIcon } from "lucide-react";
 import { css } from "@akabase/styled-system/css";
 import { Stack } from "@akabase/styled-system/jsx";
@@ -39,26 +39,31 @@ function formatRelativeTime(date: Date): string {
   return date.toLocaleDateString("ja-JP");
 }
 
-function getNotificationLink(notification: NotificationListItem, slug: string): string | null {
-  if (!notification.submissionId) {
+function getNotificationLink(notification: NotificationListItem, slug: string) {
+  const { type, submissionId, orgId, projectId } = notification;
+
+  if (submissionId === null) {
     return null;
   }
 
-  switch (notification.type) {
+  switch (type) {
     case "submitted":
-    case "withdrawn": {
-      return `/${slug}/committee/submissions/${notification.submissionId}`;
-    }
+    case "withdrawn":
+      return linkOptions({
+        to: "/$slug/committee/submissions/$submissionId",
+        params: { slug, submissionId },
+      });
     case "approved":
-    case "returned": {
-      if (!notification.orgId || !notification.projectId) {
+    case "returned":
+      if (orgId === null || projectId === null) {
         return null;
       }
-      return `/${slug}/orgs/${notification.orgId}/projects/${notification.projectId}/submissions/${notification.submissionId}`;
-    }
-    default: {
+      return linkOptions({
+        to: "/$slug/orgs/$orgId/projects/$projectId/submissions/$submissionId",
+        params: { slug, orgId, projectId, submissionId },
+      });
+    default:
       return null;
-    }
   }
 }
 
@@ -92,7 +97,6 @@ export function NotificationItem({
   const Icon = ACTION_ICONS[notification.type];
   const isUnread = notification.readAt === null;
   const link = getNotificationLink(notification, slug);
-  const hasLink = link !== null;
 
   const handleMarkAsRead = () => {
     if (isUnread && !markAsRead.isPending) {
@@ -147,10 +151,10 @@ export function NotificationItem({
     </>
   );
 
-  if (hasLink) {
+  if (link !== null) {
     return (
       <Link
-        to={link}
+        {...link}
         onClick={handleLinkClick}
         className={`${itemStyle} ${css({
           cursor: "pointer",
