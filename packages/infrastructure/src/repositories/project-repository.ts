@@ -71,15 +71,12 @@ export class ProjectRepositoryImpl implements ProjectRepository {
 
   async findByEventAndContestVoteNumber(
     eventId: EventId,
-    contestVoteNumber: number,
+    contestVoteNumber: string,
   ): Promise<Project | null> {
     try {
       const row = await this.db.query.projects.findFirst({
         where: (projects, { eq, and }) =>
-          and(
-            eq(projects.eventId, eventId),
-            eq(projects.contestVoteNumber, contestVoteNumber),
-          ),
+          and(eq(projects.eventId, eventId), eq(projects.contestVoteNumber, contestVoteNumber)),
       });
 
       if (!row) {

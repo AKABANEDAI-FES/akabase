@@ -15,11 +15,8 @@ import { nl2br } from "@/libs/text";
 import { createListCollection } from "@ark-ui/react/collection";
 import { Portal } from "@ark-ui/react/portal";
 import type { OrgId } from "@akabase/domain/organization/schema";
-import {
-  CONTEST_VOTE_NUMBER_MAX,
-  CONTEST_VOTE_NUMBER_MIN,
-  type ProjectId,
-} from "@akabase/domain/project/schema";
+import { CONTEST_VOTE_NUMBER_PATTERN } from '@akabase/domain/project/schema';
+import type { ProjectId } from '@akabase/domain/project/schema';
 import { cast } from "@akabase/domain/shared/ids";
 import { z } from "zod";
 import { LogoUploadField } from "./logo-upload-field";
@@ -50,33 +47,21 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
       name: project.name,
       placeId: project.placeId,
       logoImageId: project.logoImageId,
-      contestVoteNumber: project.contestVoteNumber?.toString() ?? "",
+      contestVoteNumber: project.contestVoteNumber ?? "",
     },
     validators: {
       onDynamic: z.object({
         name: updateProjectInputSchema.shape.name,
         placeId: updateProjectInputSchema.shape.placeId,
         logoImageId: updateProjectInputSchema.shape.logoImageId,
-        contestVoteNumber: z.string().refine(
-          (val) => {
-            if (val === "") return true;
-            const num = Number(val);
-            return (
-              !Number.isNaN(num) &&
-              Number.isInteger(num) &&
-              num >= CONTEST_VOTE_NUMBER_MIN &&
-              num <= CONTEST_VOTE_NUMBER_MAX
-            );
-          },
-          {
-            message: `投票番号は${CONTEST_VOTE_NUMBER_MIN}〜${CONTEST_VOTE_NUMBER_MAX}の整数で入力してください`,
-          },
-        ),
+        contestVoteNumber: z
+          .string()
+          .refine((val) => val === "" || CONTEST_VOTE_NUMBER_PATTERN.test(val), {
+            message: "投票番号は4桁の数字で入力してください",
+          }),
       }),
       onSubmitAsync: async ({ value }) => {
         try {
-          const parsedVoteNumber =
-            value.contestVoteNumber === "" ? null : Number(value.contestVoteNumber);
           const projectData = updateProjectInputSchema.parse({
             projectId: cast<ProjectId>(projectId),
             eventId,
@@ -84,7 +69,7 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
             name: value.name,
             placeId: value.placeId,
             logoImageId: value.logoImageId,
-            contestVoteNumber: parsedVoteNumber,
+            contestVoteNumber: value.contestVoteNumber === "" ? null : value.contestVoteNumber,
           });
 
           const result = await updateProjectMutate({ data: projectData });
@@ -201,14 +186,14 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
               <Input
                 id={field.name}
                 name={field.name}
-                type="number"
-                min={CONTEST_VOTE_NUMBER_MIN}
-                max={CONTEST_VOTE_NUMBER_MAX}
-                step={1}
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]{4}"
+                maxLength={4}
                 value={field.state.value}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="投票番号を入力（任意）"
+                placeholder="例: 0001"
               />
               {!field.state.meta.isValid && (
                 <Field.ErrorText>

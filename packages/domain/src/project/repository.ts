@@ -64,7 +64,7 @@ export type ProjectRepository = {
    */
   findByEventAndContestVoteNumber(
     eventId: EventId,
-    contestVoteNumber: number,
+    contestVoteNumber: string,
   ): Promise<Project | null>;
 
   /**

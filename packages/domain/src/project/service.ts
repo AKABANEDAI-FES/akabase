@@ -41,7 +41,7 @@ export type ProjectDomainService = {
    */
   ensureContestVoteNumberUnique(
     eventId: EventId,
-    contestVoteNumber: number,
+    contestVoteNumber: string,
     excludeProjectId?: ProjectId,
   ): Promise<Result.Result<true, ProjectError>>;
 };

@@ -20,7 +20,7 @@ export const projectDetailSchema = z.object({
   placeName: z.string().nullable(),
   logoImageId: z.string().nullable(),
   logoUrl: z.string().nullable(),
-  contestVoteNumber: z.number().nullable(),
+  contestVoteNumber: z.string().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });

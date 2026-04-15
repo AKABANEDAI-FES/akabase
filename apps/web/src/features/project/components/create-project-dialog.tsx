@@ -17,7 +17,7 @@ import { useState } from "react";
 import { nl2br } from "@/libs/text";
 import type { EventId } from "@akabase/domain/event/schema";
 import type { OrgId } from "@akabase/domain/organization/schema";
-import { CONTEST_VOTE_NUMBER_MAX, CONTEST_VOTE_NUMBER_MIN } from "@akabase/domain/project/schema";
+import { CONTEST_VOTE_NUMBER_PATTERN } from "@akabase/domain/project/schema";
 import { z } from "zod";
 import { LogoUploadField } from "./logo-upload-field";
 
@@ -62,28 +62,21 @@ export function CreateProjectDialog({
       onDynamic: createProjectInputSchema
         .omit({ eventId: true, orgId: true, contestVoteNumber: true })
         .extend({
-          contestVoteNumber: z.string().refine(
-            (val) => {
-              if (val === "") return true;
-              const num = Number(val);
-              return (
-                !Number.isNaN(num) &&
-                Number.isInteger(num) &&
-                num >= CONTEST_VOTE_NUMBER_MIN &&
-                num <= CONTEST_VOTE_NUMBER_MAX
-              );
-            },
-            {
-              message: `投票番号は${CONTEST_VOTE_NUMBER_MIN}〜${CONTEST_VOTE_NUMBER_MAX}の整数で入力してください`,
-            },
-          ),
+          contestVoteNumber: z
+            .string()
+            .refine((val) => val === "" || CONTEST_VOTE_NUMBER_PATTERN.test(val), {
+              message: "投票番号は4桁の数字で入力してください",
+            }),
         }),
       onSubmitAsync: async ({ value }) => {
         try {
-          const parsedVoteNumber =
-            value.contestVoteNumber === "" ? null : Number(value.contestVoteNumber);
           const result = await mutateAsync({
-            data: { ...value, contestVoteNumber: parsedVoteNumber, eventId, orgId },
+            data: {
+              ...value,
+              contestVoteNumber: value.contestVoteNumber === "" ? null : value.contestVoteNumber,
+              eventId,
+              orgId,
+            },
           });
 
           if (Result.isFailure(result)) {
@@ -228,14 +221,14 @@ export function CreateProjectDialog({
                         <Input
                           id={field.name}
                           name={field.name}
-                          type="number"
-                          min={CONTEST_VOTE_NUMBER_MIN}
-                          max={CONTEST_VOTE_NUMBER_MAX}
-                          step={1}
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]{4}"
+                          maxLength={4}
                           value={field.state.value}
                           onBlur={field.handleBlur}
                           onChange={(e) => field.handleChange(e.target.value)}
-                          placeholder="投票番号を入力"
+                          placeholder="例: 0001"
                         />
                         {!field.state.meta.isValid && (
                           <Field.ErrorText>

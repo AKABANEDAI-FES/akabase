@@ -238,7 +238,7 @@ export const projects = sqliteTable(
     logoImageId: text("logo_image_id").references(() => images.id, {
       onDelete: "set null",
     }),
-    contestVoteNumber: integer("contest_vote_number"),
+    contestVoteNumber: text("contest_vote_number"),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .notNull(),

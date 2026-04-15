@@ -45,7 +45,7 @@ export class ProjectDomainServiceImpl implements ProjectDomainService {
 
   async ensureContestVoteNumberUnique(
     eventId: EventId,
-    contestVoteNumber: number,
+    contestVoteNumber: string,
     excludeProjectId?: ProjectId,
   ) {
     const project = await this.projectRepo.findByEventAndContestVoteNumber(

@@ -27,7 +27,7 @@ export type CreateProjectInput = {
   name: string;
   placeId: PlaceId | null;
   logoImageId: ImageId | null;
-  contestVoteNumber?: number | null;
+  contestVoteNumber?: string | null;
   actor: Actor;
 };
 

@@ -44,7 +44,7 @@ export function createProjectEntity(input: {
   name: string;
   placeId: PlaceId | null;
   logoImageId: ImageId | null;
-  contestVoteNumber?: number | null;
+  contestVoteNumber?: string | null;
   now?: Date;
 }): Result.Result<Project, ProjectError> {
   const now = input.now ?? new Date();
@@ -80,7 +80,7 @@ export function updateProjectEntity(input: {
   name: string;
   placeId: PlaceId | null;
   logoImageId: ImageId | null;
-  contestVoteNumber: number | null;
+  contestVoteNumber: string | null;
   now?: Date;
 }): Result.Result<Project, ProjectError> {
   const now = input.now ?? new Date();
