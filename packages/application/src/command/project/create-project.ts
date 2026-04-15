@@ -18,6 +18,7 @@ import { createProjectDraftEntity, createProjectEntity } from "@akabase/domain/p
 import type { ProjectRepository } from "@akabase/domain/project/repository";
 import type { AuthorizationService } from "@akabase/domain/authorization/service";
 import type { EventDomainService } from "@akabase/domain/event/service";
+import type { ProjectDomainService } from "@akabase/domain/project/service";
 import { migrateImageScope } from "../shared/migrate-image-scope";
 
 export type CreateProjectInput = {
@@ -43,6 +44,7 @@ export async function createProject(
     projectRepo: ProjectRepository;
     authService: AuthorizationService;
     eventDomainService: EventDomainService;
+    projectDomainService: ProjectDomainService;
     imageRepo: ImageRepository;
   },
   input: CreateProjectInput,
@@ -54,6 +56,15 @@ export async function createProject(
     yield* $(deps.authService.enforce(input.actor, resource, "project:create"));
 
     yield* $(await deps.eventDomainService.resolveModifiableEvent(input.eventId));
+
+    if (input.contestVoteNumber != null) {
+      yield* $(
+        await deps.projectDomainService.ensureContestVoteNumberUnique(
+          input.eventId,
+          input.contestVoteNumber,
+        ),
+      );
+    }
 
     const project = yield* $(
       createProjectEntity({

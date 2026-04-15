@@ -9,6 +9,7 @@ import type {
   SubmissionMessage,
   SubmissionWithTags,
 } from "./schema";
+import type { EventId } from "../event/schema";
 import type { OrgId } from "../organization/schema";
 import type { UserId } from "../user/schema";
 
@@ -56,6 +57,15 @@ export type ProjectRepository = {
    * @throws {RepositoryExceptionError} on database errors
    */
   listSubmissionsByProject(projectId: ProjectId): Promise<ProjectSubmission[]>;
+
+  /**
+   * Find project by event ID and contest vote number
+   * @throws {RepositoryExceptionError} on database errors
+   */
+  findByEventAndContestVoteNumber(
+    eventId: EventId,
+    contestVoteNumber: number,
+  ): Promise<Project | null>;
 
   /**
    * Save project (insert or update)

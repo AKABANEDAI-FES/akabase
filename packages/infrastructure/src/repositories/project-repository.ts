@@ -21,6 +21,7 @@ import type {
   SubmissionMessage,
   SubmissionWithTags,
 } from "@akabase/domain/project/schema";
+import type { EventId } from "@akabase/domain/event/schema";
 import type { OrgId } from "@akabase/domain/organization/schema";
 import type { UserId } from "@akabase/domain/user/schema";
 import type { ProjectRepository } from "@akabase/domain/project/repository";
@@ -63,6 +64,45 @@ export class ProjectRepositoryImpl implements ProjectRepository {
       throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to find project",
+        error,
+      );
+    }
+  }
+
+  async findByEventAndContestVoteNumber(
+    eventId: EventId,
+    contestVoteNumber: number,
+  ): Promise<Project | null> {
+    try {
+      const row = await this.db.query.projects.findFirst({
+        where: (projects, { eq, and }) =>
+          and(
+            eq(projects.eventId, eventId),
+            eq(projects.contestVoteNumber, contestVoteNumber),
+          ),
+      });
+
+      if (!row) {
+        return null;
+      }
+
+      const project = projectSchema.parse({
+        id: row.id,
+        eventId: row.eventId,
+        orgId: row.orgId,
+        name: row.name,
+        placeId: row.placeId,
+        logoImageId: row.logoImageId,
+        contestVoteNumber: row.contestVoteNumber ?? null,
+        createdAt: new Date(row.createdAt),
+        updatedAt: new Date(row.updatedAt),
+      });
+
+      return project;
+    } catch (error) {
+      throw new RepositoryExceptionError(
+        REPOSITORY_ERROR_CODE.DATABASE_ERROR,
+        "Failed to find project by event and contest vote number",
         error,
       );
     }

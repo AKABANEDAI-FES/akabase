@@ -1,4 +1,5 @@
 import type { Result } from "@akabase/result";
+import type { EventId } from "../event/schema";
 import type { UserId } from "../user/schema";
 import type { ProjectId, SubmissionId } from "./schema";
 import type { ProjectError } from "./errors";
@@ -28,5 +29,19 @@ export type ProjectDomainService = {
   ensureUserNotApproved(
     submissionId: SubmissionId,
     userId: UserId,
+  ): Promise<Result.Result<true, ProjectError>>;
+
+  /**
+   * コンテスト投票番号の一意性を保証する（イベント内）
+   *
+   * @param eventId - 対象イベントID
+   * @param contestVoteNumber - チェック対象の投票番号
+   * @param excludeProjectId - 除外するプロジェクトID（更新時に自身を除外する用途）
+   * @returns 一意であれば成功、重複があればCONTEST_VOTE_NUMBER_NOT_UNIQUEエラー
+   */
+  ensureContestVoteNumberUnique(
+    eventId: EventId,
+    contestVoteNumber: number,
+    excludeProjectId?: ProjectId,
   ): Promise<Result.Result<true, ProjectError>>;
 };
