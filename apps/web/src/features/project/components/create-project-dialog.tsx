@@ -17,8 +17,6 @@ import { useState } from "react";
 import { nl2br } from "@/libs/text";
 import type { EventId } from "@akabase/domain/event/schema";
 import type { OrgId } from "@akabase/domain/organization/schema";
-import { CONTEST_VOTE_NUMBER_PATTERN } from "@akabase/domain/project/schema";
-import { z } from "zod";
 import { LogoUploadField } from "./logo-upload-field";
 
 type CreateProjectDialogProps = {
@@ -56,27 +54,14 @@ export function CreateProjectDialog({
       name: "",
       placeId: null as string | null,
       logoImageId: null as string | null,
-      contestVoteNumber: "",
+      contestVoteNumber: null as string | null,
     },
     validators: {
-      onDynamic: createProjectInputSchema
-        .omit({ eventId: true, orgId: true, contestVoteNumber: true })
-        .extend({
-          contestVoteNumber: z
-            .string()
-            .refine((val) => val === "" || CONTEST_VOTE_NUMBER_PATTERN.test(val), {
-              message: "投票番号は4桁の数字で入力してください",
-            }),
-        }),
+      onDynamic: createProjectInputSchema.omit({ eventId: true, orgId: true }),
       onSubmitAsync: async ({ value }) => {
         try {
           const result = await mutateAsync({
-            data: {
-              ...value,
-              contestVoteNumber: value.contestVoteNumber === "" ? null : value.contestVoteNumber,
-              eventId,
-              orgId,
-            },
+            data: { ...value, eventId, orgId },
           });
 
           if (Result.isFailure(result)) {
@@ -225,9 +210,9 @@ export function CreateProjectDialog({
                           inputMode="numeric"
                           pattern="[0-9]{4}"
                           maxLength={4}
-                          value={field.state.value}
+                          value={field.state.value ?? ""}
                           onBlur={field.handleBlur}
-                          onChange={(e) => field.handleChange(e.target.value)}
+                          onChange={(e) => field.handleChange(e.target.value || null)}
                           placeholder="例: 0001"
                         />
                         {!field.state.meta.isValid && (

@@ -15,10 +15,8 @@ import { nl2br } from "@/libs/text";
 import { createListCollection } from "@ark-ui/react/collection";
 import { Portal } from "@ark-ui/react/portal";
 import type { OrgId } from "@akabase/domain/organization/schema";
-import { CONTEST_VOTE_NUMBER_PATTERN } from "@akabase/domain/project/schema";
 import type { ProjectId } from "@akabase/domain/project/schema";
 import { cast } from "@akabase/domain/shared/ids";
-import { z } from "zod";
 import { LogoUploadField } from "./logo-upload-field";
 
 type ProjectBasicInfoFormProps = {
@@ -47,19 +45,10 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
       name: project.name,
       placeId: project.placeId,
       logoImageId: project.logoImageId,
-      contestVoteNumber: project.contestVoteNumber ?? "",
+      contestVoteNumber: project.contestVoteNumber,
     },
     validators: {
-      onDynamic: z.object({
-        name: updateProjectInputSchema.shape.name,
-        placeId: updateProjectInputSchema.shape.placeId,
-        logoImageId: updateProjectInputSchema.shape.logoImageId,
-        contestVoteNumber: z
-          .string()
-          .refine((val) => val === "" || CONTEST_VOTE_NUMBER_PATTERN.test(val), {
-            message: "投票番号は4桁の数字で入力してください",
-          }),
-      }),
+      onDynamic: updateProjectInputSchema.omit({ projectId: true, eventId: true, orgId: true }),
       onSubmitAsync: async ({ value }) => {
         try {
           const projectData = updateProjectInputSchema.parse({
@@ -69,7 +58,7 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
             name: value.name,
             placeId: value.placeId,
             logoImageId: value.logoImageId,
-            contestVoteNumber: value.contestVoteNumber === "" ? null : value.contestVoteNumber,
+            contestVoteNumber: value.contestVoteNumber,
           });
 
           const result = await updateProjectMutate({ data: projectData });
@@ -190,9 +179,9 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
                 inputMode="numeric"
                 pattern="[0-9]{4}"
                 maxLength={4}
-                value={field.state.value}
+                value={field.state.value ?? ""}
                 onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
+                onChange={(e) => field.handleChange(e.target.value || null)}
                 placeholder="例: 0001"
               />
               {!field.state.meta.isValid && (
