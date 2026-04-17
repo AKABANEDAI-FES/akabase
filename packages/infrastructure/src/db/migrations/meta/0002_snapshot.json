@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "6e65f604-cb68-4c1b-8309-8cd5676433ed",
+  "id": "9055e969-e4b2-4b39-b104-2ee24f673acb",
   "prevId": "a00160c9-59c9-4150-815f-85e18bdab372",
   "tables": {
     "committee_roles": {
@@ -1009,7 +1009,7 @@
         },
         "contest_vote_number": {
           "name": "contest_vote_number",
-          "type": "integer",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false

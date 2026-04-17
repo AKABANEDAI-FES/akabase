@@ -19,15 +19,8 @@
     {
       "idx": 2,
       "version": "6",
-      "when": 1775917476739,
-      "tag": "0002_last_the_initiative",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1776263493552,
-      "tag": "0003_wonderful_bulldozer",
+      "when": 1776428339977,
+      "tag": "0002_useful_thena",
       "breakpoints": true
     }
   ]
