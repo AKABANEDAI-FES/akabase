@@ -19,7 +19,7 @@
   "r2_buckets": [
     {
       "binding": "STORAGE",
-      "bucket_name": "archive-images",
+      "bucket_name": "akabase-images",
     },
   ],
   "vars": {
