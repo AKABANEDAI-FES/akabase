@@ -10,8 +10,8 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "archive",
-      "database_id": "923a490d-aba7-4e8a-a8c1-1db9db656f3b",
+      "database_name": "akabase",
+      "database_id": "2cf1f8e5-9b1e-4605-b086-9d567b110c30",
       "preview_database_id": "DB",
       "migrations_dir": "node_modules/@akabase/infrastructure/src/db/migrations",
     },
