@@ -17,7 +17,6 @@ import { Portal } from "@ark-ui/react/portal";
 import type { OrgId } from "@akabase/domain/organization/schema";
 import type { ProjectId } from "@akabase/domain/project/schema";
 import { cast } from "@akabase/domain/shared/ids";
-import { z } from "zod";
 import { LogoUploadField } from "./logo-upload-field";
 
 type ProjectBasicInfoFormProps = {
@@ -46,13 +45,10 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
       name: project.name,
       placeId: project.placeId,
       logoImageId: project.logoImageId,
+      contestVoteNumber: project.contestVoteNumber,
     },
     validators: {
-      onDynamic: z.object({
-        name: updateProjectInputSchema.shape.name,
-        placeId: updateProjectInputSchema.shape.placeId,
-        logoImageId: updateProjectInputSchema.shape.logoImageId,
-      }),
+      onDynamic: updateProjectInputSchema.omit({ projectId: true, eventId: true, orgId: true }),
       onSubmitAsync: async ({ value }) => {
         try {
           const projectData = updateProjectInputSchema.parse({
@@ -62,6 +58,7 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
             name: value.name,
             placeId: value.placeId,
             logoImageId: value.logoImageId,
+            contestVoteNumber: value.contestVoteNumber,
           });
 
           const result = await updateProjectMutate({ data: projectData });
@@ -162,6 +159,31 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
                   </Select.Positioner>
                 </Portal>
               </Select.Root>
+              {!field.state.meta.isValid && (
+                <Field.ErrorText>
+                  {nl2br(field.state.meta.errors.map((error) => error?.message ?? "").join("\n"))}
+                </Field.ErrorText>
+              )}
+            </Field.Root>
+          )}
+        </form.Field>
+
+        <form.Field name="contestVoteNumber">
+          {(field) => (
+            <Field.Root invalid={!field.state.meta.isValid}>
+              <Field.Label htmlFor={field.name}>コンテスト投票番号</Field.Label>
+              <Input
+                id={field.name}
+                name={field.name}
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]{4}"
+                maxLength={4}
+                value={field.state.value ?? ""}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value || null)}
+                placeholder="例: 0001"
+              />
               {!field.state.meta.isValid && (
                 <Field.ErrorText>
                   {nl2br(field.state.meta.errors.map((error) => error?.message ?? "").join("\n"))}

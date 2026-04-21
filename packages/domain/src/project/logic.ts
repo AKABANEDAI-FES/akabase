@@ -44,6 +44,7 @@ export function createProjectEntity(input: {
   name: string;
   placeId: PlaceId | null;
   logoImageId: ImageId | null;
+  contestVoteNumber?: string | null;
   now?: Date;
 }): Result.Result<Project, ProjectError> {
   const now = input.now ?? new Date();
@@ -54,6 +55,7 @@ export function createProjectEntity(input: {
     name: input.name.trim(),
     placeId: input.placeId,
     logoImageId: input.logoImageId,
+    contestVoteNumber: input.contestVoteNumber ?? null,
     createdAt: now,
     updatedAt: now,
   };
@@ -78,6 +80,7 @@ export function updateProjectEntity(input: {
   name: string;
   placeId: PlaceId | null;
   logoImageId: ImageId | null;
+  contestVoteNumber: string | null;
   now?: Date;
 }): Result.Result<Project, ProjectError> {
   const now = input.now ?? new Date();
@@ -89,6 +92,7 @@ export function updateProjectEntity(input: {
         name: input.name.trim(),
         placeId: input.placeId,
         logoImageId: input.logoImageId,
+        contestVoteNumber: input.contestVoteNumber,
         updatedAt: now,
       }),
     catch: () => projectError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "企画の更新に失敗しました"),

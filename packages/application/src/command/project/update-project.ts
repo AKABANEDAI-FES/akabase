@@ -18,6 +18,7 @@ import { updateProjectEntity } from "@akabase/domain/project/logic";
 import type { ProjectRepository } from "@akabase/domain/project/repository";
 import type { AuthorizationService } from "@akabase/domain/authorization/service";
 import type { EventDomainService } from "@akabase/domain/event/service";
+import type { ProjectDomainService } from "@akabase/domain/project/service";
 import { migrateImageScope } from "../shared/migrate-image-scope";
 
 export type UpdateProjectInput = {
@@ -27,6 +28,7 @@ export type UpdateProjectInput = {
   name: string;
   placeId: PlaceId | null;
   logoImageId: ImageId | null;
+  contestVoteNumber: string | null;
   actor: Actor;
 };
 
@@ -43,6 +45,7 @@ export async function updateProject(
     projectRepo: ProjectRepository;
     authService: AuthorizationService;
     eventDomainService: EventDomainService;
+    projectDomainService: ProjectDomainService;
     imageRepo: ImageRepository;
   },
   input: UpdateProjectInput,
@@ -60,12 +63,23 @@ export async function updateProject(
 
     yield* $(await deps.eventDomainService.resolveModifiableEvent(project.eventId));
 
+    if (input.contestVoteNumber != null) {
+      yield* $(
+        await deps.projectDomainService.ensureContestVoteNumberUnique(
+          project.eventId,
+          input.contestVoteNumber,
+          input.projectId,
+        ),
+      );
+    }
+
     const updatedProject = yield* $(
       updateProjectEntity({
         project,
         name: input.name,
         placeId: input.placeId,
         logoImageId: input.logoImageId,
+        contestVoteNumber: input.contestVoteNumber,
       }),
     );
 

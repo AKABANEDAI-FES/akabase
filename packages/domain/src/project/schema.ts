@@ -23,6 +23,7 @@ export const PROJECT_NAME_MIN_LENGTH = 1;
 export const PROJECT_NAME_MAX_LENGTH = 100;
 export const PROJECT_PAMPHLET_TEXT_MAX_LENGTH = 120;
 export const PROJECT_MAX_TAGS = 5;
+export const CONTEST_VOTE_NUMBER_PATTERN = /^[0-9]{4}$/;
 export const SUBMISSION_MESSAGE_MIN_LENGTH = 1;
 export const SUBMISSION_MESSAGE_MAX_LENGTH = 200;
 
@@ -40,6 +41,10 @@ export const projectSchema = z.object({
     .max(PROJECT_NAME_MAX_LENGTH, "企画名は100文字以内で入力してください"),
   placeId: placeIdSchema.nullable(),
   logoImageId: imageIdSchema.nullable(),
+  contestVoteNumber: z
+    .string()
+    .regex(CONTEST_VOTE_NUMBER_PATTERN, "投票番号は4桁の数字で入力してください")
+    .nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });

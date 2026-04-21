@@ -238,6 +238,7 @@ export const projects = sqliteTable(
     logoImageId: text("logo_image_id").references(() => images.id, {
       onDelete: "set null",
     }),
+    contestVoteNumber: text("contest_vote_number"),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .notNull(),
@@ -249,6 +250,7 @@ export const projects = sqliteTable(
   (table) => [
     index("projects_event_id_idx").on(table.eventId),
     index("projects_org_id_idx").on(table.orgId),
+    unique("projects_event_vote_number_unique").on(table.eventId, table.contestVoteNumber),
   ],
 );
 

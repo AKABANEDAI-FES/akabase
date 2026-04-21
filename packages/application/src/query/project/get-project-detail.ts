@@ -20,6 +20,7 @@ export const projectDetailSchema = z.object({
   placeName: z.string().nullable(),
   logoImageId: z.string().nullable(),
   logoUrl: z.string().nullable(),
+  contestVoteNumber: z.string().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
@@ -65,6 +66,7 @@ export async function getProjectDetail(
       placeName: project.place?.name ?? null,
       logoImageId: project.logoImageId,
       logoUrl: project.logoImage ? deps.imageRepo.getPublicUrl(project.logoImage.objectKey) : null,
+      contestVoteNumber: project.contestVoteNumber ?? null,
       createdAt: project.createdAt,
       updatedAt: project.updatedAt,
     });

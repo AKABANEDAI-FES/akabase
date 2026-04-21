@@ -1,6 +1,7 @@
 import { Result } from "@akabase/result";
 import type { ProjectDomainService } from "@akabase/domain/project/service";
 import type { ProjectRepository } from "@akabase/domain/project/repository";
+import type { EventId } from "@akabase/domain/event/schema";
 import type { ProjectId, SubmissionId } from "@akabase/domain/project/schema";
 import type { UserId } from "@akabase/domain/user/schema";
 import { PROJECT_ERROR_CODE, projectError } from "@akabase/domain/project/errors";
@@ -36,6 +37,28 @@ export class ProjectDomainServiceImpl implements ProjectDomainService {
     if (existingApproval) {
       return Result.fail(
         projectError(PROJECT_ERROR_CODE.CANNOT_APPROVE, "既にこの提出を承認しています"),
+      );
+    }
+
+    return Result.succeed(true);
+  }
+
+  async ensureContestVoteNumberUnique(
+    eventId: EventId,
+    contestVoteNumber: string,
+    excludeProjectId?: ProjectId,
+  ) {
+    const project = await this.projectRepo.findByEventAndContestVoteNumber(
+      eventId,
+      contestVoteNumber,
+    );
+
+    if (project !== null && project.id !== excludeProjectId) {
+      return Result.fail(
+        projectError(
+          PROJECT_ERROR_CODE.CONTEST_VOTE_NUMBER_NOT_UNIQUE,
+          "この投票番号は既に使用されています",
+        ),
       );
     }
 
