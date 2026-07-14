@@ -4,6 +4,7 @@ import { Badge } from "@akabase/ui/components/badge";
 import { Card } from "@akabase/ui/components/card";
 import { Text } from "@akabase/ui/components/text";
 import type { SubmissionDetail } from "@akabase/application/query/project/get-submission-detail";
+import { PROJECT_DETAIL_INFO_FIELDS } from "../utils/detail-info";
 import { TipTapContentRenderer } from "./tiptap-content-renderer";
 import { FormatDate } from "@/libs/date";
 
@@ -18,6 +19,29 @@ export function SubmissionOverviewTab({ submission }: SubmissionOverviewTabProps
         <SubmissionInfoCard submission={submission} />
         <SubmissionTagsCard tags={submission.tags} />
       </Grid>
+      <Card.Root>
+        <Card.Header>
+          <Card.Title>企画詳細情報</Card.Title>
+        </Card.Header>
+        <Card.Body>
+          <Stack gap="2">
+            {PROJECT_DETAIL_INFO_FIELDS.map(({ name, label }) => (
+              <Flex key={name} justify="space-between">
+                <Text textStyle="sm" color="fg.muted">
+                  {label}
+                </Text>
+                <Text textStyle="sm">
+                  {submission[name] || (
+                    <Text as="span" color="fg.muted">
+                      (未入力)
+                    </Text>
+                  )}
+                </Text>
+              </Flex>
+            ))}
+          </Stack>
+        </Card.Body>
+      </Card.Root>
       <Card.Root>
         <Card.Header>
           <Card.Title>パンフレットテキスト</Card.Title>

@@ -4,6 +4,7 @@ import { Flex, Stack } from "@akabase/styled-system/jsx";
 import { Alert } from "@akabase/ui/components/alert";
 import { Button } from "@akabase/ui/components/button";
 import { Field } from "@akabase/ui/components/field";
+import { Input } from "@akabase/ui/components/input";
 import { Select } from "@akabase/ui/components/select";
 import { Textarea } from "@akabase/ui/components/textarea";
 import { toaster } from "@akabase/ui/components/toast";
@@ -13,6 +14,7 @@ import { Result } from "@akabase/result";
 import { generateLoadProjectPublishedQueryOptions } from "../actions/queries";
 import { updatePublishedInputSchema, useUpdatePublishedMutationOption } from "../actions/mutations";
 import { generateLoadTagsQueryOptions } from "@/features/event/actions/queries/tag";
+import { PROJECT_DETAIL_INFO_FIELDS } from "../utils/detail-info";
 import { RichTextEditor } from "./editor";
 import { nl2br } from "@/libs/text";
 import { createListCollection } from "@ark-ui/react/collection";
@@ -57,12 +59,16 @@ export function ProjectPublishedDataForm({
     defaultValues: {
       pamphletText: published?.pamphletText ?? "",
       webContentJson: (published?.webContentJson ?? null) as unknown,
+      openingHours: published?.openingHours ?? "",
+      lastEntryTime: published?.lastEntryTime ?? "",
       tags: published?.tags.map((tag) => tag.id as string) ?? [],
     },
     validators: {
       onDynamic: z.object({
         pamphletText: updatePublishedInputSchema.shape.pamphletText,
         webContentJson: z.unknown(),
+        openingHours: updatePublishedInputSchema.shape.openingHours,
+        lastEntryTime: updatePublishedInputSchema.shape.lastEntryTime,
         tags: updatePublishedInputSchema.shape.tags,
       }),
       onSubmitAsync: async ({ value }) => {
@@ -82,6 +88,8 @@ export function ProjectPublishedDataForm({
             orgId: cast<OrgId>(orgId),
             pamphletText: value.pamphletText,
             webContentJson: value.webContentJson,
+            openingHours: value.openingHours,
+            lastEntryTime: value.lastEntryTime,
             tags: value.tags.map((id) => cast<TagId>(id)),
           });
 
@@ -169,6 +177,31 @@ export function ProjectPublishedDataForm({
             </Field.Root>
           )}
         </form.Field>
+
+        {PROJECT_DETAIL_INFO_FIELDS.map(({ name, label, placeholder, helperText }) => (
+          <form.Field key={name} name={name}>
+            {(field) => (
+              <Field.Root invalid={!field.state.meta.isValid}>
+                <Field.Label htmlFor={field.name}>{label}</Field.Label>
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder={placeholder}
+                  disabled={!published}
+                />
+                {!field.state.meta.isValid && (
+                  <Field.ErrorText>
+                    {nl2br(field.state.meta.errors.map((error) => error?.message ?? "").join("\n"))}
+                  </Field.ErrorText>
+                )}
+                <Field.HelperText>{helperText}</Field.HelperText>
+              </Field.Root>
+            )}
+          </form.Field>
+        ))}
 
         <form.Field name="tags">
           {(field) => (

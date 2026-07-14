@@ -86,6 +86,14 @@ const columns = [
     header: "パンフレットテキスト",
     cell: (info) => <span style={{ whiteSpace: "pre-wrap" }}>{info.getValue()}</span>,
   }),
+  columnHelper.accessor("openingHours", {
+    header: "開催時間",
+    cell: (info) => info.getValue() || "—",
+  }),
+  columnHelper.accessor("lastEntryTime", {
+    header: "最終受付時間",
+    cell: (info) => info.getValue() || "—",
+  }),
   columnHelper.accessor("placeId", {
     id: "placeId",
     header: "場所",
@@ -123,7 +131,7 @@ async function fetchImageBuffer(url: string): Promise<Uint8Array | null> {
   }
 }
 
-const LOGO_COL = 5;
+const LOGO_COL = 7;
 const LOGO_SIZE_PX = 128;
 
 // oxlint-disable-next-line max-statements
@@ -145,7 +153,16 @@ async function toExcel(data: EventPublishedDataItem[]): Promise<Blob> {
   const worksheet = workbook.addWorksheet();
   const boldFormat = new Format().setBold();
 
-  const headers = ["企画名", "出展団体名", "パンフレットテキスト", "場所", "タグ", "ロゴ"];
+  const headers = [
+    "企画名",
+    "出展団体名",
+    "パンフレットテキスト",
+    "開催時間",
+    "最終受付時間",
+    "場所",
+    "タグ",
+    "ロゴ",
+  ];
   for (let col = 0; col < headers.length; col += 1) {
     worksheet.writeWithFormat(0, col, headers[col], boldFormat);
   }
@@ -155,8 +172,10 @@ async function toExcel(data: EventPublishedDataItem[]): Promise<Blob> {
     worksheet.write(row + 1, 0, item.projectName);
     worksheet.write(row + 1, 1, item.orgName);
     worksheet.write(row + 1, 2, item.pamphletText);
-    worksheet.write(row + 1, 3, item.placeName ?? "");
-    worksheet.write(row + 1, 4, item.tags.join(", "));
+    worksheet.write(row + 1, 3, item.openingHours);
+    worksheet.write(row + 1, 4, item.lastEntryTime);
+    worksheet.write(row + 1, 5, item.placeName ?? "");
+    worksheet.write(row + 1, 6, item.tags.join(", "));
 
     const buf = imageBuffers[row];
     if (buf) {
@@ -183,11 +202,24 @@ function toCSV(data: EventPublishedDataItem[]): string {
       企画名: item.projectName,
       出展団体名: item.orgName,
       パンフレットテキスト: item.pamphletText,
+      開催時間: item.openingHours,
+      最終受付時間: item.lastEntryTime,
       場所: item.placeName ?? "",
       タグ: item.tags.join(", "),
       ロゴURL: item.logoUrl ? toAbsoluteUrl(item.logoUrl) : "",
     })),
-    { columns: ["企画名", "出展団体名", "パンフレットテキスト", "場所", "タグ", "ロゴURL"] },
+    {
+      columns: [
+        "企画名",
+        "出展団体名",
+        "パンフレットテキスト",
+        "開催時間",
+        "最終受付時間",
+        "場所",
+        "タグ",
+        "ロゴURL",
+      ],
+    },
   );
 }
 
@@ -359,10 +391,21 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
           data={() =>
             JSON.stringify(
               filteredData.map(
-                ({ projectName, orgName, pamphletText, placeName, tags, logoUrl }) => ({
+                ({
                   projectName,
                   orgName,
                   pamphletText,
+                  openingHours,
+                  lastEntryTime,
+                  placeName,
+                  tags,
+                  logoUrl,
+                }) => ({
+                  projectName,
+                  orgName,
+                  pamphletText,
+                  openingHours,
+                  lastEntryTime,
                   placeName,
                   tags,
                   logoUrl: logoUrl ? toAbsoluteUrl(logoUrl) : null,

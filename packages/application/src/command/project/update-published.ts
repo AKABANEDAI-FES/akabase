@@ -24,6 +24,8 @@ export type UpdatePublishedInput = {
   orgId: OrgId;
   pamphletText: string;
   webContentJson: unknown;
+  openingHours: string;
+  lastEntryTime: string;
   tags: TagId[];
   actor: Actor;
 };
@@ -71,6 +73,8 @@ export async function updatePublished(
         projectId: input.projectId,
         pamphletText: input.pamphletText,
         webContentJson: input.webContentJson,
+        openingHours: input.openingHours,
+        lastEntryTime: input.lastEntryTime,
         tags: input.tags,
         publishedBy: input.actor.userId,
       }),

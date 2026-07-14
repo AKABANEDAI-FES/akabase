@@ -24,6 +24,8 @@ export type UpdateProjectDraftInput = {
   projectId: ProjectId;
   pamphletText: string;
   webContentJson: unknown;
+  openingHours: string;
+  lastEntryTime: string;
   tags: TagId[];
   actor: Actor;
 };
@@ -43,7 +45,14 @@ function applyDeadlineEnforcement(
   existingDraft: DraftWithTags,
   input: UpdateProjectDraftInput,
   blockedFieldKeys: Set<string>,
-): { pamphletText: string; webContentJson: unknown; tags: TagId[] } {
+): {
+  pamphletText: string;
+  webContentJson: unknown;
+  openingHours: string;
+  lastEntryTime: string;
+  tags: TagId[];
+} {
+  const isDetailInfoBlocked = blockedFieldKeys.has("detail_info");
   return {
     pamphletText: blockedFieldKeys.has("pamphlet_text")
       ? existingDraft.pamphletText
@@ -51,6 +60,8 @@ function applyDeadlineEnforcement(
     webContentJson: blockedFieldKeys.has("web_content")
       ? existingDraft.webContentJson
       : input.webContentJson,
+    openingHours: isDetailInfoBlocked ? existingDraft.openingHours : input.openingHours,
+    lastEntryTime: isDetailInfoBlocked ? existingDraft.lastEntryTime : input.lastEntryTime,
     tags: blockedFieldKeys.has("tags") ? existingDraft.tags : input.tags,
   };
 }
@@ -93,6 +104,8 @@ export async function updateProjectDraft(
         projectId: input.projectId,
         pamphletText: enforced.pamphletText,
         webContentJson: enforced.webContentJson,
+        openingHours: enforced.openingHours,
+        lastEntryTime: enforced.lastEntryTime,
         tags: enforced.tags,
         updatedBy: input.actor.userId,
       }),

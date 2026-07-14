@@ -15,6 +15,8 @@ export const projectPublishedDetailSchema = z.object({
   projectId: projectIdSchema,
   pamphletText: projectPublishedSchema.shape.pamphletText,
   webContentJson: projectPublishedSchema.shape.webContentJson,
+  openingHours: projectPublishedSchema.shape.openingHours,
+  lastEntryTime: projectPublishedSchema.shape.lastEntryTime,
   publishedAt: z.date(),
   tags: tagSchema.pick({ id: true, name: true }).array(),
 });
@@ -65,6 +67,8 @@ export async function getProjectPublished(
       projectId: publishedRow.projectId,
       pamphletText: publishedRow.pamphletText,
       webContentJson: publishedRow.webContentJson,
+      openingHours: publishedRow.openingHours,
+      lastEntryTime: publishedRow.lastEntryTime,
       publishedAt: publishedRow.publishedAt,
       tags: publishedRow.tags
         .toSorted((a, b) => a.tag.displayOrder - b.tag.displayOrder)
