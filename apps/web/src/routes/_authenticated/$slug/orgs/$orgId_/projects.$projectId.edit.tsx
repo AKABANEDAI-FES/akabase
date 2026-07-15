@@ -6,6 +6,7 @@ import { Badge } from "@akabase/ui/components/badge";
 import { Button } from "@akabase/ui/components/button";
 import { Field } from "@akabase/ui/components/field";
 import { Heading } from "@akabase/ui/components/heading";
+import { Input } from "@akabase/ui/components/input";
 import { Select } from "@akabase/ui/components/select";
 import { Textarea } from "@akabase/ui/components/textarea";
 import { toaster } from "@akabase/ui/components/toast";
@@ -26,6 +27,7 @@ import { nl2br } from "@/libs/text";
 import { createListCollection } from "@ark-ui/react/collection";
 import { Portal } from "@ark-ui/react/portal";
 import { getDeadlineMessage, getFieldDeadlineStatus } from "@/features/project/utils/deadline";
+import { PROJECT_DETAIL_INFO_FIELDS } from "@/features/project/utils/detail-info";
 import { PROJECT_MAX_TAGS, PROJECT_PAMPHLET_TEXT_MAX_LENGTH } from "@akabase/domain/project/schema";
 import type { OrgId } from "@akabase/domain/organization/schema";
 import type { ProjectId } from "@akabase/domain/project/schema";
@@ -75,17 +77,26 @@ function ProjectEditPage() {
   const now = new Date();
   const blockedFields = getBlockedFieldKeys(deadlines, now);
 
+  // 企画詳細情報の2フィールドは同一の締切キーを共有するため、一度だけ計算する
+  const detailInfoStatus = getFieldDeadlineStatus("detail_info", deadlines, now);
+  const isDetailInfoBlocked = blockedFields.has("detail_info");
+  const detailInfoDeadlineMsg = getDeadlineMessage("detail_info", deadlines, now);
+
   const form = useForm({
     defaultValues: {
       pamphletText: draft?.pamphletText ?? "",
       tags: draft?.tags.map((tag) => tag.id as string) ?? [],
       webContentJson: (draft?.webContentJson ?? null) as unknown,
+      openingHours: draft?.openingHours ?? "",
+      lastEntryTime: draft?.lastEntryTime ?? "",
     },
     validators: {
       onDynamic: z.object({
         pamphletText: updateProjectDraftInputSchema.shape.pamphletText,
         tags: updateProjectDraftInputSchema.shape.tags,
         webContentJson: z.unknown(),
+        openingHours: updateProjectDraftInputSchema.shape.openingHours,
+        lastEntryTime: updateProjectDraftInputSchema.shape.lastEntryTime,
       }),
       onSubmitAsync: async ({ value }) => {
         const result = await updateProjectDraftInputSchema["~standard"].validate({
@@ -245,6 +256,53 @@ function ProjectEditPage() {
                 );
               }}
             </form.Field>
+
+            {detailInfoStatus === "before_start" ? (
+              <Alert.Root colorPalette="gray">
+                <Alert.Content>
+                  <Alert.Title>企画詳細情報</Alert.Title>
+                  <Alert.Description>{detailInfoDeadlineMsg}</Alert.Description>
+                </Alert.Content>
+              </Alert.Root>
+            ) : (
+              PROJECT_DETAIL_INFO_FIELDS.map(({ name, label, placeholder, helperText }) => (
+                <form.Field key={name} name={name}>
+                  {(field) => (
+                    <Field.Root invalid={!field.state.meta.isValid}>
+                      <Field.Label htmlFor={field.name}>
+                        {label}
+                        {isDetailInfoBlocked && (
+                          <Badge ml="2" variant="subtle">
+                            編集不可
+                          </Badge>
+                        )}
+                      </Field.Label>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        placeholder={placeholder}
+                        disabled={isDetailInfoBlocked}
+                      />
+                      {!field.state.meta.isValid && (
+                        <Field.ErrorText>
+                          {nl2br(
+                            field.state.meta.errors.map((error) => error?.message ?? "").join("\n"),
+                          )}
+                        </Field.ErrorText>
+                      )}
+                      <Field.HelperText>
+                        {isDetailInfoBlocked && detailInfoDeadlineMsg
+                          ? detailInfoDeadlineMsg
+                          : helperText}
+                      </Field.HelperText>
+                    </Field.Root>
+                  )}
+                </form.Field>
+              ))
+            )}
 
             <form.Field name="tags">
               {(field) => {

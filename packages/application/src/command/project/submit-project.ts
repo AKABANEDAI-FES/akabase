@@ -23,6 +23,7 @@ import {
   createSubmissionActionEntity,
   createSubmissionEntity,
   createSubmissionMessageEntity,
+  validateDraftForSubmission,
 } from "@akabase/domain/project/logic";
 import type { ProjectRepository } from "@akabase/domain/project/repository";
 import type { ProjectDomainService } from "@akabase/domain/project/service";
@@ -72,6 +73,8 @@ export async function submitProject(
         Result.fail(projectError(PROJECT_ERROR_CODE.DRAFT_NOT_FOUND, "下書きが見つかりません")),
       );
     }
+
+    yield* $(validateDraftForSubmission(draft));
 
     yield* $(await deps.projectDomainService.canSubmit(input.projectId));
 

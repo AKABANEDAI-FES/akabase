@@ -7,6 +7,7 @@ import { generateLoadProjectPublishedQueryOptions } from "../actions/queries";
 import type { EventId } from "@akabase/domain/event/schema";
 import type { OrgId } from "@akabase/domain/organization/schema";
 import type { ProjectId } from "@akabase/domain/project/schema";
+import { PROJECT_DETAIL_INFO_FIELDS } from "../utils/detail-info";
 import { TipTapContentRenderer } from "./tiptap-content-renderer";
 
 type ProjectPublishedDataCardProps = {
@@ -49,6 +50,18 @@ export function ProjectPublishedDataCard({
             <Text fontWeight="medium">パンフレット用説明</Text>
             <Text>{publishedData.pamphletText}</Text>
           </div>
+          {PROJECT_DETAIL_INFO_FIELDS.map(({ name, label }) => (
+            <div key={name}>
+              <Text fontWeight="medium">{label}</Text>
+              <Text>
+                {publishedData[name] || (
+                  <Text as="span" color="fg.muted">
+                    (未入力)
+                  </Text>
+                )}
+              </Text>
+            </div>
+          ))}
           <div>
             <Text fontWeight="medium">タグ</Text>
             <Flex gap="2">

@@ -22,6 +22,7 @@ export type SubmissionMessageId = z.infer<typeof submissionMessageIdSchema>;
 export const PROJECT_NAME_MIN_LENGTH = 1;
 export const PROJECT_NAME_MAX_LENGTH = 100;
 export const PROJECT_PAMPHLET_TEXT_MAX_LENGTH = 120;
+export const PROJECT_DETAIL_INFO_MAX_LENGTH = 100;
 export const PROJECT_MAX_TAGS = 5;
 export const CONTEST_VOTE_NUMBER_PATTERN = /^[0-9]{4}$/;
 export const SUBMISSION_MESSAGE_MIN_LENGTH = 1;
@@ -52,6 +53,30 @@ export const projectSchema = z.object({
 export type Project = z.infer<typeof projectSchema>;
 
 /**
+ * 企画詳細情報（開催時間・最終受付時間）
+ * Draft では任意、Submission / Published では必須
+ */
+const detailInfoShape = {
+  openingHours: z
+    .string()
+    .max(
+      PROJECT_DETAIL_INFO_MAX_LENGTH,
+      `開催時間は${PROJECT_DETAIL_INFO_MAX_LENGTH}文字以内で入力してください`,
+    ),
+  lastEntryTime: z
+    .string()
+    .max(
+      PROJECT_DETAIL_INFO_MAX_LENGTH,
+      `最終受付時間は${PROJECT_DETAIL_INFO_MAX_LENGTH}文字以内で入力してください`,
+    ),
+};
+
+const requiredDetailInfoShape = {
+  openingHours: detailInfoShape.openingHours.min(1, "開催時間を入力してください"),
+  lastEntryTime: detailInfoShape.lastEntryTime.min(1, "最終受付時間を入力してください"),
+};
+
+/**
  * ProjectDraft
  * 編集可能な作業データ
  */
@@ -61,6 +86,7 @@ export const projectDraftSchema = z.object({
     .string()
     .max(PROJECT_PAMPHLET_TEXT_MAX_LENGTH, "パンフレットテキストは120文字以内で入力してください"),
   webContentJson: z.json().nullable(), // TipTap JSON
+  ...detailInfoShape,
   updatedAt: z.date(),
   updatedBy: userIdSchema,
 });
@@ -86,6 +112,7 @@ export const projectSubmissionSchema = z.object({
     .string()
     .max(PROJECT_PAMPHLET_TEXT_MAX_LENGTH, "パンフレットテキストは120文字以内で入力してください"),
   webContentJson: z.json().nullable(),
+  ...requiredDetailInfoShape,
   submittedAt: z.date(),
   submittedBy: userIdSchema,
 });
@@ -102,6 +129,7 @@ export const projectPublishedSchema = z.object({
     .string()
     .max(PROJECT_PAMPHLET_TEXT_MAX_LENGTH, "パンフレットテキストは120文字以内で入力してください"),
   webContentJson: z.json().nullable(),
+  ...requiredDetailInfoShape,
   publishedAt: z.date(),
   publishedBy: userIdSchema,
 });

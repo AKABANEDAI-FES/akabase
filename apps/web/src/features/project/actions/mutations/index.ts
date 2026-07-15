@@ -15,6 +15,7 @@ import { cast } from "@akabase/domain/shared/ids";
 import {
   draftWithTagsSchema,
   projectIdSchema,
+  projectPublishedSchema,
   projectSchema,
   submissionIdSchema,
   submissionMessageSchema,
@@ -98,6 +99,8 @@ export const updateProjectDraftInputSchema = z.object({
   pamphletText: draftWithTagsSchema.shape.pamphletText,
   tags: draftWithTagsSchema.shape.tags,
   webContentJson: draftWithTagsSchema.shape.webContentJson,
+  openingHours: draftWithTagsSchema.shape.openingHours,
+  lastEntryTime: draftWithTagsSchema.shape.lastEntryTime,
 });
 
 /**
@@ -118,6 +121,8 @@ export const updateProjectDraftFn = createServerFn({ method: "POST" })
           projectId: data.projectId,
           pamphletText: data.pamphletText,
           webContentJson: data.webContentJson,
+          openingHours: data.openingHours,
+          lastEntryTime: data.lastEntryTime,
           tags: data.tags,
           actor,
         }),
@@ -415,6 +420,8 @@ export const updatePublishedInputSchema = z.object({
   orgId: projectSchema.shape.orgId,
   pamphletText: draftWithTagsSchema.shape.pamphletText,
   webContentJson: draftWithTagsSchema.shape.webContentJson,
+  openingHours: projectPublishedSchema.shape.openingHours,
+  lastEntryTime: projectPublishedSchema.shape.lastEntryTime,
   tags: draftWithTagsSchema.shape.tags,
 });
 

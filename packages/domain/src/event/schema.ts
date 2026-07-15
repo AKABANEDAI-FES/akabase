@@ -90,7 +90,7 @@ export type Place = z.infer<typeof placeSchema>;
  * Deadline Field Keys
  * フィールドごとの締切設定で使用可能なキー
  */
-export const DEADLINE_FIELD_KEYS = ["pamphlet_text", "web_content", "tags"] as const;
+export const DEADLINE_FIELD_KEYS = ["pamphlet_text", "web_content", "tags", "detail_info"] as const;
 
 export type DeadlineFieldKey = (typeof DEADLINE_FIELD_KEYS)[number];
 
@@ -102,6 +102,7 @@ export const DEADLINE_FIELD_LABELS: Record<DeadlineFieldKey, string> = {
   pamphlet_text: "パンフレット説明文",
   web_content: "Webコンテンツ",
   tags: "タグ",
+  detail_info: "企画詳細情報",
 } as const;
 
 export const deadlineRefinement = z.refine<{ startAt?: Date | null; deadlineAt: Date }>(
