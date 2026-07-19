@@ -15,6 +15,12 @@
       "persist": true,
     },
   },
+  "routes": [
+    {
+      "custom_domain": true,
+      "pattern": "akabase.akabanedai-fes.com",
+    },
+  ],
   "d1_databases": [
     {
       "binding": "DB",
