@@ -38,6 +38,10 @@
     },
   ],
   "vars": {
-    "ADMIN_EMAILS": ["s1f102200558@toyo.jp", "s1f102503060@toyo.jp"],
+    "ADMIN_EMAILS": [
+      "s1f102200558@toyo.jp", // yu7400ki
+      "s1f102303057@toyo.jp", // mst-mkt
+      "s1f102503060@toyo.jp", // 糸井優翔
+    ],
   },
 }
