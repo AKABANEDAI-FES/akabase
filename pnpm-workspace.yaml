@@ -2,6 +2,11 @@ packages:
   - apps/*
   - packages/*
 
+onlyBuiltDependencies:
+  - esbuild
+  - workerd
+  - sharp
+
 overrides:
   vite: npm:@voidzero-dev/vite-plus-core@^0.1.14
   vitest: npm:@voidzero-dev/vite-plus-test@^0.1.14
