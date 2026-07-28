@@ -262,7 +262,7 @@ export const projectDrafts = sqliteTable("project_drafts", {
   projectId: text("project_id")
     .primaryKey()
     .references(() => projects.id, { onDelete: "cascade" }),
-  pamphletText: text("pamphlet_text").notNull(), // 120文字以内
+  pamphletText: text("pamphlet_text").notNull(), // 68文字以内
   webContentJson: text("web_content_json", { mode: "json" }), // TipTap JSON
   openingHours: text("opening_hours").notNull().default(""), // 開催時間
   lastEntryTime: text("last_entry_time").notNull().default(""), // 最終受付時間

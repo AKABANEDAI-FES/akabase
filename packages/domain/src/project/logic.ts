@@ -134,7 +134,7 @@ export function createProjectDraftEntity(input: {
  * Business rules:
  * - Draft must exist before updating
  * - All fields can be updated except projectId
- * - Validation is performed by zod schema (e.g., pamphletText max 120 chars)
+ * - Validation is performed by zod schema (e.g., pamphletText max 68 chars)
  */
 export function updateProjectDraftEntity(input: {
   projectId: ProjectId;
