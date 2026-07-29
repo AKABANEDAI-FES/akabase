@@ -8,7 +8,7 @@ import { inArray } from "drizzle-orm";
 import { Result } from "@akabase/result";
 import { schema } from "@akabase/infrastructure/db";
 import type { Database } from "@akabase/infrastructure/db";
-import { apiKeyIdSchema } from "@akabase/domain/api-key/schema";
+import { apiKeyIdSchema, apiKeyMetadataSchema } from "@akabase/domain/api-key/schema";
 import { eventIdSchema } from "@akabase/domain/event/schema";
 import type { EventId } from "@akabase/domain/event/schema";
 import type { Actor } from "@akabase/domain/authorization/schema";
@@ -41,12 +41,8 @@ function parseEventId(metadata: string | null): string | null {
     return null;
   }
   try {
-    const parsed: unknown = JSON.parse(metadata);
-    if (typeof parsed === "object" && parsed !== null && "eventId" in parsed) {
-      const { eventId } = parsed;
-      return typeof eventId === "string" ? eventId : null;
-    }
-    return null;
+    const parsed = apiKeyMetadataSchema.safeParse(JSON.parse(metadata));
+    return parsed.success ? parsed.data.eventId : null;
   } catch {
     return null;
   }

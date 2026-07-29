@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { Result } from "@akabase/result";
 import type { ApiKeyService } from "@akabase/domain/api-key/service";
-import type { ApiKeyId } from "@akabase/domain/api-key/schema";
+import type { ApiKeyId, ApiKeyMetadata } from "@akabase/domain/api-key/schema";
 import type { EventId } from "@akabase/domain/event/schema";
 import type { UserId } from "@akabase/domain/user/schema";
 import { API_KEY_ERROR_CODE, apiKeyError } from "@akabase/domain/api-key/errors";
@@ -25,7 +25,7 @@ export class ApiKeyServiceImpl implements ApiKeyService {
         body: {
           name: input.name,
           userId: input.userId,
-          metadata: { eventId: input.eventId },
+          metadata: { eventId: input.eventId } satisfies ApiKeyMetadata,
         },
       });
 

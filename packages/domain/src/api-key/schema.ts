@@ -4,9 +4,19 @@
  */
 
 import { z } from "zod";
+import { eventIdSchema } from "../event/schema";
 
 export const apiKeyIdSchema = z.string().brand<"ApiKeyId">();
 export type ApiKeyId = z.infer<typeof apiKeyIdSchema>;
+
+/**
+ * Metadata stored with a key, which binds the key to a single event
+ */
+export const apiKeyMetadataSchema = z.object({
+  eventId: eventIdSchema,
+});
+
+export type ApiKeyMetadata = z.infer<typeof apiKeyMetadataSchema>;
 
 /**
  * Schema constraints
