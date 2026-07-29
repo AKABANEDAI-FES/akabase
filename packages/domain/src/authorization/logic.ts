@@ -6,6 +6,7 @@
 import { actorSchema } from "./schema";
 import type {
   Actor,
+  ApiKeyResource,
   CommitteeRole,
   EventResource,
   GlobalRole,
@@ -139,4 +140,13 @@ export function organizationResource(
  */
 export function userResource(userId: UserId): UserResource {
   return { type: "user", userId };
+}
+
+/**
+ * Create an API key resource
+ *
+ * @returns API key resource
+ */
+export function apiKeyResource(): ApiKeyResource {
+  return { type: "api_key" };
 }

@@ -7,6 +7,7 @@ import { Result } from "@akabase/result";
 import { AuthorizationService } from "./service";
 import type { CommitteeRole, OrgRole } from "./schema";
 import {
+  apiKeyResource,
   createActor,
   eventResource,
   organizationResource,
@@ -603,6 +604,79 @@ describe("AuthorizationService", () => {
         if (Result.isSuccess(result)) {
           expect(result.value.allowed).toBe(false);
           expect(result.value.reason).toContain("委員会メンバー");
+        }
+      });
+    });
+  });
+
+  describe("APIキー認可", () => {
+    describe("api_key:create", () => {
+      it("グローバル管理者を許可する", () => {
+        const actor = createActor(cast<UserId>("user_1"), "admin");
+        const result = authService.isAllowed(actor, apiKeyResource(), "api_key:create");
+
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value).toBe(true);
+        }
+      });
+
+      it("非グローバル管理者を拒否する", () => {
+        const eventId = cast<EventId>("event_1");
+        const committeeRoles = new Map<EventId, CommitteeRole>([[eventId, "admin"]]);
+        const actor = createActor(cast<UserId>("user_1"), "user", committeeRoles);
+        const result = authService.checkPermission(actor, apiKeyResource(), "api_key:create");
+
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.allowed).toBe(false);
+          expect(result.value.reason).toContain("グローバル管理者");
+        }
+      });
+    });
+
+    describe("api_key:list", () => {
+      it("グローバル管理者を許可する", () => {
+        const actor = createActor(cast<UserId>("user_1"), "admin");
+        const result = authService.isAllowed(actor, apiKeyResource(), "api_key:list");
+
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value).toBe(true);
+        }
+      });
+
+      it("非グローバル管理者を拒否する", () => {
+        const actor = createActor(cast<UserId>("user_1"));
+        const result = authService.checkPermission(actor, apiKeyResource(), "api_key:list");
+
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.allowed).toBe(false);
+          expect(result.value.reason).toContain("グローバル管理者");
+        }
+      });
+    });
+
+    describe("api_key:delete", () => {
+      it("グローバル管理者を許可する", () => {
+        const actor = createActor(cast<UserId>("user_1"), "admin");
+        const result = authService.isAllowed(actor, apiKeyResource(), "api_key:delete");
+
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value).toBe(true);
+        }
+      });
+
+      it("非グローバル管理者を拒否する", () => {
+        const actor = createActor(cast<UserId>("user_1"));
+        const result = authService.checkPermission(actor, apiKeyResource(), "api_key:delete");
+
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.allowed).toBe(false);
+          expect(result.value.reason).toContain("グローバル管理者");
         }
       });
     });

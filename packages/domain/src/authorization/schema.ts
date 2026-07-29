@@ -101,6 +101,15 @@ export const userResourceSchema = z.object({
 export type UserResource = z.infer<typeof userResourceSchema>;
 
 /**
+ * API key resource (for API key management operations)
+ */
+export const apiKeyResourceSchema = z.object({
+  type: z.literal("api_key"),
+});
+
+export type ApiKeyResource = z.infer<typeof apiKeyResourceSchema>;
+
+/**
  * Resource types that can be protected by authorization
  */
 export const resourceSchema = z.discriminatedUnion("type", [
@@ -108,6 +117,7 @@ export const resourceSchema = z.discriminatedUnion("type", [
   projectResourceSchema,
   organizationResourceSchema,
   userResourceSchema,
+  apiKeyResourceSchema,
 ]);
 
 export type Resource = z.infer<typeof resourceSchema>;
@@ -155,6 +165,11 @@ export const actionSchema = z.enum([
 
   // Event actions (for submissions)
   "event:list_submissions",
+
+  // API key actions
+  "api_key:create",
+  "api_key:list",
+  "api_key:delete",
 ]);
 
 export type Action = z.infer<typeof actionSchema>;
