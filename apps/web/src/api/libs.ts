@@ -5,14 +5,14 @@ import type { Database } from "@akabase/infrastructure/db";
 import { env } from "cloudflare:workers";
 import { createFactory } from "hono/factory";
 
-export const factory = createFactory<{
-  Variables: {
-    auth: Auth;
-    db: Database;
-    user: Session["user"] | null;
-    session: Session["session"] | null;
-  };
-}>();
+export type ApiVariables = {
+  auth: Auth;
+  db: Database;
+  user: Session["user"] | null;
+  session: Session["session"] | null;
+};
+
+export const factory = createFactory<{ Variables: ApiVariables }>();
 
 export const depsMiddleware = factory.createMiddleware(async (c, next) => {
   const db = createDb(env.DB);
