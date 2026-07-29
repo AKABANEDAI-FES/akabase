@@ -47,6 +47,7 @@
     "@tiptap/pm": "catalog:frontend",
     "@tiptap/react": "catalog:frontend",
     "@tiptap/starter-kit": "catalog:frontend",
+    "@tiptap/static-renderer": "catalog:frontend",
     "better-auth": "catalog:backend",
     "es-toolkit": "catalog:",
     "hono": "catalog:backend",
