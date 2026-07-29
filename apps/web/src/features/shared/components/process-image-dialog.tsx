@@ -448,7 +448,7 @@ function CompressSection({
         min={1}
         max={100}
         value={[qualityPercent]}
-        onValueChange={({ value }) => onQualityChange(value[0] ?? 80 / 100)}
+        onValueChange={({ value }) => onQualityChange((value[0] ?? 80) / 100)}
       >
         {isPng ? (
           <>
