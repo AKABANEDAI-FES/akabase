@@ -33,8 +33,9 @@
     "migration": "drizzle-kit generate"
   },
   "dependencies": {
-    "@akabase/result": "workspace:*",
     "@akabase/domain": "workspace:*",
+    "@akabase/result": "workspace:*",
+    "@better-auth/api-key": "catalog:backend",
     "better-auth": "catalog:backend",
     "drizzle-orm": "catalog:backend",
     "drizzle-zod": "catalog:backend",

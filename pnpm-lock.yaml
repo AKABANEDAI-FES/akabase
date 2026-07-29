@@ -6,6 +6,9 @@ settings:
 
 catalogs:
   backend:
+    '@better-auth/api-key':
+      specifier: 1.5.5
+      version: 1.5.5
     '@hono/standard-validator':
       specifier: ^0.2.2
       version: 0.2.2
@@ -419,6 +422,9 @@ importers:
       '@akabase/result':
         specifier: workspace:*
         version: link:../result
+      '@better-auth/api-key':
+        specifier: catalog:backend
+        version: 1.5.5(@better-auth/core@1.5.5(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(better-call@1.3.2(zod@4.3.6))(jose@6.2.1)(kysely@0.28.11)(nanostores@1.1.1))(@better-auth/utils@0.3.1)(better-auth@1.5.5(@tanstack/react-start@1.166.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0)))(drizzle-kit@0.31.9)(drizzle-orm@0.45.1(@libsql/client@0.17.0)(kysely@0.28.11))(mongodb@7.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(solid-js@1.9.11)(vitest@4.1.0(@types/node@22.19.15)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0))))
       better-auth:
         specifier: catalog:backend
         version: 1.5.5(@tanstack/react-start@1.166.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0)))(drizzle-kit@0.31.9)(drizzle-orm@0.45.1(@libsql/client@0.17.0)(kysely@0.28.11))(mongodb@7.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(solid-js@1.9.11)(vitest@4.1.0(@types/node@22.19.15)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0)))
@@ -623,6 +629,13 @@ packages:
   '@babel/types@7.29.0':
     resolution: {integrity: sha512-LwdZHpScM4Qz8Xw2iKSzS+cfglZzJGvofQICy7W7v4caru4EaAmyUuO6BGrbyQ2mYV11W0U8j5mBhd14dd3B0A==}
     engines: {node: '>=6.9.0'}
+
+  '@better-auth/api-key@1.5.5':
+    resolution: {integrity: sha512-jNWHA9GHOCxXPXqKvc6etUuKEYTO9M58Ah1Q/7wPIiSvK93vigDL/R2jd6uByUdX6XPHsDZorbeVqe0I8NnTDQ==}
+    peerDependencies:
+      '@better-auth/core': 1.5.5
+      '@better-auth/utils': 0.3.1
+      better-auth: 1.5.5
 
   '@better-auth/core@1.5.5':
     resolution: {integrity: sha512-1oR/2jAp821Dcf67kQYHUoyNcdc1TcShfw4QMK0YTVntuRES5mUOyvEJql5T6eIuLfaqaN4LOF78l0FtF66HXA==}
@@ -5759,6 +5772,13 @@ snapshots:
     dependencies:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.28.5
+
+  '@better-auth/api-key@1.5.5(@better-auth/core@1.5.5(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(better-call@1.3.2(zod@4.3.6))(jose@6.2.1)(kysely@0.28.11)(nanostores@1.1.1))(@better-auth/utils@0.3.1)(better-auth@1.5.5(@tanstack/react-start@1.166.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0)))(drizzle-kit@0.31.9)(drizzle-orm@0.45.1(@libsql/client@0.17.0)(kysely@0.28.11))(mongodb@7.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(solid-js@1.9.11)(vitest@4.1.0(@types/node@22.19.15)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0))))':
+    dependencies:
+      '@better-auth/core': 1.5.5(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(better-call@1.3.2(zod@4.3.6))(jose@6.2.1)(kysely@0.28.11)(nanostores@1.1.1)
+      '@better-auth/utils': 0.3.1
+      better-auth: 1.5.5(@tanstack/react-start@1.166.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0)))(drizzle-kit@0.31.9)(drizzle-orm@0.45.1(@libsql/client@0.17.0)(kysely@0.28.11))(mongodb@7.1.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(solid-js@1.9.11)(vitest@4.1.0(@types/node@22.19.15)(vite@8.0.0(@emnapi/core@1.9.0)(@emnapi/runtime@1.9.0)(@types/node@22.19.15)(esbuild@0.27.4)(tsx@4.21.0)))
+      zod: 4.3.6
 
   '@better-auth/core@1.5.5(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(better-call@1.3.2(zod@4.3.6))(jose@6.2.1)(kysely@0.28.11)(nanostores@1.1.1)':
     dependencies:
