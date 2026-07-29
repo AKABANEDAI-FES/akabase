@@ -7,6 +7,7 @@ import { EventDomainServiceImpl } from "@akabase/infrastructure/services/event-d
 import { OrganizationDomainServiceImpl } from "@akabase/infrastructure/services/organization-domain-service";
 import { ProjectDomainServiceImpl } from "@akabase/infrastructure/services/project-domain-service";
 import { AuthorizationService } from "@akabase/domain/authorization/service";
+import { MockApiKeyService } from "./mock-api-key-service";
 import { MockImageRepository } from "./mock-image-repository";
 
 export function createTestDependencies(db: Database) {
@@ -26,5 +27,6 @@ export function createTestDependencies(db: Database) {
     projectDomainService: new ProjectDomainServiceImpl(projectRepo),
     authService: new AuthorizationService(),
     imageRepo: new MockImageRepository(),
+    apiKeyService: new MockApiKeyService(),
   };
 }
