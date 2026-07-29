@@ -16,7 +16,10 @@ const getProjectsHandler = externalFactory.createHandlers(async (c) => {
     logoUrl: toAbsoluteUrl(project.logoUrl, env.BETTER_AUTH_URL),
   }));
 
-  return c.json({ projects: projectsWithAbsoluteLogoUrl }, { status: 200 });
+  return c.json(
+    { projects: projectsWithAbsoluteLogoUrl },
+    { status: 200, headers: { "Cache-Control": "private, max-age=60" } },
+  );
 });
 
 const getProjectHandler = externalFactory.createHandlers(
@@ -44,7 +47,7 @@ const getProjectHandler = externalFactory.createHandlers(
         organization,
         webContentHtml: renderWebContentHtml(webContentJson, env.BETTER_AUTH_URL),
       },
-      { status: 200 },
+      { status: 200, headers: { "Cache-Control": "private, max-age=60" } },
     );
   },
 );
