@@ -24,6 +24,9 @@ export function createAuth(db: Database, env: Env) {
         enableMetadata: true,
         defaultPrefix: API_KEY_PREFIX,
         maximumNameLength: API_KEY_NAME_MAX_LENGTH,
+        startingCharactersConfig: {
+          charactersLength: API_KEY_PREFIX.length + 6,
+        },
         rateLimit: {
           enabled: false,
         },
