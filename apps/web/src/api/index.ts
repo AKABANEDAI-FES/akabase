@@ -8,7 +8,7 @@ const api = factory
   .use("*", depsMiddleware)
   .route("/auth", authRoute)
   .route("/storage", storageRoute)
-  .route("/external", externalRoute);
+  .route("/", externalRoute);
 
 export const app = factory.createApp().route("/api", api);
 
