@@ -2,7 +2,7 @@ import { createContext, use, useState } from "react";
 import { Outlet } from "@tanstack/react-router";
 import { Portal } from "@ark-ui/react/portal";
 import { css } from "@akabase/styled-system/css";
-import { Stack } from "@akabase/styled-system/jsx";
+import { HStack, Stack } from "@akabase/styled-system/jsx";
 import { MenuIcon } from "lucide-react";
 import { Button } from "@akabase/ui/components/button";
 import { CloseButton } from "@akabase/ui/components/close-button";
@@ -15,10 +15,11 @@ const SidebarNavContext = createContext<{ onNavigate?: () => void }>({});
 
 type SidebarLayoutProps = {
   title: string;
+  headerExtra?: React.ReactNode;
   children: React.ReactNode;
 };
 
-export function SidebarLayout({ title, children }: SidebarLayoutProps) {
+export function SidebarLayout({ title, headerExtra, children }: SidebarLayoutProps) {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
@@ -46,9 +47,10 @@ export function SidebarLayout({ title, children }: SidebarLayoutProps) {
               <MenuIcon />
             </IconButton>
           </Drawer.Trigger>
-          <Heading as="h1" textStyle="lg">
+          <Heading as="h1" textStyle="lg" flex="1">
             {title}
           </Heading>
+          {headerExtra}
         </header>
 
         <Portal>
@@ -91,9 +93,12 @@ export function SidebarLayout({ title, children }: SidebarLayoutProps) {
           })}
         >
           <Stack gap="8">
-            <Heading as="h1" textStyle="lg">
-              {title}
-            </Heading>
+            <HStack justify="space-between" alignItems="center">
+              <Heading as="h1" textStyle="lg">
+                {title}
+              </Heading>
+              {headerExtra}
+            </HStack>
             {children}
           </Stack>
         </nav>

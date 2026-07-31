@@ -8,6 +8,10 @@
       "import": "./dist/command/event/*.mjs",
       "types": "./dist/command/event/*.d.mts"
     },
+    "./command/notification/*": {
+      "import": "./dist/command/notification/*.mjs",
+      "types": "./dist/command/notification/*.d.mts"
+    },
     "./command/organization/*": {
       "import": "./dist/command/organization/*.mjs",
       "types": "./dist/command/organization/*.d.mts"
@@ -31,6 +35,10 @@
     "./query/event/*": {
       "import": "./dist/query/event/*.mjs",
       "types": "./dist/query/event/*.d.mts"
+    },
+    "./query/notification/*": {
+      "import": "./dist/query/notification/*.mjs",
+      "types": "./dist/query/notification/*.d.mts"
     },
     "./query/organization/*": {
       "import": "./dist/query/organization/*.mjs",

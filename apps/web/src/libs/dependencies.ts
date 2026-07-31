@@ -8,6 +8,7 @@ import { EventDomainServiceImpl } from "@akabase/infrastructure/services/event-d
 import { OrganizationDomainServiceImpl } from "@akabase/infrastructure/services/organization-domain-service";
 import { ProjectDomainServiceImpl } from "@akabase/infrastructure/services/project-domain-service";
 import { ImageRepositoryImpl } from "@akabase/infrastructure/storage/image-repository";
+import { NotificationRepositoryImpl } from "@akabase/infrastructure/repositories/notification-repository";
 import { AuthorizationService } from "@akabase/domain/authorization/service";
 import { env } from "cloudflare:workers";
 
@@ -22,6 +23,7 @@ export const createDependenciesFn = createServerOnlyFn(() => {
   const projectDomainService = new ProjectDomainServiceImpl(projectRepo);
   const authService = new AuthorizationService();
   const imageRepo = new ImageRepositoryImpl(env.STORAGE, db);
+  const notificationRepo = new NotificationRepositoryImpl(db);
 
   return {
     db,
@@ -34,6 +36,7 @@ export const createDependenciesFn = createServerOnlyFn(() => {
     projectDomainService,
     authService,
     imageRepo,
+    notificationRepo,
   };
 });
 

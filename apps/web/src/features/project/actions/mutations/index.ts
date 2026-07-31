@@ -8,6 +8,7 @@ import { submitProject } from "@akabase/application/command/project/submit-proje
 import { approveProject } from "@akabase/application/command/project/approve-project";
 import { returnProject } from "@akabase/application/command/project/return-project";
 import { withdrawSubmission } from "@akabase/application/command/project/withdraw-submission";
+import { createNotifications } from "@akabase/application/command/notification/create-notifications";
 import { resolveActor } from "@akabase/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/auth";
 import { dependenciesMiddleware } from "@/libs/dependencies";
@@ -31,6 +32,10 @@ import {
   generateLoadSubmissionDetailCacheKey,
   generateLoadSubmissionsCacheKey,
 } from "../queries";
+import {
+  generateLoadNotificationsCacheKey,
+  generateLoadUnreadCountCacheKey,
+} from "@/features/notification/actions/queries";
 import { z } from "zod";
 
 /**
@@ -159,7 +164,7 @@ export const submitProjectFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware, dependenciesMiddleware])
   .inputValidator(submitProjectInputSchema)
   .handler(async ({ data, context }) => {
-    return Result.gen(async function* ($) {
+    const result = await Result.gen(async function* ($) {
       const actor = await resolveActor(context.dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
@@ -173,6 +178,16 @@ export const submitProjectFn = createServerFn({ method: "POST" })
         }),
       );
     });
+
+    if (Result.isSuccess(result)) {
+      await createNotifications(context.dependencies, {
+        ...result.value,
+        type: "submitted",
+        actorUserId: cast<UserId>(context.session.user.id),
+      });
+    }
+
+    return result;
   });
 
 export function useSubmitProjectMutationOption() {
@@ -192,6 +207,12 @@ export function useSubmitProjectMutationOption() {
         }),
         queryClient.invalidateQueries({
           queryKey: generateLoadSubmissionDetailCacheKey(eventId, submissionId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadNotificationsCacheKey(eventId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadUnreadCountCacheKey(eventId),
         }),
       ]);
     }),
@@ -214,7 +235,7 @@ export const approveProjectFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware, dependenciesMiddleware])
   .inputValidator(approveProjectInputSchema)
   .handler(async ({ data, context }) => {
-    return Result.gen(async function* ($) {
+    const result = await Result.gen(async function* ($) {
       const actor = await resolveActor(context.dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
@@ -228,6 +249,16 @@ export const approveProjectFn = createServerFn({ method: "POST" })
         }),
       );
     });
+
+    if (Result.isSuccess(result)) {
+      await createNotifications(context.dependencies, {
+        ...result.value,
+        type: "approved",
+        actorUserId: cast<UserId>(context.session.user.id),
+      });
+    }
+
+    return result;
   });
 
 export function useApproveProjectMutationOption() {
@@ -241,6 +272,12 @@ export function useApproveProjectMutationOption() {
         }),
         queryClient.invalidateQueries({
           queryKey: generateLoadEventSubmissionsCacheKey(eventId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadNotificationsCacheKey(eventId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadUnreadCountCacheKey(eventId),
         }),
       ]);
     }),
@@ -265,7 +302,7 @@ export const returnProjectFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware, dependenciesMiddleware])
   .inputValidator(returnProjectInputSchema)
   .handler(async ({ data, context }) => {
-    return Result.gen(async function* ($) {
+    const result = await Result.gen(async function* ($) {
       const actor = await resolveActor(context.dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
@@ -279,6 +316,16 @@ export const returnProjectFn = createServerFn({ method: "POST" })
         }),
       );
     });
+
+    if (Result.isSuccess(result)) {
+      await createNotifications(context.dependencies, {
+        ...result.value,
+        type: "returned",
+        actorUserId: cast<UserId>(context.session.user.id),
+      });
+    }
+
+    return result;
   });
 
 export function useReturnProjectMutationOption() {
@@ -298,6 +345,12 @@ export function useReturnProjectMutationOption() {
         }),
         queryClient.invalidateQueries({
           queryKey: generateLoadDraftCacheKey(eventId, orgId, projectId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadNotificationsCacheKey(eventId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadUnreadCountCacheKey(eventId),
         }),
       ]);
     }),
@@ -322,7 +375,7 @@ export const withdrawSubmissionFn = createServerFn({ method: "POST" })
   .middleware([authMiddleware, dependenciesMiddleware])
   .inputValidator(withdrawSubmissionInputSchema)
   .handler(async ({ data, context }) => {
-    return Result.gen(async function* ($) {
+    const result = await Result.gen(async function* ($) {
       const actor = await resolveActor(context.dependencies, {
         userId: cast<UserId>(context.session.user.id),
         eventIds: [data.eventId],
@@ -336,6 +389,16 @@ export const withdrawSubmissionFn = createServerFn({ method: "POST" })
         }),
       );
     });
+
+    if (Result.isSuccess(result)) {
+      await createNotifications(context.dependencies, {
+        ...result.value,
+        type: "withdrawn",
+        actorUserId: cast<UserId>(context.session.user.id),
+      });
+    }
+
+    return result;
   });
 
 export function useWithdrawSubmissionMutationOption() {
@@ -352,6 +415,12 @@ export function useWithdrawSubmissionMutationOption() {
         }),
         queryClient.invalidateQueries({
           queryKey: generateLoadEventSubmissionsCacheKey(eventId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadNotificationsCacheKey(eventId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadUnreadCountCacheKey(eventId),
         }),
       ]);
     }),
