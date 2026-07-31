@@ -1,4 +1,4 @@
-import { factory } from "./libs";
+import { factory } from "../libs";
 import { env } from "cloudflare:workers";
 import { cors } from "hono/cors";
 

@@ -1,4 +1,4 @@
-import { apiClient } from "@/api/client";
+import { apiClient } from "@/api/internal/client";
 import type { ImageScope } from "@akabase/domain/shared/image";
 import { mutationOptions } from "@tanstack/react-query";
 
