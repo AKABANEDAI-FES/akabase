@@ -1,5 +1,4 @@
 import { cors } from "hono/cors";
-import { Scalar } from "@scalar/hono-api-reference";
 import { openAPIRouteHandler, resolver } from "hono-openapi";
 import { apiKeyMiddleware, externalFactory } from "../libs";
 import { errorResponseSchema } from "./schemas";
@@ -34,7 +33,6 @@ export const v1Route = app
         },
         security: [{ apiKey: [] }],
       },
-      exclude: ["/docs"],
       defaultOptions: {
         GET: {
           responses: {
@@ -51,6 +49,5 @@ export const v1Route = app
       },
     }),
   )
-  .get("/docs", Scalar({ url: "/api/v1/openapi.json" }))
   .use("/*", apiKeyMiddleware)
   .route("/projects", projectsRoute);
