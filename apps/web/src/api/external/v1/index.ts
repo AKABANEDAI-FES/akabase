@@ -26,7 +26,7 @@ export const v1Route = app
           description:
             "学祭サイト向けに公開企画情報を提供する API です。リクエストには `x-api-key` ヘッダーで API キーを指定してください。",
         },
-        servers: [{ url: "/api/external/v1" }],
+        servers: [{ url: "/api/v1" }],
         components: {
           securitySchemes: {
             apiKey: { type: "apiKey", in: "header", name: "x-api-key" },
@@ -51,6 +51,6 @@ export const v1Route = app
       },
     }),
   )
-  .get("/docs", Scalar({ url: "/api/external/v1/openapi.json" }))
+  .get("/docs", Scalar({ url: "/api/v1/openapi.json" }))
   .use("/*", apiKeyMiddleware)
   .route("/projects", projectsRoute);
