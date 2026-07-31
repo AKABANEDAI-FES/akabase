@@ -22,8 +22,7 @@ export const v1Route = app
         info: {
           title: "AKABASE External API",
           version: "1.0.0",
-          description:
-            "学祭サイト向けに公開企画情報を提供する API です。リクエストには `x-api-key` ヘッダーで API キーを指定してください。",
+          description: "akabanedai-fes.com 等の外部サービス向けに企画情報を提供する API です",
         },
         servers: [{ url: "/api/v1" }],
         components: {
@@ -37,7 +36,7 @@ export const v1Route = app
         GET: {
           responses: {
             401: {
-              description: "API キーが指定されていないか、無効です",
+              description: "API キーが指定されていない、もしくは無効です",
               content: { "application/json": { schema: resolver(errorResponseSchema) } },
             },
             403: {

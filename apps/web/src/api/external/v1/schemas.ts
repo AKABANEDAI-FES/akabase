@@ -11,6 +11,9 @@ export const projectListResponseSchema = z.object({
 export const projectDetailResponseSchema = externalProjectDetailSchema
   .omit({ webContentJson: true })
   .extend({
-    webContentHtml: z.string().nullable(),
+    webContentHtml: z.string().nullable().meta({
+      description:
+        "レンダリング済みの Web コンテンツの HTML 文字列。コンテンツが入力されていない場合は null になります",
+    }),
     publishedAt: z.iso.datetime(),
   });

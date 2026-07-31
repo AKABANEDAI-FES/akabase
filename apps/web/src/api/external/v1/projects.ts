@@ -15,11 +15,11 @@ import { renderWebContentHtml, toAbsoluteUrl } from "@/features/project/utils/we
 
 const getProjectsHandler = externalFactory.createHandlers(
   describeRoute({
-    summary: "公開企画の一覧を取得",
-    description: "API キーに紐づくイベントの公開済み企画を名前順で返します。",
+    summary: "企画の一覧を取得",
+    description: "API キーに紐づくイベントの企画を一覧で返します",
     responses: {
       200: {
-        description: "公開済み企画の一覧",
+        description: "企画の一覧",
         content: { "application/json": { schema: resolver(projectListResponseSchema) } },
       },
     },
@@ -41,16 +41,16 @@ const getProjectsHandler = externalFactory.createHandlers(
 
 const getProjectHandler = externalFactory.createHandlers(
   describeRoute({
-    summary: "公開企画の詳細を取得",
+    summary: "企画の詳細を取得",
     description:
-      "公開済み企画の詳細を返します。Web コンテンツはレンダリング済みの HTML 文字列です。",
+      "指定された企画の詳細を返します。Web コンテンツはレンダリング済みの HTML 文字列です。",
     responses: {
       200: {
-        description: "公開済み企画の詳細",
+        description: "企画の詳細",
         content: { "application/json": { schema: resolver(projectDetailResponseSchema) } },
       },
       404: {
-        description: "企画が存在しないか、公開されていません",
+        description: "企画が存在しない、もしくは公開されていません",
         content: { "application/json": { schema: resolver(errorResponseSchema) } },
       },
     },
