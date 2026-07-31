@@ -131,6 +131,13 @@ pnpm --filter web cf-typegen  # Cloudflare バインディングの型生成
 
 > DB スキーマ変更時は `packages/infrastructure/src/db/schema.ts` を編集後、`drizzle-kit generate` でマイグレーション生成。
 
+## 外部サービス向け API
+
+外部サービス向けに企画情報を提供する読み取り専用 API を `/api/v1` で提供している。認証には、管理画面で発行した API キーを `x-api-key` ヘッダーに指定する。
+
+- API ドキュメント: https://akabase.akabanedai-fes.com/api/docs
+- OpenAPI スキーマ: https://akabase.akabanedai-fes.com/api/v1/openapi.json
+
 ## ドキュメント
 
 アーキテクチャの詳細（DDD 設計、CQRS パターン、型システム、エラーハンドリング、実装パターン等）は [docs/architecture.md](docs/architecture.md) を参照。
