@@ -106,6 +106,25 @@ export const deadlines = sqliteTable(
 );
 
 /**
+ * EventSettings (イベント詳細設定)
+ * イベント単位の各種設定。events との 1:1 拡張テーブルのため event_id を PK とする
+ * 各設定カラムは null = 未設定 (行が存在しない場合も全項目未設定として扱う)
+ */
+export const eventSettings = sqliteTable("event_settings", {
+  eventId: text("event_id")
+    .primaryKey()
+    .references(() => events.id, { onDelete: "cascade" }),
+  webContentDescription: text("web_content_description"),
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
+    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+    .notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+    .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
+/**
  * CommitteeRole (委員会役割)
  * イベント単位でユーザーに役割を付与
  */
@@ -456,10 +475,11 @@ export const submissionMessages = sqliteTable(
 // Relations
 // ============================================================================
 
-export const eventsRelations = relations(events, ({ many }) => ({
+export const eventsRelations = relations(events, ({ one, many }) => ({
   tags: many(tags),
   places: many(places),
   deadlines: many(deadlines),
+  settings: one(eventSettings),
   committeeRoles: many(committeeRoles),
   organizations: many(organizations),
 }));
@@ -492,6 +512,13 @@ export const placesRelations = relations(places, ({ one, many }) => ({
 export const deadlinesRelations = relations(deadlines, ({ one }) => ({
   event: one(events, {
     fields: [deadlines.eventId],
+    references: [events.id],
+  }),
+}));
+
+export const eventSettingsRelations = relations(eventSettings, ({ one }) => ({
+  event: one(events, {
+    fields: [eventSettings.eventId],
     references: [events.id],
   }),
 }));
@@ -680,6 +707,9 @@ export const selectPlaceSchema = createSelectSchema(places);
 
 export const insertDeadlineSchema = createInsertSchema(deadlines);
 export const selectDeadlineSchema = createSelectSchema(deadlines);
+
+export const insertEventSettingsSchema = createInsertSchema(eventSettings);
+export const selectEventSettingsSchema = createSelectSchema(eventSettings);
 
 export const insertCommitteeRoleSchema = createInsertSchema(committeeRoles);
 export const selectCommitteeRoleSchema = createSelectSchema(committeeRoles);
