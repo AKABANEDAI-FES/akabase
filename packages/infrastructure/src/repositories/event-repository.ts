@@ -2,12 +2,19 @@ import type { Database } from "../db";
 import { schema } from "../db";
 import { and, desc, eq, max } from "drizzle-orm";
 import type { BatchItem } from "drizzle-orm/batch";
-import { deadlineSchema, eventSchema, placeSchema, tagSchema } from "@akabase/domain/event/schema";
+import {
+  deadlineSchema,
+  eventSchema,
+  eventSettingsSchema,
+  placeSchema,
+  tagSchema,
+} from "@akabase/domain/event/schema";
 import type {
   Deadline,
   DeadlineId,
   Event,
   EventId,
+  EventSettings,
   Place,
   PlaceId,
   Tag,
@@ -398,6 +405,63 @@ export class EventRepositoryImpl implements EventRepository {
       throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to delete deadline",
+        error,
+      );
+    }
+  }
+
+  // =============================================================================
+  // Event settings operations
+  // =============================================================================
+
+  async findEventSettings(eventId: EventId): Promise<EventSettings | null> {
+    try {
+      const row = await this.db.query.eventSettings.findFirst({
+        where: (eventSettings, { eq }) => eq(eventSettings.eventId, eventId),
+      });
+
+      if (!row) {
+        return null;
+      }
+
+      const settings = eventSettingsSchema.parse({
+        eventId: row.eventId,
+        webContentDescription: row.webContentDescription,
+        createdAt: new Date(row.createdAt),
+        updatedAt: new Date(row.updatedAt),
+      });
+
+      return settings;
+    } catch (error) {
+      throw new RepositoryExceptionError(
+        REPOSITORY_ERROR_CODE.DATABASE_ERROR,
+        "Failed to find event settings",
+        error,
+      );
+    }
+  }
+
+  async saveEventSettings(settings: EventSettings): Promise<void> {
+    try {
+      await this.db
+        .insert(schema.eventSettings)
+        .values({
+          eventId: settings.eventId,
+          webContentDescription: settings.webContentDescription,
+          createdAt: settings.createdAt,
+          updatedAt: settings.updatedAt,
+        })
+        .onConflictDoUpdate({
+          target: schema.eventSettings.eventId,
+          set: {
+            webContentDescription: settings.webContentDescription,
+            updatedAt: settings.updatedAt,
+          },
+        });
+    } catch (error) {
+      throw new RepositoryExceptionError(
+        REPOSITORY_ERROR_CODE.DATABASE_ERROR,
+        "Failed to save event settings",
         error,
       );
     }

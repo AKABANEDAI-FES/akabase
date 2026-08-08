@@ -136,3 +136,16 @@ export const deadlineSchema = z
   .check(deadlineRefinement);
 
 export type Deadline = z.infer<typeof deadlineSchema>;
+
+/**
+ * EventSettings
+ * イベント詳細設定（イベント単位、events と 1:1）
+ */
+export const eventSettingsSchema = z.object({
+  eventId: eventIdSchema,
+  webContentDescription: z.string().nullable(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type EventSettings = z.infer<typeof eventSettingsSchema>;

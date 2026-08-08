@@ -7,7 +7,9 @@ import {
   archiveEvent,
   canModifyEvent,
   createEventEntity,
+  createEventSettingsEntity,
   updateEventEntity,
+  updateEventSettingsEntity,
 } from "./logic";
 
 // Test fixtures
@@ -119,6 +121,65 @@ describe("Event Domain Logic", () => {
         expect(Result.isSuccess(result)).toBe(true);
         if (Result.isSuccess(result)) {
           expect(result.value.status).toBe("active");
+          expect(result.value.updatedAt).toBe(now);
+        }
+      });
+    });
+  });
+
+  describe("Event Settings", () => {
+    describe("createEventSettingsEntity", () => {
+      it("creates settings with same createdAt and updatedAt", () => {
+        const now = new Date("2025-02-01T10:00:00.000Z");
+        const result = createEventSettingsEntity({
+          eventId: mockEventId,
+          webContentDescription: "紹介文、注意事項の順に記載してください",
+          now,
+        });
+
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.eventId).toBe(mockEventId);
+          expect(result.value.webContentDescription).toBe("紹介文、注意事項の順に記載してください");
+          expect(result.value.createdAt).toBe(now);
+          expect(result.value.updatedAt).toBe(now);
+        }
+      });
+
+      it("normalizes whitespace-only description to null", () => {
+        const result = createEventSettingsEntity({
+          eventId: mockEventId,
+          webContentDescription: "  \n  ",
+        });
+
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.webContentDescription).toBeNull();
+        }
+      });
+    });
+
+    describe("updateEventSettingsEntity", () => {
+      it("updates description and updatedAt while keeping createdAt", () => {
+        const createdAt = new Date("2025-01-01T00:00:00.000Z");
+        const settings = {
+          eventId: mockEventId,
+          webContentDescription: "旧説明",
+          createdAt,
+          updatedAt: createdAt,
+        };
+        const now = new Date("2025-02-01T10:00:00.000Z");
+
+        const result = updateEventSettingsEntity(settings, {
+          webContentDescription: "新説明",
+          now,
+        });
+
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.eventId).toBe(mockEventId);
+          expect(result.value.webContentDescription).toBe("新説明");
+          expect(result.value.createdAt).toBe(createdAt);
           expect(result.value.updatedAt).toBe(now);
         }
       });
