@@ -265,7 +265,6 @@ export const projectDrafts = sqliteTable("project_drafts", {
   pamphletText: text("pamphlet_text").notNull(), // 68文字以内
   webContentJson: text("web_content_json", { mode: "json" }), // TipTap JSON
   openingHours: text("opening_hours").notNull().default(""), // 開催時間
-  lastEntryTime: text("last_entry_time").notNull().default(""), // 最終受付時間
   updatedAt: integer("updated_at", { mode: "timestamp_ms" })
     .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
     .$onUpdate(() => new Date())
@@ -294,7 +293,6 @@ export const projectSubmissions = sqliteTable(
     pamphletText: text("pamphlet_text").notNull(),
     webContentJson: text("web_content_json", { mode: "json" }),
     openingHours: text("opening_hours").notNull().default(""),
-    lastEntryTime: text("last_entry_time").notNull().default(""),
     submittedAt: integer("submitted_at", { mode: "timestamp_ms" }).notNull(),
     submittedBy: text("submitted_by")
       .notNull()
@@ -317,7 +315,6 @@ export const projectPublished = sqliteTable("project_published", {
   pamphletText: text("pamphlet_text").notNull(),
   webContentJson: text("web_content_json", { mode: "json" }),
   openingHours: text("opening_hours").notNull().default(""),
-  lastEntryTime: text("last_entry_time").notNull().default(""),
   publishedAt: integer("published_at", { mode: "timestamp_ms" }).notNull(),
   publishedBy: text("published_by")
     .notNull()

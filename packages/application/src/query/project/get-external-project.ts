@@ -16,7 +16,6 @@ export const externalProjectDetailSchema = z.object({
   pamphletText: z.string(),
   webContentJson: z.json().nullable(),
   openingHours: z.string(),
-  lastEntryTime: z.string(),
   logoUrl: z.string().nullable(),
   organization: z.object({
     id: orgIdSchema,
@@ -89,7 +88,6 @@ export async function getExternalProject(
       pamphletText: row.published.pamphletText,
       webContentJson: row.published.webContentJson,
       openingHours: row.published.openingHours,
-      lastEntryTime: row.published.lastEntryTime,
       logoUrl: row.logoImage ? deps.imageRepo.getPublicUrl(row.logoImage.objectKey) : null,
       organization: {
         id: row.organization.id,

@@ -96,7 +96,6 @@ describe("listExternalProjects", () => {
         pamphletText: "パンフレット用の説明",
         webContentJson: { type: "doc", content: [] },
         openingHours: "10:00-17:00",
-        lastEntryTime: "16:30",
         publishedAt: now,
         publishedBy: "user-1",
       });
@@ -154,7 +153,6 @@ describe("listExternalProjects", () => {
     expect(result[0]!.name).toBe("企画 project-1");
     expect(result[0]!.pamphletText).toBe("パンフレット用の説明");
     expect(result[0]!.openingHours).toBe("10:00-17:00");
-    expect(result[0]!.lastEntryTime).toBe("16:30");
     expect(result[0]!.organization).toEqual({ id: "org-1", name: "Org 1" });
     expect(result[0]!.publishedAt).toBeInstanceOf(Date);
   });

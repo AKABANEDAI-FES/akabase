@@ -90,10 +90,6 @@ const columns = [
     header: "開催時間",
     cell: (info) => info.getValue() || "—",
   }),
-  columnHelper.accessor("lastEntryTime", {
-    header: "最終受付時間",
-    cell: (info) => info.getValue() || "—",
-  }),
   columnHelper.accessor("placeId", {
     id: "placeId",
     header: "場所",
@@ -131,7 +127,7 @@ async function fetchImageBuffer(url: string): Promise<Uint8Array | null> {
   }
 }
 
-const LOGO_COL = 7;
+const LOGO_COL = 6;
 const LOGO_SIZE_PX = 128;
 
 // oxlint-disable-next-line max-statements
@@ -158,7 +154,6 @@ async function toExcel(data: EventPublishedDataItem[]): Promise<Blob> {
     "出展団体名",
     "パンフレットテキスト",
     "開催時間",
-    "最終受付時間",
     "場所",
     "タグ",
     "ロゴ",
@@ -173,9 +168,8 @@ async function toExcel(data: EventPublishedDataItem[]): Promise<Blob> {
     worksheet.write(row + 1, 1, item.orgName);
     worksheet.write(row + 1, 2, item.pamphletText);
     worksheet.write(row + 1, 3, item.openingHours);
-    worksheet.write(row + 1, 4, item.lastEntryTime);
-    worksheet.write(row + 1, 5, item.placeName ?? "");
-    worksheet.write(row + 1, 6, item.tags.join(", "));
+    worksheet.write(row + 1, 4, item.placeName ?? "");
+    worksheet.write(row + 1, 5, item.tags.join(", "));
 
     const buf = imageBuffers[row];
     if (buf) {
@@ -203,7 +197,6 @@ function toCSV(data: EventPublishedDataItem[]): string {
       出展団体名: item.orgName,
       パンフレットテキスト: item.pamphletText,
       開催時間: item.openingHours,
-      最終受付時間: item.lastEntryTime,
       場所: item.placeName ?? "",
       タグ: item.tags.join(", "),
       ロゴURL: item.logoUrl ? toAbsoluteUrl(item.logoUrl) : "",
@@ -214,7 +207,6 @@ function toCSV(data: EventPublishedDataItem[]): string {
         "出展団体名",
         "パンフレットテキスト",
         "開催時間",
-        "最終受付時間",
         "場所",
         "タグ",
         "ロゴURL",
@@ -396,7 +388,6 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
                   orgName,
                   pamphletText,
                   openingHours,
-                  lastEntryTime,
                   placeName,
                   tags,
                   logoUrl,
@@ -405,7 +396,6 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
                   orgName,
                   pamphletText,
                   openingHours,
-                  lastEntryTime,
                   placeName,
                   tags,
                   logoUrl: logoUrl ? toAbsoluteUrl(logoUrl) : null,

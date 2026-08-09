@@ -115,7 +115,6 @@ export function createProjectDraftEntity(input: {
     pamphletText: "",
     webContentJson: null,
     openingHours: "",
-    lastEntryTime: "",
     updatedAt: now,
     updatedBy: input.updatedBy,
     tags: input.tags ?? [],
@@ -141,7 +140,6 @@ export function updateProjectDraftEntity(input: {
   pamphletText: string;
   webContentJson: unknown;
   openingHours: string;
-  lastEntryTime: string;
   tags: TagId[];
   updatedBy: UserId;
   now?: Date;
@@ -152,7 +150,6 @@ export function updateProjectDraftEntity(input: {
     pamphletText: input.pamphletText,
     webContentJson: input.webContentJson,
     openingHours: input.openingHours.trim(),
-    lastEntryTime: input.lastEntryTime.trim(),
     updatedAt: now,
     updatedBy: input.updatedBy,
     tags: input.tags,
@@ -187,7 +184,6 @@ export function createSubmissionEntity(input: {
     pamphletText: input.draft.pamphletText,
     webContentJson: input.draft.webContentJson,
     openingHours: input.draft.openingHours,
-    lastEntryTime: input.draft.lastEntryTime,
     submittedAt: now,
     submittedBy: input.submittedBy,
     tags: input.draft.tags,
@@ -364,7 +360,6 @@ export function createPublishedEntity(input: {
     pamphletText: input.submission.pamphletText,
     webContentJson: input.submission.webContentJson,
     openingHours: input.submission.openingHours,
-    lastEntryTime: input.submission.lastEntryTime,
     publishedAt: now,
     publishedBy: input.publishedBy,
     tags: input.submission.tags,
@@ -390,7 +385,6 @@ export function updatePublishedEntity(input: {
   pamphletText: string;
   webContentJson: unknown;
   openingHours: string;
-  lastEntryTime: string;
   tags: TagId[];
   publishedBy: UserId;
   now?: Date;
@@ -402,7 +396,6 @@ export function updatePublishedEntity(input: {
     pamphletText: input.pamphletText.trim(),
     webContentJson: input.webContentJson,
     openingHours: input.openingHours.trim(),
-    lastEntryTime: input.lastEntryTime.trim(),
     tags: input.tags,
     publishedAt: now,
     publishedBy: input.publishedBy,
@@ -424,7 +417,7 @@ export function updatePublishedEntity(input: {
  * Check if a draft has all fields required for submission
  *
  * Business rules:
- * - openingHours and lastEntryTime are optional while drafting,
+ * - openingHours is optional while drafting,
  *   but must be filled in before the draft can be submitted
  *
  * @param draft - The draft to check
@@ -433,10 +426,7 @@ export function updatePublishedEntity(input: {
 export function validateDraftForSubmission(
   draft: DraftWithTags,
 ): Result.Result<true, ProjectError> {
-  const missingLabels = [
-    ...(draft.openingHours.trim() === "" ? ["開催時間"] : []),
-    ...(draft.lastEntryTime.trim() === "" ? ["最終受付時間"] : []),
-  ];
+  const missingLabels = draft.openingHours.trim() === "" ? ["開催時間"] : [];
 
   if (missingLabels.length > 0) {
     return Result.fail(

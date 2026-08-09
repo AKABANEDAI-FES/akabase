@@ -53,7 +53,7 @@ export const projectSchema = z.object({
 export type Project = z.infer<typeof projectSchema>;
 
 /**
- * 企画詳細情報（開催時間・最終受付時間）
+ * 企画詳細情報（開催時間）
  * Draft では任意、Submission / Published では必須
  */
 const detailInfoShape = {
@@ -63,17 +63,10 @@ const detailInfoShape = {
       PROJECT_DETAIL_INFO_MAX_LENGTH,
       `開催時間は${PROJECT_DETAIL_INFO_MAX_LENGTH}文字以内で入力してください`,
     ),
-  lastEntryTime: z
-    .string()
-    .max(
-      PROJECT_DETAIL_INFO_MAX_LENGTH,
-      `最終受付時間は${PROJECT_DETAIL_INFO_MAX_LENGTH}文字以内で入力してください`,
-    ),
 };
 
 const requiredDetailInfoShape = {
   openingHours: detailInfoShape.openingHours.min(1, "開催時間を入力してください"),
-  lastEntryTime: detailInfoShape.lastEntryTime.min(1, "最終受付時間を入力してください"),
 };
 
 /**

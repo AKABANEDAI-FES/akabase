@@ -17,7 +17,6 @@ export const draftDetailSchema = z.object({
   pamphletText: projectDraftSchema.shape.pamphletText,
   webContentJson: projectDraftSchema.shape.webContentJson,
   openingHours: projectDraftSchema.shape.openingHours,
-  lastEntryTime: projectDraftSchema.shape.lastEntryTime,
   updatedAt: z.date().nullable(),
   updatedBy: userIdSchema.nullable(),
   tags: tagSchema.pick({ id: true, name: true }).array(),
@@ -64,7 +63,6 @@ export async function getDraft(
         pamphletText: "",
         webContentJson: null,
         openingHours: "",
-        lastEntryTime: "",
         updatedAt: null,
         updatedBy: null,
         tags: [],
@@ -78,7 +76,6 @@ export async function getDraft(
       pamphletText: draftRow.pamphletText,
       webContentJson: draftRow.webContentJson,
       openingHours: draftRow.openingHours,
-      lastEntryTime: draftRow.lastEntryTime,
       updatedAt: draftRow.updatedAt,
       updatedBy: draftRow.updatedBy,
       tags: draftRow.tags

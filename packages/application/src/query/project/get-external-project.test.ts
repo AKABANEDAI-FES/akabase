@@ -101,7 +101,6 @@ describe("getExternalProject", () => {
             ? { type: "doc", content: [{ type: "paragraph" }] }
             : options.webContentJson,
         openingHours: "10:00-17:00",
-        lastEntryTime: "16:30",
         publishedAt: now,
         publishedBy: "user-1",
       });
