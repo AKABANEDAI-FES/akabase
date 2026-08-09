@@ -144,6 +144,7 @@ export type Deadline = z.infer<typeof deadlineSchema>;
 export const eventSettingsSchema = z.object({
   eventId: eventIdSchema,
   webContentDescription: z.string().nullable(),
+  pamphletTextMaxLength: z.number().int().min(1).nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });

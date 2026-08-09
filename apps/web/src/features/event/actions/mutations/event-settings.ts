@@ -1,12 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
-import { z } from "zod";
 import { Result } from "@akabase/result";
 import { upsertEventSettings } from "@akabase/application/command/event/upsert-event-settings";
 import { resolveActor } from "@akabase/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/auth";
 import { dependenciesMiddleware } from "@/libs/dependencies";
 import { cast } from "@akabase/domain/shared/ids";
-import { eventIdSchema, eventSettingsSchema } from "@akabase/domain/event/schema";
+import { eventSettingsSchema } from "@akabase/domain/event/schema";
 import type { UserId } from "@akabase/domain/user/schema";
 import { mutationOptions, useQueryClient } from "@tanstack/react-query";
 import { generateLoadEventSettingsCacheKey } from "../queries/event-settings";
@@ -14,9 +13,10 @@ import { generateLoadEventSettingsCacheKey } from "../queries/event-settings";
 /**
  * Upsert event settings input validation schema
  */
-export const upsertEventSettingsInputSchema = z.object({
-  eventId: eventIdSchema,
-  webContentDescription: eventSettingsSchema.shape.webContentDescription,
+export const upsertEventSettingsInputSchema = eventSettingsSchema.pick({
+  eventId: true,
+  webContentDescription: true,
+  pamphletTextMaxLength: true,
 });
 
 /**
@@ -36,6 +36,7 @@ export const upsertEventSettingsFn = createServerFn({ method: "POST" })
         await upsertEventSettings(context.dependencies, {
           eventId: data.eventId,
           webContentDescription: data.webContentDescription,
+          pamphletTextMaxLength: data.pamphletTextMaxLength,
           actor,
         }),
       );

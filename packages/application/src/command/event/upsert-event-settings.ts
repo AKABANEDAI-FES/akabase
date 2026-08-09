@@ -17,6 +17,7 @@ import type { EventDomainService } from "@akabase/domain/event/service";
 export type UpsertEventSettingsInput = {
   eventId: EventId;
   webContentDescription: string | null;
+  pamphletTextMaxLength: number | null;
   actor: Actor;
 };
 
@@ -45,10 +46,12 @@ export async function upsertEventSettings(
       existingSettings
         ? updateEventSettingsEntity(existingSettings, {
             webContentDescription: input.webContentDescription,
+            pamphletTextMaxLength: input.pamphletTextMaxLength,
           })
         : createEventSettingsEntity({
             eventId: input.eventId,
             webContentDescription: input.webContentDescription,
+            pamphletTextMaxLength: input.pamphletTextMaxLength,
           }),
     );
 

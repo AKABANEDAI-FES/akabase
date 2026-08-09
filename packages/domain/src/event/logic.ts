@@ -319,6 +319,7 @@ export function getBlockedFieldKeys(deadlines: Deadline[], now: Date): Set<strin
 export function createEventSettingsEntity(input: {
   eventId: EventId;
   webContentDescription: string | null;
+  pamphletTextMaxLength: number | null;
   now?: Date;
 }): Result.Result<EventSettings, EventError> {
   const now = input.now ?? new Date();
@@ -327,6 +328,7 @@ export function createEventSettingsEntity(input: {
     eventId: input.eventId,
     // Whitespace-only descriptions are normalized to null (= not configured)
     webContentDescription: input.webContentDescription?.trim() || null,
+    pamphletTextMaxLength: input.pamphletTextMaxLength,
     createdAt: now,
     updatedAt: now,
   };
@@ -345,6 +347,7 @@ export function updateEventSettingsEntity(
   settings: EventSettings,
   input: {
     webContentDescription: string | null;
+    pamphletTextMaxLength: number | null;
     now?: Date;
   },
 ): Result.Result<EventSettings, EventError> {
@@ -352,6 +355,7 @@ export function updateEventSettingsEntity(
     ...settings,
     // Whitespace-only descriptions are normalized to null (= not configured)
     webContentDescription: input.webContentDescription?.trim() || null,
+    pamphletTextMaxLength: input.pamphletTextMaxLength,
     updatedAt: input.now ?? new Date(),
   };
 

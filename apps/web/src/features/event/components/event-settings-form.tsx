@@ -7,11 +7,15 @@ import type { EventSettingsDetail } from "@akabase/application/query/event/get-e
 import { Button } from "@akabase/ui/components/button";
 import { Field } from "@akabase/ui/components/field";
 import { Heading } from "@akabase/ui/components/heading";
+import { Input } from "@akabase/ui/components/input";
 import { Textarea } from "@akabase/ui/components/textarea";
 import { toaster } from "@akabase/ui/components/toast";
 import { Text } from "@akabase/ui/components/text";
 import { Box, Flex, Stack } from "@akabase/styled-system/jsx";
+import { PROJECT_PAMPHLET_TEXT_MAX_LENGTH } from "@akabase/domain/project/schema";
 import { confirm } from "@/components/confirm";
+import { nl2br } from "@/libs/text";
+import { z } from "zod";
 
 type EventSettingsFormProps = {
   settings: EventSettingsDetail;
@@ -28,6 +32,13 @@ export function EventSettingsForm({ settings, disabled }: EventSettingsFormProps
   const form = useForm({
     defaultValues: {
       webContentDescription: settings.webContentDescription ?? "",
+      pamphletTextMaxLength: settings.pamphletTextMaxLength?.toString() ?? "",
+    },
+    validators: {
+      onDynamic: z.object({
+        webContentDescription: z.string(),
+        pamphletTextMaxLength: z.string().regex(/^$|^[1-9][0-9]*$/, "1以上の整数で入力してください"),
+      }),
     },
     onSubmit: async ({ value }) => {
       try {
@@ -35,6 +46,8 @@ export function EventSettingsForm({ settings, disabled }: EventSettingsFormProps
           data: {
             eventId: settings.eventId,
             webContentDescription: value.webContentDescription,
+            pamphletTextMaxLength:
+              value.pamphletTextMaxLength === "" ? null : Number(value.pamphletTextMaxLength),
           },
         });
 
@@ -127,6 +140,35 @@ export function EventSettingsForm({ settings, disabled }: EventSettingsFormProps
                   />
                   <Field.HelperText>
                     出展団体がWeb用コンテンツを入力する際に、入力欄の案内として表示されます。空の場合は表示されません。
+                  </Field.HelperText>
+                </Field.Root>
+              )}
+            </form.Field>
+
+            <form.Field name="pamphletTextMaxLength">
+              {(field) => (
+                <Field.Root invalid={!field.state.meta.isValid}>
+                  <Field.Label htmlFor={field.name}>パンフレット用説明文の文字数制限</Field.Label>
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    inputMode="numeric"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    placeholder={`例: ${PROJECT_PAMPHLET_TEXT_MAX_LENGTH}`}
+                    disabled={disabled}
+                  />
+                  {!field.state.meta.isValid && (
+                    <Field.ErrorText>
+                      {nl2br(
+                        field.state.meta.errors.map((error) => error?.message ?? "").join("\n"),
+                      )}
+                    </Field.ErrorText>
+                  )}
+                  <Field.HelperText>
+                    パンフレット用説明文の最大文字数です。空の場合は既定値 (
+                    {PROJECT_PAMPHLET_TEXT_MAX_LENGTH}文字) になります。
                   </Field.HelperText>
                 </Field.Root>
               )}

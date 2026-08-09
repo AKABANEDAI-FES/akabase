@@ -427,6 +427,7 @@ export class EventRepositoryImpl implements EventRepository {
       const settings = eventSettingsSchema.parse({
         eventId: row.eventId,
         webContentDescription: row.webContentDescription,
+        pamphletTextMaxLength: row.pamphletTextMaxLength,
         createdAt: new Date(row.createdAt),
         updatedAt: new Date(row.updatedAt),
       });
@@ -448,6 +449,7 @@ export class EventRepositoryImpl implements EventRepository {
         .values({
           eventId: settings.eventId,
           webContentDescription: settings.webContentDescription,
+          pamphletTextMaxLength: settings.pamphletTextMaxLength,
           createdAt: settings.createdAt,
           updatedAt: settings.updatedAt,
         })
@@ -455,6 +457,7 @@ export class EventRepositoryImpl implements EventRepository {
           target: schema.eventSettings.eventId,
           set: {
             webContentDescription: settings.webContentDescription,
+            pamphletTextMaxLength: settings.pamphletTextMaxLength,
             updatedAt: settings.updatedAt,
           },
         });

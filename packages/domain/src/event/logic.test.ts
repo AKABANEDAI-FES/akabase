@@ -134,6 +134,7 @@ describe("Event Domain Logic", () => {
         const result = createEventSettingsEntity({
           eventId: mockEventId,
           webContentDescription: "紹介文、注意事項の順に記載してください",
+          pamphletTextMaxLength: 68,
           now,
         });
 
@@ -150,6 +151,7 @@ describe("Event Domain Logic", () => {
         const result = createEventSettingsEntity({
           eventId: mockEventId,
           webContentDescription: "  \n  ",
+          pamphletTextMaxLength: null,
         });
 
         expect(Result.isSuccess(result)).toBe(true);
@@ -165,6 +167,7 @@ describe("Event Domain Logic", () => {
         const settings = {
           eventId: mockEventId,
           webContentDescription: "旧説明",
+          pamphletTextMaxLength: null,
           createdAt,
           updatedAt: createdAt,
         };
@@ -172,6 +175,7 @@ describe("Event Domain Logic", () => {
 
         const result = updateEventSettingsEntity(settings, {
           webContentDescription: "新説明",
+          pamphletTextMaxLength: 100,
           now,
         });
 
@@ -179,6 +183,7 @@ describe("Event Domain Logic", () => {
         if (Result.isSuccess(result)) {
           expect(result.value.eventId).toBe(mockEventId);
           expect(result.value.webContentDescription).toBe("新説明");
+          expect(result.value.pamphletTextMaxLength).toBe(100);
           expect(result.value.createdAt).toBe(createdAt);
           expect(result.value.updatedAt).toBe(now);
         }

@@ -9,6 +9,7 @@ import { QueryExceptionError } from "../shared";
 export const eventSettingsDetailSchema = z.object({
   eventId: eventIdSchema,
   webContentDescription: z.string().nullable(),
+  pamphletTextMaxLength: z.number().int().min(1).nullable(),
 });
 
 export type EventSettingsDetail = z.infer<typeof eventSettingsDetailSchema>;
@@ -26,6 +27,7 @@ export async function getEventSettings(
     return eventSettingsDetailSchema.parse({
       eventId,
       webContentDescription: row?.webContentDescription ?? null,
+      pamphletTextMaxLength: row?.pamphletTextMaxLength ?? null,
     });
   } catch (error) {
     throw new QueryExceptionError(

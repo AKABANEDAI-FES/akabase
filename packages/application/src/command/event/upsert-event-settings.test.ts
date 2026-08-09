@@ -43,6 +43,7 @@ describe("upsertEventSettings", () => {
     const result = await upsertEventSettings(deps, {
       eventId,
       webContentDescription: "紹介文、注意事項の順に記載してください",
+      pamphletTextMaxLength: null,
       actor,
     });
 
@@ -62,6 +63,7 @@ describe("upsertEventSettings", () => {
     const firstResult = await upsertEventSettings(deps, {
       eventId,
       webContentDescription: "初回の説明",
+      pamphletTextMaxLength: null,
       actor,
     });
     expect(Result.isSuccess(firstResult)).toBe(true);
@@ -69,6 +71,7 @@ describe("upsertEventSettings", () => {
     const secondResult = await upsertEventSettings(deps, {
       eventId,
       webContentDescription: "更新後の説明",
+      pamphletTextMaxLength: null,
       actor,
     });
 
@@ -84,6 +87,7 @@ describe("upsertEventSettings", () => {
     const result = await upsertEventSettings(deps, {
       eventId,
       webContentDescription: "  \n  ",
+      pamphletTextMaxLength: null,
       actor,
     });
 
@@ -99,18 +103,36 @@ describe("upsertEventSettings", () => {
     await upsertEventSettings(deps, {
       eventId,
       webContentDescription: "一時的な説明",
+      pamphletTextMaxLength: null,
       actor,
     });
 
     const result = await upsertEventSettings(deps, {
       eventId,
       webContentDescription: null,
+      pamphletTextMaxLength: null,
       actor,
     });
 
     expect(Result.isSuccess(result)).toBe(true);
     const settings = await getEventSettings(deps, eventId);
     expect(settings.webContentDescription).toBeNull();
+  });
+
+  it("パンフレット用説明文の文字数制限を保存できる", async () => {
+    const actor = createAdminActor();
+    const eventId = await createActiveEvent();
+
+    const result = await upsertEventSettings(deps, {
+      eventId,
+      webContentDescription: null,
+      pamphletTextMaxLength: 100,
+      actor,
+    });
+
+    expect(Result.isSuccess(result)).toBe(true);
+    const settings = await getEventSettings(deps, eventId);
+    expect(settings.pamphletTextMaxLength).toBe(100);
   });
 
   it("管理者以外はイベント詳細設定を保存できない", async () => {
@@ -120,6 +142,7 @@ describe("upsertEventSettings", () => {
     const result = await upsertEventSettings(deps, {
       eventId,
       webContentDescription: "説明",
+      pamphletTextMaxLength: null,
       actor,
     });
 
@@ -138,6 +161,7 @@ describe("upsertEventSettings", () => {
     const result = await upsertEventSettings(deps, {
       eventId,
       webContentDescription: "説明",
+      pamphletTextMaxLength: null,
       actor,
     });
 
@@ -153,6 +177,7 @@ describe("upsertEventSettings", () => {
     const result = await upsertEventSettings(deps, {
       eventId: cast<EventId>("non-existent-id"),
       webContentDescription: "説明",
+      pamphletTextMaxLength: null,
       actor,
     });
 
