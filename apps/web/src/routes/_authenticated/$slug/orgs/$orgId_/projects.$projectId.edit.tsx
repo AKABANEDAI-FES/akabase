@@ -409,6 +409,23 @@ function ProjectEditPage() {
                         </Badge>
                       )}
                     </Field.Label>
+                    <Alert.Root>
+                      <Alert.Content>
+                        <Alert.Description>
+                          以下の順に記載してください
+                          <br />
+                          1. 紹介文 (Webサイト用)
+                          <br />
+                          2. 注意事項
+                          <br />
+                          3. 企画ページに掲載する写真 (任意・5枚まで)
+                          <br />
+                          4. SNSリンク (X, Instagram, YouTube, HP)
+                          <br />
+                          5. 販売メニューと価格 (任意)
+                        </Alert.Description>
+                      </Alert.Content>
+                    </Alert.Root>
                     <ClientOnly>
                       <RichTextEditor
                         value={field.state.value}
