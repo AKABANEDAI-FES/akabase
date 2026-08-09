@@ -3,7 +3,11 @@ import { describe, expect, it } from "vite-plus/test";
 import type { DraftWithTags, ProjectId } from "./schema";
 import type { UserId } from "../user/schema";
 import { cast } from "../shared/ids";
-import { updateProjectDraftEntity, updatePublishedEntity, validateDraftForSubmission } from "./logic";
+import {
+  updateProjectDraftEntity,
+  updatePublishedEntity,
+  validateDraftForSubmission,
+} from "./logic";
 
 // Test fixtures
 const mockProjectId = cast<ProjectId>("project-123");

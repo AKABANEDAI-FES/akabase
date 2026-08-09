@@ -37,7 +37,9 @@ export function EventSettingsForm({ settings, disabled }: EventSettingsFormProps
     validators: {
       onDynamic: z.object({
         webContentDescription: z.string(),
-        pamphletTextMaxLength: z.string().regex(/^$|^[1-9][0-9]*$/, "1以上の整数で入力してください"),
+        pamphletTextMaxLength: z
+          .string()
+          .regex(/^$|^[1-9][0-9]*$/, "1以上の整数で入力してください"),
       }),
     },
     onSubmit: async ({ value }) => {
