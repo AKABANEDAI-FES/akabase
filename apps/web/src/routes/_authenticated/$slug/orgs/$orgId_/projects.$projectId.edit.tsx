@@ -22,6 +22,7 @@ import { RichTextEditor } from "@/features/project/components/editor";
 import { SubmitProjectDialog } from "@/features/project/components/submit-project-dialog";
 import { generateLoadTagsQueryOptions } from "@/features/event/actions/queries/tag";
 import { generateLoadDeadlinesQueryOptions } from "@/features/event/actions/queries/deadline";
+import { generateLoadEventSettingsQueryOptions } from "@/features/event/actions/queries/event-settings";
 import { generateCheckOrganizationPermissionsQueryOptions } from "@/features/authorization/actions/queries";
 import { nl2br } from "@/libs/text";
 import { createListCollection } from "@ark-ui/react/collection";
@@ -52,6 +53,7 @@ export const Route = createFileRoute("/_authenticated/$slug/orgs/$orgId_/project
           generateCheckOrganizationPermissionsQueryOptions(event.id, params.orgId),
         ),
         context.queryClient.ensureQueryData(generateLoadDeadlinesQueryOptions(event.id)),
+        context.queryClient.ensureQueryData(generateLoadEventSettingsQueryOptions(event.id)),
       ]);
     },
     component: ProjectEditPage,
@@ -71,6 +73,7 @@ function ProjectEditPage() {
     generateCheckOrganizationPermissionsQueryOptions(event.id, orgId),
   );
   const { data: deadlines } = useSuspenseQuery(generateLoadDeadlinesQueryOptions(event.id));
+  const { data: eventSettings } = useSuspenseQuery(generateLoadEventSettingsQueryOptions(event.id));
   const { mutateAsync } = useMutation(useUpdateProjectDraftMutationOption());
 
   // Calculate blocked fields once
@@ -409,6 +412,15 @@ function ProjectEditPage() {
                         </Badge>
                       )}
                     </Field.Label>
+                    {eventSettings.webContentDescription && (
+                      <Alert.Root>
+                        <Alert.Content>
+                          <Alert.Description>
+                            {nl2br(eventSettings.webContentDescription)}
+                          </Alert.Description>
+                        </Alert.Content>
+                      </Alert.Root>
+                    )}
                     <ClientOnly>
                       <RichTextEditor
                         value={field.state.value}
