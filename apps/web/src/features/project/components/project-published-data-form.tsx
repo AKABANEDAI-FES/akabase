@@ -14,12 +14,17 @@ import { Result } from "@akabase/result";
 import { generateLoadProjectPublishedQueryOptions } from "../actions/queries";
 import { updatePublishedInputSchema, useUpdatePublishedMutationOption } from "../actions/mutations";
 import { generateLoadTagsQueryOptions } from "@/features/event/actions/queries/tag";
+import { generateLoadEventSettingsQueryOptions } from "@/features/event/actions/queries/event-settings";
 import { PROJECT_DETAIL_INFO_FIELDS } from "../utils/detail-info";
 import { RichTextEditor } from "./editor";
 import { nl2br } from "@/libs/text";
 import { createListCollection } from "@ark-ui/react/collection";
 import { Portal } from "@ark-ui/react/portal";
-import { PROJECT_MAX_TAGS, PROJECT_PAMPHLET_TEXT_MAX_LENGTH } from "@akabase/domain/project/schema";
+import {
+  PROJECT_MAX_TAGS,
+  pamphletTextSchema,
+  resolvePamphletTextMaxLength,
+} from "@akabase/domain/project/schema";
 import type { ProjectId } from "@akabase/domain/project/schema";
 import type { OrgId } from "@akabase/domain/organization/schema";
 import type { TagId } from "@akabase/domain/event/schema";
@@ -45,6 +50,8 @@ export function ProjectPublishedDataForm({
     generateLoadProjectPublishedQueryOptions(eventId, orgId, projectId),
   );
   const { data: tags } = useSuspenseQuery(generateLoadTagsQueryOptions(eventId));
+  const { data: eventSettings } = useSuspenseQuery(generateLoadEventSettingsQueryOptions(eventId));
+  const pamphletTextMaxLength = resolvePamphletTextMaxLength(eventSettings);
 
   const selectedTags = published?.tags.map((t) => t.id) ?? [];
   const tagsCollection = createListCollection({
@@ -65,7 +72,7 @@ export function ProjectPublishedDataForm({
     },
     validators: {
       onDynamic: z.object({
-        pamphletText: updatePublishedInputSchema.shape.pamphletText,
+        pamphletText: pamphletTextSchema(pamphletTextMaxLength),
         webContentJson: z.unknown(),
         openingHours: updatePublishedInputSchema.shape.openingHours,
         lastEntryTime: updatePublishedInputSchema.shape.lastEntryTime,
@@ -154,7 +161,7 @@ export function ProjectPublishedDataForm({
           {(field) => (
             <Field.Root invalid={!field.state.meta.isValid}>
               <Field.Label htmlFor={field.name}>
-                パンフレット用説明（{PROJECT_PAMPHLET_TEXT_MAX_LENGTH}文字以内）
+                パンフレット用説明（{pamphletTextMaxLength}文字以内）
               </Field.Label>
               <Textarea
                 id={field.name}
@@ -172,7 +179,7 @@ export function ProjectPublishedDataForm({
                 </Field.ErrorText>
               )}
               <Field.HelperText>
-                残り: {PROJECT_PAMPHLET_TEXT_MAX_LENGTH - field.state.value.length}文字
+                残り: {pamphletTextMaxLength - field.state.value.length}文字
               </Field.HelperText>
             </Field.Root>
           )}

@@ -12,7 +12,7 @@ import { Textarea } from "@akabase/ui/components/textarea";
 import { toaster } from "@akabase/ui/components/toast";
 import { Text } from "@akabase/ui/components/text";
 import { Box, Flex, Stack } from "@akabase/styled-system/jsx";
-import { PROJECT_PAMPHLET_TEXT_MAX_LENGTH } from "@akabase/domain/project/schema";
+import { PROJECT_PAMPHLET_TEXT_DEFAULT_MAX_LENGTH } from "@akabase/domain/project/schema";
 import { confirm } from "@/components/confirm";
 import { nl2br } from "@/libs/text";
 import { z } from "zod";
@@ -156,7 +156,7 @@ export function EventSettingsForm({ settings, disabled }: EventSettingsFormProps
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder={`例: ${PROJECT_PAMPHLET_TEXT_MAX_LENGTH}`}
+                    placeholder={`例: ${PROJECT_PAMPHLET_TEXT_DEFAULT_MAX_LENGTH}`}
                     disabled={disabled}
                   />
                   {!field.state.meta.isValid && (
@@ -168,7 +168,7 @@ export function EventSettingsForm({ settings, disabled }: EventSettingsFormProps
                   )}
                   <Field.HelperText>
                     パンフレット用説明文の最大文字数です。空の場合は既定値 (
-                    {PROJECT_PAMPHLET_TEXT_MAX_LENGTH}文字) になります。
+                    {PROJECT_PAMPHLET_TEXT_DEFAULT_MAX_LENGTH}文字) になります。
                   </Field.HelperText>
                 </Field.Root>
               )}

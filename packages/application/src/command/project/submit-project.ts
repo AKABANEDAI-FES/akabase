@@ -13,6 +13,7 @@ import type {
   SubmissionId,
   SubmissionMessageId,
 } from "@akabase/domain/project/schema";
+import { resolvePamphletTextMaxLength } from "@akabase/domain/project/schema";
 import type { ProjectError } from "@akabase/domain/project/errors";
 import { PROJECT_ERROR_CODE, projectError } from "@akabase/domain/project/errors";
 import type { EventError } from "@akabase/domain/event/errors";
@@ -26,6 +27,7 @@ import {
   validateDraftForSubmission,
 } from "@akabase/domain/project/logic";
 import type { ProjectRepository } from "@akabase/domain/project/repository";
+import type { EventRepository } from "@akabase/domain/event/repository";
 import type { ProjectDomainService } from "@akabase/domain/project/service";
 import type { AuthorizationService } from "@akabase/domain/authorization/service";
 import type { EventDomainService } from "@akabase/domain/event/service";
@@ -48,6 +50,7 @@ export type SubmitProjectError = ProjectError | EventError | AuthorizationError;
 export async function submitProject(
   deps: {
     projectRepo: ProjectRepository;
+    eventRepo: EventRepository;
     projectDomainService: ProjectDomainService;
     authService: AuthorizationService;
     eventDomainService: EventDomainService;
@@ -74,7 +77,8 @@ export async function submitProject(
       );
     }
 
-    yield* $(validateDraftForSubmission(draft));
+    const settings = await deps.eventRepo.findEventSettings(project.eventId);
+    yield* $(validateDraftForSubmission(draft, resolvePamphletTextMaxLength(settings)));
 
     yield* $(await deps.projectDomainService.canSubmit(input.projectId));
 

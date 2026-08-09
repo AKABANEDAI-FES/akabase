@@ -13,6 +13,7 @@ import type {
 } from "./schema";
 import {
   draftWithTagsSchema,
+  pamphletTextMaxLengthMessage,
   projectSchema,
   publishedWithTagsSchema,
   submissionActionSchema,
@@ -134,11 +135,12 @@ export function createProjectDraftEntity(input: {
  * Business rules:
  * - Draft must exist before updating
  * - All fields can be updated except projectId
- * - Validation is performed by zod schema (e.g., pamphletText max 68 chars)
+ * - pamphletText max length is per-event (event settings)
  */
 export function updateProjectDraftEntity(input: {
   projectId: ProjectId;
   pamphletText: string;
+  pamphletTextMaxLength: number;
   webContentJson: unknown;
   openingHours: string;
   lastEntryTime: string;
@@ -146,6 +148,15 @@ export function updateProjectDraftEntity(input: {
   updatedBy: UserId;
   now?: Date;
 }): Result.Result<DraftWithTags, ProjectError> {
+  if (input.pamphletText.length > input.pamphletTextMaxLength) {
+    return Result.fail(
+      projectError(
+        DOMAIN_ERROR_CODE.VALIDATION_ERROR,
+        pamphletTextMaxLengthMessage(input.pamphletTextMaxLength),
+      ),
+    );
+  }
+
   const now = input.now ?? new Date();
   const data = {
     projectId: input.projectId,
@@ -382,12 +393,14 @@ export function createPublishedEntity(input: {
  *
  * Business rules:
  * - pamphletText is trimmed before validation
+ * - pamphletText max length is per-event (event settings)
  * - publishedAt and publishedBy are updated to reflect the editor
  * - All fields can be updated except projectId
  */
 export function updatePublishedEntity(input: {
   projectId: ProjectId;
   pamphletText: string;
+  pamphletTextMaxLength: number;
   webContentJson: unknown;
   openingHours: string;
   lastEntryTime: string;
@@ -395,6 +408,15 @@ export function updatePublishedEntity(input: {
   publishedBy: UserId;
   now?: Date;
 }): Result.Result<PublishedWithTags, ProjectError> {
+  if (input.pamphletText.trim().length > input.pamphletTextMaxLength) {
+    return Result.fail(
+      projectError(
+        DOMAIN_ERROR_CODE.VALIDATION_ERROR,
+        pamphletTextMaxLengthMessage(input.pamphletTextMaxLength),
+      ),
+    );
+  }
+
   const now = input.now ?? new Date();
 
   const data = {
@@ -432,6 +454,7 @@ export function updatePublishedEntity(input: {
  */
 export function validateDraftForSubmission(
   draft: DraftWithTags,
+  pamphletTextMaxLength: number,
 ): Result.Result<true, ProjectError> {
   const missingLabels = [
     ...(draft.openingHours.trim() === "" ? ["開催時間"] : []),
@@ -443,6 +466,15 @@ export function validateDraftForSubmission(
       projectError(
         DOMAIN_ERROR_CODE.VALIDATION_ERROR,
         `${missingLabels.join("、")}を入力してから提出してください`,
+      ),
+    );
+  }
+
+  if (draft.pamphletText.length > pamphletTextMaxLength) {
+    return Result.fail(
+      projectError(
+        DOMAIN_ERROR_CODE.VALIDATION_ERROR,
+        pamphletTextMaxLengthMessage(pamphletTextMaxLength),
       ),
     );
   }

@@ -29,7 +29,11 @@ import { createListCollection } from "@ark-ui/react/collection";
 import { Portal } from "@ark-ui/react/portal";
 import { getDeadlineMessage, getFieldDeadlineStatus } from "@/features/project/utils/deadline";
 import { PROJECT_DETAIL_INFO_FIELDS } from "@/features/project/utils/detail-info";
-import { PROJECT_MAX_TAGS, PROJECT_PAMPHLET_TEXT_MAX_LENGTH } from "@akabase/domain/project/schema";
+import {
+  PROJECT_MAX_TAGS,
+  pamphletTextSchema,
+  resolvePamphletTextMaxLength,
+} from "@akabase/domain/project/schema";
 import type { OrgId } from "@akabase/domain/organization/schema";
 import type { ProjectId } from "@akabase/domain/project/schema";
 import { cast } from "@akabase/domain/shared/ids";
@@ -74,6 +78,7 @@ function ProjectEditPage() {
   );
   const { data: deadlines } = useSuspenseQuery(generateLoadDeadlinesQueryOptions(event.id));
   const { data: eventSettings } = useSuspenseQuery(generateLoadEventSettingsQueryOptions(event.id));
+  const pamphletTextMaxLength = resolvePamphletTextMaxLength(eventSettings);
   const { mutateAsync } = useMutation(useUpdateProjectDraftMutationOption());
 
   // Calculate blocked fields once
@@ -95,7 +100,7 @@ function ProjectEditPage() {
     },
     validators: {
       onDynamic: z.object({
-        pamphletText: updateProjectDraftInputSchema.shape.pamphletText,
+        pamphletText: pamphletTextSchema(pamphletTextMaxLength),
         tags: updateProjectDraftInputSchema.shape.tags,
         webContentJson: z.unknown(),
         openingHours: updateProjectDraftInputSchema.shape.openingHours,
@@ -226,7 +231,7 @@ function ProjectEditPage() {
                 return (
                   <Field.Root invalid={!field.state.meta.isValid}>
                     <Field.Label htmlFor={field.name}>
-                      パンフレット用説明（{PROJECT_PAMPHLET_TEXT_MAX_LENGTH}文字以内）
+                      パンフレット用説明（{pamphletTextMaxLength}文字以内）
                       {isBlocked && (
                         <Badge ml="2" variant="subtle">
                           編集不可
@@ -253,7 +258,7 @@ function ProjectEditPage() {
                     <Field.HelperText>
                       {isBlocked && deadlineMsg
                         ? deadlineMsg
-                        : `残り: ${PROJECT_PAMPHLET_TEXT_MAX_LENGTH - field.state.value.length}文字`}
+                        : `残り: ${pamphletTextMaxLength - field.state.value.length}文字`}
                     </Field.HelperText>
                   </Field.Root>
                 );
