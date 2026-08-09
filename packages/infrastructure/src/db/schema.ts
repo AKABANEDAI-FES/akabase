@@ -115,6 +115,7 @@ export const eventSettings = sqliteTable("event_settings", {
     .primaryKey()
     .references(() => events.id, { onDelete: "cascade" }),
   webContentDescription: text("web_content_description"),
+  pamphletTextMaxLength: integer("pamphlet_text_max_length"),
   createdAt: integer("created_at", { mode: "timestamp_ms" })
     .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
     .notNull(),
