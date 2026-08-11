@@ -4,6 +4,10 @@
   "type": "module",
   "version": "1.0.0",
   "exports": {
+    "./api-key/*": {
+      "import": "./dist/api-key/*.mjs",
+      "types": "./dist/api-key/*.d.mts"
+    },
     "./authorization/*": {
       "import": "./dist/authorization/*.mjs",
       "types": "./dist/authorization/*.d.mts"

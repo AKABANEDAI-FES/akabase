@@ -1,6 +1,6 @@
 import { Link, createFileRoute, redirect } from "@tanstack/react-router";
 import { Stack } from "@akabase/styled-system/jsx";
-import { CalendarIcon, UsersIcon } from "lucide-react";
+import { CalendarIcon, KeyIcon, UsersIcon } from "lucide-react";
 import { NavLink, SidebarLayout } from "@/components/sidebar-layout";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -29,6 +29,12 @@ function AdminLayout() {
           <Link to="/admin/users">
             <UsersIcon />
             ユーザー
+          </Link>
+        </NavLink>
+        <NavLink>
+          <Link to="/admin/api-keys">
+            <KeyIcon />
+            APIキー
           </Link>
         </NavLink>
       </Stack>

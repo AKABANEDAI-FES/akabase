@@ -4,6 +4,10 @@
   "type": "module",
   "version": "1.0.0",
   "exports": {
+    "./command/api-key/*": {
+      "import": "./dist/command/api-key/*.mjs",
+      "types": "./dist/command/api-key/*.d.mts"
+    },
     "./command/event/*": {
       "import": "./dist/command/event/*.mjs",
       "types": "./dist/command/event/*.d.mts"
@@ -23,6 +27,10 @@
     "./command/user/*": {
       "import": "./dist/command/user/*.mjs",
       "types": "./dist/command/user/*.d.mts"
+    },
+    "./query/api-key/*": {
+      "import": "./dist/query/api-key/*.mjs",
+      "types": "./dist/query/api-key/*.d.mts"
     },
     "./query/authorization/*": {
       "import": "./dist/query/authorization/*.mjs",

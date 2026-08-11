@@ -9,3 +9,4 @@
 
 #include "chapters/admin/events.typ"
 #include "chapters/admin/users.typ"
+#include "chapters/admin/api-keys.typ"

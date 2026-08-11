@@ -1,8 +1,12 @@
 import { betterAuth } from "better-auth/minimal";
-import { APIError } from "better-auth/api";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin } from "better-auth/plugins/admin";
+import { apiKey } from "@better-auth/api-key";
+import { API_KEY_NAME_MAX_LENGTH } from "@akabase/domain/api-key/schema";
 import type { Database } from "../db";
+
+export const API_KEY_PREFIX = "akbs_";
 
 type Env = {
   BETTER_AUTH_SECRET: string;
@@ -14,10 +18,34 @@ type Env = {
 
 export function createAuth(db: Database, env: Env) {
   return betterAuth({
-    plugins: [admin()],
+    plugins: [
+      admin(),
+      apiKey({
+        enableMetadata: true,
+        defaultPrefix: API_KEY_PREFIX,
+        maximumNameLength: API_KEY_NAME_MAX_LENGTH,
+        startingCharactersConfig: {
+          charactersLength: API_KEY_PREFIX.length + 6,
+        },
+        rateLimit: {
+          enabled: false,
+        },
+      }),
+    ],
     database: drizzleAdapter(db, {
       provider: "sqlite",
     }),
+    hooks: {
+      // API key operations are only exposed through server functions
+      // `ctx.request` is only set for HTTP calls, so server-side `auth.api.*` calls stay allowed
+      before: createAuthMiddleware(async (ctx) => {
+        if (ctx.request !== undefined && ctx.path.startsWith("/api-key/")) {
+          throw new APIError("FORBIDDEN", {
+            message: "API key endpoints are disabled.",
+          });
+        }
+      }),
+    },
     secret: env.BETTER_AUTH_SECRET,
     url: env.BETTER_AUTH_URL,
     socialProviders: {

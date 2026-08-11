@@ -11,24 +11,25 @@
 - 年度（イベント）単位のデータ管理とアーカイブ
 - タグ・場所・締切のマスタ管理
 - 公開データの CSV/XLSX/JSON 出力
+- 外部サービス向けに企画情報を提供する API（API キー認証, Scalar による API ドキュメント）
 
 ## 技術スタック
 
-| カテゴリ          | 技術                                     |
-| ----------------- | ---------------------------------------- |
-| フロントエンド    | React 19 + TanStack Start (SSR)          |
-| UI コンポーネント | Park UI (Ark UI + Panda CSS)             |
-| バックエンド      | Cloudflare Workers                       |
-| データベース      | Cloudflare D1 (SQLite) + Drizzle ORM     |
-| ストレージ        | Cloudflare R2                            |
-| 認証              | Better Auth (Google OIDC, @toyo.jp 制限) |
-| ルーティング      | TanStack Router (ファイルベース)         |
-| サーバー状態      | TanStack Query                           |
-| テスト            | Vitest (vp test)                         |
-| Lint, Format      | oxlint, oxfmt (vp lint, vp fmt)          |
-| ビルド            | Vite, tsdown (vp build, vp pack)         |
-| タスクランナー    | Vite Task (vp run)                       |
-| パッケージ管理    | pnpm workspaces                          |
+| カテゴリ          | 技術                                                |
+| ----------------- | --------------------------------------------------- |
+| フロントエンド    | React 19 + TanStack Start (SSR)                     |
+| UI コンポーネント | Park UI (Ark UI + Panda CSS)                        |
+| バックエンド      | Cloudflare Workers                                  |
+| データベース      | Cloudflare D1 (SQLite) + Drizzle ORM                |
+| ストレージ        | Cloudflare R2                                       |
+| 認証              | Better Auth (Google OIDC (@toyo.jp 制限), API キー) |
+| ルーティング      | TanStack Router (ファイルベース)                    |
+| サーバー状態      | TanStack Query                                      |
+| テスト            | Vitest (vp test)                                    |
+| Lint, Format      | oxlint, oxfmt (vp lint, vp fmt)                     |
+| ビルド            | Vite, tsdown (vp build, vp pack)                    |
+| タスクランナー    | Vite Task (vp run)                                  |
+| パッケージ管理    | pnpm workspaces                                     |
 
 ## モノレポ構成
 
@@ -129,6 +130,13 @@ pnpm --filter web cf-typegen  # Cloudflare バインディングの型生成
 ```
 
 > DB スキーマ変更時は `packages/infrastructure/src/db/schema.ts` を編集後、`drizzle-kit generate` でマイグレーション生成。
+
+## 外部サービス向け API
+
+外部サービス向けに企画情報を提供する読み取り専用 API を `/api/v1` で提供している。認証には、管理画面で発行した API キーを `x-api-key` ヘッダーに指定する。
+
+- API ドキュメント: https://akabase.akabanedai-fes.com/api/docs
+- OpenAPI スキーマ: https://akabase.akabanedai-fes.com/api/v1/openapi.json
 
 ## ドキュメント
 

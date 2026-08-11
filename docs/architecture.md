@@ -173,6 +173,11 @@ apps/web
 
 ```
 packages/domain/src/
+├── api-key/                    # APIキードメイン
+│   ├── schema.ts               # ApiKey スキーマ + metadata 定義
+│   ├── logic.ts                # ドメインロジック
+│   ├── errors.ts               # エラー型
+│   └── service.ts              # ApiKeyService IF
 ├── authorization/              # 認可ドメイン
 │   ├── schema.ts               # Actor, Resource, Action 型定義
 │   ├── logic.ts                # 権限判定ロジック + リソース生成ヘルパー
@@ -212,12 +217,14 @@ packages/domain/src/
 ```
 packages/application/src/
 ├── command/                     # Command側（書き込み）
+│   ├── api-key/                # APIキー管理コマンド
 │   ├── event/                  # イベント管理コマンド
 │   ├── organization/           # 団体管理コマンド
 │   ├── project/                # 企画管理コマンド
 │   ├── user/                   # ユーザー管理コマンド
 │   └── shared/                 # 共通コマンドユーティリティ
 ├── query/                      # Query側（読み取り）
+│   ├── api-key/                # APIキー関連クエリ
 │   ├── authorization/          # 認可情報クエリ
 │   ├── event/                  # イベント関連クエリ
 │   ├── organization/           # 団体関連クエリ
@@ -247,6 +254,8 @@ packages/infrastructure/src/
 ```
 apps/web/src/
 ├── api/                        # HTTP API（Hono）
+│   ├── internal/               # フロントエンド向け API（認証、ストレージ）
+│   └── external/               # 外部サービス向け API（APIキー認証、企画情報の提供）
 ├── features/                   # 機能別モジュール（TanStack Query 統合）
 │   ├── <feature>/
 │   │   ├── actions/            # Server Functions + Query Options + Mutation Hooks
@@ -1228,6 +1237,14 @@ export function projectResource(
    → Actor のロールに基づき権限を判定
    → 権限がなければ AuthorizationError を返す
 ```
+
+### APIキーによる認証（外部 API）
+
+外部サービス向け API（`/api/v1`）は、Actor ベースの認可とは別系統の APIキー認証を使います。
+
+- Better Auth の api-key プラグインでキーを発行・検証する
+- キーの `metadata.eventId` で参照できるイベントをスコープし、公開済みデータのみを返す
+- キー自体の発行・削除は管理画面から行い、`api_key:create` などのアクションとして Actor ベースの認可で保護する
 
 詳細は `packages/domain/src/authorization/` を参照。
 

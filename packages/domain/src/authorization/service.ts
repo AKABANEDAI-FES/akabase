@@ -47,6 +47,9 @@ export class AuthorizationService {
       case "user": {
         return AuthorizationService.checkUserPermission(actor, resource, action);
       }
+      case "api_key": {
+        return AuthorizationService.checkApiKeyPermission(actor, resource, action);
+      }
       default: {
         return Result.fail(
           authorizationError(AUTHORIZATION_ERROR_CODE.UNKNOWN_RESOURCE, "不明なリソースタイプ"),
@@ -325,6 +328,39 @@ export class AuthorizationService {
         return Result.succeed({
           allowed: false,
           reason: "グローバル管理者のみが全ユーザー一覧を閲覧できます",
+        });
+      }
+
+      default: {
+        return Result.succeed({ allowed: false, reason: "不明なアクション" });
+      }
+    }
+  }
+
+  private static checkApiKeyPermission(
+    _actor: Actor,
+    _resource: Extract<Resource, { type: "api_key" }>,
+    action: Action,
+  ): Result.Result<AuthorizationDecision, AuthorizationError> {
+    switch (action) {
+      case "api_key:create": {
+        return Result.succeed({
+          allowed: false,
+          reason: "グローバル管理者のみがAPIキーを作成できます",
+        });
+      }
+
+      case "api_key:list": {
+        return Result.succeed({
+          allowed: false,
+          reason: "グローバル管理者のみがAPIキー一覧を閲覧できます",
+        });
+      }
+
+      case "api_key:delete": {
+        return Result.succeed({
+          allowed: false,
+          reason: "グローバル管理者のみがAPIキーを削除できます",
         });
       }
 

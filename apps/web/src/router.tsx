@@ -19,6 +19,12 @@ const createEventModalMask = createRouteMask({
   to: "/admin/events",
 });
 
+const createApiKeyModalMask = createRouteMask({
+  routeTree,
+  from: "/admin/api-keys/new",
+  to: "/admin/api-keys",
+});
+
 const createOrganizationModalMask = createRouteMask({
   routeTree,
   from: "/$slug/committee/organizations/new",
@@ -103,6 +109,7 @@ export const getRouter = () => {
     },
     routeMasks: [
       createEventModalMask,
+      createApiKeyModalMask,
       createOrganizationModalMask,
       createTagModalMask,
       editTagModalMask,

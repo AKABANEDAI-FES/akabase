@@ -1,9 +1,11 @@
 import { createDbFn } from "./db";
+import { createAuthFn } from "./auth";
 import { createMiddleware, createServerOnlyFn } from "@tanstack/react-start";
 import { EventRepositoryImpl } from "@akabase/infrastructure/repositories/event-repository";
 import { ProjectRepositoryImpl } from "@akabase/infrastructure/repositories/project-repository";
 import { UserRepositoryImpl } from "@akabase/infrastructure/repositories/user-repository";
 import { OrganizationRepositoryImpl } from "@akabase/infrastructure/repositories/organization-repository";
+import { ApiKeyServiceImpl } from "@akabase/infrastructure/services/api-key-service";
 import { EventDomainServiceImpl } from "@akabase/infrastructure/services/event-domain-service";
 import { OrganizationDomainServiceImpl } from "@akabase/infrastructure/services/organization-domain-service";
 import { ProjectDomainServiceImpl } from "@akabase/infrastructure/services/project-domain-service";
@@ -22,6 +24,7 @@ export const createDependenciesFn = createServerOnlyFn(() => {
   const projectDomainService = new ProjectDomainServiceImpl(projectRepo);
   const authService = new AuthorizationService();
   const imageRepo = new ImageRepositoryImpl(env.STORAGE, db);
+  const apiKeyService = new ApiKeyServiceImpl(createAuthFn(), db);
 
   return {
     db,
@@ -34,6 +37,7 @@ export const createDependenciesFn = createServerOnlyFn(() => {
     projectDomainService,
     authService,
     imageRepo,
+    apiKeyService,
   };
 });
 

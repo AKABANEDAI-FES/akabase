@@ -19,9 +19,11 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedSlugIndexRouteImport } from './routes/_authenticated/$slug/index'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
 import { Route as AuthenticatedAdminEventsRouteImport } from './routes/_authenticated/admin/events'
+import { Route as AuthenticatedAdminApiKeysRouteImport } from './routes/_authenticated/admin/api-keys'
 import { Route as AuthenticatedSlugCommitteeRouteImport } from './routes/_authenticated/$slug/committee'
 import { Route as AuthenticatedAdminEventsEventIdRouteImport } from './routes/_authenticated/admin/events_.$eventId'
 import { Route as AuthenticatedAdminEventsNewRouteImport } from './routes/_authenticated/admin/events.new'
+import { Route as AuthenticatedAdminApiKeysNewRouteImport } from './routes/_authenticated/admin/api-keys.new'
 import { Route as AuthenticatedSlugOrgsOrgIdRouteImport } from './routes/_authenticated/$slug/orgs/$orgId'
 import { Route as AuthenticatedSlugCommitteeTagsRouteImport } from './routes/_authenticated/$slug/committee/tags'
 import { Route as AuthenticatedSlugCommitteeSubmissionsRouteImport } from './routes/_authenticated/$slug/committee/submissions'
@@ -104,6 +106,12 @@ const AuthenticatedAdminEventsRoute =
     path: '/events',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminApiKeysRoute =
+  AuthenticatedAdminApiKeysRouteImport.update({
+    id: '/api-keys',
+    path: '/api-keys',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedSlugCommitteeRoute =
   AuthenticatedSlugCommitteeRouteImport.update({
     id: '/committee',
@@ -121,6 +129,12 @@ const AuthenticatedAdminEventsNewRoute =
     id: '/new',
     path: '/new',
     getParentRoute: () => AuthenticatedAdminEventsRoute,
+  } as any)
+const AuthenticatedAdminApiKeysNewRoute =
+  AuthenticatedAdminApiKeysNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthenticatedAdminApiKeysRoute,
   } as any)
 const AuthenticatedSlugOrgsOrgIdRoute =
   AuthenticatedSlugOrgsOrgIdRouteImport.update({
@@ -327,6 +341,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/login': typeof PublicLoginRoute
   '/$slug/committee': typeof AuthenticatedSlugCommitteeRouteWithChildren
+  '/admin/api-keys': typeof AuthenticatedAdminApiKeysRouteWithChildren
   '/admin/events': typeof AuthenticatedAdminEventsRouteWithChildren
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/$slug/': typeof AuthenticatedSlugIndexRoute
@@ -339,6 +354,7 @@ export interface FileRoutesByFullPath {
   '/$slug/committee/submissions': typeof AuthenticatedSlugCommitteeSubmissionsRoute
   '/$slug/committee/tags': typeof AuthenticatedSlugCommitteeTagsRouteWithChildren
   '/$slug/orgs/$orgId': typeof AuthenticatedSlugOrgsOrgIdRouteWithChildren
+  '/admin/api-keys/new': typeof AuthenticatedAdminApiKeysNewRoute
   '/admin/events/new': typeof AuthenticatedAdminEventsNewRoute
   '/admin/events/$eventId': typeof AuthenticatedAdminEventsEventIdRouteWithChildren
   '/$slug/committee/deadlines/new': typeof AuthenticatedSlugCommitteeDeadlinesNewRoute
@@ -370,6 +386,7 @@ export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof PublicLoginRoute
   '/$slug/committee': typeof AuthenticatedSlugCommitteeRouteWithChildren
+  '/admin/api-keys': typeof AuthenticatedAdminApiKeysRouteWithChildren
   '/admin/events': typeof AuthenticatedAdminEventsRouteWithChildren
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/$slug': typeof AuthenticatedSlugIndexRoute
@@ -381,6 +398,7 @@ export interface FileRoutesByTo {
   '/$slug/committee/places': typeof AuthenticatedSlugCommitteePlacesRouteWithChildren
   '/$slug/committee/submissions': typeof AuthenticatedSlugCommitteeSubmissionsRoute
   '/$slug/committee/tags': typeof AuthenticatedSlugCommitteeTagsRouteWithChildren
+  '/admin/api-keys/new': typeof AuthenticatedAdminApiKeysNewRoute
   '/admin/events/new': typeof AuthenticatedAdminEventsNewRoute
   '/$slug/committee/deadlines/new': typeof AuthenticatedSlugCommitteeDeadlinesNewRoute
   '/$slug/committee/organizations/new': typeof AuthenticatedSlugCommitteeOrganizationsNewRoute
@@ -415,6 +433,7 @@ export interface FileRoutesById {
   '/_public/login': typeof PublicLoginRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/$slug/committee': typeof AuthenticatedSlugCommitteeRouteWithChildren
+  '/_authenticated/admin/api-keys': typeof AuthenticatedAdminApiKeysRouteWithChildren
   '/_authenticated/admin/events': typeof AuthenticatedAdminEventsRouteWithChildren
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/$slug/': typeof AuthenticatedSlugIndexRoute
@@ -427,6 +446,7 @@ export interface FileRoutesById {
   '/_authenticated/$slug/committee/submissions': typeof AuthenticatedSlugCommitteeSubmissionsRoute
   '/_authenticated/$slug/committee/tags': typeof AuthenticatedSlugCommitteeTagsRouteWithChildren
   '/_authenticated/$slug/orgs/$orgId': typeof AuthenticatedSlugOrgsOrgIdRouteWithChildren
+  '/_authenticated/admin/api-keys/new': typeof AuthenticatedAdminApiKeysNewRoute
   '/_authenticated/admin/events/new': typeof AuthenticatedAdminEventsNewRoute
   '/_authenticated/admin/events_/$eventId': typeof AuthenticatedAdminEventsEventIdRouteWithChildren
   '/_authenticated/$slug/committee/deadlines/new': typeof AuthenticatedSlugCommitteeDeadlinesNewRoute
@@ -462,6 +482,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/login'
     | '/$slug/committee'
+    | '/admin/api-keys'
     | '/admin/events'
     | '/admin/users'
     | '/$slug/'
@@ -474,6 +495,7 @@ export interface FileRouteTypes {
     | '/$slug/committee/submissions'
     | '/$slug/committee/tags'
     | '/$slug/orgs/$orgId'
+    | '/admin/api-keys/new'
     | '/admin/events/new'
     | '/admin/events/$eventId'
     | '/$slug/committee/deadlines/new'
@@ -505,6 +527,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/$slug/committee'
+    | '/admin/api-keys'
     | '/admin/events'
     | '/admin/users'
     | '/$slug'
@@ -516,6 +539,7 @@ export interface FileRouteTypes {
     | '/$slug/committee/places'
     | '/$slug/committee/submissions'
     | '/$slug/committee/tags'
+    | '/admin/api-keys/new'
     | '/admin/events/new'
     | '/$slug/committee/deadlines/new'
     | '/$slug/committee/organizations/new'
@@ -549,6 +573,7 @@ export interface FileRouteTypes {
     | '/_public/login'
     | '/_authenticated/'
     | '/_authenticated/$slug/committee'
+    | '/_authenticated/admin/api-keys'
     | '/_authenticated/admin/events'
     | '/_authenticated/admin/users'
     | '/_authenticated/$slug/'
@@ -561,6 +586,7 @@ export interface FileRouteTypes {
     | '/_authenticated/$slug/committee/submissions'
     | '/_authenticated/$slug/committee/tags'
     | '/_authenticated/$slug/orgs/$orgId'
+    | '/_authenticated/admin/api-keys/new'
     | '/_authenticated/admin/events/new'
     | '/_authenticated/admin/events_/$eventId'
     | '/_authenticated/$slug/committee/deadlines/new'
@@ -666,6 +692,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminEventsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/api-keys': {
+      id: '/_authenticated/admin/api-keys'
+      path: '/api-keys'
+      fullPath: '/admin/api-keys'
+      preLoaderRoute: typeof AuthenticatedAdminApiKeysRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/$slug/committee': {
       id: '/_authenticated/$slug/committee'
       path: '/committee'
@@ -686,6 +719,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/events/new'
       preLoaderRoute: typeof AuthenticatedAdminEventsNewRouteImport
       parentRoute: typeof AuthenticatedAdminEventsRoute
+    }
+    '/_authenticated/admin/api-keys/new': {
+      id: '/_authenticated/admin/api-keys/new'
+      path: '/new'
+      fullPath: '/admin/api-keys/new'
+      preLoaderRoute: typeof AuthenticatedAdminApiKeysNewRouteImport
+      parentRoute: typeof AuthenticatedAdminApiKeysRoute
     }
     '/_authenticated/$slug/orgs/$orgId': {
       id: '/_authenticated/$slug/orgs/$orgId'
@@ -1135,6 +1175,20 @@ const AuthenticatedSlugRouteChildren: AuthenticatedSlugRouteChildren = {
 const AuthenticatedSlugRouteWithChildren =
   AuthenticatedSlugRoute._addFileChildren(AuthenticatedSlugRouteChildren)
 
+interface AuthenticatedAdminApiKeysRouteChildren {
+  AuthenticatedAdminApiKeysNewRoute: typeof AuthenticatedAdminApiKeysNewRoute
+}
+
+const AuthenticatedAdminApiKeysRouteChildren: AuthenticatedAdminApiKeysRouteChildren =
+  {
+    AuthenticatedAdminApiKeysNewRoute: AuthenticatedAdminApiKeysNewRoute,
+  }
+
+const AuthenticatedAdminApiKeysRouteWithChildren =
+  AuthenticatedAdminApiKeysRoute._addFileChildren(
+    AuthenticatedAdminApiKeysRouteChildren,
+  )
+
 interface AuthenticatedAdminEventsRouteChildren {
   AuthenticatedAdminEventsNewRoute: typeof AuthenticatedAdminEventsNewRoute
 }
@@ -1168,6 +1222,7 @@ const AuthenticatedAdminEventsEventIdRouteWithChildren =
   )
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminApiKeysRoute: typeof AuthenticatedAdminApiKeysRouteWithChildren
   AuthenticatedAdminEventsRoute: typeof AuthenticatedAdminEventsRouteWithChildren
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -1175,6 +1230,7 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminApiKeysRoute: AuthenticatedAdminApiKeysRouteWithChildren,
   AuthenticatedAdminEventsRoute: AuthenticatedAdminEventsRouteWithChildren,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
