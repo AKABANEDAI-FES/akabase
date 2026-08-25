@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { asc, eq } from "drizzle-orm";
+import { and, asc, count, eq } from "drizzle-orm";
 import { schema } from "@akabase/infrastructure/db";
 import type { Database } from "@akabase/infrastructure/db";
 import type { EventId } from "@akabase/domain/event/schema";
@@ -12,6 +12,7 @@ export const projectCategoryListItemSchema = z.object({
   name: z.string(),
   displayOrder: z.number().int(),
   createdAt: z.date(),
+  projectCount: z.number().int().nonnegative(),
 });
 
 export type ProjectCategoryListItem = z.infer<typeof projectCategoryListItemSchema>;
@@ -21,10 +22,26 @@ export async function listProjectCategories(
   eventId: EventId,
 ): Promise<ProjectCategoryListItem[]> {
   try {
-    const rows = await deps.db.query.projectCategories.findMany({
-      where: eq(schema.projectCategories.eventId, eventId),
-      orderBy: [asc(schema.projectCategories.displayOrder)],
-    });
+    const rows = await deps.db
+      .select({
+        id: schema.projectCategories.id,
+        eventId: schema.projectCategories.eventId,
+        name: schema.projectCategories.name,
+        displayOrder: schema.projectCategories.displayOrder,
+        createdAt: schema.projectCategories.createdAt,
+        projectCount: count(schema.projects.id),
+      })
+      .from(schema.projectCategories)
+      .leftJoin(
+        schema.projects,
+        and(
+          eq(schema.projects.categoryId, schema.projectCategories.id),
+          eq(schema.projects.eventId, eventId),
+        ),
+      )
+      .where(eq(schema.projectCategories.eventId, eventId))
+      .groupBy(schema.projectCategories.id)
+      .orderBy(asc(schema.projectCategories.displayOrder));
 
     return rows.map((row) =>
       projectCategoryListItemSchema.parse({
@@ -32,7 +49,8 @@ export async function listProjectCategories(
         eventId: row.eventId,
         name: row.name,
         displayOrder: row.displayOrder,
-        createdAt: new Date(row.createdAt),
+        createdAt: row.createdAt,
+        projectCount: row.projectCount,
       }),
     );
   } catch (error) {
