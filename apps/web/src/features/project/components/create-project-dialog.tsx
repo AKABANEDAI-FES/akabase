@@ -4,6 +4,7 @@ import { createListCollection } from "@ark-ui/react/collection";
 import { Result } from "@akabase/result";
 import { createProjectInputSchema, useCreateProjectMutationOption } from "../actions/mutations";
 import { generateLoadPlacesQueryOptions } from "@/features/event/actions/queries/place";
+import { generateLoadProjectCategoriesQueryOptions } from "@/features/event/actions/queries/project-category";
 import { Button } from "@akabase/ui/components/button";
 import { CloseButton } from "@akabase/ui/components/close-button";
 import { Dialog } from "@akabase/ui/components/dialog";
@@ -41,6 +42,9 @@ export function CreateProjectDialog({
   // Load places for select dropdown
   const { data: places } = useSuspenseQuery(generateLoadPlacesQueryOptions(eventId));
 
+  // Load project categories for select dropdown
+  const { data: categories } = useSuspenseQuery(generateLoadProjectCategoriesQueryOptions(eventId));
+
   // Create collection for Select component
   const placesCollection = createListCollection({
     items: places.map((place) => ({
@@ -49,10 +53,18 @@ export function CreateProjectDialog({
     })),
   });
 
+  const categoriesCollection = createListCollection({
+    items: categories.map((category) => ({
+      label: category.name,
+      value: category.id,
+    })),
+  });
+
   const form = useForm({
     defaultValues: {
       name: "",
       placeId: null as string | null,
+      categoryId: null as string | null,
       logoImageId: null as string | null,
       contestVoteNumber: null as string | null,
     },
@@ -224,6 +236,50 @@ export function CreateProjectDialog({
                             )}
                           </Field.ErrorText>
                         )}
+                      </Field.Root>
+                    )}
+                  </form.Field>
+
+                  {/* Project category selection field */}
+                  <form.Field name="categoryId">
+                    {(field) => (
+                      <Field.Root invalid={!field.state.meta.isValid}>
+                        <Field.Label htmlFor={field.name}>企画区分（任意）</Field.Label>
+                        <Select.Root
+                          collection={categoriesCollection}
+                          value={field.state.value ? [field.state.value] : []}
+                          onValueChange={({ value }) => {
+                            field.handleChange(value[0] || null);
+                          }}
+                          positioning={{ sameWidth: true }}
+                        >
+                          <Select.Control>
+                            <Select.Trigger>
+                              <Select.ValueText placeholder="企画区分を選択" />
+                              <Select.Indicator />
+                            </Select.Trigger>
+                          </Select.Control>
+                          <Select.Positioner>
+                            <Select.Content>
+                              {categoriesCollection.items.map((option) => (
+                                <Select.Item key={option.value} item={option}>
+                                  <Select.ItemText>{option.label}</Select.ItemText>
+                                  <Select.ItemIndicator />
+                                </Select.Item>
+                              ))}
+                            </Select.Content>
+                          </Select.Positioner>
+                        </Select.Root>
+                        {!field.state.meta.isValid && (
+                          <Field.ErrorText>
+                            {nl2br(
+                              field.state.meta.errors
+                                .map((error) => error?.message ?? "")
+                                .join("\n"),
+                            )}
+                          </Field.ErrorText>
+                        )}
+                        <Field.HelperText>企画の区分を選択してください</Field.HelperText>
                       </Field.Root>
                     )}
                   </form.Field>

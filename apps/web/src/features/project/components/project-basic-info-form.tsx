@@ -11,6 +11,7 @@ import { Result } from "@akabase/result";
 import { generateLoadProjectDetailQueryOptions } from "../actions/queries";
 import { updateProjectInputSchema, useUpdateProjectMutationOption } from "../actions/mutations";
 import { generateLoadPlacesQueryOptions } from "@/features/event/actions/queries/place";
+import { generateLoadProjectCategoriesQueryOptions } from "@/features/event/actions/queries/project-category";
 import { nl2br } from "@/libs/text";
 import { createListCollection } from "@ark-ui/react/collection";
 import { Portal } from "@ark-ui/react/portal";
@@ -32,6 +33,7 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
     generateLoadProjectDetailQueryOptions(eventId, orgId, projectId),
   );
   const { data: places } = useSuspenseQuery(generateLoadPlacesQueryOptions(eventId));
+  const { data: categories } = useSuspenseQuery(generateLoadProjectCategoriesQueryOptions(eventId));
 
   const placesCollection = createListCollection({
     items: places.map((place) => ({
@@ -40,10 +42,18 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
     })),
   });
 
+  const categoriesCollection = createListCollection({
+    items: categories.map((category) => ({
+      label: category.name,
+      value: category.id,
+    })),
+  });
+
   const form = useForm({
     defaultValues: {
       name: project.name,
       placeId: project.placeId,
+      categoryId: project.categoryId,
       logoImageId: project.logoImageId,
       contestVoteNumber: project.contestVoteNumber,
     },
@@ -57,6 +67,7 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
             orgId: cast<OrgId>(orgId),
             name: value.name,
             placeId: value.placeId,
+            categoryId: value.categoryId,
             logoImageId: value.logoImageId,
             contestVoteNumber: value.contestVoteNumber,
           });
@@ -150,6 +161,46 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
                   <Select.Positioner>
                     <Select.Content>
                       {placesCollection.items.map((option) => (
+                        <Select.Item key={option.value} item={option}>
+                          <Select.ItemText>{option.label}</Select.ItemText>
+                          <Select.ItemIndicator />
+                        </Select.Item>
+                      ))}
+                    </Select.Content>
+                  </Select.Positioner>
+                </Portal>
+              </Select.Root>
+              {!field.state.meta.isValid && (
+                <Field.ErrorText>
+                  {nl2br(field.state.meta.errors.map((error) => error?.message ?? "").join("\n"))}
+                </Field.ErrorText>
+              )}
+            </Field.Root>
+          )}
+        </form.Field>
+
+        <form.Field name="categoryId">
+          {(field) => (
+            <Field.Root invalid={!field.state.meta.isValid}>
+              <Field.Label htmlFor={field.name}>企画区分</Field.Label>
+              <Select.Root
+                collection={categoriesCollection}
+                value={field.state.value ? [field.state.value] : []}
+                onValueChange={({ value }) => {
+                  field.handleChange(value[0] ?? null);
+                }}
+                positioning={{ sameWidth: true }}
+              >
+                <Select.Control>
+                  <Select.Trigger>
+                    <Select.ValueText placeholder="企画区分を選択" />
+                    <Select.Indicator />
+                  </Select.Trigger>
+                </Select.Control>
+                <Portal>
+                  <Select.Positioner>
+                    <Select.Content>
+                      {categoriesCollection.items.map((option) => (
                         <Select.Item key={option.value} item={option}>
                           <Select.ItemText>{option.label}</Select.ItemText>
                           <Select.ItemIndicator />
