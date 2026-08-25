@@ -49,6 +49,18 @@ export type EventDomainService = {
   ): Promise<Result.Result<true, EventError>>;
 
   /**
+   * 企画区分がイベントに属することを保証する
+   *
+   * @param eventId - 対象イベントID
+   * @param categoryId - チェック対象の企画区分ID
+   * @returns 属していれば成功、属していなければPROJECT_CATEGORY_NOT_FOUNDエラー
+   */
+  ensureProjectCategoryInEvent(
+    eventId: EventId,
+    categoryId: ProjectCategoryId,
+  ): Promise<Result.Result<true, EventError>>;
+
+  /**
    * 場所名の一意性を保証する（同一イベント・同一階層内）
    *
    * @param eventId - 対象イベントID

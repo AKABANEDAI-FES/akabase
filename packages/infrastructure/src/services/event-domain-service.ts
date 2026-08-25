@@ -61,6 +61,18 @@ export class EventDomainServiceImpl implements EventDomainService {
     return Result.succeed(true);
   }
 
+  async ensureProjectCategoryInEvent(eventId: EventId, categoryId: ProjectCategoryId) {
+    const categories = await this.eventRepo.findProjectCategories(eventId);
+
+    if (!categories.some((category) => category.id === categoryId)) {
+      return Result.fail(
+        eventError(EVENT_ERROR_CODE.PROJECT_CATEGORY_NOT_FOUND, "企画区分が見つかりません"),
+      );
+    }
+
+    return Result.succeed(true);
+  }
+
   async ensurePlaceNameUnique(
     eventId: EventId,
     name: string,

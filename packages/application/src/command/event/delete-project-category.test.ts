@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vite-plus/test";
 import { Result } from "@akabase/result";
 import type { EventId, ProjectCategoryId } from "@akabase/domain/event/schema";
+import { schema } from "@akabase/infrastructure/db";
 import { createTestDb } from "../../test/db-mock";
 import { createTestDependencies } from "../../test/test-dependencies";
 import { createAdminActor, createUserActor } from "../../test/test-helpers";
@@ -40,6 +41,27 @@ describe("deleteProjectCategory", () => {
     return result.value.categoryId;
   }
 
+  async function createTestProject(eventId: EventId, categoryId: ProjectCategoryId) {
+    const now = new Date();
+    await testDb.db.insert(schema.organizations).values({
+      id: "org-1",
+      eventId,
+      name: "Org 1",
+      description: "",
+      createdAt: now,
+      updatedAt: now,
+    });
+    await testDb.db.insert(schema.projects).values({
+      id: "project-1",
+      eventId,
+      orgId: "org-1",
+      name: "Project 1",
+      categoryId,
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
+
   it("管理者が企画区分を削除できる", async () => {
     const actor = createAdminActor();
     const eventId = await createActiveEvent();
@@ -54,6 +76,23 @@ describe("deleteProjectCategory", () => {
       const categories = await deps.eventRepo.findProjectCategories(eventId);
       expect(categories).toHaveLength(0);
     }
+  });
+
+  it("企画区分を削除すると紐づく企画は未分類に戻る", async () => {
+    const actor = createAdminActor();
+    const eventId = await createActiveEvent();
+    const categoryId = await createTestCategory(eventId, "WELLB模擬店");
+    await createTestProject(eventId, categoryId);
+
+    const result = await deleteProjectCategory(deps, { categoryId, eventId, actor });
+
+    expect(Result.isSuccess(result)).toBe(true);
+
+    const rows = await testDb.db
+      .select({ categoryId: schema.projects.categoryId })
+      .from(schema.projects);
+    expect(rows).toHaveLength(1);
+    expect(rows[0]!.categoryId).toBeNull();
   });
 
   it("他のイベントの企画区分は削除されない", async () => {

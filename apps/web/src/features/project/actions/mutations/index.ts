@@ -368,6 +368,7 @@ export const updateProjectInputSchema = z.object({
   orgId: projectSchema.shape.orgId,
   name: projectSchema.shape.name,
   placeId: projectSchema.shape.placeId,
+  categoryId: projectSchema.shape.categoryId,
   logoImageId: projectSchema.shape.logoImageId,
   contestVoteNumber: projectSchema.shape.contestVoteNumber,
 });

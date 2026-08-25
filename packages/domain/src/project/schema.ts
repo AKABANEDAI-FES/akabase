@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { eventIdSchema, placeIdSchema, tagIdSchema } from "../event/schema";
+import {
+  eventIdSchema,
+  placeIdSchema,
+  projectCategoryIdSchema,
+  tagIdSchema,
+} from "../event/schema";
 import { orgIdSchema } from "../organization/schema";
 import { imageIdSchema } from "../shared/image";
 import { userIdSchema } from "../user/schema";
@@ -69,6 +74,7 @@ export const projectSchema = z.object({
     .min(PROJECT_NAME_MIN_LENGTH, "企画名を入力してください")
     .max(PROJECT_NAME_MAX_LENGTH, "企画名は100文字以内で入力してください"),
   placeId: placeIdSchema.nullable(),
+  categoryId: projectCategoryIdSchema.nullable(),
   logoImageId: imageIdSchema.nullable(),
   contestVoteNumber: z
     .string()
