@@ -1,5 +1,5 @@
 import type { Result } from "@akabase/result";
-import type { Event, EventId, PlaceId, TagId } from "./schema";
+import type { Event, EventId, PlaceId, ProjectCategoryId, TagId } from "./schema";
 import type { EventError } from "./errors";
 
 /**
@@ -32,6 +32,20 @@ export type EventDomainService = {
     eventId: EventId,
     name: string,
     excludeTagId?: TagId,
+  ): Promise<Result.Result<true, EventError>>;
+
+  /**
+   * 企画区分名の一意性を保証する（イベント内）
+   *
+   * @param eventId - 対象イベントID
+   * @param name - チェック対象の企画区分名
+   * @param excludeCategoryId - 除外する企画区分ID（更新時に自身を除外する用途）
+   * @returns 一意であれば成功、重複があればPROJECT_CATEGORY_NOT_UNIQUEエラー
+   */
+  ensureProjectCategoryNameUnique(
+    eventId: EventId,
+    name: string,
+    excludeCategoryId?: ProjectCategoryId,
   ): Promise<Result.Result<true, EventError>>;
 
   /**

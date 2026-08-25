@@ -1,6 +1,7 @@
 import { Result } from "@akabase/result";
 import { describe, expect, it } from "vite-plus/test";
-import type { Event, EventId } from "./schema";
+import type { Event, EventId, ProjectCategory, ProjectCategoryId } from "./schema";
+import { PROJECT_CATEGORY_NAME_MAX_LENGTH } from "./schema";
 import { cast } from "../shared/ids";
 import {
   activateEvent,
@@ -8,12 +9,15 @@ import {
   canModifyEvent,
   createEventEntity,
   createEventSettingsEntity,
+  createProjectCategoryEntity,
   updateEventEntity,
   updateEventSettingsEntity,
+  updateProjectCategoryEntity,
 } from "./logic";
 
 // Test fixtures
 const mockEventId = cast<EventId>("event-123");
+const mockProjectCategoryId = cast<ProjectCategoryId>("project-category-123");
 
 const createMockEvent = (overrides?: Partial<Event>): Event => ({
   id: mockEventId,
@@ -22,6 +26,15 @@ const createMockEvent = (overrides?: Partial<Event>): Event => ({
   status: "active",
   createdAt: new Date("2025-01-01"),
   updatedAt: new Date("2025-01-01"),
+  ...overrides,
+});
+
+const createMockProjectCategory = (overrides?: Partial<ProjectCategory>): ProjectCategory => ({
+  id: mockProjectCategoryId,
+  eventId: mockEventId,
+  name: "WELLB教室企画",
+  displayOrder: 0,
+  createdAt: new Date("2025-01-01"),
   ...overrides,
 });
 
@@ -186,6 +199,150 @@ describe("Event Domain Logic", () => {
           expect(result.value.pamphletTextMaxLength).toBe(100);
           expect(result.value.createdAt).toBe(createdAt);
           expect(result.value.updatedAt).toBe(now);
+        }
+      });
+    });
+  });
+
+  describe("Project Category Management", () => {
+    describe("createProjectCategoryEntity", () => {
+      it("creates project category with given displayOrder", () => {
+        const now = new Date("2025-02-01T10:00:00.000Z");
+        const result = createProjectCategoryEntity({
+          id: mockProjectCategoryId,
+          eventId: mockEventId,
+          name: "WELLB模擬店",
+          displayOrder: 3,
+          now,
+        });
+
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.id).toBe(mockProjectCategoryId);
+          expect(result.value.eventId).toBe(mockEventId);
+          expect(result.value.name).toBe("WELLB模擬店");
+          expect(result.value.displayOrder).toBe(3);
+          expect(result.value.createdAt).toBe(now);
+        }
+      });
+
+      it("trims surrounding whitespace from name", () => {
+        const result = createProjectCategoryEntity({
+          id: mockProjectCategoryId,
+          eventId: mockEventId,
+          name: "  WELLB模擬店  ",
+          displayOrder: 0,
+        });
+
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.name).toBe("WELLB模擬店");
+        }
+      });
+
+      it("fails when name is empty", () => {
+        const result = createProjectCategoryEntity({
+          id: mockProjectCategoryId,
+          eventId: mockEventId,
+          name: "",
+          displayOrder: 0,
+        });
+
+        expect(Result.isFailure(result)).toBe(true);
+        if (Result.isFailure(result)) {
+          expect(result.error.code).toBe("VALIDATION_ERROR");
+        }
+      });
+
+      it("fails when name is whitespace only", () => {
+        const result = createProjectCategoryEntity({
+          id: mockProjectCategoryId,
+          eventId: mockEventId,
+          name: "   ",
+          displayOrder: 0,
+        });
+
+        expect(Result.isFailure(result)).toBe(true);
+        if (Result.isFailure(result)) {
+          expect(result.error.code).toBe("VALIDATION_ERROR");
+        }
+      });
+
+      it("fails when name exceeds the max length", () => {
+        const result = createProjectCategoryEntity({
+          id: mockProjectCategoryId,
+          eventId: mockEventId,
+          name: "あ".repeat(PROJECT_CATEGORY_NAME_MAX_LENGTH + 1),
+          displayOrder: 0,
+        });
+
+        expect(Result.isFailure(result)).toBe(true);
+        if (Result.isFailure(result)) {
+          expect(result.error.code).toBe("VALIDATION_ERROR");
+        }
+      });
+
+      it("succeeds for exactly the max length", () => {
+        const result = createProjectCategoryEntity({
+          id: mockProjectCategoryId,
+          eventId: mockEventId,
+          name: "あ".repeat(PROJECT_CATEGORY_NAME_MAX_LENGTH),
+          displayOrder: 0,
+        });
+
+        expect(Result.isSuccess(result)).toBe(true);
+      });
+
+      it("fails when displayOrder is negative", () => {
+        const result = createProjectCategoryEntity({
+          id: mockProjectCategoryId,
+          eventId: mockEventId,
+          name: "WELLB模擬店",
+          displayOrder: -1,
+        });
+
+        expect(Result.isFailure(result)).toBe(true);
+        if (Result.isFailure(result)) {
+          expect(result.error.code).toBe("VALIDATION_ERROR");
+        }
+      });
+    });
+
+    describe("updateProjectCategoryEntity", () => {
+      it("updates name while keeping other fields", () => {
+        const category = createMockProjectCategory({ name: "旧区分", displayOrder: 2 });
+
+        const result = updateProjectCategoryEntity(category, { name: "INIADホール企画" });
+
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.id).toBe(category.id);
+          expect(result.value.eventId).toBe(category.eventId);
+          expect(result.value.displayOrder).toBe(category.displayOrder);
+          expect(result.value.createdAt).toBe(category.createdAt);
+          expect(result.value.name).toBe("INIADホール企画");
+        }
+      });
+
+      it("trims surrounding whitespace from name", () => {
+        const category = createMockProjectCategory();
+
+        const result = updateProjectCategoryEntity(category, { name: "  INIADホール企画  " });
+
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.name).toBe("INIADホール企画");
+        }
+      });
+
+      it("fails when name is empty", () => {
+        const category = createMockProjectCategory();
+
+        const result = updateProjectCategoryEntity(category, { name: "" });
+
+        expect(Result.isFailure(result)).toBe(true);
+        if (Result.isFailure(result)) {
+          expect(result.error.code).toBe("VALIDATION_ERROR");
         }
       });
     });

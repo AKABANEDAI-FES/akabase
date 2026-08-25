@@ -1,7 +1,7 @@
 import { Result } from "@akabase/result";
 import type { EventDomainService } from "@akabase/domain/event/service";
 import type { EventRepository } from "@akabase/domain/event/repository";
-import type { EventId, PlaceId, TagId } from "@akabase/domain/event/schema";
+import type { EventId, PlaceId, ProjectCategoryId, TagId } from "@akabase/domain/event/schema";
 import { EVENT_ERROR_CODE, eventError } from "@akabase/domain/event/errors";
 import { canModifyEvent } from "@akabase/domain/event/logic";
 
@@ -32,6 +32,29 @@ export class EventDomainServiceImpl implements EventDomainService {
     if (duplicate) {
       return Result.fail(
         eventError(EVENT_ERROR_CODE.TAG_NOT_UNIQUE, "このタグ名は既に使用されています"),
+      );
+    }
+
+    return Result.succeed(true);
+  }
+
+  async ensureProjectCategoryNameUnique(
+    eventId: EventId,
+    name: string,
+    excludeCategoryId?: ProjectCategoryId,
+  ) {
+    const categories = await this.eventRepo.findProjectCategories(eventId);
+
+    const duplicate = categories.find(
+      (category) => category.name === name && category.id !== excludeCategoryId,
+    );
+
+    if (duplicate) {
+      return Result.fail(
+        eventError(
+          EVENT_ERROR_CODE.PROJECT_CATEGORY_NOT_UNIQUE,
+          "この企画区分名は既に使用されています",
+        ),
       );
     }
 
