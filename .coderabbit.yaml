@@ -1,0 +1,32 @@
+language: ja-JP
+
+reviews:
+  profile: assertive
+  request_changes_workflow: true
+  abort_on_close: true
+
+  review_details: true
+  review_status: true
+  in_progress_fortune: false
+  poem: false
+  sequence_diagrams: false
+  estimate_code_review_effort: false
+
+  path_filters:
+    - "!pnpm-lock.yaml"
+    - "!apps/web/src/routeTree.gen.ts"
+    - "!**/worker-configuration.d.ts"
+
+  auto_review:
+    enabled: true
+    auto_incremental_review: true
+    auto_pause_after_reviewed_commits: 0
+
+knowledge_base:
+  code_guidelines:
+    file_patterns:
+      - "docs/architecture.md"
+
+code_generation:
+  docstrings:
+    language: ja-JP
