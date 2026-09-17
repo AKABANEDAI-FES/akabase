@@ -83,6 +83,7 @@ export const checkCommitteePermissionsFn = createServerFn({ method: "GET" })
       canDeleteOrganization: check(orgRes, "organization:delete"),
       canManageOrgMembers: check(orgRes, "organization:manage_members"),
       canManageDeadlines: check(eventRes, "event:update"),
+      canManageEventSettings: check(eventRes, "event:update"),
       canManagePlaces: check(eventRes, "event:update"),
       canManageTags: check(eventRes, "event:update"),
       canCreateProject: check(projectRes, "project:create"),

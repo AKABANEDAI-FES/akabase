@@ -7,6 +7,7 @@ import {
   FileClockIcon,
   HomeIcon,
   MapPinIcon,
+  SettingsIcon,
   TagIcon,
   UsersIcon,
 } from "lucide-react";
@@ -98,6 +99,12 @@ function SlugLayout() {
             <Link to="/$slug/committee/export" params={{ slug }}>
               <DownloadIcon />
               データエクスポート
+            </Link>
+          </NavLink>
+          <NavLink>
+            <Link to="/$slug/committee/settings" params={{ slug }}>
+              <SettingsIcon />
+              詳細設定
             </Link>
           </NavLink>
         </NavSection>

@@ -12,6 +12,7 @@ import { ProjectBasicInfoForm } from "@/features/project/components/project-basi
 import { ProjectPublishedDataForm } from "@/features/project/components/project-published-data-form";
 import { generateLoadTagsQueryOptions } from "@/features/event/actions/queries/tag";
 import { generateLoadPlacesQueryOptions } from "@/features/event/actions/queries/place";
+import { generateLoadEventSettingsQueryOptions } from "@/features/event/actions/queries/event-settings";
 import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions/queries";
 import { handleNotFoundError } from "@/libs/error";
 
@@ -29,6 +30,7 @@ export const Route = createFileRoute(
       ),
       context.queryClient.ensureQueryData(generateLoadPlacesQueryOptions(event.id)),
       context.queryClient.ensureQueryData(generateLoadTagsQueryOptions(event.id)),
+      context.queryClient.ensureQueryData(generateLoadEventSettingsQueryOptions(event.id)),
       context.queryClient.ensureQueryData(generateCheckCommitteePermissionsQueryOptions(event.id)),
     ]);
   },

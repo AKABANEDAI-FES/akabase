@@ -36,6 +36,20 @@
       "when": 1785262001143,
       "tag": "0004_goofy_terror",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1786463697386,
+      "tag": "0005_late_loa",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1786464643460,
+      "tag": "0006_lyrical_skrulls",
+      "breakpoints": true
     }
   ]
 }

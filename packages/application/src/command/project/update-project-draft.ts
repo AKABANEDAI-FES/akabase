@@ -7,6 +7,7 @@ import { Result } from "@akabase/result";
 import type { EventId, TagId } from "@akabase/domain/event/schema";
 import type { OrgId } from "@akabase/domain/organization/schema";
 import type { DraftWithTags, ProjectId } from "@akabase/domain/project/schema";
+import { resolvePamphletTextMaxLength } from "@akabase/domain/project/schema";
 import type { ProjectError } from "@akabase/domain/project/errors";
 import { PROJECT_ERROR_CODE, projectError } from "@akabase/domain/project/errors";
 import type { EventError } from "@akabase/domain/event/errors";
@@ -99,10 +100,14 @@ export async function updateProjectDraft(
     const blockedFieldKeys = getBlockedFieldKeys(deadlines, new Date());
     const enforced = applyDeadlineEnforcement(existingDraft, input, blockedFieldKeys);
 
+    const settings = await deps.eventRepo.findEventSettings(project.eventId);
+    const pamphletTextMaxLength = resolvePamphletTextMaxLength(settings);
+
     const updatedDraft = yield* $(
       updateProjectDraftEntity({
         projectId: input.projectId,
         pamphletText: enforced.pamphletText,
+        pamphletTextMaxLength,
         webContentJson: enforced.webContentJson,
         openingHours: enforced.openingHours,
         lastEntryTime: enforced.lastEntryTime,

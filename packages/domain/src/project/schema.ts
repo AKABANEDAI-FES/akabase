@@ -21,12 +21,40 @@ export type SubmissionMessageId = z.infer<typeof submissionMessageIdSchema>;
  */
 export const PROJECT_NAME_MIN_LENGTH = 1;
 export const PROJECT_NAME_MAX_LENGTH = 100;
-export const PROJECT_PAMPHLET_TEXT_MAX_LENGTH = 68;
+export const PROJECT_PAMPHLET_TEXT_DEFAULT_MAX_LENGTH = 68;
 export const PROJECT_DETAIL_INFO_MAX_LENGTH = 100;
 export const PROJECT_MAX_TAGS = 5;
 export const CONTEST_VOTE_NUMBER_PATTERN = /^[0-9]{4}$/;
 export const SUBMISSION_MESSAGE_MIN_LENGTH = 1;
 export const SUBMISSION_MESSAGE_MAX_LENGTH = 200;
+
+/**
+ * Resolve the effective pamphlet text max length from event settings
+ */
+export function resolvePamphletTextMaxLength(
+  settings: { pamphletTextMaxLength: number | null } | null,
+): number {
+  return settings?.pamphletTextMaxLength ?? PROJECT_PAMPHLET_TEXT_DEFAULT_MAX_LENGTH;
+}
+
+/**
+ * Generate the error message for pamphlet text exceeding the max length
+ */
+export function pamphletTextMaxLengthMessage(maxLength: number): string {
+  return `パンフレットテキストは${maxLength}文字以内で入力してください`;
+}
+
+/**
+ * Generate the pamphlet text validation schema for a per-event max length
+ *
+ * Leading/trailing whitespace is trimmed before applying the max length,
+ * matching the server-side behavior of updateProjectDraftEntity / updatePublishedEntity.
+ */
+export function pamphletTextSchema(maxLength: number) {
+  return z
+    .string()
+    .refine((value) => value.trim().length <= maxLength, pamphletTextMaxLengthMessage(maxLength));
+}
 
 /**
  * Project (Aggregate Root)
@@ -82,12 +110,8 @@ const requiredDetailInfoShape = {
  */
 export const projectDraftSchema = z.object({
   projectId: projectIdSchema,
-  pamphletText: z
-    .string()
-    .max(
-      PROJECT_PAMPHLET_TEXT_MAX_LENGTH,
-      `パンフレットテキストは${PROJECT_PAMPHLET_TEXT_MAX_LENGTH}文字以内で入力してください`,
-    ),
+  // Max length is per-event (event settings) and enforced in entity logic, not here
+  pamphletText: z.string(),
   webContentJson: z.json().nullable(), // TipTap JSON
   ...detailInfoShape,
   updatedAt: z.date(),
@@ -111,12 +135,7 @@ export const projectSubmissionSchema = z.object({
   id: submissionIdSchema,
   projectId: projectIdSchema,
   status: submissionStatusSchema,
-  pamphletText: z
-    .string()
-    .max(
-      PROJECT_PAMPHLET_TEXT_MAX_LENGTH,
-      `パンフレットテキストは${PROJECT_PAMPHLET_TEXT_MAX_LENGTH}文字以内で入力してください`,
-    ),
+  pamphletText: z.string(),
   webContentJson: z.json().nullable(),
   ...requiredDetailInfoShape,
   submittedAt: z.date(),
@@ -131,12 +150,7 @@ export type ProjectSubmission = z.infer<typeof projectSubmissionSchema>;
  */
 export const projectPublishedSchema = z.object({
   projectId: projectIdSchema,
-  pamphletText: z
-    .string()
-    .max(
-      PROJECT_PAMPHLET_TEXT_MAX_LENGTH,
-      `パンフレットテキストは${PROJECT_PAMPHLET_TEXT_MAX_LENGTH}文字以内で入力してください`,
-    ),
+  pamphletText: z.string(),
   webContentJson: z.json().nullable(),
   ...requiredDetailInfoShape,
   publishedAt: z.date(),

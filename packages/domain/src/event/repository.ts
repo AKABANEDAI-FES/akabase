@@ -1,4 +1,14 @@
-import type { Deadline, DeadlineId, Event, EventId, Place, PlaceId, Tag, TagId } from "./schema";
+import type {
+  Deadline,
+  DeadlineId,
+  Event,
+  EventId,
+  EventSettings,
+  Place,
+  PlaceId,
+  Tag,
+  TagId,
+} from "./schema";
 
 /**
  * =============================================================================
@@ -102,4 +112,17 @@ export type EventRepository = {
    * @throws {RepositoryExceptionError} on database errors
    */
   deleteDeadline(eventId: EventId, deadlineId: DeadlineId): Promise<void>;
+
+  /**
+   * Find event settings for an event
+   * Returns null if not configured yet
+   * @throws {RepositoryExceptionError} on database errors
+   */
+  findEventSettings(eventId: EventId): Promise<EventSettings | null>;
+
+  /**
+   * Save event settings (insert or update)
+   * @throws {RepositoryExceptionError} on database errors
+   */
+  saveEventSettings(settings: EventSettings): Promise<void>;
 };

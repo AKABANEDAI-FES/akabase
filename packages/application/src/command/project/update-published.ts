@@ -7,6 +7,7 @@ import { Result } from "@akabase/result";
 import type { EventId, TagId } from "@akabase/domain/event/schema";
 import type { OrgId } from "@akabase/domain/organization/schema";
 import type { ProjectId } from "@akabase/domain/project/schema";
+import { resolvePamphletTextMaxLength } from "@akabase/domain/project/schema";
 import type { ProjectError } from "@akabase/domain/project/errors";
 import { PROJECT_ERROR_CODE, projectError } from "@akabase/domain/project/errors";
 import type { EventError } from "@akabase/domain/event/errors";
@@ -15,6 +16,7 @@ import type { Actor } from "@akabase/domain/authorization/schema";
 import { projectResource } from "@akabase/domain/authorization/logic";
 import { updatePublishedEntity } from "@akabase/domain/project/logic";
 import type { ProjectRepository } from "@akabase/domain/project/repository";
+import type { EventRepository } from "@akabase/domain/event/repository";
 import type { AuthorizationService } from "@akabase/domain/authorization/service";
 import type { EventDomainService } from "@akabase/domain/event/service";
 
@@ -41,6 +43,7 @@ export type UpdatePublishedError = ProjectError | EventError | AuthorizationErro
 export async function updatePublished(
   deps: {
     projectRepo: ProjectRepository;
+    eventRepo: EventRepository;
     authService: AuthorizationService;
     eventDomainService: EventDomainService;
   },
@@ -68,10 +71,14 @@ export async function updatePublished(
       );
     }
 
+    const settings = await deps.eventRepo.findEventSettings(project.eventId);
+    const pamphletTextMaxLength = resolvePamphletTextMaxLength(settings);
+
     const updatedPublished = yield* $(
       updatePublishedEntity({
         projectId: input.projectId,
         pamphletText: input.pamphletText,
+        pamphletTextMaxLength,
         webContentJson: input.webContentJson,
         openingHours: input.openingHours,
         lastEntryTime: input.lastEntryTime,

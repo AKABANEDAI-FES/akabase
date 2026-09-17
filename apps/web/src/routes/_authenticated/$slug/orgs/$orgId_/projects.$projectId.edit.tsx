@@ -22,13 +22,18 @@ import { RichTextEditor } from "@/features/project/components/editor";
 import { SubmitProjectDialog } from "@/features/project/components/submit-project-dialog";
 import { generateLoadTagsQueryOptions } from "@/features/event/actions/queries/tag";
 import { generateLoadDeadlinesQueryOptions } from "@/features/event/actions/queries/deadline";
+import { generateLoadEventSettingsQueryOptions } from "@/features/event/actions/queries/event-settings";
 import { generateCheckOrganizationPermissionsQueryOptions } from "@/features/authorization/actions/queries";
 import { nl2br } from "@/libs/text";
 import { createListCollection } from "@ark-ui/react/collection";
 import { Portal } from "@ark-ui/react/portal";
 import { getDeadlineMessage, getFieldDeadlineStatus } from "@/features/project/utils/deadline";
 import { PROJECT_DETAIL_INFO_FIELDS } from "@/features/project/utils/detail-info";
-import { PROJECT_MAX_TAGS, PROJECT_PAMPHLET_TEXT_MAX_LENGTH } from "@akabase/domain/project/schema";
+import {
+  PROJECT_MAX_TAGS,
+  pamphletTextSchema,
+  resolvePamphletTextMaxLength,
+} from "@akabase/domain/project/schema";
 import type { OrgId } from "@akabase/domain/organization/schema";
 import type { ProjectId } from "@akabase/domain/project/schema";
 import { cast } from "@akabase/domain/shared/ids";
@@ -52,6 +57,7 @@ export const Route = createFileRoute("/_authenticated/$slug/orgs/$orgId_/project
           generateCheckOrganizationPermissionsQueryOptions(event.id, params.orgId),
         ),
         context.queryClient.ensureQueryData(generateLoadDeadlinesQueryOptions(event.id)),
+        context.queryClient.ensureQueryData(generateLoadEventSettingsQueryOptions(event.id)),
       ]);
     },
     component: ProjectEditPage,
@@ -71,6 +77,8 @@ function ProjectEditPage() {
     generateCheckOrganizationPermissionsQueryOptions(event.id, orgId),
   );
   const { data: deadlines } = useSuspenseQuery(generateLoadDeadlinesQueryOptions(event.id));
+  const { data: eventSettings } = useSuspenseQuery(generateLoadEventSettingsQueryOptions(event.id));
+  const pamphletTextMaxLength = resolvePamphletTextMaxLength(eventSettings);
   const { mutateAsync } = useMutation(useUpdateProjectDraftMutationOption());
 
   // Calculate blocked fields once
@@ -92,7 +100,7 @@ function ProjectEditPage() {
     },
     validators: {
       onDynamic: z.object({
-        pamphletText: updateProjectDraftInputSchema.shape.pamphletText,
+        pamphletText: pamphletTextSchema(pamphletTextMaxLength),
         tags: updateProjectDraftInputSchema.shape.tags,
         webContentJson: z.unknown(),
         openingHours: updateProjectDraftInputSchema.shape.openingHours,
@@ -223,7 +231,7 @@ function ProjectEditPage() {
                 return (
                   <Field.Root invalid={!field.state.meta.isValid}>
                     <Field.Label htmlFor={field.name}>
-                      パンフレット用説明（{PROJECT_PAMPHLET_TEXT_MAX_LENGTH}文字以内）
+                      パンフレット用説明（{pamphletTextMaxLength}文字以内）
                       {isBlocked && (
                         <Badge ml="2" variant="subtle">
                           編集不可
@@ -250,7 +258,7 @@ function ProjectEditPage() {
                     <Field.HelperText>
                       {isBlocked && deadlineMsg
                         ? deadlineMsg
-                        : `残り: ${PROJECT_PAMPHLET_TEXT_MAX_LENGTH - field.state.value.length}文字`}
+                        : `残り: ${pamphletTextMaxLength - field.state.value.trim().length}文字`}
                     </Field.HelperText>
                   </Field.Root>
                 );
@@ -409,6 +417,15 @@ function ProjectEditPage() {
                         </Badge>
                       )}
                     </Field.Label>
+                    {eventSettings.webContentDescription && (
+                      <Alert.Root>
+                        <Alert.Content>
+                          <Alert.Description>
+                            {nl2br(eventSettings.webContentDescription)}
+                          </Alert.Description>
+                        </Alert.Content>
+                      </Alert.Root>
+                    )}
                     <ClientOnly>
                       <RichTextEditor
                         value={field.state.value}
