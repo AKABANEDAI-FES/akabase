@@ -1,4 +1,4 @@
-import { revalidateLogic, useForm, useStore } from "@tanstack/react-form";
+import { useForm, useStore } from "@tanstack/react-form";
 import { useBlocker } from "@tanstack/react-router";
 import { Result } from "@akabase/result";
 import { useMutation } from "@tanstack/react-query";
@@ -29,47 +29,37 @@ export function EventSettingsForm({ settings, disabled }: EventSettingsFormProps
     defaultValues: {
       webContentDescription: settings.webContentDescription ?? "",
     },
-    validators: {
-      onSubmitAsync: async ({ value }) => {
-        try {
-          const result = await mutateAsync({
-            data: {
-              eventId: settings.eventId,
-              webContentDescription: value.webContentDescription,
-            },
-          });
+    onSubmit: async ({ value }) => {
+      try {
+        const result = await mutateAsync({
+          data: {
+            eventId: settings.eventId,
+            webContentDescription: value.webContentDescription,
+          },
+        });
 
-          if (Result.isFailure(result)) {
-            toaster.create({
-              type: "error",
-              title: "エラー",
-              description: result.error.message,
-            });
-            return {};
-          }
-
-          return undefined;
-        } catch (error) {
-          console.error("Failed to upsert event settings:", error);
+        if (Result.isFailure(result)) {
           toaster.create({
             type: "error",
             title: "エラー",
-            description: "予期しないエラーが発生しました",
+            description: result.error.message,
           });
-          return {};
+          return;
         }
-      },
-    },
-    validationLogic: revalidateLogic({
-      mode: "submit",
-      modeAfterSubmission: "change",
-    }),
-    onSubmit: async () => {
-      form.reset();
-      toaster.create({
-        type: "success",
-        title: "イベント詳細設定を保存しました",
-      });
+
+        form.reset(value);
+        toaster.create({
+          type: "success",
+          title: "イベント詳細設定を保存しました",
+        });
+      } catch (error) {
+        console.error("Failed to upsert event settings:", error);
+        toaster.create({
+          type: "error",
+          title: "エラー",
+          description: "予期しないエラーが発生しました",
+        });
+      }
     },
   });
 
