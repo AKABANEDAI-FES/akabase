@@ -64,6 +64,7 @@ export function EventSettingsForm({ settings, disabled }: EventSettingsFormProps
   });
 
   const isDefaultValue = useStore(form.store, (state) => state.isDefaultValue);
+  const isSubmitting = useStore(form.store, (state) => state.isSubmitting);
 
   useBlocker({
     shouldBlockFn: async () => {
@@ -122,7 +123,7 @@ export function EventSettingsForm({ settings, disabled }: EventSettingsFormProps
                       "例: 以下の順に記載してください\n1. 紹介文 (Webサイト用)\n2. 注意事項\n3. 企画ページに掲載する写真 (任意・5枚まで)\n4. SNSリンク (X, Instagram, YouTube, HP)\n5. 販売メニューと価格 (任意)"
                     }
                     rows={6}
-                    disabled={disabled}
+                    disabled={disabled || isSubmitting}
                   />
                   <Field.HelperText>
                     出展団体がWeb用コンテンツを入力する際に、入力欄の案内として表示されます。空の場合は表示されません。
