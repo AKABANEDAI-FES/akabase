@@ -14,7 +14,6 @@ export const externalProjectListItemSchema = z.object({
   name: z.string(),
   pamphletText: z.string(),
   openingHours: z.string(),
-  lastEntryTime: z.string(),
   logoUrl: z.string().nullable(),
   organization: z.object({
     id: orgIdSchema,
@@ -78,7 +77,6 @@ export async function listExternalProjects(
           name: row.name,
           pamphletText: row.published.pamphletText,
           openingHours: row.published.openingHours,
-          lastEntryTime: row.published.lastEntryTime,
           logoUrl: row.logoImage ? deps.imageRepo.getPublicUrl(row.logoImage.objectKey) : null,
           organization: row.organization,
           place: row.placeId === null ? null : (placesWithPath.get(row.placeId) ?? null),

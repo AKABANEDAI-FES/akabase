@@ -67,7 +67,6 @@ export function ProjectPublishedDataForm({
       pamphletText: published?.pamphletText ?? "",
       webContentJson: (published?.webContentJson ?? null) as unknown,
       openingHours: published?.openingHours ?? "",
-      lastEntryTime: published?.lastEntryTime ?? "",
       tags: published?.tags.map((tag) => tag.id as string) ?? [],
     },
     validators: {
@@ -75,7 +74,6 @@ export function ProjectPublishedDataForm({
         pamphletText: pamphletTextSchema(pamphletTextMaxLength),
         webContentJson: z.unknown(),
         openingHours: updatePublishedInputSchema.shape.openingHours,
-        lastEntryTime: updatePublishedInputSchema.shape.lastEntryTime,
         tags: updatePublishedInputSchema.shape.tags,
       }),
       onSubmitAsync: async ({ value }) => {
@@ -96,7 +94,6 @@ export function ProjectPublishedDataForm({
             pamphletText: value.pamphletText,
             webContentJson: value.webContentJson,
             openingHours: value.openingHours,
-            lastEntryTime: value.lastEntryTime,
             tags: value.tags.map((id) => cast<TagId>(id)),
           });
 

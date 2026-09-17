@@ -96,7 +96,6 @@ function ProjectEditPage() {
       tags: draft?.tags.map((tag) => tag.id as string) ?? [],
       webContentJson: (draft?.webContentJson ?? null) as unknown,
       openingHours: draft?.openingHours ?? "",
-      lastEntryTime: draft?.lastEntryTime ?? "",
     },
     validators: {
       onDynamic: z.object({
@@ -104,7 +103,6 @@ function ProjectEditPage() {
         tags: updateProjectDraftInputSchema.shape.tags,
         webContentJson: z.unknown(),
         openingHours: updateProjectDraftInputSchema.shape.openingHours,
-        lastEntryTime: updateProjectDraftInputSchema.shape.lastEntryTime,
       }),
       onSubmitAsync: async ({ value }) => {
         const result = await updateProjectDraftInputSchema["~standard"].validate({
