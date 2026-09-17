@@ -1,4 +1,4 @@
-import { useForm, useStore } from "@tanstack/react-form";
+import { revalidateLogic, useForm, useStore } from "@tanstack/react-form";
 import { useBlocker } from "@tanstack/react-router";
 import { Result } from "@akabase/result";
 import { useMutation } from "@tanstack/react-query";
@@ -42,6 +42,10 @@ export function EventSettingsForm({ settings, disabled }: EventSettingsFormProps
           .regex(/^$|^[1-9][0-9]*$/, "1以上の整数で入力してください"),
       }),
     },
+    validationLogic: revalidateLogic({
+      mode: "submit",
+      modeAfterSubmission: "change",
+    }),
     onSubmit: async ({ value }) => {
       try {
         const result = await mutateAsync({
