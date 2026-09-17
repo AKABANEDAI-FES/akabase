@@ -18,7 +18,6 @@ const createMockDraft = (overrides?: Partial<DraftWithTags>): DraftWithTags => (
   pamphletText: "テスト用の説明文",
   webContentJson: null,
   openingHours: "10:00-18:00",
-  lastEntryTime: "17:30",
   updatedAt: new Date("2025-01-01"),
   updatedBy: mockUserId,
   tags: [],
@@ -34,7 +33,6 @@ describe("Project Domain Logic", () => {
         pamphletTextMaxLength: 10,
         webContentJson: null,
         openingHours: "",
-        lastEntryTime: "",
         tags: [],
         updatedBy: mockUserId,
       });
@@ -49,7 +47,6 @@ describe("Project Domain Logic", () => {
         pamphletTextMaxLength: 10,
         webContentJson: null,
         openingHours: "",
-        lastEntryTime: "",
         tags: [],
         updatedBy: mockUserId,
       });
@@ -68,7 +65,6 @@ describe("Project Domain Logic", () => {
         pamphletTextMaxLength: 10,
         webContentJson: null,
         openingHours: "",
-        lastEntryTime: "",
         tags: [],
         updatedBy: mockUserId,
       });
@@ -88,7 +84,6 @@ describe("Project Domain Logic", () => {
         pamphletTextMaxLength: 10,
         webContentJson: null,
         openingHours: "10:00-18:00",
-        lastEntryTime: "17:30",
         tags: [],
         publishedBy: mockUserId,
       });
@@ -103,7 +98,6 @@ describe("Project Domain Logic", () => {
         pamphletTextMaxLength: 10,
         webContentJson: null,
         openingHours: "10:00-18:00",
-        lastEntryTime: "17:30",
         tags: [],
         publishedBy: mockUserId,
       });
@@ -143,12 +137,12 @@ describe("Project Domain Logic", () => {
     });
 
     it("fails when required fields are missing", () => {
-      const draft = createMockDraft({ openingHours: "", lastEntryTime: "" });
+      const draft = createMockDraft({ openingHours: "" });
       const result = validateDraftForSubmission(draft, 68);
 
       expect(Result.isFailure(result)).toBe(true);
       if (Result.isFailure(result)) {
-        expect(result.error.message).toBe("開催時間、最終受付時間を入力してから提出してください");
+        expect(result.error.message).toBe("開催時間を入力してから提出してください");
       }
     });
   });
