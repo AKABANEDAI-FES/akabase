@@ -159,7 +159,7 @@ export function EventSettingsForm({ settings, disabled }: EventSettingsFormProps
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
                     placeholder={`例: ${PROJECT_PAMPHLET_TEXT_DEFAULT_MAX_LENGTH}`}
-                    disabled={disabled}
+                    disabled={disabled || isSubmitting}
                   />
                   {!field.state.meta.isValid && (
                     <Field.ErrorText>
