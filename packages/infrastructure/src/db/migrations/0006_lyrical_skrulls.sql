@@ -1,0 +1,1 @@
+ALTER TABLE `event_settings` ADD `pamphlet_text_max_length` integer;

@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "44241cd8-5235-42ba-b6ba-f43348eb4842",
-  "prevId": "c27ba4df-3d60-43da-bfd1-89da90e55424",
+  "id": "8106f333-4fd3-44ea-aae0-93ffd58d97aa",
+  "prevId": "44241cd8-5235-42ba-b6ba-f43348eb4842",
   "tables": {
     "committee_roles": {
       "name": "committee_roles",
@@ -172,6 +172,13 @@
         "web_content_description": {
           "name": "web_content_description",
           "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "pamphlet_text_max_length": {
+          "name": "pamphlet_text_max_length",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false

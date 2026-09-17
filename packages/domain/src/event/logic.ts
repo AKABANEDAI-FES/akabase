@@ -5,12 +5,13 @@ import type {
   DeadlineId,
   Event,
   EventId,
+  EventSettings,
   Place,
   PlaceId,
   Tag,
   TagId,
 } from "./schema";
-import { deadlineSchema, eventSchema, placeSchema, tagSchema } from "./schema";
+import { deadlineSchema, eventSchema, eventSettingsSchema, placeSchema, tagSchema } from "./schema";
 import type { EventError } from "./errors";
 import { EVENT_ERROR_CODE, eventError } from "./errors";
 import { DOMAIN_ERROR_CODE } from "../shared/errors";
@@ -304,4 +305,63 @@ export function getBlockedFieldKeys(deadlines: Deadline[], now: Date): Set<strin
     }
   }
   return keys;
+}
+
+/**
+ * =============================================================================
+ * Event Settings Management Functions (Pure Functions)
+ * =============================================================================
+ */
+
+/**
+ * Create a new event settings entity
+ */
+export function createEventSettingsEntity(input: {
+  eventId: EventId;
+  webContentDescription: string | null;
+  pamphletTextMaxLength: number | null;
+  now?: Date;
+}): Result.Result<EventSettings, EventError> {
+  const now = input.now ?? new Date();
+
+  const data = {
+    eventId: input.eventId,
+    // Whitespace-only descriptions are normalized to null (= not configured)
+    webContentDescription: input.webContentDescription?.trim() || null,
+    pamphletTextMaxLength: input.pamphletTextMaxLength,
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  return Result.try({
+    try: () => eventSettingsSchema.parse(data),
+    catch: () =>
+      eventError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "イベント詳細設定の保存に失敗しました"),
+  });
+}
+
+/**
+ * Update event settings entity
+ */
+export function updateEventSettingsEntity(
+  settings: EventSettings,
+  input: {
+    webContentDescription: string | null;
+    pamphletTextMaxLength: number | null;
+    now?: Date;
+  },
+): Result.Result<EventSettings, EventError> {
+  const data = {
+    ...settings,
+    // Whitespace-only descriptions are normalized to null (= not configured)
+    webContentDescription: input.webContentDescription?.trim() || null,
+    pamphletTextMaxLength: input.pamphletTextMaxLength,
+    updatedAt: input.now ?? new Date(),
+  };
+
+  return Result.try({
+    try: () => eventSettingsSchema.parse(data),
+    catch: () =>
+      eventError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "イベント詳細設定の保存に失敗しました"),
+  });
 }
