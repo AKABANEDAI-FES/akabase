@@ -258,7 +258,7 @@ function ProjectEditPage() {
                     <Field.HelperText>
                       {isBlocked && deadlineMsg
                         ? deadlineMsg
-                        : `残り: ${pamphletTextMaxLength - field.state.value.length}文字`}
+                        : `残り: ${pamphletTextMaxLength - field.state.value.trim().length}文字`}
                     </Field.HelperText>
                   </Field.Root>
                 );

@@ -60,6 +60,24 @@ describe("Project Domain Logic", () => {
         expect(result.error.message).toBe("パンフレットテキストは10文字以内で入力してください");
       }
     });
+
+    it("validates pamphletText length after trimming and saves the trimmed value", () => {
+      const result = updateProjectDraftEntity({
+        projectId: mockProjectId,
+        pamphletText: `  ${"あ".repeat(10)}  `,
+        pamphletTextMaxLength: 10,
+        webContentJson: null,
+        openingHours: "",
+        lastEntryTime: "",
+        tags: [],
+        updatedBy: mockUserId,
+      });
+
+      expect(Result.isSuccess(result)).toBe(true);
+      if (Result.isSuccess(result)) {
+        expect(result.value.pamphletText).toBe("あ".repeat(10));
+      }
+    });
   });
 
   describe("updatePublishedEntity", () => {
@@ -115,6 +133,13 @@ describe("Project Domain Logic", () => {
         expect(result.error.code).toBe("VALIDATION_ERROR");
         expect(result.error.message).toBe("パンフレットテキストは10文字以内で入力してください");
       }
+    });
+
+    it("succeeds when pamphletText is within the max length after trimming", () => {
+      const draft = createMockDraft({ pamphletText: `  ${"あ".repeat(10)}  ` });
+      const result = validateDraftForSubmission(draft, 10);
+
+      expect(Result.isSuccess(result)).toBe(true);
     });
 
     it("fails when required fields are missing", () => {

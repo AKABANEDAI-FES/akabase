@@ -179,7 +179,7 @@ export function ProjectPublishedDataForm({
                 </Field.ErrorText>
               )}
               <Field.HelperText>
-                残り: {pamphletTextMaxLength - field.state.value.length}文字
+                残り: {pamphletTextMaxLength - field.state.value.trim().length}文字
               </Field.HelperText>
             </Field.Root>
           )}

@@ -46,9 +46,14 @@ export function pamphletTextMaxLengthMessage(maxLength: number): string {
 
 /**
  * Generate the pamphlet text validation schema for a per-event max length
+ *
+ * Leading/trailing whitespace is trimmed before applying the max length,
+ * matching the server-side behavior of updateProjectDraftEntity / updatePublishedEntity.
  */
 export function pamphletTextSchema(maxLength: number) {
-  return z.string().max(maxLength, pamphletTextMaxLengthMessage(maxLength));
+  return z
+    .string()
+    .refine((value) => value.trim().length <= maxLength, pamphletTextMaxLengthMessage(maxLength));
 }
 
 /**

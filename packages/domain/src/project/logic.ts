@@ -135,6 +135,7 @@ export function createProjectDraftEntity(input: {
  * Business rules:
  * - Draft must exist before updating
  * - All fields can be updated except projectId
+ * - pamphletText is trimmed before validation and saving
  * - pamphletText max length is per-event (event settings)
  */
 export function updateProjectDraftEntity(input: {
@@ -148,7 +149,7 @@ export function updateProjectDraftEntity(input: {
   updatedBy: UserId;
   now?: Date;
 }): Result.Result<DraftWithTags, ProjectError> {
-  if (input.pamphletText.length > input.pamphletTextMaxLength) {
+  if (input.pamphletText.trim().length > input.pamphletTextMaxLength) {
     return Result.fail(
       projectError(
         DOMAIN_ERROR_CODE.VALIDATION_ERROR,
@@ -160,7 +161,7 @@ export function updateProjectDraftEntity(input: {
   const now = input.now ?? new Date();
   const data = {
     projectId: input.projectId,
-    pamphletText: input.pamphletText,
+    pamphletText: input.pamphletText.trim(),
     webContentJson: input.webContentJson,
     openingHours: input.openingHours.trim(),
     lastEntryTime: input.lastEntryTime.trim(),
@@ -470,7 +471,7 @@ export function validateDraftForSubmission(
     );
   }
 
-  if (draft.pamphletText.length > pamphletTextMaxLength) {
+  if (draft.pamphletText.trim().length > pamphletTextMaxLength) {
     return Result.fail(
       projectError(
         DOMAIN_ERROR_CODE.VALIDATION_ERROR,
