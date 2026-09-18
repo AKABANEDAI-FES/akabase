@@ -8,9 +8,7 @@ type ExportSettingsPanelProps = {
   columns: { id: string; header: string }[];
   selectedIds: string[];
   onSelectedIdsChange: (ids: string[]) => void;
-  /** Shown right above the download buttons */
   summary: string;
-  /** Download buttons */
   children: ReactNode;
 };
 

@@ -66,15 +66,10 @@ function getLeafNodeIds(node: PlaceTreeNode): string[] {
 type ExportColumn = {
   id: string;
   header: string;
-  /** Cell value for CSV and Excel */
   text: (item: EventPublishedDataItem) => string;
-  /** Value for JSON. Defaults to `text` */
   json?: (item: EventPublishedDataItem) => unknown;
-  /** Key for JSON. Defaults to `id` */
   jsonKey?: string;
-  /** Cell content for the table. Defaults to `text`, or "—" when empty */
   cell?: (item: EventPublishedDataItem) => ReactNode;
-  /** Image columns are embedded as pictures in Excel and placed last in exported files */
   imageUrl?: (item: EventPublishedDataItem) => string | null;
 };
 
