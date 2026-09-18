@@ -73,16 +73,11 @@ type ExportColumn = {
   imageUrl?: (item: EventPublishedDataItem) => string | null;
 };
 
-function toAbsoluteUrl(path: string): string {
-  return `${globalThis.window.location.origin}${path}`;
-}
-
 const exportColumns: ExportColumn[] = [
   {
     id: "logoUrl",
     header: "ロゴ",
-    text: (item) => (item.logoUrl ? toAbsoluteUrl(item.logoUrl) : ""),
-    json: (item) => (item.logoUrl ? toAbsoluteUrl(item.logoUrl) : null),
+    text: (item) => item.logoUrl ?? "",
     cell: (item) =>
       item.logoUrl ? (
         <img src={item.logoUrl} alt="" width={256} height={256} style={{ objectFit: "contain" }} />
@@ -137,8 +132,20 @@ function jsonKeyOf(col: ExportColumn): string {
   return col.jsonKey ?? col.id;
 }
 
+function toAbsoluteUrl(path: string): string {
+  return `${globalThis.window.location.origin}${path}`;
+}
+
+function imageFileUrlOf(col: ExportColumn, item: EventPublishedDataItem): string | null {
+  const url = col.imageUrl?.(item);
+  return url ? toAbsoluteUrl(url) : null;
+}
+
 function jsonValueOf(col: ExportColumn, item: EventPublishedDataItem): unknown {
-  return col.json ? col.json(item) : col.text(item);
+  if (col.json) {
+    return col.json(item);
+  }
+  return col.imageUrl ? imageFileUrlOf(col, item) : col.text(item);
 }
 
 function cellOf(col: ExportColumn, item: EventPublishedDataItem): ReactNode {
@@ -247,11 +254,15 @@ function csvHeaderOf(col: ExportColumn): string {
   return col.imageUrl ? `${col.header}URL` : col.header;
 }
 
+function csvValueOf(col: ExportColumn, item: EventPublishedDataItem): string {
+  return col.imageUrl ? (imageFileUrlOf(col, item) ?? "") : col.text(item);
+}
+
 function toCSV(data: EventPublishedDataItem[], columns: ExportColumn[]): string {
   const fileColumns = toFileColumns(columns);
   return stringify(
     data.map((item) =>
-      Object.fromEntries(fileColumns.map((col) => [csvHeaderOf(col), col.text(item)])),
+      Object.fromEntries(fileColumns.map((col) => [csvHeaderOf(col), csvValueOf(col, item)])),
     ),
     { columns: fileColumns.map(csvHeaderOf) },
   );
