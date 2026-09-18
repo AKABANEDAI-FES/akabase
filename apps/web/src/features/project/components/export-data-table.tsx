@@ -552,7 +552,7 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
           size="sm"
           variant="outline"
           loading={pendingFormat === "CSV"}
-          disabled={!canDownload}
+          disabled={!canDownload || pendingFormat !== null}
           onClick={() =>
             downloadText("CSV", "csv", "text/csv", (items) => toCSV(items, selectedColumns))
           }
@@ -564,7 +564,7 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
           size="sm"
           variant="outline"
           loading={pendingFormat === "Excel"}
-          disabled={!canDownload}
+          disabled={!canDownload || pendingFormat !== null}
           onClick={downloadExcel}
         >
           <SheetIcon />
@@ -574,7 +574,7 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
           size="sm"
           variant="outline"
           loading={pendingFormat === "JSON"}
-          disabled={!canDownload}
+          disabled={!canDownload || pendingFormat !== null}
           onClick={() =>
             downloadText("JSON", "json", "application/json", (items) =>
               toJSON(items, selectedColumns),
