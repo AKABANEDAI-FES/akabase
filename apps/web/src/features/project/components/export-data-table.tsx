@@ -9,7 +9,7 @@ import {
   getFilteredRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import type { ColumnFiltersState, FilterFn } from "@tanstack/react-table";
+import type { ColumnFiltersState, FilterFn, VisibilityState } from "@tanstack/react-table";
 import { Portal } from "@ark-ui/react/portal";
 import { BracesIcon, ListFilterIcon, SheetIcon, TableIcon } from "lucide-react";
 import { Box, Flex, Grid, Stack } from "@akabase/styled-system/jsx";
@@ -432,10 +432,16 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
     [selectedColumnIds],
   );
 
+  const columnVisibility: VisibilityState = useMemo(
+    () =>
+      Object.fromEntries(exportColumns.map((col) => [col.id, selectedColumnIds.includes(col.id)])),
+    [selectedColumnIds],
+  );
+
   const table = useReactTable({
     data,
     columns,
-    state: { columnFilters },
+    state: { columnFilters, columnVisibility },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
   });
@@ -495,43 +501,47 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
       alignItems="start"
     >
       <Stack gap="4">
-        <Box overflowX="auto">
-          <Table.Root>
-            <Table.Head>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <Table.Row key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <Table.Header key={header.id}>
-                      {header.isPlaceholder ? null : header.column.id === "placeId" ? (
-                        <Flex align="center" gap="1">
-                          場所
-                          <PlaceFilterPopover
-                            places={places}
-                            selectedPlaceIds={selectedPlaceIds}
-                            onToggleNode={toggleNode}
-                          />
-                        </Flex>
-                      ) : (
-                        flexRender(header.column.columnDef.header, header.getContext())
-                      )}
-                    </Table.Header>
-                  ))}
-                </Table.Row>
-              ))}
-            </Table.Head>
-            <Table.Body>
-              {table.getRowModel().rows.map((row) => (
-                <Table.Row key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <Table.Cell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </Table.Cell>
-                  ))}
-                </Table.Row>
-              ))}
-            </Table.Body>
-          </Table.Root>
-        </Box>
+        {selectedColumns.length === 0 ? (
+          <Text color="fg.muted">出力する列が選択されていません。</Text>
+        ) : (
+          <Box overflowX="auto">
+            <Table.Root>
+              <Table.Head>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <Table.Row key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <Table.Header key={header.id}>
+                        {header.isPlaceholder ? null : header.column.id === "placeId" ? (
+                          <Flex align="center" gap="1">
+                            場所
+                            <PlaceFilterPopover
+                              places={places}
+                              selectedPlaceIds={selectedPlaceIds}
+                              onToggleNode={toggleNode}
+                            />
+                          </Flex>
+                        ) : (
+                          flexRender(header.column.columnDef.header, header.getContext())
+                        )}
+                      </Table.Header>
+                    ))}
+                  </Table.Row>
+                ))}
+              </Table.Head>
+              <Table.Body>
+                {table.getRowModel().rows.map((row) => (
+                  <Table.Row key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <Table.Cell key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </Table.Cell>
+                    ))}
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table.Root>
+          </Box>
+        )}
 
         <Text textStyle="sm" color="fg.muted">
           {selectedPlaceIds.size > 0
