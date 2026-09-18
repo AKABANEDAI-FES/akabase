@@ -1,3 +1,4 @@
+import { switchRecipe } from "./switch";
 import { numberInput } from "./number-input";
 import { slider } from "./slider";
 import { skeleton } from "./skeleton";
@@ -69,5 +70,6 @@ export const recipes = {
   skeleton,
   slider,
   numberInput,
+  switchRecipe,
 };
 export const slotRecipes = {};
