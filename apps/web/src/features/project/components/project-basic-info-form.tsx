@@ -196,6 +196,7 @@ export function ProjectBasicInfoForm({ projectId, eventId, orgId }: ProjectBasic
                     <Select.ValueText placeholder="企画区分を選択" />
                     <Select.Indicator />
                   </Select.Trigger>
+                  <Select.ClearTrigger />
                 </Select.Control>
                 <Portal>
                   <Select.Positioner>

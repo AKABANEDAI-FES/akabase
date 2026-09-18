@@ -258,6 +258,7 @@ export function CreateProjectDialog({
                               <Select.ValueText placeholder="企画区分を選択" />
                               <Select.Indicator />
                             </Select.Trigger>
+                            <Select.ClearTrigger />
                           </Select.Control>
                           <Select.Positioner>
                             <Select.Content>
