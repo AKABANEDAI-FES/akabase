@@ -19,6 +19,7 @@ import { IconButton } from "@akabase/ui/components/icon-button";
 import { Popover } from "@akabase/ui/components/popover";
 import { Table } from "@akabase/ui/components/table";
 import { Text } from "@akabase/ui/components/text";
+import { toaster } from "@akabase/ui/components/toast";
 import { generateLoadEventPublishedDataQueryOptions } from "../actions/queries";
 import { generateLoadPlacesQueryOptions } from "@/features/event/actions/queries/place";
 import type { EventPublishedDataItem } from "@akabase/application/query/project/list-event-published-data";
@@ -469,6 +470,13 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
     setIsDownloadingExcel(true);
     try {
       downloadFile(`${slug}-published-data.xlsx`, await toExcel(exportGroups(), selectedColumns));
+    } catch (error) {
+      console.error("Failed to export Excel:", error);
+      toaster.create({
+        type: "error",
+        title: "エラー",
+        description: "Excelファイルの生成に失敗しました",
+      });
     } finally {
       setIsDownloadingExcel(false);
     }
