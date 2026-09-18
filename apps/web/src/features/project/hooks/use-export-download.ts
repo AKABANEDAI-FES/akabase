@@ -1,12 +1,15 @@
 import { useCallback, useState } from "react";
 import { toaster } from "@akabase/ui/components/toast";
 import { downloadFile } from "@/libs/download";
+import { createZip } from "@/libs/zip";
+import type { ZipEntry } from "@/libs/zip";
 
 export type ExportFormat = "CSV" | "JSON" | "Excel";
 
-type BuildFiles = () => Promise<{ name: string; blob: Blob }[]>;
+type BuildFiles = () => Promise<ZipEntry[]>;
 
 export function useExportDownload() {
+  const [zipEnabled, setZipEnabled] = useState(false);
   const [pendingFormat, setPendingFormat] = useState<ExportFormat | null>(null);
 
   const download = useCallback(
@@ -30,5 +33,16 @@ export function useExportDownload() {
     [],
   );
 
-  return { pendingFormat, download };
+  const downloadZippable = useCallback(
+    async (format: ExportFormat, zipName: string, buildFiles: BuildFiles): Promise<void> =>
+      download(format, async () => {
+        const files = await buildFiles();
+        return zipEnabled && files.length > 1
+          ? [{ name: zipName, blob: await createZip(files) }]
+          : files;
+      }),
+    [download, zipEnabled],
+  );
+
+  return { zipEnabled, setZipEnabled, pendingFormat, download, downloadZippable };
 }

@@ -402,7 +402,8 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
     exportColumns.map((col) => col.id),
   );
   const [splitByCategory, setSplitByCategory] = useState(false);
-  const { pendingFormat, download } = useExportDownload();
+  const { zipEnabled, setZipEnabled, pendingFormat, download, downloadZippable } =
+    useExportDownload();
 
   const toggleNode = useCallback((allIds: string[]) => {
     setSelectedPlaceIds((prev) => {
@@ -463,7 +464,7 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
     mimeType: string,
     serialize: (items: EventPublishedDataItem[]) => string,
   ) =>
-    download(format, async () =>
+    downloadZippable(format, `${slug}-published-data-${extension}.zip`, async () =>
       withSafeNames(exportGroups()).map((group) => ({
         name: `${slug}-published-data${splitByCategory ? `-${group.safeName}` : ""}.${extension}`,
         blob: new Blob([serialize(group.items)], { type: mimeType }),
@@ -543,6 +544,8 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
         onSelectedIdsChange={setSelectedColumnIds}
         splitByCategory={splitByCategory}
         onSplitByCategoryChange={setSplitByCategory}
+        zipEnabled={zipEnabled}
+        onZipEnabledChange={setZipEnabled}
         summary={summary}
       >
         <Button
