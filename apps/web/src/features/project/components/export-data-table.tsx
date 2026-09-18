@@ -10,7 +10,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import type { ColumnFiltersState, FilterFn } from "@tanstack/react-table";
-import { DownloadTrigger } from "@ark-ui/react/download-trigger";
 import { Portal } from "@ark-ui/react/portal";
 import { BracesIcon, ListFilterIcon, SheetIcon, TableIcon } from "lucide-react";
 import { Box, Flex, Grid, Stack } from "@akabase/styled-system/jsx";
@@ -25,6 +24,7 @@ import { generateLoadPlacesQueryOptions } from "@/features/event/actions/queries
 import type { EventPublishedDataItem } from "@akabase/application/query/project/list-event-published-data";
 import type { PlaceListItem } from "@akabase/application/query/event/list-places";
 import type { EventId } from "@akabase/domain/event/schema";
+import { downloadFile } from "@/libs/download";
 import { createImageObject, processImage } from "@/libs/image";
 import { ExportSettingsPanel } from "./export-settings-panel";
 
@@ -487,39 +487,48 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
         onSelectedIdsChange={setSelectedColumnIds}
         summary={`${selectedColumns.length} / ${exportColumns.length} 列 · ${filteredData.length} 件`}
       >
-        <DownloadTrigger
-          data={() => toCSV(filteredData, selectedColumns)}
-          fileName={`${slug}-published-data.csv`}
-          mimeType="text/csv"
-          asChild
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={!canDownload}
+          onClick={() =>
+            downloadFile(
+              `${slug}-published-data.csv`,
+              new Blob([toCSV(filteredData, selectedColumns)], { type: "text/csv" }),
+            )
+          }
         >
-          <Button size="sm" variant="outline" disabled={!canDownload}>
-            <TableIcon />
-            CSV
-          </Button>
-        </DownloadTrigger>
-        <DownloadTrigger
-          data={() => toExcel(filteredData, selectedColumns)}
-          fileName={`${slug}-published-data.xlsx`}
-          mimeType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-          asChild
+          <TableIcon />
+          CSV
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={!canDownload}
+          onClick={async () =>
+            downloadFile(
+              `${slug}-published-data.xlsx`,
+              await toExcel(filteredData, selectedColumns),
+            )
+          }
         >
-          <Button size="sm" variant="outline" disabled={!canDownload}>
-            <SheetIcon />
-            Excel
-          </Button>
-        </DownloadTrigger>
-        <DownloadTrigger
-          data={() => toJSON(filteredData, selectedColumns)}
-          fileName={`${slug}-published-data.json`}
-          mimeType="application/json"
-          asChild
+          <SheetIcon />
+          Excel
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={!canDownload}
+          onClick={() =>
+            downloadFile(
+              `${slug}-published-data.json`,
+              new Blob([toJSON(filteredData, selectedColumns)], { type: "application/json" }),
+            )
+          }
         >
-          <Button size="sm" variant="outline" disabled={!canDownload}>
-            <BracesIcon />
-            JSON
-          </Button>
-        </DownloadTrigger>
+          <BracesIcon />
+          JSON
+        </Button>
       </ExportSettingsPanel>
     </Grid>
   );
