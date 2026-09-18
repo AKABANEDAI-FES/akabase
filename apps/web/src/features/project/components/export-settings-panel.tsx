@@ -11,6 +11,8 @@ type ExportSettingsPanelProps = {
   onSelectedIdsChange: (ids: string[]) => void;
   splitByCategory: boolean;
   onSplitByCategoryChange: (split: boolean) => void;
+  zipEnabled: boolean;
+  onZipEnabledChange: (enabled: boolean) => void;
   summary: string;
   children: ReactNode;
 };
@@ -21,6 +23,8 @@ export function ExportSettingsPanel({
   onSelectedIdsChange,
   splitByCategory,
   onSplitByCategoryChange,
+  zipEnabled,
+  onZipEnabledChange,
   summary,
   children,
 }: ExportSettingsPanelProps) {
@@ -45,15 +49,28 @@ export function ExportSettingsPanel({
             </Stack>
           </Checkbox.Group>
 
-          <Switch.Root
-            checked={splitByCategory}
-            onCheckedChange={(details) => onSplitByCategoryChange(details.checked)}
-            size="sm"
-          >
-            <Switch.HiddenInput />
-            <Switch.Control />
-            <Switch.Label>企画区分ごとに分割する</Switch.Label>
-          </Switch.Root>
+          <Stack gap="3">
+            <Switch.Root
+              checked={splitByCategory}
+              onCheckedChange={(details) => onSplitByCategoryChange(details.checked)}
+              size="sm"
+            >
+              <Switch.HiddenInput />
+              <Switch.Control />
+              <Switch.Label>企画区分ごとに分割する</Switch.Label>
+            </Switch.Root>
+
+            <Switch.Root
+              checked={zipEnabled}
+              onCheckedChange={(details) => onZipEnabledChange(details.checked)}
+              disabled={!splitByCategory}
+              size="sm"
+            >
+              <Switch.HiddenInput />
+              <Switch.Control />
+              <Switch.Label>ZIP にまとめる (CSV, JSON)</Switch.Label>
+            </Switch.Root>
+          </Stack>
 
           <Stack gap="2">
             <Text textStyle="sm" color="fg.muted">

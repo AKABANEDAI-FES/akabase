@@ -51,6 +51,7 @@
     "@tiptap/static-renderer": "catalog:frontend",
     "better-auth": "catalog:backend",
     "es-toolkit": "catalog:",
+    "fflate": "catalog:frontend",
     "hono": "catalog:backend",
     "hono-openapi": "catalog:backend",
     "lucide-react": "catalog:frontend",
