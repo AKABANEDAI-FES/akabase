@@ -109,6 +109,25 @@ describe("updateProjectCategory", () => {
     }
   });
 
+  it("前後の空白を除いた名前が他の企画区分と重複する場合は変更できない", async () => {
+    const actor = createAdminActor();
+    const eventId = await createActiveEvent();
+    await createTestCategory(eventId, "WELLB教室企画");
+    const categoryId = await createTestCategory(eventId, "WELLB模擬店");
+
+    const result = await updateProjectCategory(deps, {
+      categoryId,
+      eventId,
+      name: "  WELLB教室企画  ",
+      actor,
+    });
+
+    expect(Result.isFailure(result)).toBe(true);
+    if (Result.isFailure(result)) {
+      expect(result.error.code).toBe("PROJECT_CATEGORY_NOT_UNIQUE");
+    }
+  });
+
   it("同じ名前のまま更新できる", async () => {
     const actor = createAdminActor();
     const eventId = await createActiveEvent();

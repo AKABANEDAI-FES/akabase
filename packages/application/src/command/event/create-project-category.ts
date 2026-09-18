@@ -42,9 +42,9 @@ export async function createProjectCategory(
 
     yield* $(await deps.eventDomainService.resolveModifiableEvent(input.eventId));
 
-    yield* $(
-      await deps.eventDomainService.ensureProjectCategoryNameUnique(input.eventId, input.name),
-    );
+    const name = input.name.trim();
+
+    yield* $(await deps.eventDomainService.ensureProjectCategoryNameUnique(input.eventId, name));
 
     const maxDisplayOrder = await deps.eventRepo.getMaxProjectCategoryDisplayOrder(input.eventId);
 
@@ -53,7 +53,7 @@ export async function createProjectCategory(
       createProjectCategoryEntity({
         id: categoryId,
         eventId: input.eventId,
-        name: input.name,
+        name,
         displayOrder: maxDisplayOrder + 1,
       }),
     );

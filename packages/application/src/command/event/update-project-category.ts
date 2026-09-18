@@ -54,17 +54,17 @@ export async function updateProjectCategory(
       );
     }
 
+    const name = input.name.trim();
+
     yield* $(
       await deps.eventDomainService.ensureProjectCategoryNameUnique(
         input.eventId,
-        input.name,
+        name,
         input.categoryId,
       ),
     );
 
-    const updatedCategory = yield* $(
-      updateProjectCategoryEntity(existingCategory, { name: input.name }),
-    );
+    const updatedCategory = yield* $(updateProjectCategoryEntity(existingCategory, { name }));
 
     await deps.eventRepo.saveProjectCategory(updatedCategory);
 

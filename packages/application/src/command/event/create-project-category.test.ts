@@ -87,6 +87,29 @@ describe("createProjectCategory", () => {
     }
   });
 
+  it("前後の空白を除いた名前が既存と重複する場合は作成できない", async () => {
+    const actor = createAdminActor();
+    const eventId = await createActiveEvent();
+
+    const firstResult = await createProjectCategory(deps, {
+      eventId,
+      name: "WELLB模擬店",
+      actor,
+    });
+    expect(Result.isSuccess(firstResult)).toBe(true);
+
+    const secondResult = await createProjectCategory(deps, {
+      eventId,
+      name: "  WELLB模擬店  ",
+      actor,
+    });
+
+    expect(Result.isFailure(secondResult)).toBe(true);
+    if (Result.isFailure(secondResult)) {
+      expect(secondResult.error.code).toBe("PROJECT_CATEGORY_NOT_UNIQUE");
+    }
+  });
+
   it("別のイベントであれば同名の企画区分を作成できる", async () => {
     const actor = createAdminActor();
     const eventId = await createActiveEvent();
