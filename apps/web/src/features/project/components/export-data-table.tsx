@@ -401,6 +401,7 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
     exportColumns.map((col) => col.id),
   );
   const [splitByCategory, setSplitByCategory] = useState(false);
+  const [isDownloadingExcel, setIsDownloadingExcel] = useState(false);
 
   const toggleNode = useCallback((allIds: string[]) => {
     setSelectedPlaceIds((prev) => {
@@ -461,6 +462,15 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
         `${slug}-published-data${suffix}.${extension}`,
         new Blob([serialize(group.items)], { type: mimeType }),
       );
+    }
+  };
+
+  const downloadExcel = async () => {
+    setIsDownloadingExcel(true);
+    try {
+      downloadFile(`${slug}-published-data.xlsx`, await toExcel(exportGroups(), selectedColumns));
+    } finally {
+      setIsDownloadingExcel(false);
     }
   };
 
@@ -544,13 +554,9 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
         <Button
           size="sm"
           variant="outline"
+          loading={isDownloadingExcel}
           disabled={!canDownload}
-          onClick={async () =>
-            downloadFile(
-              `${slug}-published-data.xlsx`,
-              await toExcel(exportGroups(), selectedColumns),
-            )
-          }
+          onClick={downloadExcel}
         >
           <SheetIcon />
           Excel
