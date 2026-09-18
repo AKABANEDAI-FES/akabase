@@ -4,7 +4,7 @@ import { Result } from "@akabase/result";
 import { schema } from "@akabase/infrastructure/db";
 import type { Database } from "@akabase/infrastructure/db";
 import type { EventId } from "@akabase/domain/event/schema";
-import { placeIdSchema } from "@akabase/domain/event/schema";
+import { placeIdSchema, projectCategoryIdSchema } from "@akabase/domain/event/schema";
 import { projectIdSchema } from "@akabase/domain/project/schema";
 import type { Actor } from "@akabase/domain/authorization/schema";
 import { eventResource } from "@akabase/domain/authorization/logic";
@@ -20,6 +20,10 @@ export const eventPublishedDataItemSchema = z.object({
   openingHours: z.string(),
   placeId: placeIdSchema.nullable(),
   placeName: z.string().nullable(),
+  categoryId: projectCategoryIdSchema.nullable(),
+  categoryName: z.string().nullable(),
+  categoryDisplayOrder: z.number().int().nullable(),
+  contestVoteNumber: z.string().nullable(),
   logoUrl: z.string().nullable(),
   tags: z.array(z.string()),
 });
@@ -50,6 +54,9 @@ export async function listEventPublishedData(
         place: {
           columns: { name: true },
         },
+        category: {
+          columns: { name: true, displayOrder: true },
+        },
         logoImage: {
           columns: { objectKey: true },
         },
@@ -78,6 +85,10 @@ export async function listEventPublishedData(
           openingHours: row.published.openingHours,
           placeId: row.placeId,
           placeName: row.place?.name ?? null,
+          categoryId: row.categoryId,
+          categoryName: row.category?.name ?? null,
+          categoryDisplayOrder: row.category?.displayOrder ?? null,
+          contestVoteNumber: row.contestVoteNumber,
           logoUrl: row.logoImage ? deps.imageRepo.getPublicUrl(row.logoImage.objectKey) : null,
           tags: row.published.tags
             .toSorted((a, b) => a.tag.displayOrder - b.tag.displayOrder)
