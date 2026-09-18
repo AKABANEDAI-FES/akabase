@@ -31,6 +31,7 @@ import {
   generateLoadSubmissionDetailCacheKey,
   generateLoadSubmissionsCacheKey,
 } from "../queries";
+import { generateLoadProjectCategoriesCacheKey } from "@/features/event/actions/queries/project-category";
 import { z } from "zod";
 
 /**
@@ -41,6 +42,7 @@ export const createProjectInputSchema = projectSchema.pick({
   orgId: true,
   name: true,
   placeId: true,
+  categoryId: true,
   logoImageId: true,
   contestVoteNumber: true,
 });
@@ -65,6 +67,7 @@ export const createProjectFn = createServerFn({ method: "POST" })
             orgId: data.orgId,
             name: data.name,
             placeId: data.placeId,
+            categoryId: data.categoryId,
             logoImageId: data.logoImageId,
             contestVoteNumber: data.contestVoteNumber,
             actor,
@@ -82,9 +85,14 @@ export function useCreateProjectMutationOption() {
   return mutationOptions({
     mutationFn: createProjectFn,
     onSuccess: Result.inspect(async ({ orgId, eventId }) => {
-      await queryClient.invalidateQueries({
-        queryKey: generateLoadProjectsCacheKey(eventId, orgId),
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: generateLoadProjectsCacheKey(eventId, orgId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadProjectCategoriesCacheKey(eventId),
+        }),
+      ]);
     }),
   });
 }
@@ -368,6 +376,7 @@ export const updateProjectInputSchema = z.object({
   orgId: projectSchema.shape.orgId,
   name: projectSchema.shape.name,
   placeId: projectSchema.shape.placeId,
+  categoryId: projectSchema.shape.categoryId,
   logoImageId: projectSchema.shape.logoImageId,
   contestVoteNumber: projectSchema.shape.contestVoteNumber,
 });
@@ -400,6 +409,9 @@ export function useUpdateProjectMutationOption() {
         }),
         queryClient.invalidateQueries({
           queryKey: generateLoadProjectDetailCacheKey(eventId, orgId, projectId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadProjectCategoriesCacheKey(eventId),
         }),
       ]);
     }),

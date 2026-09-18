@@ -56,6 +56,29 @@ export const tags = sqliteTable(
 );
 
 /**
+ * ProjectCategory (企画区分マスタ)
+ * イベント単位で管理
+ */
+export const projectCategories = sqliteTable(
+  "project_categories",
+  {
+    id: text("id").primaryKey(),
+    eventId: text("event_id")
+      .notNull()
+      .references(() => events.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    displayOrder: integer("display_order").notNull().default(0),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+  },
+  (table) => [
+    index("project_categories_event_id_idx").on(table.eventId),
+    unique("project_categories_event_name_unique").on(table.eventId, table.name),
+  ],
+);
+
+/**
  * Place (場所マスタ)
  * イベント単位で管理、階層構造（自己参照）
  */
@@ -255,6 +278,7 @@ export const projects = sqliteTable(
       .references(() => organizations.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     placeId: text("place_id").references(() => places.id),
+    categoryId: text("category_id").references(() => projectCategories.id),
     logoImageId: text("logo_image_id").references(() => images.id, {
       onDelete: "set null",
     }),
@@ -270,6 +294,7 @@ export const projects = sqliteTable(
   (table) => [
     index("projects_event_id_idx").on(table.eventId),
     index("projects_org_id_idx").on(table.orgId),
+    index("projects_category_id_idx").on(table.categoryId),
     unique("projects_event_vote_number_unique").on(table.eventId, table.contestVoteNumber),
   ],
 );
@@ -475,6 +500,7 @@ export const submissionMessages = sqliteTable(
 
 export const eventsRelations = relations(events, ({ one, many }) => ({
   tags: many(tags),
+  projectCategories: many(projectCategories),
   places: many(places),
   deadlines: many(deadlines),
   settings: one(eventSettings),
@@ -490,6 +516,14 @@ export const tagsRelations = relations(tags, ({ one, many }) => ({
   draftTags: many(projectDraftTags),
   submissionTags: many(projectSubmissionTags),
   publishedTags: many(projectPublishedTags),
+}));
+
+export const projectCategoriesRelations = relations(projectCategories, ({ one, many }) => ({
+  event: one(events, {
+    fields: [projectCategories.eventId],
+    references: [events.id],
+  }),
+  projects: many(projects),
 }));
 
 export const placesRelations = relations(places, ({ one, many }) => ({
@@ -575,6 +609,10 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
   place: one(places, {
     fields: [projects.placeId],
     references: [places.id],
+  }),
+  category: one(projectCategories, {
+    fields: [projects.categoryId],
+    references: [projectCategories.id],
   }),
   logoImage: one(images, {
     fields: [projects.logoImageId],
@@ -700,6 +738,9 @@ export const selectEventSchema = createSelectSchema(events);
 export const insertTagSchema = createInsertSchema(tags);
 export const selectTagSchema = createSelectSchema(tags);
 
+export const insertProjectCategorySchema = createInsertSchema(projectCategories);
+export const selectProjectCategorySchema = createSelectSchema(projectCategories);
+
 export const insertPlaceSchema = createInsertSchema(places);
 export const selectPlaceSchema = createSelectSchema(places);
 
@@ -761,6 +802,9 @@ export type SelectEvent = z.infer<typeof selectEventSchema>;
 
 export type InsertTag = z.infer<typeof insertTagSchema>;
 export type SelectTag = z.infer<typeof selectTagSchema>;
+
+export type InsertProjectCategory = z.infer<typeof insertProjectCategorySchema>;
+export type SelectProjectCategory = z.infer<typeof selectProjectCategorySchema>;
 
 export type InsertPlace = z.infer<typeof insertPlaceSchema>;
 export type SelectPlace = z.infer<typeof selectPlaceSchema>;

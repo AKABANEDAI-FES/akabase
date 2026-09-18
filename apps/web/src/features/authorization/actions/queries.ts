@@ -86,6 +86,7 @@ export const checkCommitteePermissionsFn = createServerFn({ method: "GET" })
       canManageEventSettings: check(eventRes, "event:update"),
       canManagePlaces: check(eventRes, "event:update"),
       canManageTags: check(eventRes, "event:update"),
+      canManageProjectCategories: check(eventRes, "event:update"),
       canCreateProject: check(projectRes, "project:create"),
       canUpdateProject: check(projectRes, "project:update"),
       canApproveProject: check(projectRes, "project:approve"),

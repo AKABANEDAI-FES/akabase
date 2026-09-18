@@ -4,7 +4,7 @@ import { Container, Flex, Stack } from "@akabase/styled-system/jsx";
 import { Button } from "@akabase/ui/components/button";
 import { Heading } from "@akabase/ui/components/heading";
 import { Text } from "@akabase/ui/components/text";
-import { ArrowLeftIcon, EditIcon, HistoryIcon, MapPinIcon } from "lucide-react";
+import { ArrowLeftIcon, EditIcon, HistoryIcon, MapPinIcon, ShapesIcon } from "lucide-react";
 import {
   generateLoadProjectDetailQueryOptions,
   generateLoadProjectPublishedQueryOptions,
@@ -66,6 +66,12 @@ function ProjectDetailPage() {
                 <Flex align="center" gap="1" color="fg.muted">
                   <MapPinIcon size={16} />
                   <Text textStyle="sm">{project.placeName}</Text>
+                </Flex>
+              )}
+              {project.categoryName && (
+                <Flex align="center" gap="1" color="fg.muted">
+                  <ShapesIcon size={16} />
+                  <Text textStyle="sm">{project.categoryName}</Text>
                 </Flex>
               )}
             </Stack>

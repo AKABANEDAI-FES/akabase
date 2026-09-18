@@ -46,6 +46,20 @@ const editTagModalMask = createRouteMask({
   params: (prev) => ({ slug: prev.slug, tagId: prev.tagId }),
 });
 
+const createProjectCategoryModalMask = createRouteMask({
+  routeTree,
+  from: "/$slug/committee/project-categories/new",
+  to: "/$slug/committee/project-categories",
+  params: (prev) => ({ slug: prev.slug }),
+});
+
+const editProjectCategoryModalMask = createRouteMask({
+  routeTree,
+  from: "/$slug/committee/project-categories/$categoryId/edit",
+  to: "/$slug/committee/project-categories",
+  params: (prev) => ({ slug: prev.slug, categoryId: prev.categoryId }),
+});
+
 const createPlaceModalMask = createRouteMask({
   routeTree,
   from: "/$slug/committee/places/new",
@@ -113,6 +127,8 @@ export const getRouter = () => {
       createOrganizationModalMask,
       createTagModalMask,
       editTagModalMask,
+      createProjectCategoryModalMask,
+      editProjectCategoryModalMask,
       createPlaceModalMask,
       editPlaceModalMask,
       createDeadlineModalMask,

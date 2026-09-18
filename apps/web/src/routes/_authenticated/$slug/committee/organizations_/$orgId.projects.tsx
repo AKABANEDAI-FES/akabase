@@ -48,6 +48,7 @@ function ProjectsPage() {
             <Table.Row>
               <Table.Header>企画名</Table.Header>
               <Table.Header>開催場所</Table.Header>
+              <Table.Header>企画区分</Table.Header>
               <Table.Header>作成日</Table.Header>
               {canUpdate && <Table.Header>操作</Table.Header>}
             </Table.Row>
@@ -57,6 +58,7 @@ function ProjectsPage() {
               <Table.Row key={project.id}>
                 <Table.Cell fontWeight="medium">{project.name}</Table.Cell>
                 <Table.Cell>{project.placeName || "—"}</Table.Cell>
+                <Table.Cell>{project.categoryName || "—"}</Table.Cell>
                 <Table.Cell>
                   <FormatDate value={project.createdAt} option={{ dateStyle: "medium" }} />
                 </Table.Cell>

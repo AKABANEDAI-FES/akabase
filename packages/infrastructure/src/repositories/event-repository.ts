@@ -7,6 +7,7 @@ import {
   eventSchema,
   eventSettingsSchema,
   placeSchema,
+  projectCategorySchema,
   tagSchema,
 } from "@akabase/domain/event/schema";
 import type {
@@ -17,6 +18,8 @@ import type {
   EventSettings,
   Place,
   PlaceId,
+  ProjectCategory,
+  ProjectCategoryId,
   Tag,
   TagId,
 } from "@akabase/domain/event/schema";
@@ -259,6 +262,139 @@ export class EventRepositoryImpl implements EventRepository {
       throw new RepositoryExceptionError(
         REPOSITORY_ERROR_CODE.DATABASE_ERROR,
         "Failed to delete tag",
+        error,
+      );
+    }
+  }
+
+  // =============================================================================
+  // Project category operations
+  // =============================================================================
+
+  async findProjectCategories(eventId: EventId): Promise<ProjectCategory[]> {
+    try {
+      const rows = await this.db.query.projectCategories.findMany({
+        where: (projectCategories, { eq }) => eq(projectCategories.eventId, eventId),
+      });
+
+      const categoryList: ProjectCategory[] = rows.map((row) =>
+        projectCategorySchema.parse({
+          id: row.id,
+          eventId: row.eventId,
+          name: row.name,
+          displayOrder: row.displayOrder,
+          createdAt: new Date(row.createdAt),
+        }),
+      );
+
+      return categoryList;
+    } catch (error) {
+      throw new RepositoryExceptionError(
+        REPOSITORY_ERROR_CODE.DATABASE_ERROR,
+        "Failed to find project categories",
+        error,
+      );
+    }
+  }
+
+  async saveProjectCategory(category: ProjectCategory): Promise<void> {
+    try {
+      await this.db
+        .insert(schema.projectCategories)
+        .values({
+          id: category.id,
+          eventId: category.eventId,
+          name: category.name,
+          displayOrder: category.displayOrder,
+          createdAt: category.createdAt,
+        })
+        .onConflictDoUpdate({
+          target: schema.projectCategories.id,
+          set: {
+            // Immutable fields excluded: id, eventId, createdAt
+            name: category.name,
+            displayOrder: category.displayOrder,
+          },
+          where: eq(schema.projectCategories.eventId, category.eventId),
+        });
+    } catch (error) {
+      throw new RepositoryExceptionError(
+        REPOSITORY_ERROR_CODE.DATABASE_ERROR,
+        "Failed to save project category",
+        error,
+      );
+    }
+  }
+
+  async getMaxProjectCategoryDisplayOrder(eventId: EventId): Promise<number> {
+    try {
+      const [result] = await this.db
+        .select({ maxOrder: max(schema.projectCategories.displayOrder) })
+        .from(schema.projectCategories)
+        .where(eq(schema.projectCategories.eventId, eventId));
+
+      return result?.maxOrder ?? -1;
+    } catch (error) {
+      throw new RepositoryExceptionError(
+        REPOSITORY_ERROR_CODE.DATABASE_ERROR,
+        "Failed to get max project category display order",
+        error,
+      );
+    }
+  }
+
+  async updateProjectCategoryDisplayOrders(
+    eventId: EventId,
+    categoryOrders: { categoryId: ProjectCategoryId; displayOrder: number }[],
+  ): Promise<void> {
+    try {
+      const [firstQuery, ...restQueries] = categoryOrders.map((order) =>
+        this.db
+          .update(schema.projectCategories)
+          .set({ displayOrder: order.displayOrder })
+          .where(
+            and(
+              eq(schema.projectCategories.id, order.categoryId),
+              eq(schema.projectCategories.eventId, eventId),
+            ),
+          ),
+      );
+      if (!firstQuery) {
+        return;
+      }
+      await this.db.batch([firstQuery, ...restQueries]);
+    } catch (error) {
+      throw new RepositoryExceptionError(
+        REPOSITORY_ERROR_CODE.DATABASE_ERROR,
+        "Failed to update project category display orders",
+        error,
+      );
+    }
+  }
+
+  async deleteProjectCategory(eventId: EventId, categoryId: ProjectCategoryId): Promise<void> {
+    try {
+      // FK has no ON DELETE action, so detach projects before deleting
+      await this.db.batch([
+        this.db
+          .update(schema.projects)
+          .set({ categoryId: null })
+          .where(
+            and(eq(schema.projects.categoryId, categoryId), eq(schema.projects.eventId, eventId)),
+          ),
+        this.db
+          .delete(schema.projectCategories)
+          .where(
+            and(
+              eq(schema.projectCategories.id, categoryId),
+              eq(schema.projectCategories.eventId, eventId),
+            ),
+          ),
+      ]);
+    } catch (error) {
+      throw new RepositoryExceptionError(
+        REPOSITORY_ERROR_CODE.DATABASE_ERROR,
+        "Failed to delete project category",
         error,
       );
     }

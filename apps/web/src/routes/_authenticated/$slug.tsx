@@ -8,6 +8,7 @@ import {
   HomeIcon,
   MapPinIcon,
   SettingsIcon,
+  ShapesIcon,
   TagIcon,
   UsersIcon,
 } from "lucide-react";
@@ -63,6 +64,12 @@ function SlugLayout() {
             <Link to="/$slug/committee/organizations" params={{ slug }}>
               <Building2Icon />
               出展団体
+            </Link>
+          </NavLink>
+          <NavLink>
+            <Link to="/$slug/committee/project-categories" params={{ slug }}>
+              <ShapesIcon />
+              企画区分
             </Link>
           </NavLink>
           <NavLink>

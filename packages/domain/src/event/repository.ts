@@ -6,6 +6,8 @@ import type {
   EventSettings,
   Place,
   PlaceId,
+  ProjectCategory,
+  ProjectCategoryId,
   Tag,
   TagId,
 } from "./schema";
@@ -56,6 +58,12 @@ export type EventRepository = {
   findDeadlines(eventId: EventId): Promise<Deadline[]>;
 
   /**
+   * Find all project categories for an event
+   * @throws {RepositoryExceptionError} on database errors
+   */
+  findProjectCategories(eventId: EventId): Promise<ProjectCategory[]>;
+
+  /**
    * Save event (insert or update)
    * @throws {RepositoryExceptionError} on database errors
    */
@@ -88,6 +96,35 @@ export type EventRepository = {
    * @throws {RepositoryExceptionError} on database errors
    */
   getMaxTagDisplayOrder(eventId: EventId): Promise<number>;
+
+  /**
+   * Save project category (insert or update)
+   * @throws {RepositoryExceptionError} on database errors
+   */
+  saveProjectCategory(category: ProjectCategory): Promise<void>;
+
+  /**
+   * Batch update project category display orders atomically
+   * @throws {RepositoryExceptionError} on database errors
+   */
+  updateProjectCategoryDisplayOrders(
+    eventId: EventId,
+    categoryOrders: { categoryId: ProjectCategoryId; displayOrder: number }[],
+  ): Promise<void>;
+
+  /**
+   * Delete project category (scoped by eventId)
+   * Projects referencing the category fall back to uncategorized
+   * @throws {RepositoryExceptionError} on database errors
+   */
+  deleteProjectCategory(eventId: EventId, categoryId: ProjectCategoryId): Promise<void>;
+
+  /**
+   * Get the maximum displayOrder value for project categories in an event
+   * Returns -1 if no project categories exist
+   * @throws {RepositoryExceptionError} on database errors
+   */
+  getMaxProjectCategoryDisplayOrder(eventId: EventId): Promise<number>;
 
   /**
    * Save place (insert or update)

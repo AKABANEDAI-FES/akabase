@@ -1,0 +1,173 @@
+import { useState } from "react";
+import { revalidateLogic, useForm } from "@tanstack/react-form";
+import { Result } from "@akabase/result";
+import { Button } from "@akabase/ui/components/button";
+import { CloseButton } from "@akabase/ui/components/close-button";
+import { Dialog } from "@akabase/ui/components/dialog";
+import { Field } from "@akabase/ui/components/field";
+import { Input } from "@akabase/ui/components/input";
+import { toaster } from "@akabase/ui/components/toast";
+import { Portal } from "@ark-ui/react/portal";
+import { Stack } from "@akabase/styled-system/jsx";
+import type { EventId } from "@akabase/domain/event/schema";
+import type { ProjectCategoryListItem } from "@akabase/application/query/event/list-project-categories";
+import { useMutation } from "@tanstack/react-query";
+import {
+  updateProjectCategoryInputSchema,
+  useUpdateProjectCategoryMutationOption,
+} from "../actions/mutations/project-category";
+import { nl2br } from "@/libs/text";
+
+type EditProjectCategoryDialogProps = {
+  eventId: EventId;
+  category: ProjectCategoryListItem;
+  defaultOpen?: boolean;
+  onClose?: () => void;
+};
+
+export function EditProjectCategoryDialog({
+  eventId,
+  category,
+  defaultOpen,
+  onClose,
+}: EditProjectCategoryDialogProps) {
+  const [open, setOpen] = useState(defaultOpen ?? false);
+  const { mutateAsync } = useMutation(useUpdateProjectCategoryMutationOption());
+
+  const form = useForm({
+    defaultValues: {
+      name: category.name,
+    },
+    validators: {
+      onDynamic: updateProjectCategoryInputSchema.omit({ categoryId: true, eventId: true }),
+      onSubmitAsync: async ({ value }) => {
+        try {
+          const result = await mutateAsync({
+            data: { ...value, categoryId: category.id, eventId },
+          });
+
+          if (Result.isFailure(result)) {
+            // Display field-level error for duplicate project category names
+            if (result.error.code === "PROJECT_CATEGORY_NOT_UNIQUE") {
+              return {
+                fields: {
+                  name: {
+                    message: result.error.message,
+                  },
+                },
+              };
+            }
+
+            // Display toast for other errors
+            toaster.create({
+              type: "error",
+              title: "エラー",
+              description: result.error.message,
+            });
+            return {};
+          }
+
+          return undefined;
+        } catch (error) {
+          console.error("Failed to update project category:", error);
+          toaster.create({
+            type: "error",
+            title: "エラー",
+            description: "予期しないエラーが発生しました",
+          });
+          return {};
+        }
+      },
+    },
+    validationLogic: revalidateLogic({
+      mode: "submit",
+      modeAfterSubmission: "change",
+    }),
+    onSubmit: async ({ value }) => {
+      toaster.create({
+        type: "success",
+        title: "企画区分を更新しました",
+        description: `「${value.name}」を更新しました`,
+      });
+      setOpen(false);
+    },
+  });
+
+  return (
+    <Dialog.Root
+      open={open}
+      onOpenChange={({ open }) => setOpen(open)}
+      onExitComplete={onClose}
+      size="md"
+    >
+      <Portal>
+        <Dialog.Backdrop />
+        <Dialog.Positioner>
+          <Dialog.Content asChild>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                await form.handleSubmit();
+              }}
+            >
+              <Dialog.Header>
+                <Dialog.Title>企画区分を編集</Dialog.Title>
+                <Dialog.Description>企画区分の情報を編集します</Dialog.Description>
+              </Dialog.Header>
+              <Dialog.Body>
+                <Stack gap="4" w="full">
+                  <form.Field name="name">
+                    {(field) => (
+                      <Field.Root invalid={!field.state.meta.isValid}>
+                        <Field.Label htmlFor={field.name}>
+                          企画区分名 <Field.RequiredIndicator />
+                        </Field.Label>
+                        <Input
+                          id={field.name}
+                          name={field.name}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                        />
+                        {!field.state.meta.isValid && field.state.meta.errors.length > 0 && (
+                          <Field.ErrorText>
+                            {nl2br(
+                              field.state.meta.errors
+                                .map((error) => error?.message)
+                                .filter((msg) => msg != null)
+                                .join("\n"),
+                            )}
+                          </Field.ErrorText>
+                        )}
+                      </Field.Root>
+                    )}
+                  </form.Field>
+                </Stack>
+              </Dialog.Body>
+              <Dialog.Footer>
+                <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+                  {([canSubmit, isSubmitting]) => (
+                    <>
+                      <Dialog.ActionTrigger asChild>
+                        <Button type="button" variant="outline" disabled={isSubmitting}>
+                          キャンセル
+                        </Button>
+                      </Dialog.ActionTrigger>
+                      <Button type="submit" loading={isSubmitting} disabled={!canSubmit}>
+                        更新
+                      </Button>
+                    </>
+                  )}
+                </form.Subscribe>
+              </Dialog.Footer>
+              <Dialog.CloseTrigger asChild>
+                <CloseButton />
+              </Dialog.CloseTrigger>
+            </form>
+          </Dialog.Content>
+        </Dialog.Positioner>
+      </Portal>
+    </Dialog.Root>
+  );
+}

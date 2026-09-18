@@ -8,10 +8,19 @@ import type {
   EventSettings,
   Place,
   PlaceId,
+  ProjectCategory,
+  ProjectCategoryId,
   Tag,
   TagId,
 } from "./schema";
-import { deadlineSchema, eventSchema, eventSettingsSchema, placeSchema, tagSchema } from "./schema";
+import {
+  deadlineSchema,
+  eventSchema,
+  eventSettingsSchema,
+  placeSchema,
+  projectCategorySchema,
+  tagSchema,
+} from "./schema";
 import type { EventError } from "./errors";
 import { EVENT_ERROR_CODE, eventError } from "./errors";
 import { DOMAIN_ERROR_CODE } from "../shared/errors";
@@ -134,6 +143,57 @@ export function updateTagEntity(
   return Result.try({
     try: () => tagSchema.parse(data),
     catch: () => eventError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "タグの更新に失敗しました"),
+  });
+}
+
+/**
+ * =============================================================================
+ * Project Category Management Functions (Pure Functions)
+ * =============================================================================
+ */
+
+/**
+ * Create a new project category entity
+ */
+export function createProjectCategoryEntity(input: {
+  id: ProjectCategoryId;
+  eventId: EventId;
+  name: string;
+  displayOrder: number;
+  now?: Date;
+}): Result.Result<ProjectCategory, EventError> {
+  const data = {
+    id: input.id,
+    eventId: input.eventId,
+    name: input.name.trim(),
+    displayOrder: input.displayOrder,
+    createdAt: input.now ?? new Date(),
+  };
+
+  return Result.try({
+    try: () => projectCategorySchema.parse(data),
+    catch: () => eventError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "企画区分の作成に失敗しました"),
+  });
+}
+
+/**
+ * Update project category entity
+ * Only name can be updated (displayOrder is changed by reordering)
+ */
+export function updateProjectCategoryEntity(
+  category: ProjectCategory,
+  input: {
+    name: string;
+  },
+): Result.Result<ProjectCategory, EventError> {
+  const data = {
+    ...category,
+    name: input.name.trim(),
+  };
+
+  return Result.try({
+    try: () => projectCategorySchema.parse(data),
+    catch: () => eventError(DOMAIN_ERROR_CODE.VALIDATION_ERROR, "企画区分の更新に失敗しました"),
   });
 }
 

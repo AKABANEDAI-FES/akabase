@@ -4,7 +4,11 @@ import { Result } from "@akabase/result";
 import { schema } from "@akabase/infrastructure/db";
 import type { Database } from "@akabase/infrastructure/db";
 import type { EventId } from "@akabase/domain/event/schema";
-import { eventIdSchema, placeIdSchema } from "@akabase/domain/event/schema";
+import {
+  eventIdSchema,
+  placeIdSchema,
+  projectCategoryIdSchema,
+} from "@akabase/domain/event/schema";
 import { orgIdSchema } from "@akabase/domain/organization/schema";
 import type { OrgId } from "@akabase/domain/organization/schema";
 import { projectIdSchema, submissionStatusSchema } from "@akabase/domain/project/schema";
@@ -20,6 +24,8 @@ export const projectListItemSchema = z.object({
   name: z.string(),
   placeId: placeIdSchema.nullable(),
   placeName: z.string().nullable(),
+  categoryId: projectCategoryIdSchema.nullable(),
+  categoryName: z.string().nullable(),
   logoImageId: z.string().nullable(),
   latestSubmissionStatus: submissionStatusSchema.nullable(),
   createdAt: z.date(),
@@ -49,6 +55,7 @@ export async function listProjects(
       orderBy: [desc(schema.projects.createdAt)],
       with: {
         place: true,
+        category: true,
         submissions: {
           limit: 1,
           orderBy: [desc(schema.projectSubmissions.submittedAt)],
@@ -67,6 +74,8 @@ export async function listProjects(
         name: row.name,
         placeId: row.placeId,
         placeName: row.place?.name ?? null,
+        categoryId: row.categoryId,
+        categoryName: row.category?.name ?? null,
         logoImageId: row.logoImageId,
         latestSubmissionStatus: row.submissions[0]?.status ?? null,
         createdAt: row.createdAt,

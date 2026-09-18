@@ -6,6 +6,9 @@ export type EventId = z.infer<typeof eventIdSchema>;
 export const tagIdSchema = z.string().brand<"TagId">();
 export type TagId = z.infer<typeof tagIdSchema>;
 
+export const projectCategoryIdSchema = z.string().brand<"ProjectCategoryId">();
+export type ProjectCategoryId = z.infer<typeof projectCategoryIdSchema>;
+
 export const placeIdSchema = z.string().brand<"PlaceId">();
 export type PlaceId = z.infer<typeof placeIdSchema>;
 
@@ -19,6 +22,8 @@ export const EVENT_NAME_MIN_LENGTH = 1;
 export const EVENT_NAME_MAX_LENGTH = 100;
 export const TAG_NAME_MIN_LENGTH = 1;
 export const TAG_NAME_MAX_LENGTH = 100;
+export const PROJECT_CATEGORY_NAME_MIN_LENGTH = 1;
+export const PROJECT_CATEGORY_NAME_MAX_LENGTH = 100;
 export const PLACE_NAME_MIN_LENGTH = 1;
 export const PLACE_NAME_MAX_LENGTH = 100;
 export const SLUG_MIN_LENGTH = 1;
@@ -68,6 +73,23 @@ export const tagSchema = z.object({
 });
 
 export type Tag = z.infer<typeof tagSchema>;
+
+/**
+ * ProjectCategory
+ * 企画区分マスタ（イベント単位で管理）
+ */
+export const projectCategorySchema = z.object({
+  id: projectCategoryIdSchema,
+  eventId: eventIdSchema,
+  name: z
+    .string()
+    .min(PROJECT_CATEGORY_NAME_MIN_LENGTH, "企画区分名を入力してください")
+    .max(PROJECT_CATEGORY_NAME_MAX_LENGTH, "企画区分名は100文字以内で入力してください"),
+  displayOrder: z.number().int().nonnegative(),
+  createdAt: z.date(),
+});
+
+export type ProjectCategory = z.infer<typeof projectCategorySchema>;
 
 /**
  * Place

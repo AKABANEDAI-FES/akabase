@@ -4,7 +4,7 @@
  */
 
 import { Result } from "@akabase/result";
-import type { EventId, PlaceId } from "@akabase/domain/event/schema";
+import type { EventId, PlaceId, ProjectCategoryId } from "@akabase/domain/event/schema";
 import type { OrgId } from "@akabase/domain/organization/schema";
 import type { ProjectId } from "@akabase/domain/project/schema";
 import type { ImageId, ImageRepository } from "@akabase/domain/shared/image";
@@ -27,6 +27,7 @@ export type UpdateProjectInput = {
   orgId: OrgId;
   name: string;
   placeId: PlaceId | null;
+  categoryId: ProjectCategoryId | null;
   logoImageId: ImageId | null;
   contestVoteNumber: string | null;
   actor: Actor;
@@ -63,6 +64,15 @@ export async function updateProject(
 
     yield* $(await deps.eventDomainService.resolveModifiableEvent(project.eventId));
 
+    if (input.categoryId != null) {
+      yield* $(
+        await deps.eventDomainService.ensureProjectCategoryInEvent(
+          project.eventId,
+          input.categoryId,
+        ),
+      );
+    }
+
     if (input.contestVoteNumber != null) {
       yield* $(
         await deps.projectDomainService.ensureContestVoteNumberUnique(
@@ -78,6 +88,7 @@ export async function updateProject(
         project,
         name: input.name,
         placeId: input.placeId,
+        categoryId: input.categoryId,
         logoImageId: input.logoImageId,
         contestVoteNumber: input.contestVoteNumber,
       }),

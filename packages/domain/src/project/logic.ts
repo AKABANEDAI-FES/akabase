@@ -23,7 +23,7 @@ import {
 import type { ProjectError } from "./errors";
 import { PROJECT_ERROR_CODE, projectError } from "./errors";
 import { DOMAIN_ERROR_CODE } from "../shared/errors";
-import type { EventId, PlaceId, TagId } from "../event/schema";
+import type { EventId, PlaceId, ProjectCategoryId, TagId } from "../event/schema";
 import type { OrgId } from "../organization/schema";
 import type { ImageId } from "../shared/image";
 import type { UserId } from "../user/schema";
@@ -44,6 +44,7 @@ export function createProjectEntity(input: {
   orgId: OrgId;
   name: string;
   placeId: PlaceId | null;
+  categoryId?: ProjectCategoryId | null;
   logoImageId: ImageId | null;
   contestVoteNumber?: string | null;
   now?: Date;
@@ -55,6 +56,7 @@ export function createProjectEntity(input: {
     orgId: input.orgId,
     name: input.name.trim(),
     placeId: input.placeId,
+    categoryId: input.categoryId ?? null,
     logoImageId: input.logoImageId,
     contestVoteNumber: input.contestVoteNumber ?? null,
     createdAt: now,
@@ -80,6 +82,7 @@ export function updateProjectEntity(input: {
   project: Project;
   name: string;
   placeId: PlaceId | null;
+  categoryId: ProjectCategoryId | null;
   logoImageId: ImageId | null;
   contestVoteNumber: string | null;
   now?: Date;
@@ -92,6 +95,7 @@ export function updateProjectEntity(input: {
         ...input.project,
         name: input.name.trim(),
         placeId: input.placeId,
+        categoryId: input.categoryId,
         logoImageId: input.logoImageId,
         contestVoteNumber: input.contestVoteNumber,
         updatedAt: now,

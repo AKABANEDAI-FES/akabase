@@ -18,6 +18,8 @@ export const projectDetailSchema = z.object({
   name: z.string(),
   placeId: z.string().nullable(),
   placeName: z.string().nullable(),
+  categoryId: z.string().nullable(),
+  categoryName: z.string().nullable(),
   logoImageId: z.string().nullable(),
   logoUrl: z.string().nullable(),
   contestVoteNumber: z.string().nullable(),
@@ -49,6 +51,7 @@ export async function getProjectDetail(
         and(eq(projects.id, projectId), eq(projects.eventId, eventId), eq(projects.orgId, orgId)),
       with: {
         place: true,
+        category: true,
         logoImage: true,
       },
     });
@@ -64,6 +67,8 @@ export async function getProjectDetail(
       name: project.name,
       placeId: project.placeId,
       placeName: project.place?.name ?? null,
+      categoryId: project.categoryId,
+      categoryName: project.category?.name ?? null,
       logoImageId: project.logoImageId,
       logoUrl: project.logoImage ? deps.imageRepo.getPublicUrl(project.logoImage.objectKey) : null,
       contestVoteNumber: project.contestVoteNumber ?? null,
