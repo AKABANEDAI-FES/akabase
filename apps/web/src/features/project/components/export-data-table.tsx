@@ -19,14 +19,14 @@ import { IconButton } from "@akabase/ui/components/icon-button";
 import { Popover } from "@akabase/ui/components/popover";
 import { Table } from "@akabase/ui/components/table";
 import { Text } from "@akabase/ui/components/text";
-import { toaster } from "@akabase/ui/components/toast";
 import { generateLoadEventPublishedDataQueryOptions } from "../actions/queries";
 import { generateLoadPlacesQueryOptions } from "@/features/event/actions/queries/place";
 import type { EventPublishedDataItem } from "@akabase/application/query/project/list-event-published-data";
 import type { PlaceListItem } from "@akabase/application/query/event/list-places";
 import type { EventId } from "@akabase/domain/event/schema";
-import { downloadFile } from "@/libs/download";
 import { createImageObject, processImage } from "@/libs/image";
+import { useExportDownload } from "../hooks/use-export-download";
+import type { ExportFormat } from "../hooks/use-export-download";
 import { groupByCategory, withSafeNames } from "../utils/export-groups";
 import type { ExportGroup } from "../utils/export-groups";
 import { ExportSettingsPanel } from "./export-settings-panel";
@@ -402,7 +402,7 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
     exportColumns.map((col) => col.id),
   );
   const [splitByCategory, setSplitByCategory] = useState(false);
-  const [isDownloadingExcel, setIsDownloadingExcel] = useState(false);
+  const { pendingFormat, download } = useExportDownload();
 
   const toggleNode = useCallback((allIds: string[]) => {
     setSelectedPlaceIds((prev) => {
@@ -457,36 +457,23 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
   const exportGroups = (): ExportGroup[] =>
     splitByCategory ? groupByCategory(filteredData) : [{ name: slug, items: filteredData }];
 
-  // One file per group. Files are downloaded one after another when split
-  const downloadTextFiles = (
+  const downloadText = (
+    format: ExportFormat,
     extension: string,
     mimeType: string,
     serialize: (items: EventPublishedDataItem[]) => string,
-  ) => {
-    for (const group of withSafeNames(exportGroups())) {
-      const suffix = splitByCategory ? `-${group.safeName}` : "";
-      downloadFile(
-        `${slug}-published-data${suffix}.${extension}`,
-        new Blob([serialize(group.items)], { type: mimeType }),
-      );
-    }
-  };
+  ) =>
+    download(format, async () =>
+      withSafeNames(exportGroups()).map((group) => ({
+        name: `${slug}-published-data${splitByCategory ? `-${group.safeName}` : ""}.${extension}`,
+        blob: new Blob([serialize(group.items)], { type: mimeType }),
+      })),
+    );
 
-  const downloadExcel = async () => {
-    setIsDownloadingExcel(true);
-    try {
-      downloadFile(`${slug}-published-data.xlsx`, await toExcel(exportGroups(), selectedColumns));
-    } catch (error) {
-      console.error("Failed to export Excel:", error);
-      toaster.create({
-        type: "error",
-        title: "エラー",
-        description: "Excelファイルの生成に失敗しました",
-      });
-    } finally {
-      setIsDownloadingExcel(false);
-    }
-  };
+  const downloadExcel = () =>
+    download("Excel", async () => [
+      { name: `${slug}-published-data.xlsx`, blob: await toExcel(exportGroups(), selectedColumns) },
+    ]);
 
   const summary = [
     `${selectedColumns.length} / ${exportColumns.length} 列`,
@@ -561,9 +548,10 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
         <Button
           size="sm"
           variant="outline"
+          loading={pendingFormat === "CSV"}
           disabled={!canDownload}
           onClick={() =>
-            downloadTextFiles("csv", "text/csv", (items) => toCSV(items, selectedColumns))
+            downloadText("CSV", "csv", "text/csv", (items) => toCSV(items, selectedColumns))
           }
         >
           <TableIcon />
@@ -572,7 +560,7 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
         <Button
           size="sm"
           variant="outline"
-          loading={isDownloadingExcel}
+          loading={pendingFormat === "Excel"}
           disabled={!canDownload}
           onClick={downloadExcel}
         >
@@ -582,9 +570,12 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
         <Button
           size="sm"
           variant="outline"
+          loading={pendingFormat === "JSON"}
           disabled={!canDownload}
           onClick={() =>
-            downloadTextFiles("json", "application/json", (items) => toJSON(items, selectedColumns))
+            downloadText("JSON", "json", "application/json", (items) =>
+              toJSON(items, selectedColumns),
+            )
           }
         >
           <BracesIcon />
