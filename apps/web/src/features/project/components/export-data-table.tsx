@@ -98,6 +98,13 @@ const exportColumns: ExportColumn[] = [
   { id: "projectName", header: "企画名", text: (item) => item.projectName },
   { id: "orgName", header: "出展団体名", text: (item) => item.orgName },
   {
+    id: "categoryId",
+    header: "企画区分",
+    text: (item) => item.categoryName ?? "",
+    json: (item) => item.categoryName,
+    jsonKey: "categoryName",
+  },
+  {
     id: "pamphletText",
     header: "パンフレットテキスト",
     text: (item) => item.pamphletText,
@@ -116,6 +123,12 @@ const exportColumns: ExportColumn[] = [
     header: "タグ",
     text: (item) => item.tags.join(", "),
     json: (item) => item.tags,
+  },
+  {
+    id: "contestVoteNumber",
+    header: "投票番号",
+    text: (item) => item.contestVoteNumber ?? "",
+    json: (item) => item.contestVoteNumber,
   },
 ];
 
