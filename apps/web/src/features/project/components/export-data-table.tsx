@@ -13,7 +13,7 @@ import type { ColumnFiltersState, FilterFn } from "@tanstack/react-table";
 import { DownloadTrigger } from "@ark-ui/react/download-trigger";
 import { Portal } from "@ark-ui/react/portal";
 import { BracesIcon, ListFilterIcon, SheetIcon, TableIcon } from "lucide-react";
-import { Flex, Stack } from "@akabase/styled-system/jsx";
+import { Box, Flex, Grid, Stack } from "@akabase/styled-system/jsx";
 import { Button } from "@akabase/ui/components/button";
 import { Checkbox } from "@akabase/ui/components/checkbox";
 import { IconButton } from "@akabase/ui/components/icon-button";
@@ -26,6 +26,7 @@ import type { EventPublishedDataItem } from "@akabase/application/query/project/
 import type { PlaceListItem } from "@akabase/application/query/event/list-places";
 import type { EventId } from "@akabase/domain/event/schema";
 import { createImageObject, processImage } from "@/libs/image";
+import { ExportSettingsPanel } from "./export-settings-panel";
 
 // --- Place hierarchy helpers ---
 
@@ -132,11 +133,10 @@ const exportColumns: ExportColumn[] = [
   },
 ];
 
-/** Columns in exported files. Image columns go last */
-const exportFileColumns = [
-  ...exportColumns.filter((col) => !col.imageUrl),
-  ...exportColumns.filter((col) => col.imageUrl),
-];
+/** Order columns for exported files. Image columns go last */
+function toFileColumns(columns: ExportColumn[]): ExportColumn[] {
+  return [...columns.filter((col) => !col.imageUrl), ...columns.filter((col) => col.imageUrl)];
+}
 
 function jsonKeyOf(col: ExportColumn): string {
   return col.jsonKey ?? col.id;
@@ -188,7 +188,7 @@ async function fetchImageBuffer(url: string): Promise<Uint8Array | null> {
 const IMAGE_SIZE_PX = 128;
 
 // oxlint-disable-next-line max-statements
-async function toExcel(data: EventPublishedDataItem[]): Promise<Blob> {
+async function toExcel(data: EventPublishedDataItem[], columns: ExportColumn[]): Promise<Blob> {
   const {
     default: xlsxInit,
     Format,
@@ -197,7 +197,8 @@ async function toExcel(data: EventPublishedDataItem[]): Promise<Blob> {
   } = await import("wasm-xlsxwriter/web");
   await xlsxInit();
 
-  const imageColumns = exportFileColumns.flatMap((col, index) =>
+  const fileColumns = toFileColumns(columns);
+  const imageColumns = fileColumns.flatMap((col, index) =>
     col.imageUrl ? [{ index, imageUrl: col.imageUrl }] : [],
   );
 
@@ -217,7 +218,7 @@ async function toExcel(data: EventPublishedDataItem[]): Promise<Blob> {
   const worksheet = workbook.addWorksheet();
   const boldFormat = new Format().setBold();
 
-  for (const [col, column] of exportFileColumns.entries()) {
+  for (const [col, column] of fileColumns.entries()) {
     worksheet.writeWithFormat(0, col, column.header, boldFormat);
   }
   for (const { index } of imageColumns) {
@@ -225,7 +226,7 @@ async function toExcel(data: EventPublishedDataItem[]): Promise<Blob> {
   }
 
   for (const [row, item] of data.entries()) {
-    for (const [col, column] of exportFileColumns.entries()) {
+    for (const [col, column] of fileColumns.entries()) {
       if (!column.imageUrl) {
         worksheet.write(row + 1, col, column.text(item));
       }
@@ -251,19 +252,21 @@ function csvHeaderOf(col: ExportColumn): string {
   return col.imageUrl ? `${col.header}URL` : col.header;
 }
 
-function toCSV(data: EventPublishedDataItem[]): string {
+function toCSV(data: EventPublishedDataItem[], columns: ExportColumn[]): string {
+  const fileColumns = toFileColumns(columns);
   return stringify(
     data.map((item) =>
-      Object.fromEntries(exportFileColumns.map((col) => [csvHeaderOf(col), col.text(item)])),
+      Object.fromEntries(fileColumns.map((col) => [csvHeaderOf(col), col.text(item)])),
     ),
-    { columns: exportFileColumns.map(csvHeaderOf) },
+    { columns: fileColumns.map(csvHeaderOf) },
   );
 }
 
-function toJSON(data: EventPublishedDataItem[]): string {
+function toJSON(data: EventPublishedDataItem[], columns: ExportColumn[]): string {
+  const fileColumns = toFileColumns(columns);
   return JSON.stringify(
     data.map((item) =>
-      Object.fromEntries(exportFileColumns.map((col) => [jsonKeyOf(col), jsonValueOf(col, item)])),
+      Object.fromEntries(fileColumns.map((col) => [jsonKeyOf(col), jsonValueOf(col, item)])),
     ),
     null,
     2,
@@ -372,6 +375,9 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
   const { data: places } = useSuspenseQuery(generateLoadPlacesQueryOptions(eventId));
 
   const [selectedPlaceIds, setSelectedPlaceIds] = useState<Set<string>>(new Set());
+  const [selectedColumnIds, setSelectedColumnIds] = useState<string[]>(() =>
+    exportColumns.map((col) => col.id),
+  );
 
   const toggleNode = useCallback((allIds: string[]) => {
     setSelectedPlaceIds((prev) => {
@@ -395,6 +401,12 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
     [selectedPlaceIds],
   );
 
+  // Keep the definition order regardless of the order the user checked them
+  const selectedColumns = useMemo(
+    () => exportColumns.filter((col) => selectedColumnIds.includes(col.id)),
+    [selectedColumnIds],
+  );
+
   const table = useReactTable({
     data,
     columns,
@@ -409,85 +421,100 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
     return <Text>公開済みのデータがありません。</Text>;
   }
 
+  const canDownload = filteredData.length > 0 && selectedColumns.length > 0;
+
   return (
-    <Stack gap="4">
-      <Flex justify="flex-end" gap="2">
+    <Grid
+      gridTemplateColumns={{ base: "1fr", lg: "minmax(0, 1fr) 20rem" }}
+      gap="6"
+      alignItems="start"
+    >
+      <Stack gap="4">
+        <Box overflowX="auto">
+          <Table.Root>
+            <Table.Head>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <Table.Row key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <Table.Header key={header.id}>
+                      {header.isPlaceholder ? null : header.column.id === "placeId" ? (
+                        <Flex align="center" gap="1">
+                          場所
+                          <PlaceFilterPopover
+                            places={places}
+                            selectedPlaceIds={selectedPlaceIds}
+                            onToggleNode={toggleNode}
+                          />
+                        </Flex>
+                      ) : (
+                        flexRender(header.column.columnDef.header, header.getContext())
+                      )}
+                    </Table.Header>
+                  ))}
+                </Table.Row>
+              ))}
+            </Table.Head>
+            <Table.Body>
+              {table.getRowModel().rows.map((row) => (
+                <Table.Row key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <Table.Cell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </Table.Cell>
+                  ))}
+                </Table.Row>
+              ))}
+            </Table.Body>
+          </Table.Root>
+        </Box>
+
+        <Text textStyle="sm" color="fg.muted">
+          {selectedPlaceIds.size > 0
+            ? `${filteredData.length} / ${data.length} 件の公開済みデータ（フィルタ中）`
+            : `${data.length} 件の公開済みデータ`}
+        </Text>
+      </Stack>
+
+      <ExportSettingsPanel
+        columns={exportColumns}
+        selectedIds={selectedColumnIds}
+        onSelectedIdsChange={setSelectedColumnIds}
+        summary={`${selectedColumns.length} / ${exportColumns.length} 列 · ${filteredData.length} 件`}
+      >
         <DownloadTrigger
-          data={() => toCSV(filteredData)}
+          data={() => toCSV(filteredData, selectedColumns)}
           fileName={`${slug}-published-data.csv`}
           mimeType="text/csv"
           asChild
         >
-          <Button size="sm" variant="outline" disabled={filteredData.length === 0}>
+          <Button size="sm" variant="outline" disabled={!canDownload}>
             <TableIcon />
             CSV
           </Button>
         </DownloadTrigger>
         <DownloadTrigger
-          data={() => toExcel(filteredData)}
+          data={() => toExcel(filteredData, selectedColumns)}
           fileName={`${slug}-published-data.xlsx`}
           mimeType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
           asChild
         >
-          <Button size="sm" variant="outline" disabled={filteredData.length === 0}>
+          <Button size="sm" variant="outline" disabled={!canDownload}>
             <SheetIcon />
             Excel
           </Button>
         </DownloadTrigger>
         <DownloadTrigger
-          data={() => toJSON(filteredData)}
+          data={() => toJSON(filteredData, selectedColumns)}
           fileName={`${slug}-published-data.json`}
           mimeType="application/json"
           asChild
         >
-          <Button size="sm" variant="outline" disabled={filteredData.length === 0}>
+          <Button size="sm" variant="outline" disabled={!canDownload}>
             <BracesIcon />
             JSON
           </Button>
         </DownloadTrigger>
-      </Flex>
-
-      <Table.Root>
-        <Table.Head>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <Table.Row key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <Table.Header key={header.id}>
-                  {header.isPlaceholder ? null : header.column.id === "placeId" ? (
-                    <Flex align="center" gap="1">
-                      場所
-                      <PlaceFilterPopover
-                        places={places}
-                        selectedPlaceIds={selectedPlaceIds}
-                        onToggleNode={toggleNode}
-                      />
-                    </Flex>
-                  ) : (
-                    flexRender(header.column.columnDef.header, header.getContext())
-                  )}
-                </Table.Header>
-              ))}
-            </Table.Row>
-          ))}
-        </Table.Head>
-        <Table.Body>
-          {table.getRowModel().rows.map((row) => (
-            <Table.Row key={row.id}>
-              {row.getVisibleCells().map((cell) => (
-                <Table.Cell key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </Table.Cell>
-              ))}
-            </Table.Row>
-          ))}
-        </Table.Body>
-      </Table.Root>
-
-      <Text textStyle="sm" color="fg.muted">
-        {selectedPlaceIds.size > 0
-          ? `${filteredData.length} / ${data.length} 件の公開済みデータ（フィルタ中）`
-          : `${data.length} 件の公開済みデータ`}
-      </Text>
-    </Stack>
+      </ExportSettingsPanel>
+    </Grid>
   );
 }
