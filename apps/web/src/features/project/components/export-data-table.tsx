@@ -26,6 +26,8 @@ import type { PlaceListItem } from "@akabase/application/query/event/list-places
 import type { EventId } from "@akabase/domain/event/schema";
 import { downloadFile } from "@/libs/download";
 import { createImageObject, processImage } from "@/libs/image";
+import { groupByCategory, withSafeNames } from "../utils/export-groups";
+import type { ExportGroup } from "../utils/export-groups";
 import { ExportSettingsPanel } from "./export-settings-panel";
 
 // --- Place hierarchy helpers ---
@@ -189,8 +191,26 @@ async function fetchImageBuffer(url: string): Promise<Uint8Array | null> {
 
 const IMAGE_SIZE_PX = 128;
 
+type ImageColumn = { index: number; imageUrl: NonNullable<ExportColumn["imageUrl"]> };
+
+function fetchImages(
+  items: EventPublishedDataItem[],
+  imageColumns: ImageColumn[],
+): Promise<(Uint8Array | null)[][]> {
+  return Promise.all(
+    items.map((item) =>
+      Promise.all(
+        imageColumns.map(({ imageUrl }) => {
+          const url = imageUrl(item);
+          return url ? fetchImageBuffer(url) : Promise.resolve(null);
+        }),
+      ),
+    ),
+  );
+}
+
 // oxlint-disable-next-line max-statements
-async function toExcel(data: EventPublishedDataItem[], columns: ExportColumn[]): Promise<Blob> {
+async function toExcel(sheets: ExportGroup[], columns: ExportColumn[]): Promise<Blob> {
   const {
     default: xlsxInit,
     Format,
@@ -200,45 +220,41 @@ async function toExcel(data: EventPublishedDataItem[], columns: ExportColumn[]):
   await xlsxInit();
 
   const fileColumns = toFileColumns(columns);
-  const imageColumns = fileColumns.flatMap((col, index) =>
+  const imageColumns: ImageColumn[] = fileColumns.flatMap((col, index) =>
     col.imageUrl ? [{ index, imageUrl: col.imageUrl }] : [],
   );
 
   // Fetch all images in parallel
   const imageBuffers = await Promise.all(
-    data.map((item) =>
-      Promise.all(
-        imageColumns.map(({ imageUrl }) => {
-          const url = imageUrl(item);
-          return url ? fetchImageBuffer(url) : Promise.resolve(null);
-        }),
-      ),
-    ),
+    sheets.map((sheet) => fetchImages(sheet.items, imageColumns)),
   );
 
   const workbook = new Workbook();
-  const worksheet = workbook.addWorksheet();
   const boldFormat = new Format().setBold();
 
-  for (const [col, column] of fileColumns.entries()) {
-    worksheet.writeWithFormat(0, col, column.header, boldFormat);
-  }
-  for (const { index } of imageColumns) {
-    worksheet.setColumnWidthPixels(index, IMAGE_SIZE_PX + 8);
-  }
+  for (const [sheetIndex, sheet] of withSafeNames(sheets).entries()) {
+    const worksheet = workbook.addWorksheet().setName(sheet.safeName);
 
-  for (const [row, item] of data.entries()) {
     for (const [col, column] of fileColumns.entries()) {
-      if (!column.imageUrl) {
-        worksheet.write(row + 1, col, column.text(item));
-      }
+      worksheet.writeWithFormat(0, col, column.header, boldFormat);
     }
-    for (const [i, { index }] of imageColumns.entries()) {
-      const buf = imageBuffers[row]?.[i];
-      if (buf) {
-        const image = new XlsxImage(buf).setScaleToSize(IMAGE_SIZE_PX, IMAGE_SIZE_PX, true);
-        worksheet.setRowHeightPixels(row + 1, IMAGE_SIZE_PX + 4);
-        worksheet.insertImageFitToCell(row + 1, index, image, true);
+    for (const { index } of imageColumns) {
+      worksheet.setColumnWidthPixels(index, IMAGE_SIZE_PX + 8);
+    }
+
+    for (const [row, item] of sheet.items.entries()) {
+      for (const [col, column] of fileColumns.entries()) {
+        if (!column.imageUrl) {
+          worksheet.write(row + 1, col, column.text(item));
+        }
+      }
+      for (const [i, { index }] of imageColumns.entries()) {
+        const buf = imageBuffers[sheetIndex]?.[row]?.[i];
+        if (buf) {
+          const image = new XlsxImage(buf).setScaleToSize(IMAGE_SIZE_PX, IMAGE_SIZE_PX, true);
+          worksheet.setRowHeightPixels(row + 1, IMAGE_SIZE_PX + 4);
+          worksheet.insertImageFitToCell(row + 1, index, image, true);
+        }
       }
     }
   }
@@ -384,6 +400,7 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
   const [selectedColumnIds, setSelectedColumnIds] = useState<string[]>(() =>
     exportColumns.map((col) => col.id),
   );
+  const [splitByCategory, setSplitByCategory] = useState(false);
 
   const toggleNode = useCallback((allIds: string[]) => {
     setSelectedPlaceIds((prev) => {
@@ -428,6 +445,30 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
   }
 
   const canDownload = filteredData.length > 0 && selectedColumns.length > 0;
+
+  const exportGroups = (): ExportGroup[] =>
+    splitByCategory ? groupByCategory(filteredData) : [{ name: slug, items: filteredData }];
+
+  // One file per group. Files are downloaded one after another when split
+  const downloadTextFiles = (
+    extension: string,
+    mimeType: string,
+    serialize: (items: EventPublishedDataItem[]) => string,
+  ) => {
+    for (const group of withSafeNames(exportGroups())) {
+      const suffix = splitByCategory ? `-${group.safeName}` : "";
+      downloadFile(
+        `${slug}-published-data${suffix}.${extension}`,
+        new Blob([serialize(group.items)], { type: mimeType }),
+      );
+    }
+  };
+
+  const summary = [
+    `${selectedColumns.length} / ${exportColumns.length} 列`,
+    `${filteredData.length} 件`,
+    ...(splitByCategory ? [`${groupByCategory(filteredData).length} 区分`] : []),
+  ].join(" · ");
 
   return (
     <Grid
@@ -485,17 +526,16 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
         columns={exportColumns}
         selectedIds={selectedColumnIds}
         onSelectedIdsChange={setSelectedColumnIds}
-        summary={`${selectedColumns.length} / ${exportColumns.length} 列 · ${filteredData.length} 件`}
+        splitByCategory={splitByCategory}
+        onSplitByCategoryChange={setSplitByCategory}
+        summary={summary}
       >
         <Button
           size="sm"
           variant="outline"
           disabled={!canDownload}
           onClick={() =>
-            downloadFile(
-              `${slug}-published-data.csv`,
-              new Blob([toCSV(filteredData, selectedColumns)], { type: "text/csv" }),
-            )
+            downloadTextFiles("csv", "text/csv", (items) => toCSV(items, selectedColumns))
           }
         >
           <TableIcon />
@@ -508,7 +548,7 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
           onClick={async () =>
             downloadFile(
               `${slug}-published-data.xlsx`,
-              await toExcel(filteredData, selectedColumns),
+              await toExcel(exportGroups(), selectedColumns),
             )
           }
         >
@@ -520,10 +560,7 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
           variant="outline"
           disabled={!canDownload}
           onClick={() =>
-            downloadFile(
-              `${slug}-published-data.json`,
-              new Blob([toJSON(filteredData, selectedColumns)], { type: "application/json" }),
-            )
+            downloadTextFiles("json", "application/json", (items) => toJSON(items, selectedColumns))
           }
         >
           <BracesIcon />

@@ -2,12 +2,15 @@ import type { ReactNode } from "react";
 import { Stack } from "@akabase/styled-system/jsx";
 import { Card } from "@akabase/ui/components/card";
 import { Checkbox } from "@akabase/ui/components/checkbox";
+import { Switch } from "@akabase/ui/components/switch";
 import { Text } from "@akabase/ui/components/text";
 
 type ExportSettingsPanelProps = {
   columns: { id: string; header: string }[];
   selectedIds: string[];
   onSelectedIdsChange: (ids: string[]) => void;
+  splitByCategory: boolean;
+  onSplitByCategoryChange: (split: boolean) => void;
   summary: string;
   children: ReactNode;
 };
@@ -16,6 +19,8 @@ export function ExportSettingsPanel({
   columns,
   selectedIds,
   onSelectedIdsChange,
+  splitByCategory,
+  onSplitByCategoryChange,
   summary,
   children,
 }: ExportSettingsPanelProps) {
@@ -39,6 +44,16 @@ export function ExportSettingsPanel({
               ))}
             </Stack>
           </Checkbox.Group>
+
+          <Switch.Root
+            checked={splitByCategory}
+            onCheckedChange={(details) => onSplitByCategoryChange(details.checked)}
+            size="sm"
+          >
+            <Switch.HiddenInput />
+            <Switch.Control />
+            <Switch.Label>企画区分ごとに分割する</Switch.Label>
+          </Switch.Root>
 
           <Stack gap="2">
             <Text textStyle="sm" color="fg.muted">
