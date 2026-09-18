@@ -1,5 +1,6 @@
 import { stringify } from "@std/csv/stringify";
 import { Fragment, useCallback, useMemo, useState } from "react";
+import type { ReactNode } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import {
   createColumnHelper,
@@ -8,7 +9,7 @@ import {
   getFilteredRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import type { ColumnFiltersState } from "@tanstack/react-table";
+import type { ColumnFiltersState, FilterFn } from "@tanstack/react-table";
 import { DownloadTrigger } from "@ark-ui/react/download-trigger";
 import { Portal } from "@ark-ui/react/portal";
 import { BracesIcon, ListFilterIcon, SheetIcon, TableIcon } from "lucide-react";
@@ -61,52 +62,96 @@ function getLeafNodeIds(node: PlaceTreeNode): string[] {
 
 // --- Column definitions ---
 
-const columnHelper = createColumnHelper<EventPublishedDataItem>();
+type ExportColumn = {
+  id: string;
+  header: string;
+  /** Cell value for CSV and Excel */
+  text: (item: EventPublishedDataItem) => string;
+  /** Value for JSON. Defaults to `text` */
+  json?: (item: EventPublishedDataItem) => unknown;
+  /** Key for JSON. Defaults to `id` */
+  jsonKey?: string;
+  /** Cell content for the table. Defaults to `text`, or "—" when empty */
+  cell?: (item: EventPublishedDataItem) => ReactNode;
+  /** Image columns are embedded as pictures in Excel and placed last in exported files */
+  imageUrl?: (item: EventPublishedDataItem) => string | null;
+};
 
-const columns = [
-  columnHelper.accessor("logoUrl", {
+function toAbsoluteUrl(path: string): string {
+  return `${globalThis.window.location.origin}${path}`;
+}
+
+const exportColumns: ExportColumn[] = [
+  {
+    id: "logoUrl",
     header: "ロゴ",
-    cell: (info) => {
-      const url = info.getValue();
-      if (!url) {
-        return "—";
-      }
-      return <img src={url} alt="" width={256} height={256} style={{ objectFit: "contain" }} />;
-    },
-  }),
-  columnHelper.accessor("projectName", {
-    header: "企画名",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("orgName", {
-    header: "出展団体名",
-    cell: (info) => info.getValue(),
-  }),
-  columnHelper.accessor("pamphletText", {
+    text: (item) => (item.logoUrl ? toAbsoluteUrl(item.logoUrl) : ""),
+    json: (item) => (item.logoUrl ? toAbsoluteUrl(item.logoUrl) : null),
+    cell: (item) =>
+      item.logoUrl ? (
+        <img src={item.logoUrl} alt="" width={256} height={256} style={{ objectFit: "contain" }} />
+      ) : (
+        "—"
+      ),
+    imageUrl: (item) => item.logoUrl,
+  },
+  { id: "projectName", header: "企画名", text: (item) => item.projectName },
+  { id: "orgName", header: "出展団体名", text: (item) => item.orgName },
+  {
+    id: "pamphletText",
     header: "パンフレットテキスト",
-    cell: (info) => <span style={{ whiteSpace: "pre-wrap" }}>{info.getValue()}</span>,
-  }),
-  columnHelper.accessor("openingHours", {
-    header: "開催時間",
-    cell: (info) => info.getValue() || "—",
-  }),
-  columnHelper.accessor("placeId", {
+    text: (item) => item.pamphletText,
+    cell: (item) => <span style={{ whiteSpace: "pre-wrap" }}>{item.pamphletText}</span>,
+  },
+  { id: "openingHours", header: "開催時間", text: (item) => item.openingHours },
+  {
     id: "placeId",
     header: "場所",
-    cell: (info) => info.row.original.placeName ?? "—",
-    filterFn: (row, _columnId, filterValue: string[]) => {
-      const placeId = row.getValue<string | null>("placeId");
-      if (!placeId) {
-        return false;
-      }
-      return filterValue.includes(placeId);
-    },
-  }),
-  columnHelper.accessor("tags", {
+    text: (item) => item.placeName ?? "",
+    json: (item) => item.placeName,
+    jsonKey: "placeName",
+  },
+  {
+    id: "tags",
     header: "タグ",
-    cell: (info) => info.getValue().join(", ") || "—",
-  }),
+    text: (item) => item.tags.join(", "),
+    json: (item) => item.tags,
+  },
 ];
+
+/** Columns in exported files. Image columns go last */
+const exportFileColumns = [
+  ...exportColumns.filter((col) => !col.imageUrl),
+  ...exportColumns.filter((col) => col.imageUrl),
+];
+
+function jsonKeyOf(col: ExportColumn): string {
+  return col.jsonKey ?? col.id;
+}
+
+function jsonValueOf(col: ExportColumn, item: EventPublishedDataItem): unknown {
+  return col.json ? col.json(item) : col.text(item);
+}
+
+function cellOf(col: ExportColumn, item: EventPublishedDataItem): ReactNode {
+  return col.cell ? col.cell(item) : col.text(item) || "—";
+}
+
+const placeFilterFn: FilterFn<EventPublishedDataItem> = (row, _columnId, filterValue: string[]) => {
+  const { placeId } = row.original;
+  return placeId !== null && filterValue.includes(placeId);
+};
+
+const columnHelper = createColumnHelper<EventPublishedDataItem>();
+
+const columns = exportColumns.map((col) =>
+  columnHelper.accessor((item) => col.text(item), {
+    id: col.id,
+    header: col.header,
+    cell: (info) => cellOf(col, info.row.original),
+    ...(col.id === "placeId" ? { filterFn: placeFilterFn } : {}),
+  }),
+);
 
 // --- CSV/JSON/Excel download helpers ---
 
@@ -127,8 +172,7 @@ async function fetchImageBuffer(url: string): Promise<Uint8Array | null> {
   }
 }
 
-const LOGO_COL = 6;
-const LOGO_SIZE_PX = 128;
+const IMAGE_SIZE_PX = 128;
 
 // oxlint-disable-next-line max-statements
 async function toExcel(data: EventPublishedDataItem[]): Promise<Blob> {
@@ -140,42 +184,46 @@ async function toExcel(data: EventPublishedDataItem[]): Promise<Blob> {
   } = await import("wasm-xlsxwriter/web");
   await xlsxInit();
 
-  // Fetch all logo images in parallel
+  const imageColumns = exportFileColumns.flatMap((col, index) =>
+    col.imageUrl ? [{ index, imageUrl: col.imageUrl }] : [],
+  );
+
+  // Fetch all images in parallel
   const imageBuffers = await Promise.all(
-    data.map((item) => (item.logoUrl ? fetchImageBuffer(item.logoUrl) : Promise.resolve(null))),
+    data.map((item) =>
+      Promise.all(
+        imageColumns.map(({ imageUrl }) => {
+          const url = imageUrl(item);
+          return url ? fetchImageBuffer(url) : Promise.resolve(null);
+        }),
+      ),
+    ),
   );
 
   const workbook = new Workbook();
   const worksheet = workbook.addWorksheet();
   const boldFormat = new Format().setBold();
 
-  const headers = [
-    "企画名",
-    "出展団体名",
-    "パンフレットテキスト",
-    "開催時間",
-    "場所",
-    "タグ",
-    "ロゴ",
-  ];
-  for (let col = 0; col < headers.length; col += 1) {
-    worksheet.writeWithFormat(0, col, headers[col], boldFormat);
+  for (const [col, column] of exportFileColumns.entries()) {
+    worksheet.writeWithFormat(0, col, column.header, boldFormat);
   }
-  worksheet.setColumnWidthPixels(LOGO_COL, LOGO_SIZE_PX + 8);
+  for (const { index } of imageColumns) {
+    worksheet.setColumnWidthPixels(index, IMAGE_SIZE_PX + 8);
+  }
 
   for (const [row, item] of data.entries()) {
-    worksheet.write(row + 1, 0, item.projectName);
-    worksheet.write(row + 1, 1, item.orgName);
-    worksheet.write(row + 1, 2, item.pamphletText);
-    worksheet.write(row + 1, 3, item.openingHours);
-    worksheet.write(row + 1, 4, item.placeName ?? "");
-    worksheet.write(row + 1, 5, item.tags.join(", "));
-
-    const buf = imageBuffers[row];
-    if (buf) {
-      const image = new XlsxImage(buf).setScaleToSize(LOGO_SIZE_PX, LOGO_SIZE_PX, true);
-      worksheet.setRowHeightPixels(row + 1, LOGO_SIZE_PX + 4);
-      worksheet.insertImageFitToCell(row + 1, LOGO_COL, image, true);
+    for (const [col, column] of exportFileColumns.entries()) {
+      if (!column.imageUrl) {
+        worksheet.write(row + 1, col, column.text(item));
+      }
+    }
+    for (const [i, { index }] of imageColumns.entries()) {
+      const buf = imageBuffers[row]?.[i];
+      if (buf) {
+        const image = new XlsxImage(buf).setScaleToSize(IMAGE_SIZE_PX, IMAGE_SIZE_PX, true);
+        worksheet.setRowHeightPixels(row + 1, IMAGE_SIZE_PX + 4);
+        worksheet.insertImageFitToCell(row + 1, index, image, true);
+      }
     }
   }
 
@@ -186,32 +234,26 @@ async function toExcel(data: EventPublishedDataItem[]): Promise<Blob> {
   });
 }
 
-function toAbsoluteUrl(path: string): string {
-  return `${globalThis.window.location.origin}${path}`;
+function csvHeaderOf(col: ExportColumn): string {
+  return col.imageUrl ? `${col.header}URL` : col.header;
 }
 
 function toCSV(data: EventPublishedDataItem[]): string {
   return stringify(
-    data.map((item) => ({
-      企画名: item.projectName,
-      出展団体名: item.orgName,
-      パンフレットテキスト: item.pamphletText,
-      開催時間: item.openingHours,
-      場所: item.placeName ?? "",
-      タグ: item.tags.join(", "),
-      ロゴURL: item.logoUrl ? toAbsoluteUrl(item.logoUrl) : "",
-    })),
-    {
-      columns: [
-        "企画名",
-        "出展団体名",
-        "パンフレットテキスト",
-        "開催時間",
-        "場所",
-        "タグ",
-        "ロゴURL",
-      ],
-    },
+    data.map((item) =>
+      Object.fromEntries(exportFileColumns.map((col) => [csvHeaderOf(col), col.text(item)])),
+    ),
+    { columns: exportFileColumns.map(csvHeaderOf) },
+  );
+}
+
+function toJSON(data: EventPublishedDataItem[]): string {
+  return JSON.stringify(
+    data.map((item) =>
+      Object.fromEntries(exportFileColumns.map((col) => [jsonKeyOf(col), jsonValueOf(col, item)])),
+    ),
+    null,
+    2,
   );
 }
 
@@ -380,31 +422,7 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
           </Button>
         </DownloadTrigger>
         <DownloadTrigger
-          data={() =>
-            JSON.stringify(
-              filteredData.map(
-                ({
-                  projectName,
-                  orgName,
-                  pamphletText,
-                  openingHours,
-                  placeName,
-                  tags,
-                  logoUrl,
-                }) => ({
-                  projectName,
-                  orgName,
-                  pamphletText,
-                  openingHours,
-                  placeName,
-                  tags,
-                  logoUrl: logoUrl ? toAbsoluteUrl(logoUrl) : null,
-                }),
-              ),
-              null,
-              2,
-            )
-          }
+          data={() => toJSON(filteredData)}
           fileName={`${slug}-published-data.json`}
           mimeType="application/json"
           asChild
