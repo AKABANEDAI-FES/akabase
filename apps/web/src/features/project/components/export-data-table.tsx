@@ -21,7 +21,7 @@ import { Table } from "@akabase/ui/components/table";
 import { Text } from "@akabase/ui/components/text";
 import { generateLoadEventPublishedDataQueryOptions } from "../actions/queries";
 import { generateLoadPlacesQueryOptions } from "@/features/event/actions/queries/place";
-import type { EventPublishedDataItem } from "@akabase/application/query/project/list-event-published-data";
+import type { EventPublishedExportItem } from "../actions/queries";
 import type { PlaceListItem } from "@akabase/application/query/event/list-places";
 import type { EventId } from "@akabase/domain/event/schema";
 import { createImageObject, processImage } from "@/libs/image";
@@ -69,11 +69,11 @@ function getLeafNodeIds(node: PlaceTreeNode): string[] {
 type ExportColumn = {
   id: string;
   header: string;
-  text: (item: EventPublishedDataItem) => string;
-  json?: (item: EventPublishedDataItem) => unknown;
+  text: (item: EventPublishedExportItem) => string;
+  json?: (item: EventPublishedExportItem) => unknown;
   jsonKey?: string;
-  cell?: (item: EventPublishedDataItem) => ReactNode;
-  imageUrl?: (item: EventPublishedDataItem) => string | null;
+  cell?: (item: EventPublishedExportItem) => ReactNode;
+  imageUrl?: (item: EventPublishedExportItem) => string | null;
 };
 
 const exportColumns: ExportColumn[] = [
@@ -103,6 +103,20 @@ const exportColumns: ExportColumn[] = [
     header: "パンフレットテキスト",
     text: (item) => item.pamphletText,
     cell: (item) => <span style={{ whiteSpace: "pre-wrap" }}>{item.pamphletText}</span>,
+  },
+  {
+    id: "webContent",
+    header: "Web コンテンツ",
+    text: (item) => item.webContentMarkdown ?? "",
+    json: (item) => item.webContentMarkdown,
+    cell: (item) =>
+      item.webContentMarkdown ? (
+        <Box maxH="48" minW="xs" overflowY="auto" whiteSpace="pre-wrap">
+          {item.webContentMarkdown}
+        </Box>
+      ) : (
+        "—"
+      ),
   },
   { id: "openingHours", header: "開催時間", text: (item) => item.openingHours },
   {
@@ -139,28 +153,32 @@ function toAbsoluteUrl(path: string): string {
   return `${globalThis.window.location.origin}${path}`;
 }
 
-function imageFileUrlOf(col: ExportColumn, item: EventPublishedDataItem): string | null {
+function imageFileUrlOf(col: ExportColumn, item: EventPublishedExportItem): string | null {
   const url = col.imageUrl?.(item);
   return url ? toAbsoluteUrl(url) : null;
 }
 
-function jsonValueOf(col: ExportColumn, item: EventPublishedDataItem): unknown {
+function jsonValueOf(col: ExportColumn, item: EventPublishedExportItem): unknown {
   if (col.json) {
     return col.json(item);
   }
   return col.imageUrl ? imageFileUrlOf(col, item) : col.text(item);
 }
 
-function cellOf(col: ExportColumn, item: EventPublishedDataItem): ReactNode {
+function cellOf(col: ExportColumn, item: EventPublishedExportItem): ReactNode {
   return col.cell ? col.cell(item) : col.text(item) || "—";
 }
 
-const placeFilterFn: FilterFn<EventPublishedDataItem> = (row, _columnId, filterValue: string[]) => {
+const placeFilterFn: FilterFn<EventPublishedExportItem> = (
+  row,
+  _columnId,
+  filterValue: string[],
+) => {
   const { placeId } = row.original;
   return placeId !== null && filterValue.includes(placeId);
 };
 
-const columnHelper = createColumnHelper<EventPublishedDataItem>();
+const columnHelper = createColumnHelper<EventPublishedExportItem>();
 
 const columns = exportColumns.map((col) =>
   columnHelper.accessor((item) => col.text(item), {
@@ -192,10 +210,21 @@ async function fetchImageBuffer(url: string): Promise<Uint8Array | null> {
 
 const IMAGE_SIZE_PX = 128;
 
+// Excel rejects longer strings, which would fail the whole export
+const EXCEL_MAX_CELL_LENGTH = 32_767;
+const TRUNCATED_MARK = "...(省略)";
+
+function truncateForExcelCell(text: string): string {
+  if (text.length <= EXCEL_MAX_CELL_LENGTH) {
+    return text;
+  }
+  return `${text.slice(0, EXCEL_MAX_CELL_LENGTH - TRUNCATED_MARK.length)}${TRUNCATED_MARK}`;
+}
+
 type ImageColumn = { index: number; imageUrl: NonNullable<ExportColumn["imageUrl"]> };
 
 function fetchImages(
-  items: EventPublishedDataItem[],
+  items: EventPublishedExportItem[],
   imageColumns: ImageColumn[],
 ): Promise<(Uint8Array | null)[][]> {
   return Promise.all(
@@ -211,7 +240,10 @@ function fetchImages(
 }
 
 // oxlint-disable-next-line max-statements
-async function toExcel(sheets: ExportGroup[], columns: ExportColumn[]): Promise<Blob> {
+async function toExcel(
+  sheets: ExportGroup<EventPublishedExportItem>[],
+  columns: ExportColumn[],
+): Promise<Blob> {
   const {
     default: xlsxInit,
     Format,
@@ -246,7 +278,7 @@ async function toExcel(sheets: ExportGroup[], columns: ExportColumn[]): Promise<
     for (const [row, item] of sheet.items.entries()) {
       for (const [col, column] of fileColumns.entries()) {
         if (!column.imageUrl) {
-          worksheet.write(row + 1, col, column.text(item));
+          worksheet.write(row + 1, col, truncateForExcelCell(column.text(item)));
         }
       }
       for (const [i, { index }] of imageColumns.entries()) {
@@ -271,11 +303,11 @@ function csvHeaderOf(col: ExportColumn): string {
   return col.imageUrl ? `${col.header}URL` : col.header;
 }
 
-function csvValueOf(col: ExportColumn, item: EventPublishedDataItem): string {
+function csvValueOf(col: ExportColumn, item: EventPublishedExportItem): string {
   return col.imageUrl ? (imageFileUrlOf(col, item) ?? "") : col.text(item);
 }
 
-function toCSV(data: EventPublishedDataItem[], columns: ExportColumn[]): string {
+function toCSV(data: EventPublishedExportItem[], columns: ExportColumn[]): string {
   const fileColumns = toFileColumns(columns);
   return stringify(
     data.map((item) =>
@@ -285,7 +317,7 @@ function toCSV(data: EventPublishedDataItem[], columns: ExportColumn[]): string 
   );
 }
 
-function toJSON(data: EventPublishedDataItem[], columns: ExportColumn[]): string {
+function toJSON(data: EventPublishedExportItem[], columns: ExportColumn[]): string {
   const fileColumns = toFileColumns(columns);
   return JSON.stringify(
     data.map((item) =>
@@ -455,14 +487,14 @@ export function ExportDataTable({ eventId, slug }: ExportDataTableProps) {
 
   const canDownload = filteredData.length > 0 && selectedColumns.length > 0;
 
-  const exportGroups = (): ExportGroup[] =>
+  const exportGroups = (): ExportGroup<EventPublishedExportItem>[] =>
     splitByCategory ? groupByCategory(filteredData) : [{ name: slug, items: filteredData }];
 
   const downloadText = (
     format: ExportFormat,
     extension: string,
     mimeType: string,
-    serialize: (items: EventPublishedDataItem[]) => string,
+    serialize: (items: EventPublishedExportItem[]) => string,
   ) =>
     downloadZippable(format, `${slug}-published-data-${extension}.zip`, async () =>
       withSafeNames(exportGroups()).map((group) => ({

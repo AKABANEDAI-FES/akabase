@@ -5,7 +5,7 @@ import { schema } from "@akabase/infrastructure/db";
 import type { Database } from "@akabase/infrastructure/db";
 import type { EventId } from "@akabase/domain/event/schema";
 import { placeIdSchema, projectCategoryIdSchema } from "@akabase/domain/event/schema";
-import { projectIdSchema } from "@akabase/domain/project/schema";
+import { projectIdSchema, projectPublishedSchema } from "@akabase/domain/project/schema";
 import type { Actor } from "@akabase/domain/authorization/schema";
 import { eventResource } from "@akabase/domain/authorization/logic";
 import type { AuthorizationService } from "@akabase/domain/authorization/service";
@@ -17,6 +17,7 @@ export const eventPublishedDataItemSchema = z.object({
   projectName: z.string(),
   orgName: z.string(),
   pamphletText: z.string(),
+  webContentJson: projectPublishedSchema.shape.webContentJson,
   openingHours: z.string(),
   placeId: placeIdSchema.nullable(),
   placeName: z.string().nullable(),
@@ -82,6 +83,7 @@ export async function listEventPublishedData(
           projectName: row.name,
           orgName: row.organization.name,
           pamphletText: row.published.pamphletText,
+          webContentJson: row.published.webContentJson,
           openingHours: row.published.openingHours,
           placeId: row.placeId,
           placeName: row.place?.name ?? null,
