@@ -1,8 +1,13 @@
 import type { EventPublishedDataItem } from "@akabase/application/query/project/list-event-published-data";
 
-export type ExportGroup = {
+type CategorizedItem = Pick<
+  EventPublishedDataItem,
+  "categoryId" | "categoryName" | "categoryDisplayOrder"
+>;
+
+export type ExportGroup<T> = {
   name: string;
-  items: EventPublishedDataItem[];
+  items: T[];
 };
 
 const UNCATEGORIZED_NAME = "未分類";
@@ -11,12 +16,9 @@ const UNCATEGORIZED_NAME = "未分類";
  * 企画区分ごとにまとめ、区分の表示順に並べる
  * 区分が未設定の企画は「未分類」として末尾にまとめる
  */
-export function groupByCategory(data: EventPublishedDataItem[]): ExportGroup[] {
-  const groups = new Map<
-    string,
-    { name: string; order: number; items: EventPublishedDataItem[] }
-  >();
-  const uncategorized: EventPublishedDataItem[] = [];
+export function groupByCategory<T extends CategorizedItem>(data: T[]): ExportGroup<T>[] {
+  const groups = new Map<string, { name: string; order: number; items: T[] }>();
+  const uncategorized: T[] = [];
 
   for (const item of data) {
     if (item.categoryId === null) {

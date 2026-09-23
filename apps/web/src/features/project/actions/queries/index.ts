@@ -10,6 +10,7 @@ import { getSubmissionDetail } from "@akabase/application/query/project/get-subm
 import { getSubmissionStats } from "@akabase/application/query/project/get-submission-stats";
 import { listRecentActivities } from "@akabase/application/query/project/list-recent-activities";
 import { listEventPublishedData } from "@akabase/application/query/project/list-event-published-data";
+import type { EventPublishedDataItem } from "@akabase/application/query/project/list-event-published-data";
 import { resolveActor } from "@akabase/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/auth";
 import { dependenciesMiddleware } from "@/libs/dependencies";
@@ -20,6 +21,8 @@ import { projectIdSchema, submissionIdSchema } from "@akabase/domain/project/sch
 import type { UserId } from "@akabase/domain/user/schema";
 import { queryOptions } from "@tanstack/react-query";
 import { NotFoundError } from "@/libs/error";
+import { getAppOriginFn } from "@/libs/origin";
+import { renderWebContentMarkdown } from "../../utils/web-content";
 
 /**
  * Server function to load projects for an organization
@@ -344,8 +347,19 @@ export const loadEventPublishedDataFn = createServerFn({ method: "GET" })
       eventIds: [data.eventId],
     });
 
-    return await listEventPublishedData(context.dependencies, data.eventId, actor);
+    const items = await listEventPublishedData(context.dependencies, data.eventId, actor);
+    const origin = getAppOriginFn();
+    return items.map(
+      ({ webContentJson, ...item }): EventPublishedExportItem => ({
+        ...item,
+        webContentMarkdown: renderWebContentMarkdown(webContentJson, origin),
+      }),
+    );
   });
+
+export type EventPublishedExportItem = Omit<EventPublishedDataItem, "webContentJson"> & {
+  webContentMarkdown: string | null;
+};
 
 export function generateLoadEventPublishedDataCacheKey(eventId: string) {
   return ["published-data", "for-event", eventId];
