@@ -1,5 +1,6 @@
 export * from "./approve-project-dialog";
 export * from "./create-project-dialog";
+export * from "./delete-project-dialog";
 export * from "./editor";
 export * from "./event-submissions-table";
 export * from "./export-data-table";

@@ -86,6 +86,12 @@ export type ProjectRepository = {
   savePublished(published: PublishedWithTags): Promise<void>;
 
   /**
+   * Delete project (CASCADE removes draft, submissions and published data)
+   * @throws {RepositoryExceptionError} on database errors
+   */
+  deleteProject(id: ProjectId): Promise<void>;
+
+  /**
    * Find approval action by submission and user
    * Used to check if a user has already approved a submission
    * @throws {RepositoryExceptionError} on database errors

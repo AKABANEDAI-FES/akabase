@@ -291,6 +291,55 @@ describe("AuthorizationService", () => {
       });
     });
 
+    describe("project:delete", () => {
+      it("委員会管理者を許可する", () => {
+        const projectId = cast<ProjectId>("project_1");
+        const eventId = cast<EventId>("event_1");
+        const orgId = cast<OrgId>("org_1");
+        const committeeRoles = new Map<EventId, CommitteeRole>([[eventId, "admin"]]);
+        const actor = createActor(cast<UserId>("user_1"), "user", committeeRoles);
+        const resource = projectResource(projectId, eventId, orgId);
+
+        const result = authService.isAllowed(actor, resource, "project:delete");
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value).toBe(true);
+        }
+      });
+
+      it("委員会承認者を拒否する", () => {
+        const projectId = cast<ProjectId>("project_1");
+        const eventId = cast<EventId>("event_1");
+        const orgId = cast<OrgId>("org_1");
+        const committeeRoles = new Map<EventId, CommitteeRole>([[eventId, "approver"]]);
+        const actor = createActor(cast<UserId>("user_1"), "user", committeeRoles);
+        const resource = projectResource(projectId, eventId, orgId);
+
+        const result = authService.checkPermission(actor, resource, "project:delete");
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.allowed).toBe(false);
+          expect(result.value.reason).toContain("委員会管理者");
+        }
+      });
+
+      it("出展団体マネージャーを拒否する", () => {
+        const projectId = cast<ProjectId>("project_1");
+        const eventId = cast<EventId>("event_1");
+        const orgId = cast<OrgId>("org_1");
+        const orgRoles = new Map<OrgId, OrgRole>([[orgId, "manager"]]);
+        const actor = createActor(cast<UserId>("user_1"), "user", new Map(), orgRoles);
+        const resource = projectResource(projectId, eventId, orgId);
+
+        const result = authService.checkPermission(actor, resource, "project:delete");
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.allowed).toBe(false);
+          expect(result.value.reason).toContain("委員会管理者");
+        }
+      });
+    });
+
     describe("project:submit", () => {
       it("出展団体マネージャーを許可する", () => {
         const projectId = cast<ProjectId>("project_1");

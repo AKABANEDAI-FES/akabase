@@ -318,6 +318,18 @@ export class ProjectRepositoryImpl implements ProjectRepository {
     }
   }
 
+  async deleteProject(id: ProjectId): Promise<void> {
+    try {
+      await this.db.delete(schema.projects).where(eq(schema.projects.id, id));
+    } catch (error) {
+      throw new RepositoryExceptionError(
+        REPOSITORY_ERROR_CODE.DATABASE_ERROR,
+        "Failed to delete project",
+        error,
+      );
+    }
+  }
+
   async saveDraft(draft: DraftWithTags): Promise<void> {
     try {
       // Upsert draft
