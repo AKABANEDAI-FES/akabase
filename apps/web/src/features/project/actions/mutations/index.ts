@@ -8,6 +8,7 @@ import { submitProject } from "@akabase/application/command/project/submit-proje
 import { approveProject } from "@akabase/application/command/project/approve-project";
 import { returnProject } from "@akabase/application/command/project/return-project";
 import { withdrawSubmission } from "@akabase/application/command/project/withdraw-submission";
+import { deleteProject } from "@akabase/application/command/project/delete-project";
 import { resolveActor } from "@akabase/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/auth";
 import { dependenciesMiddleware } from "@/libs/dependencies";
@@ -24,11 +25,14 @@ import type { UserId } from "@akabase/domain/user/schema";
 import { mutationOptions, useQueryClient } from "@tanstack/react-query";
 import {
   generateLoadDraftCacheKey,
+  generateLoadEventPublishedDataCacheKey,
   generateLoadEventSubmissionsCacheKey,
   generateLoadProjectDetailCacheKey,
   generateLoadProjectPublishedCacheKey,
   generateLoadProjectsCacheKey,
+  generateLoadRecentActivitiesCacheKey,
   generateLoadSubmissionDetailCacheKey,
+  generateLoadSubmissionStatsCacheKey,
   generateLoadSubmissionsCacheKey,
 } from "../queries";
 import { generateLoadProjectCategoriesCacheKey } from "@/features/event/actions/queries/project-category";
@@ -465,6 +469,65 @@ export function useUpdatePublishedMutationOption() {
         }),
         queryClient.invalidateQueries({
           queryKey: generateLoadProjectPublishedCacheKey(eventId, orgId, projectId),
+        }),
+      ]);
+    }),
+  });
+}
+
+/**
+ * Delete project input validation schema
+ */
+export const deleteProjectInputSchema = z.object({
+  projectId: projectIdSchema,
+  eventId: projectSchema.shape.eventId,
+});
+
+/**
+ * Server function to delete project
+ */
+export const deleteProjectFn = createServerFn({ method: "POST" })
+  .middleware([authMiddleware, dependenciesMiddleware])
+  .inputValidator(deleteProjectInputSchema)
+  .handler(async ({ data, context }) => {
+    return Result.gen(async function* ($) {
+      const actor = await resolveActor(context.dependencies, {
+        userId: cast<UserId>(context.session.user.id),
+        eventIds: [data.eventId],
+      });
+
+      return yield* $(
+        await deleteProject(context.dependencies, {
+          projectId: data.projectId,
+          actor,
+        }),
+      );
+    });
+  });
+
+export function useDeleteProjectMutationOption() {
+  const queryClient = useQueryClient();
+  return mutationOptions({
+    mutationFn: deleteProjectFn,
+    onSuccess: Result.inspect(async ({ eventId, orgId }) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: generateLoadProjectsCacheKey(eventId, orgId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadProjectCategoriesCacheKey(eventId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadEventSubmissionsCacheKey(eventId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadSubmissionStatsCacheKey(eventId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadRecentActivitiesCacheKey(eventId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: generateLoadEventPublishedDataCacheKey(eventId),
         }),
       ]);
     }),
