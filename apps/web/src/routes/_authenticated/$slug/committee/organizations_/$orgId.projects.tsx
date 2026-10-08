@@ -4,8 +4,9 @@ import { Button } from "@akabase/ui/components/button";
 import { IconButton } from "@akabase/ui/components/icon-button";
 import { Table } from "@akabase/ui/components/table";
 import { Flex, Stack } from "@akabase/styled-system/jsx";
-import { PencilIcon, PlusIcon } from "lucide-react";
+import { PencilIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { generateLoadProjectsQueryOptions } from "@/features/project/actions/queries";
+import { DeleteProjectDialog } from "@/features/project/components/delete-project-dialog";
 import { cast } from "@akabase/domain/shared/ids";
 import type { EventId } from "@akabase/domain/event/schema";
 import { generateCheckCommitteePermissionsQueryOptions } from "@/features/authorization/actions/queries";
@@ -33,6 +34,8 @@ function ProjectsPage() {
   );
 
   const canUpdate = permissions.canUpdateProject;
+  const canDelete = permissions.canDeleteProject;
+  const showActions = canUpdate || canDelete;
 
   return (
     <Stack gap="6">
@@ -50,7 +53,7 @@ function ProjectsPage() {
               <Table.Header>開催場所</Table.Header>
               <Table.Header>企画区分</Table.Header>
               <Table.Header>作成日</Table.Header>
-              {canUpdate && <Table.Header>操作</Table.Header>}
+              {showActions && <Table.Header>操作</Table.Header>}
             </Table.Row>
           </Table.Head>
           <Table.Body>
@@ -62,17 +65,31 @@ function ProjectsPage() {
                 <Table.Cell>
                   <FormatDate value={project.createdAt} option={{ dateStyle: "medium" }} />
                 </Table.Cell>
-                {canUpdate && (
+                {showActions && (
                   <Table.Cell>
                     <Flex gap="2">
-                      <IconButton aria-label="編集" variant="plain" size="sm" asChild>
-                        <Link
-                          to="/$slug/committee/organizations/$orgId/projects/$projectId"
-                          params={{ slug, orgId, projectId: project.id }}
-                        >
-                          <PencilIcon />
-                        </Link>
-                      </IconButton>
+                      {canUpdate && (
+                        <IconButton aria-label="編集" variant="plain" size="sm" asChild>
+                          <Link
+                            to="/$slug/committee/organizations/$orgId/projects/$projectId"
+                            params={{ slug, orgId, projectId: project.id }}
+                          >
+                            <PencilIcon />
+                          </Link>
+                        </IconButton>
+                      )}
+                      {canDelete && (
+                        <DeleteProjectDialog project={project}>
+                          <IconButton
+                            aria-label="削除"
+                            variant="plain"
+                            size="sm"
+                            colorPalette="red"
+                          >
+                            <Trash2Icon />
+                          </IconButton>
+                        </DeleteProjectDialog>
+                      )}
                     </Flex>
                   </Table.Cell>
                 )}

@@ -509,7 +509,15 @@ export function useDeleteProjectMutationOption() {
   const queryClient = useQueryClient();
   return mutationOptions({
     mutationFn: deleteProjectFn,
-    onSuccess: Result.inspect(async ({ eventId, orgId }) => {
+    onSuccess: Result.inspect(async ({ projectId, eventId, orgId }) => {
+      for (const queryKey of [
+        generateLoadProjectDetailCacheKey(eventId, orgId, projectId),
+        generateLoadProjectPublishedCacheKey(eventId, orgId, projectId),
+        generateLoadDraftCacheKey(eventId, orgId, projectId),
+        generateLoadSubmissionsCacheKey(eventId, orgId, projectId),
+      ]) {
+        queryClient.removeQueries({ queryKey });
+      }
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: generateLoadProjectsCacheKey(eventId, orgId),
