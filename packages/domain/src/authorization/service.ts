@@ -189,6 +189,16 @@ export class AuthorizationService {
         });
       }
 
+      case "project:delete": {
+        if (committeeRole === "admin") {
+          return Result.succeed({ allowed: true, reason: "委員会管理者" });
+        }
+        return Result.succeed({
+          allowed: false,
+          reason: "委員会管理者のみがプロジェクトを削除できます",
+        });
+      }
+
       case "project:submit": {
         if (orgRole === "manager") {
           return Result.succeed({ allowed: true, reason: "出展団体マネージャー" });

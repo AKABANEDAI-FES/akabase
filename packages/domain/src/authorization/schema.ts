@@ -143,6 +143,7 @@ export const actionSchema = z.enum([
   "project:create",
   "project:read",
   "project:update",
+  "project:delete",
   "project:submit",
   "project:approve",
   "project:return",
