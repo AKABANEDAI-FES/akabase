@@ -729,5 +729,28 @@ describe("AuthorizationService", () => {
         }
       });
     });
+
+    describe("api_key:rotate", () => {
+      it("グローバル管理者を許可する", () => {
+        const actor = createActor(cast<UserId>("user_1"), "admin");
+        const result = authService.isAllowed(actor, apiKeyResource(), "api_key:rotate");
+
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value).toBe(true);
+        }
+      });
+
+      it("非グローバル管理者を拒否する", () => {
+        const actor = createActor(cast<UserId>("user_1"));
+        const result = authService.checkPermission(actor, apiKeyResource(), "api_key:rotate");
+
+        expect(Result.isSuccess(result)).toBe(true);
+        if (Result.isSuccess(result)) {
+          expect(result.value.allowed).toBe(false);
+          expect(result.value.reason).toContain("グローバル管理者");
+        }
+      });
+    });
   });
 });
