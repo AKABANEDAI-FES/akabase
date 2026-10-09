@@ -34,6 +34,24 @@ export class MockApiKeyService implements ApiKeyService {
     return Result.succeed(true as const);
   }
 
+  async rotate(input: { id: ApiKeyId; userId: UserId }) {
+    const existing = this.keys.get(input.id);
+    if (existing === undefined) {
+      return Result.fail(
+        apiKeyError(API_KEY_ERROR_CODE.API_KEY_NOT_FOUND, "APIキーが見つかりません"),
+      );
+    }
+
+    const issued = await this.create({
+      name: existing.name,
+      eventId: existing.eventId,
+      userId: input.userId,
+    });
+    this.keys.delete(input.id);
+
+    return issued;
+  }
+
   getKeys(): ApiKeyId[] {
     return [...this.keys.keys()];
   }
