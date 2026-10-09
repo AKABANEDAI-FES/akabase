@@ -1244,7 +1244,7 @@ export function projectResource(
 
 - Better Auth の api-key プラグインでキーを発行・検証する
 - キーの `metadata.eventId` で参照できるイベントをスコープし、公開済みデータのみを返す
-- キー自体の発行・削除は管理画面から行い、`api_key:create` などのアクションとして Actor ベースの認可で保護する
+- キー自体の発行・再発行・削除は管理画面から行い、`api_key:create` などのアクションとして Actor ベースの認可で保護する
 
 詳細は `packages/domain/src/authorization/` を参照。
 
