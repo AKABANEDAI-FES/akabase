@@ -31,4 +31,18 @@ export type ApiKeyService = {
    * @returns 成功、または対象が存在しない場合はAPI_KEY_NOT_FOUNDエラー
    */
   delete(id: ApiKeyId): Promise<Result.Result<true, ApiKeyError>>;
+
+  /**
+   * APIキーを再発行する
+   *
+   * 元のキーと同じ名前と対象イベントで新しいキーを発行し、元のキーは即時に削除する
+   * 平文のキーはこの戻り値でのみ得られ、以後再取得できない
+   *
+   * @param input - 再発行対象のキーID、再発行するユーザーのID
+   * @returns 新しいキーのIDと平文、または対象が存在しない場合はAPI_KEY_NOT_FOUNDエラー
+   */
+  rotate(input: {
+    id: ApiKeyId;
+    userId: UserId;
+  }): Promise<Result.Result<{ id: ApiKeyId; key: string }, ApiKeyError>>;
 };

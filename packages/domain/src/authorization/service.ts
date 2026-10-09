@@ -374,6 +374,13 @@ export class AuthorizationService {
         });
       }
 
+      case "api_key:rotate": {
+        return Result.succeed({
+          allowed: false,
+          reason: "グローバル管理者のみがAPIキーを再発行できます",
+        });
+      }
+
       default: {
         return Result.succeed({ allowed: false, reason: "不明なアクション" });
       }

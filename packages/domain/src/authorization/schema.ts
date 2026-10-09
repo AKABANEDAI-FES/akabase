@@ -171,6 +171,7 @@ export const actionSchema = z.enum([
   "api_key:create",
   "api_key:list",
   "api_key:delete",
+  "api_key:rotate",
 ]);
 
 export type Action = z.infer<typeof actionSchema>;

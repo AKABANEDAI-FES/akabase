@@ -8,7 +8,8 @@ import { inArray } from "drizzle-orm";
 import { Result } from "@akabase/result";
 import { schema } from "@akabase/infrastructure/db";
 import type { Database } from "@akabase/infrastructure/db";
-import { apiKeyIdSchema, apiKeyMetadataSchema } from "@akabase/domain/api-key/schema";
+import { apiKeyIdSchema } from "@akabase/domain/api-key/schema";
+import { parseApiKeyMetadata } from "@akabase/domain/api-key/logic";
 import { eventIdSchema } from "@akabase/domain/event/schema";
 import type { EventId } from "@akabase/domain/event/schema";
 import type { Actor } from "@akabase/domain/authorization/schema";
@@ -36,18 +37,6 @@ export const apiKeyListItemSchema = z.object({
 
 export type ApiKeyListItem = z.infer<typeof apiKeyListItemSchema>;
 
-function parseEventId(metadata: string | null): string | null {
-  if (metadata === null) {
-    return null;
-  }
-  try {
-    const parsed = apiKeyMetadataSchema.safeParse(JSON.parse(metadata));
-    return parsed.success ? parsed.data.eventId : null;
-  } catch {
-    return null;
-  }
-}
-
 export async function listApiKeys(
   deps: { db: Database; authService: AuthorizationService },
   actor: Actor,
@@ -73,7 +62,7 @@ export async function listApiKeys(
 
     const filterEventId = options?.eventId;
     const keys = rows
-      .map((row) => ({ row, eventId: parseEventId(row.metadata) }))
+      .map((row) => ({ row, eventId: parseApiKeyMetadata(row.metadata)?.eventId ?? null }))
       .filter(({ eventId }) => filterEventId === undefined || eventId === filterEventId);
 
     const eventIds = [

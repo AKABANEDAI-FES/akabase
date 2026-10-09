@@ -7,10 +7,11 @@ import { Table } from "@akabase/ui/components/table";
 import { Text } from "@akabase/ui/components/text";
 import { Portal } from "@ark-ui/react/portal";
 import { Flex, Stack } from "@akabase/styled-system/jsx";
-import { ListFilterIcon, Trash2Icon } from "lucide-react";
+import { ListFilterIcon, RefreshCwIcon, Trash2Icon } from "lucide-react";
 import type { ApiKeyListItem } from "@akabase/application/query/api-key/list-api-keys";
 import type { EventListItem } from "@akabase/application/query/event/list-events";
 import { DeleteApiKeyDialog } from "./delete-api-key-dialog";
+import { RotateApiKeyDialog } from "./rotate-api-key-dialog";
 import { FormatDate } from "@/libs/date";
 
 type ApiKeysTableProps = {
@@ -74,6 +75,7 @@ function EventFilterPopover({
 
 export function ApiKeysTable({ apiKeys, events }: ApiKeysTableProps) {
   const [selectedEventIds, setSelectedEventIds] = useState<Set<string>>(new Set());
+  const [rotatingApiKey, setRotatingApiKey] = useState<ApiKeyListItem | null>(null);
 
   const toggleEvent = useCallback((eventId: string) => {
     setSelectedEventIds((prev) => {
@@ -127,16 +129,27 @@ export function ApiKeysTable({ apiKeys, events }: ApiKeysTableProps) {
                 <FormatDate value={apiKey.createdAt} option={{ dateStyle: "medium" }} />
               </Table.Cell>
               <Table.Cell>
-                <DeleteApiKeyDialog apiKey={apiKey}>
+                <Flex gap="2">
                   <IconButton
-                    aria-label={`「${apiKey.name ?? "名前未設定"}」を削除`}
+                    aria-label={`「${apiKey.name ?? "名前未設定"}」を再発行`}
                     variant="plain"
                     size="sm"
-                    colorPalette="red"
+                    disabled={apiKey.event === null}
+                    onClick={() => setRotatingApiKey(apiKey)}
                   >
-                    <Trash2Icon />
+                    <RefreshCwIcon />
                   </IconButton>
-                </DeleteApiKeyDialog>
+                  <DeleteApiKeyDialog apiKey={apiKey}>
+                    <IconButton
+                      aria-label={`「${apiKey.name ?? "名前未設定"}」を削除`}
+                      variant="plain"
+                      size="sm"
+                      colorPalette="red"
+                    >
+                      <Trash2Icon />
+                    </IconButton>
+                  </DeleteApiKeyDialog>
+                </Flex>
               </Table.Cell>
             </Table.Row>
           ))}
@@ -148,6 +161,15 @@ export function ApiKeysTable({ apiKeys, events }: ApiKeysTableProps) {
           ? `${filteredApiKeys.length} / ${apiKeys.length} 件のAPIキー（フィルタ中）`
           : `${apiKeys.length} 件のAPIキー`}
       </Text>
+
+      {/* Kept outside the rows, since rotation removes the row of the original key */}
+      {rotatingApiKey !== null && (
+        <RotateApiKeyDialog
+          key={rotatingApiKey.id}
+          apiKey={rotatingApiKey}
+          onClose={() => setRotatingApiKey(null)}
+        />
+      )}
     </Stack>
   );
 }
