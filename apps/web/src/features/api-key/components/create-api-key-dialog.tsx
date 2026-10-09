@@ -2,25 +2,23 @@ import { useMemo, useState } from "react";
 import { revalidateLogic, useForm } from "@tanstack/react-form";
 import { z } from "zod";
 import { Result } from "@akabase/result";
-import { Alert } from "@akabase/ui/components/alert";
 import { Button } from "@akabase/ui/components/button";
 import { CloseButton } from "@akabase/ui/components/close-button";
 import { Dialog } from "@akabase/ui/components/dialog";
 import { Field } from "@akabase/ui/components/field";
-import { IconButton } from "@akabase/ui/components/icon-button";
 import { Input } from "@akabase/ui/components/input";
 import { Select } from "@akabase/ui/components/select";
 import { toaster } from "@akabase/ui/components/toast";
 import { Portal } from "@ark-ui/react/portal";
 import { createListCollection } from "@ark-ui/react/collection";
-import { Flex, Stack } from "@akabase/styled-system/jsx";
+import { Stack } from "@akabase/styled-system/jsx";
 import { css } from "@akabase/styled-system/css";
-import { CheckIcon, CopyIcon } from "lucide-react";
 import { cast } from "@akabase/domain/shared/ids";
 import type { EventId } from "@akabase/domain/event/schema";
 import type { EventListItem } from "@akabase/application/query/event/list-events";
 import { useMutation } from "@tanstack/react-query";
 import { createApiKeyInputSchema, useCreateApiKeyMutationOption } from "../actions/mutations";
+import { IssuedApiKey } from "./issued-api-key";
 import { nl2br } from "@/libs/text";
 
 const createApiKeyFormSchema = createApiKeyInputSchema.extend({
@@ -36,7 +34,6 @@ type CreateApiKeyDialogProps = {
 export function CreateApiKeyDialog({ events, defaultOpen, onClose }: CreateApiKeyDialogProps) {
   const [open, setOpen] = useState(defaultOpen ?? false);
   const [createdKey, setCreatedKey] = useState<string | null>(null);
-  const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
   const { mutateAsync } = useMutation(useCreateApiKeyMutationOption());
 
   const eventCollection = useMemo(
@@ -87,19 +84,6 @@ export function CreateApiKeyDialog({ events, defaultOpen, onClose }: CreateApiKe
       modeAfterSubmission: "change",
     }),
   });
-
-  const handleCopy = async () => {
-    if (createdKey === null) {
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(createdKey);
-      setCopyState("copied");
-    } catch (error) {
-      console.error("Failed to copy API key:", error);
-      setCopyState("failed");
-    }
-  };
 
   return (
     <Dialog.Root
@@ -231,40 +215,7 @@ export function CreateApiKeyDialog({ events, defaultOpen, onClose }: CreateApiKe
                   </Dialog.Description>
                 </Dialog.Header>
                 <Dialog.Body>
-                  <Stack gap="4" w="full">
-                    <Alert.Root status="warning" role="alert">
-                      <Alert.Content>
-                        <Alert.Title>このキーを表示できるのは今だけです</Alert.Title>
-                        <Alert.Description>
-                          ダイアログを閉じると二度と確認できません。失った場合は作り直して、古いキーを削除してください。
-                        </Alert.Description>
-                      </Alert.Content>
-                    </Alert.Root>
-                    <Field.Root>
-                      <Field.Label htmlFor="created-api-key">APIキー</Field.Label>
-                      <Flex gap="2" align="center" w="full">
-                        <Input
-                          id="created-api-key"
-                          value={createdKey}
-                          readOnly
-                          autoFocus
-                          spellCheck={false}
-                          autoComplete="off"
-                          onFocus={(e) => e.target.select()}
-                        />
-                        <IconButton aria-label="コピー" variant="outline" onClick={handleCopy}>
-                          {copyState === "copied" ? <CheckIcon /> : <CopyIcon />}
-                        </IconButton>
-                      </Flex>
-                      <Field.HelperText aria-live="polite">
-                        {copyState === "copied"
-                          ? "クリップボードにコピーしました。"
-                          : copyState === "failed"
-                            ? "コピーできませんでした。入力欄のキーを選択して手動でコピーしてください。"
-                            : "コピーしてから閉じてください。"}
-                      </Field.HelperText>
-                    </Field.Root>
-                  </Stack>
+                  <IssuedApiKey apiKey={createdKey} />
                 </Dialog.Body>
                 <Dialog.Footer>
                   <Dialog.ActionTrigger asChild>
