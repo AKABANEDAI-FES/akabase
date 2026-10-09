@@ -98,7 +98,10 @@ export class ApiKeyServiceImpl implements ApiKeyService {
 
       // An empty result means another request deleted or rotated the original in the meantime
       if (revoked === null || revoked.length === 0) {
-        await this.db.delete(schema.apikey).where(eq(schema.apikey.id, issued.id));
+        await this.db
+          .delete(schema.apikey)
+          .where(eq(schema.apikey.id, issued.id))
+          .catch(() => null);
         return Result.fail(
           revoked === null
             ? apiKeyError(
