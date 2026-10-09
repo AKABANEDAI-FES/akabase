@@ -29,7 +29,7 @@ export function IssuedApiKey({ apiKey }: IssuedApiKeyProps) {
         <Alert.Content>
           <Alert.Title>このキーを表示できるのは今だけです</Alert.Title>
           <Alert.Description>
-            ダイアログを閉じると二度と確認できません。失った場合は作り直して、古いキーを削除してください。
+            ダイアログを閉じると二度と確認できません。失った場合はキーを再発行してください。
           </Alert.Description>
         </Alert.Content>
       </Alert.Root>

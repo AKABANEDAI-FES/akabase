@@ -3,6 +3,7 @@ import { z } from "zod";
 import { Result } from "@akabase/result";
 import { createApiKey } from "@akabase/application/command/api-key/create-api-key";
 import { deleteApiKey } from "@akabase/application/command/api-key/delete-api-key";
+import { rotateApiKey } from "@akabase/application/command/api-key/rotate-api-key";
 import { resolveActor } from "@akabase/application/query/authorization/resolve-actor";
 import { authMiddleware } from "@/libs/auth";
 import { dependenciesMiddleware } from "@/libs/dependencies";
@@ -75,6 +76,40 @@ export function useDeleteApiKeyMutationOption() {
   const queryClient = useQueryClient();
   return mutationOptions({
     mutationFn: deleteApiKeyFn,
+    onSuccess: Result.inspect(async () => {
+      await queryClient.invalidateQueries({
+        queryKey: generateLoadApiKeysCacheKey(),
+      });
+    }),
+  });
+}
+
+export const rotateApiKeyInputSchema = z.object({
+  apiKeyId: apiKeyIdSchema,
+});
+
+export const rotateApiKeyFn = createServerFn({ method: "POST" })
+  .middleware([authMiddleware, dependenciesMiddleware])
+  .inputValidator(rotateApiKeyInputSchema)
+  .handler(async ({ data, context }) => {
+    return await Result.gen(async function* ($) {
+      const actor = await resolveActor(context.dependencies, {
+        userId: cast<UserId>(context.session.user.id),
+      });
+
+      return yield* $(
+        await rotateApiKey(context.dependencies, {
+          apiKeyId: data.apiKeyId,
+          actor,
+        }),
+      );
+    });
+  });
+
+export function useRotateApiKeyMutationOption() {
+  const queryClient = useQueryClient();
+  return mutationOptions({
+    mutationFn: rotateApiKeyFn,
     onSuccess: Result.inspect(async () => {
       await queryClient.invalidateQueries({
         queryKey: generateLoadApiKeysCacheKey(),
